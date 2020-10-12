@@ -1,7 +1,5 @@
 # Eleutherios
 
-TEST
-
 Eleutherios (https://eleutherios.org.nz) is a website or tool, that lets people or businesses, cooperate or serve one another at scale, via the internet.
 
 For example, if a person is hungry and isolated at home.  They, could register with Eleutherios and create a forum for some food. A grocery store owner, could register with the site and subscribe to the forum and ask the person, what food they wanted? The grocery store owner, could gather the food from their store, and scale the forum by creating a sub-forum for a healthcare worker to help with the delivery of the food. The healthcare worker, could scale the sub-forum again and create another sub-forum, for a delivery service and accompany the delivery service and be the person, that delivers the food to the person.
