@@ -7,8 +7,42 @@
 # Only exists if Bazel was run
 /bazel-out
 
-# dependencies
-/node_modules
+# boilerplate files
+**/src/assets/.gitkeep
+**/src/favicon.ico
+**/src/styles.css
+**/src/systemjs-angular-loader.js
+**/src/systemjs.config.js
+**/src/tsconfig.json
+**/src/favicon.ico
+**/src/polyfills.ts
+**/src/test.ts
+**/src/tsconfig.app.json
+**/src/tsconfig.spec.json
+**/src/typings.d.ts
+**/e2e/src/app.po.ts
+**/e2e/tsconfig.e2e.json
+**/src/karma.conf.js
+**/karma.conf.js
+**/.angular-cli.json
+**/.editorconfig
+**/tsconfig.json
+**/package-lock.json
+**/angular.json
+**/bs-config.e2e.json
+**/bs-config.json
+**/.firebaserc
+**/.firebase
+**/firebase.json
+**/tslint.json
+**/karma-test-shim.js
+**/browser-test-shim.js
+**/browserslist
+**/node_modules
+**/functions/node_modules
+
+/src/environments/environment.prod.ts
+/src/environments/environment.ts
 
 # profiling files
 chrome-profiler-events*.json
@@ -31,6 +65,10 @@ speed-measure-plugin*.json
 !.vscode/extensions.json
 .history/*
 
+# eleutherios includes
+!**/functions/index.js
+!**/functions/tagUtil.js
+
 # misc
 /.sass-cache
 /connect.lock
@@ -41,6 +79,11 @@ yarn-error.log
 testem.log
 /typings
 
+# e2e
+/e2e/*.js
+/e2e/*.map
+
 # System Files
 .DS_Store
 Thumbs.db
+firebase-debug.log
