@@ -13,7 +13,7 @@ export class LocalCacheService {
    * @type {number}
    */
   defaultExpires: number = 86400; //24Hrs
-  constructor(private localstorage: LocalForageService) {}
+  constructor(private localforage: LocalForageService) {}
 
   /**
    * Cache or use result from observable
@@ -27,7 +27,7 @@ export class LocalCacheService {
    */
   public observable<T>(key: string, observable: Observable<T>, expires:number = this.defaultExpires): Observable<T> {
     //First fetch the item from localstorage (even though it may not exist)
-    return this.localstorage.getItem(key).pipe(
+    return this.localforage.getItem(key).pipe(
 			//If the cached value has expired, nullify it, otherwise pass it through
 			map((val: CacheStorageRecord) => {
 				if(val){
@@ -59,7 +59,7 @@ export class LocalCacheService {
   value<T>(key:string, value:T, expires:number|string|Date = this.defaultExpires):Observable<T>{
     let _expires:Date = this.sanitizeAndGenerateDateExpiry(expires);
 
-    return this.localstorage.setItem(key, {
+    return this.localforage.setItem(key, {
       expires: _expires,
       value: value
     }).pipe(
@@ -73,7 +73,7 @@ export class LocalCacheService {
    * @returns {Observable<void>}
    */
   expire(key:string):Observable<void>{
-    return this.localstorage.removeItem(key);
+    return this.localforage.removeItem(key);
   }
 
   /**
