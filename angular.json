@@ -13,6 +13,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "hammerjs",
+              "angular2-moment",
+              "angular-linky",
+              "ngx-localforage",
+              "lodash",
+              "firebase"
+            ],
             "outputPath": "dist/eleutherios-website",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -47,7 +55,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
+                  "maximumWarning": "10mb",
                   "maximumError": "5mb"
                 },
                 {

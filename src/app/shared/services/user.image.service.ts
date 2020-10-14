@@ -1,13 +1,26 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { Upload } from '../classes/Upload';
+import { Upload } from '../classes/upload';
 import { Image } from '../models';
 
 import * as firebase from 'firebase/app';
 import { Observable, of, from } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import * as _ from "lodash";
+
+// class Upload {
+//   $key: string;
+//   file: File;
+//   name: string;
+//   url: string;
+//   progress: number;
+//   createdAt: Date = new Date();
+
+//   constructor (file:File) {
+//     this.file = file;
+//   }
+// };
 
 @Injectable()
 export class UserImageService {
