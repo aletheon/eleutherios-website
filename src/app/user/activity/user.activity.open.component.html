@@ -1,0 +1,125 @@
+<div style="display:flex;flex-direction:row">
+  <ng-container *ngIf="userTotal | async as total">
+    <p style="flex:1;margin:0 5px 5px 5px;color:#818181;cursor:pointer" onclick="event.stopPropagation()" (click)="changeActivitySideBar()">
+      Activity({{ total.activityCount }})
+    </p>
+  </ng-container>
+</div>
+<ng-container *ngIf="activities | async;let activityItems">
+  <ng-container *ngIf="activityItems.length > 0; then showactivity"></ng-container>
+  <ng-template #showactivity>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;padding:5px">
+      <div style="flex:none;min-height:70px;width:100%;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px;padding-bottom:5px"
+        *ngFor="let activity of activityItems; trackBy: trackActivities">
+        <!-- title bar -->
+        <div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px 5px 3px 10px">
+          <ng-container *ngIf="activity.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+          <ng-template #showdefaultforumimage>
+            <ng-container *ngIf="activity.defaultForumImage | async;let image">
+              <div style="flex:none;margin-right:5px">
+                <ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+                  <img [src]="url">
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-template>
+          <!-- title -->
+          <div style="flex:1">
+            <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' style="color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ activity.title }}{{ activity.description.length > 0 ? (' - ' + activity.description | truncate: 80) : '' }}">{{ activity.title | truncate: 25 }}</a>
+          </div>
+          <!-- type -->
+          <div *ngIf="activity.uid == auth.uid" style="flex:none;margin-right:5px">
+            <ng-container *ngIf="activity.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
+            <ng-template #showpublictype>
+              <mat-icon onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+            </ng-template>
+            <ng-template #showprivatetype>
+              <mat-icon onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer" matTooltip="Private">lock</mat-icon>
+            </ng-template>
+          </div>
+          <div *ngIf="activity.uid != auth.uid" style="flex:none;margin-right:5px">
+            <ng-container *ngIf="activity.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
+            <ng-template #showpublictype>
+              <mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
+            </ng-template>
+            <ng-template #showprivatetype>
+              <mat-icon style="color:lightgrey" matTooltip="Private">lock</mat-icon>
+            </ng-template>
+          </div>
+          <!-- receive posts -->
+          <div style="flex:none;margin-right:5px">
+            <mat-icon *ngIf="activity.receivePosts == true" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)">radio_button_checked</mat-icon>
+            <mat-icon *ngIf="activity.receivePosts == false" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)">radio_button_unchecked</mat-icon>
+          </div>
+          <!-- remove activity, block types -->
+          <div style="flex:none">
+            <ng-container *ngIf="auth.uid == activity.uid; then showforumowner else showregistrantowner"></ng-container>
+            <ng-template #showforumowner>
+              <mat-icon onclick="event.stopPropagation()" (click)="removeActivity(activity)" style="cursor:pointer" matTooltip="Remove activity">close</mat-icon>
+            </ng-template>
+            <ng-template #showregistrantowner>
+              <mat-form-field style="width:120px">
+                <mat-select #select="matSelect" (selectionChange)="blockForum($event, activity)">
+                  <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-template>
+          </div>
+        </div>
+        <div style="flex:none;padding:0px 5px 3px 10px">
+          <ng-container *ngIf="activity.receivePosts == true; then showpostmessages else nopostmessages"></ng-container>
+          <ng-template #showpostmessages>
+            <ng-container *ngIf="activity.post | async; then showpost else nopost"></ng-container>
+            <ng-template #showpost>
+              <ng-container *ngIf="activity.post | async as post">
+                <ng-container *ngIf="post.service | async; then showservice"></ng-container>
+                <ng-template #showservice>
+                  <ng-container *ngIf="post.service | async as service">
+                    <p style="color:#faebd7;margin-bottom:5px" [ngClass]="activity.highlight == true ? 'highlight' : ''" [innerHTML]="post.message | linky: { newWindow: true, className: 'linkColor' }"></p>
+                    <div style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center">
+                      <div style="flex:none;margin-right:5px;padding:3px 10px 3px 5px;display:flex;flex-direction:row;background-color:#A9C4EB;border:1px solid #007FFF">
+                        <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+                        <ng-template #showdefaultserviceimage>
+                          <ng-container *ngIf="service.defaultServiceImage | async;let image">
+                            <div style="flex:none;margin-right:5px">
+                              <ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+                                <img [src]="url" (load)="setActivityHighlight(activity)">
+                              </ng-container>
+                            </div>
+                          </ng-container>
+                        </ng-template>
+                        <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="flex:1;color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+                        <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:1;color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+                      </div>
+                      <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+                        <p style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:3px;color:#FFFDD0;font-size:0.8em" matTooltip="{{ post.creationDate | date: 'MMM d, y, h:mm:ss a' }}">{{ post.creationDate | amTimeAgo }}</p>
+                      </div>
+                    </div>
+                  </ng-container>
+                </ng-template>
+              </ng-container>
+            </ng-template>
+            <ng-template #nopost>
+              <div style="display:flex;flex-direction:row;align-items:center">
+                <div style="flex:1;color:#faebd7;font-size:90%">
+                  <i style="animation:2s ease 0s normal forwards 1 fadein;-webkit-animation:2s ease 0s normal forwards 1 fadein;opacity:1">No Posts</i>
+                  <!-- <i>No Posts</i> -->
+                </div>
+              </div>
+            </ng-template>
+          </ng-template>
+          <ng-template #nopostmessages>
+            <div style="display:flex;flex-direction:row;align-items:center">
+              <div style="flex:1;color:#faebd7;font-size:90%">
+                <i>No Posts</i>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ng-container>
+<audio #audioSound>
+	<source src='../../../assets/stealthy-beep.mp3' type="audio/mp3">
+</audio>

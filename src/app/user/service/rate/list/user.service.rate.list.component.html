@@ -1,0 +1,133 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+  <loading-spinner *ngIf="loading | async"></loading-spinner>
+  <ng-container *ngIf="!(loading | async)">
+    <form [formGroup]="serviceGroup" novalidate>
+      <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
+          <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+          <ng-template #showdefaultserviceimage>
+            <ng-container *ngIf="defaultServiceImage | async;let image">
+              <div style="flex:none;margin-right:10px">
+                <ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+                  <ng-container *ngIf="url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                  <ng-template #showimage>
+                    <img *ngIf="serviceGroup.get('type').value == 'Private'" [src]="url" [routerLink]="['/user/service/image/list']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
+                    <img *ngIf="serviceGroup.get('type').value == 'Public'" [src]="url" [routerLink]="['/service/image/list']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
+                  </ng-template>
+                  <ng-template #noimage>
+                    <ng-container *ngIf="imageCount | async as t">
+                      <ng-container [ngSwitch]="t">
+                        <ng-container *ngSwitchCase="-1">
+                          <img [src]="url">
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                          <img *ngIf="serviceGroup.get('type').value == 'Private'" [src]="url" [routerLink]="['/user/service/image/list']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
+                          <img *ngIf="serviceGroup.get('type').value == 'Public'" [src]="url" [routerLink]="['/service/image/list']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
+                        </ng-container>
+                      </ng-container>
+                    </ng-container>
+                  </ng-template>
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-template>
+        </div>
+        <h4 style="flex:none" matTooltip="{{ serviceGroup.get('title').value }}{{ serviceGroup.get('description').value.length > 0 ? (' - ' + serviceGroup.get('description').value | truncate: 80) : '' }}">
+          <a *ngIf="serviceGroup.get('type').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B">{{ serviceGroup.get('title').value }}</a><a *ngIf="serviceGroup.get('type').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B">{{ serviceGroup.get('title').value }}</a> - <i>rates(<ng-container *ngIf="rateCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</i>
+        </h4>
+        <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+          <back></back>
+        </div>
+      </div>
+      <div style="flex:none;display:flex;flex-direction:row;justify-content:start">
+        <div style="flex:none;margin-bottom:5px">
+          <star-rating-control
+            [rating]="serviceGroup.get('rate').value"
+            [showHalfStars]="true"
+            [starType]="'svg'"
+            [readOnly]="true">
+          </star-rating-control>
+        </div>
+      </div>
+      <!-- search results -->
+      <loading-spinner *ngIf="searchLoading | async"></loading-spinner>
+      <div *ngIf="!(searchLoading | async)" style="flex:1">
+        <ng-container *ngIf="serviceRates | async;let serviceRateItems">
+          <ng-container *ngIf="serviceRateItems.length > 0; then showservicerates else noservicerates"></ng-container>
+          <ng-template #showservicerates>
+            <div *ngFor="let serviceRate of serviceRateItems; trackBy: trackServiceRates" style="border:1px solid rgb(153, 153, 153);margin-bottom:5px">
+              <ng-container *ngIf="serviceRate.service | async;let service">
+                <div style="display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
+                  <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+                  <ng-template #showdefaultserviceimage>
+                    <ng-container *ngIf="service.defaultServiceImage | async;let image">
+                      <div style="flex:none;margin-right:10px">
+                        <ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+                          <ng-container *ngIf="url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                          <ng-template #showimage>
+                            <img *ngIf="service.type == 'Private'" [src]="url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="cursor:pointer">
+                            <img *ngIf="service.type == 'Public'" [src]="url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
+                          </ng-template>
+                          <ng-template #noimage>
+                            <img [src]="url">
+                          </ng-template>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+                  </ng-template>
+                  <div style="flex:1;margin-right:5px">
+                    <div style="word-break: break-all">
+                      <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }}</a>
+                      <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }}</a>
+                    </div>
+                    <ng-container *ngIf="service.serviceReview | async; then showservicereview"></ng-container>
+                    <ng-template #showservicereview>
+                      <ng-container *ngIf="service.serviceReview | async;let serviceReview">
+                        <div *ngIf="serviceReview.review && serviceReview.review.length > 0" style="flex:none;margin-right:10px">
+                          <a [routerLink]="['/user/service/review/view']" [queryParams]="{ parentServiceUserId: serviceReview.serviceReviewServiceUid, parentServiceId: serviceReview.serviceReviewServiceId, userId: serviceReview.serviceUid, serviceId: serviceReview.serviceId }" style="color:#1B1B1B">{{ serviceReview.review | truncate: 150 }}</a>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+                  </div>
+                  <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+                    <!-- other button controls -->
+                    <div style="flex:none;margin-right:5px">
+                      <star-rating-control *ngIf="serviceRate.serviceUid == auth.uid"
+                        [rating]="serviceRate.rate"
+                        [starType]="'svg'"
+                        [readOnly]="false"
+                        (starClickChange)="onUpdateRateClick($event, serviceRate)">
+                      </star-rating-control>
+                      <star-rating-control *ngIf="serviceRate.serviceUid != auth.uid"
+                        [rating]="serviceRate.rate"
+                        [starType]="'svg'"
+                        [readOnly]="true">
+                      </star-rating-control>
+                    </div>
+                    <ng-container *ngIf="service.serviceReview | async; else noservicereview"></ng-container>
+                    <ng-template #noservicereview>
+                      <mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/service/review/create']" [queryParams]='{ parentServiceUserId: serviceRate.serviceRateServiceUid, parentServiceId: serviceRate.serviceRateServiceId, userId: serviceRate.serviceUid, serviceId: serviceRate.serviceId }' matTooltip="Create Review">add_box</mat-icon>
+                    </ng-template>
+                    <div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+                      <mat-icon onclick="event.stopPropagation()" (click)="delete(serviceRate)" style="cursor:pointer" matTooltip="Delete Rate">delete</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-template>
+          <ng-template #noservicerates>
+            <p style="flex:none;color:#999;font-size:90%;margin-top:10px">
+              <i>No Rates</i>
+            </p>
+          </ng-template>
+        </ng-container>
+      </div>
+      <!-- paging -->
+      <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+        <button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+        <button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+      </div>
+    </form>
+  </ng-container>
+</div>

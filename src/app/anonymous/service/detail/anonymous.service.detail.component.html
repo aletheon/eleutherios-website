@@ -1,0 +1,79 @@
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<ng-container *ngIf="service | async;let serviceItem">
+	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+			<div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
+				<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+				<ng-template #showdefaultserviceimage>
+					<ng-container *ngIf="defaultServiceImage | async;let image">
+						<div style="flex:none;margin-right:10px">
+							<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+								<ng-container *ngIf="url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+								<ng-template #showimage>
+									<img [src]="url" [routerLink]="['/anonymous/service/image/list']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="cursor:pointer">
+								</ng-template>
+								<ng-template #noimage>
+									<img [src]="url">
+								</ng-template>
+							</ng-container>
+						</div>
+					</ng-container>
+				</ng-template>
+			</div>
+			<div style="flex:none">
+				<h4>{{ serviceItem.title | noTitle }}</h4>
+			</div>
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+				<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+					<p style="background-color:rgb(109, 109, 109);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ serviceItem.creationDate.toDate() | amTimeAgo }}</p>
+				</div>
+				<back></back>
+			</div>
+		</div>
+		<div style="flex:1">
+			<form [formGroup]="serviceGroup" novalidate>
+				<div style="display:flex;flex-direction:column">
+					<!-- description -->
+					<mat-expansion-panel #descriptionPanel
+						(opened)="descriptionPanelEvent('expanded')"
+						(closed)="descriptionPanelEvent('contracted')"
+						class="mat-elevation-z0"
+						*ngIf="serviceItem.description.length > 0"
+						style="margin-bottom:10px">
+						<mat-expansion-panel-header style="display:flex;flex-direction:row;margin-left:-15px">
+							<mat-panel-title #descriptionPanelTitle style="flex:none">
+								{{ serviceItem.description | truncate: 80 }}
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<p style="margin-left:-15px;margin-top:-35px;padding:0px;white-space:pre-wrap">
+							<span [innerHTML]="serviceItem.description | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+						</p>
+					</mat-expansion-panel>
+					<!-- website -->
+					<div *ngIf="serviceItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
+						<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
+						<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+					</div>
+					<!-- tags -->
+					<div style="flex:none;margin-bottom:10px">
+						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
+							<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
+										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
+										<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
+									</div>
+								</div>
+							</ng-container>
+							<ng-template #noservicetags></ng-template>
+						</ng-container>
+					</div>
+          <div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+            <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create forum">Create forum</a>
+            <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left" matTooltip="Create forum">keyboard_arrow_right</a>
+          </div>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-container>

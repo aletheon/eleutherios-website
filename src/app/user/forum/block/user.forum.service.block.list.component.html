@@ -1,0 +1,89 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+	<!-- header -->
+	<div style="flex:none;display:flex;flex-direction:row">
+		<h4 style="flex:1">Forum Service Blocks(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
+		<back></back>
+	</div>
+	<!-- search results -->
+	<loading-spinner *ngIf="loading | async"></loading-spinner>
+	<div *ngIf="!(loading | async)" style="flex:1">
+		<ng-container *ngIf="forumServiceBlocks | async;let forumServiceBlockItems">
+			<ng-container *ngIf="forumServiceBlockItems.length > 0; then showforumserviceblocks else noforumserviceblocks"></ng-container>
+			<ng-template #showforumserviceblocks>
+				<div style="min-height:70px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px;padding-bottom:5px"
+					*ngFor="let forumServiceBlock of forumServiceBlockItems; trackBy: trackForumServiceBlocks">
+					<ng-container *ngIf="forumServiceBlock.forum | async; then showforum"></ng-container>
+					<ng-template #showforum>
+						<ng-container *ngIf="forumServiceBlock.forum | async as forum">
+							<div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+								<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+								<ng-template #showdefaultforumimage>
+									<ng-container *ngIf="forum.defaultForumImage | async;let image">
+										<div style="flex:none;margin-right:10px">
+											<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+												<ng-container *ngIf="url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+												<ng-template #showimage>
+													<img *ngIf="forum.type == 'Private'" [src]="url" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer">
+													<img *ngIf="forum.type == 'Public'" [src]="url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+												</ng-template>
+												<ng-template #noimage>
+													<img [src]="url">
+												</ng-template>
+											</ng-container>
+										</div>
+									</ng-container>
+								</ng-template>
+								<div style="flex:1;margin-right:5px">
+									<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+									<ng-template #showdefaultregistrant>
+										<p style="word-break: break-all">
+											<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+										</p>
+									</ng-template>
+									<ng-template #nodefaultregistrant>
+										<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+										<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+									</ng-template>
+								</div>
+								<mat-icon onclick="event.stopPropagation()" (click)="delete(forumServiceBlock)" style="flex:none;margin-left:5px;cursor:pointer" matTooltip="Delete">delete</mat-icon>
+							</div>
+							<div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+								<ng-container *ngIf="forum.service | async; then showservice"></ng-container>
+								<ng-template #showservice>
+									<ng-container *ngIf="forum.service | async as service">
+										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:#A9C4EB;border:1px solid #007FFF;align-items:center;margin-right:10px">
+											<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+											<ng-template #showdefaultserviceimage>
+												<ng-container *ngIf="service.defaultServiceImage | async;let image">
+													<div style="flex:none;margin-right:5px">
+														<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+															<img [src]="url">
+														</ng-container>
+													</div>
+												</ng-container>
+											</ng-template>
+											<div style="flex:1;margin-right:5px">
+												<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+												<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+											</div>
+										</div>
+									</ng-container>
+								</ng-template>
+							</div>
+						</ng-container>
+					</ng-template>
+				</div>
+			</ng-template>
+			<ng-template #noforumserviceblocks>
+				<p style="color:#999;font-size:90%">
+					<i>No Forum Service Blocks</i>
+				</p>
+			</ng-template>
+		</ng-container>
+	</div>
+	<!-- paging -->
+	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+		<button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+		<button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+	</div>
+</div>

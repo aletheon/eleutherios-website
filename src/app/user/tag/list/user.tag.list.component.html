@@ -1,0 +1,42 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+	<!-- header -->
+	<div style="flex:none;display:flex;flex-direction:row">
+    <h4 style="flex:1">Tags(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
+    <back></back>
+	</div>
+	<!-- search results -->
+	<loading-spinner *ngIf="loading | async"></loading-spinner>
+	<div *ngIf="!(loading | async)" style="flex:1">
+		<ng-container *ngIf="tags | async;let tagItems">
+			<ng-container *ngIf="tagItems.length > 0; then showtags else notags"></ng-container>
+			<ng-template #showtags>
+				<div style="min-height:30px;border:1px solid rgb(153, 153, 153);margin-bottom:5px;padding-bottom:5px"
+					*ngFor="let tag of tagItems; trackBy: trackTags">
+					<div style="display:flex;flex-direction:row;padding:5px 5px 3px 10px;align-items: center">
+						<p style="flex:1">{{ tag.tag }}</p>
+						<div style="flex:none;margin-right:5px">
+							<span class="btn btn-circle" style="cursor:default;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c" matTooltip="Forums">{{ tag.forumCount }}</span>
+						</div>
+						<div style="flex:none;margin-right:5px">
+							<span class="btn btn-circle" style="cursor:default;background-color:#A9C4EB;border:1px solid #007FFF" matTooltip="Services">{{ tag.serviceCount }}</span>
+						</div>
+						<div style="flex:none;margin-right:5px">
+							<span class="btn btn-circle" style="cursor:default;background-color:#99FF99;border:1px solid rgb(69, 221, 69)" matTooltip="Notifications">{{ tag.notificationCount }}</span>
+						</div>
+            <mat-icon onclick="event.stopPropagation()" (click)="delete(tag)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
+          </div>
+				</div>
+			</ng-template>
+			<ng-template #notags>
+				<p style="color:#999;font-size:90%">
+					<i>No Tags</i>
+				</p>
+			</ng-template>
+		</ng-container>
+	</div>
+	<!-- paging -->
+	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+		<button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+		<button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+	</div>
+</div>

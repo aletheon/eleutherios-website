@@ -1,0 +1,330 @@
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { AuthService } from '../../../core/auth.service';
+import { Router } from '@angular/router';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import {
+  SiteTotalService,
+  UserForumService,
+  UserForumRegistrantService,
+  UserForumImageService,
+  UserForumTagService,
+  NoTitlePipe,
+  DownloadImageUrlPipe,
+  TruncatePipe
+} from '../../../shared';
+
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
+
+import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import * as _ from "lodash";
+
+@Component({
+  selector: 'user-forum-image-list',
+  templateUrl: './user.forum.image.list.component.html',
+  styleUrls: ['./user.forum.image.list.component.css']
+})
+export class UserForumImageListComponent implements OnInit, OnDestroy {
+  private _loading = new BehaviorSubject(false);
+  private _total = new BehaviorSubject(0);
+  private _subscription: Subscription;
+  private _forumImagesSubscription: Subscription;
+  private _defaultForumImageSubscription: Subscription;
+  private _totalSubscription: Subscription;
+  private _defaultRegistrantSubscription: Subscription;
+  private _imageCount = new BehaviorSubject(0);
+
+  public forumGroup: FormGroup;
+  public forum: Observable<any>;
+  public forumTags: Observable<any[]>;
+  public imageCount: Observable<number> = this._imageCount.asObservable();
+  public numberOfItems: number = 1;
+  public nextKey: any;
+  public prevKeys: any[] = [];
+  public loading: Observable<boolean> = this._loading.asObservable();
+  public forumImages: Observable<any[]> = of([]);
+  public defaultForumImage: Observable<any>;
+  public forumImagesArray: any[] = [];
+  public total: Observable<number> = this._total.asObservable();
+  public defaultRegistrant: any;
+  public forumId: string;
+  public userId: string;
+  
+  constructor(public auth: AuthService,
+    private route: ActivatedRoute,
+    private siteTotalService: SiteTotalService,
+    private userForumService: UserForumService,
+    private userForumRegistrantService: UserForumRegistrantService,
+    private userForumImageService: UserForumImageService,
+    private userForumTagService: UserForumTagService,
+    private fb: FormBuilder,
+    private router: Router,
+    private snackbar: MatSnackBar,
+    private changeDetector : ChangeDetectorRef) {
+    }
+
+  ngOnDestroy () {
+    if (this._subscription)
+      this._subscription.unsubscribe();
+
+    if (this._defaultRegistrantSubscription)
+      this._defaultRegistrantSubscription.unsubscribe();
+
+    if (this._forumImagesSubscription)
+      this._forumImagesSubscription.unsubscribe();
+
+    if (this._defaultForumImageSubscription)
+      this._defaultForumImageSubscription.unsubscribe();
+
+    if (this._totalSubscription)
+      this._totalSubscription.unsubscribe();
+  }
+
+  trackForumImages (index, forumImage) { return forumImage.forumImageId; }
+  trackForumTags (index, tag) { return tag.tagId; }
+
+  ngOnInit () {
+    this.nextKey = null;
+    this.prevKeys = [];
+    this._loading.next(true);
+
+    this.route.queryParams.subscribe((params: Params) => {
+      this.forumId = params['forumId'];
+      this.userId = params['userId'];
+
+      this.userForumService.getForumFromPromise(this.userId, this.forumId)
+        .then(forum => {
+          if (forum){
+            if (forum.uid == this.auth.uid){
+              this.forum = this.userForumService.getForum(this.userId, this.forumId);
+              this.initForm();
+            }
+            else {
+              // ensure user is serving in the forum before viewing it
+              this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.userId, this.forumId, this.auth.uid)
+                .then(registrant => {
+                  if (registrant){
+                    this.forum = this.userForumService.getForum(this.userId, this.forumId);
+                    this.initForm();
+                  }
+                  else {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: `You don't have any services serving in the forum '${forum.title}'`,
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+  
+                    if (forum.type == 'Private')
+                      this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
+                    else
+                      this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                  }
+                }
+              )
+              .catch(error => {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: error.message,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+                this.router.navigate(['/']);
+              });
+            }
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Forum does not exist or was recently removed',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
+        }).catch(error => {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: error.message,
+              panelClass: ['red-snackbar']
+            }
+          );
+          this.router.navigate(['/']);
+      });
+    });
+  }
+
+  private initForm (){
+    const that = this;
+
+    this.forumGroup = this.fb.group({
+      forumId:                            [''],
+      parentId:                           [''],
+      parentUid:                          [''],
+      uid:                                [''],
+      type:                               [''],
+      title:                              [''],
+      title_lowercase:                    [''],
+      description:                        [''],
+      website:                            [''],
+      indexed:                            [''],
+      includeDescriptionInDetailPage:     [''],
+      includeImagesInDetailPage:          [''],
+      includeTagsInDetailPage:            [''],
+      searchPrivateServices:              [''],
+      searchServiceIncludeTagsInSearch:   [''],
+      lastUpdateDate:                     [''],
+      creationDate:                       ['']
+    });
+
+    this._subscription = this.forum
+      .subscribe(forum => {
+        if (forum)
+          this.forumGroup.patchValue(forum);
+      }
+    );
+
+    // run once subscription
+    const runOnceSubscription = this.forum.subscribe(forum => {
+      if (forum){
+        let load = async function(){
+          try {
+            // forum totals
+            that._totalSubscription = that.siteTotalService.getTotal(forum.forumId)
+              .subscribe(total => {
+                if (total) {
+                  if (total.imageCount == 0)
+                    that._imageCount.next(-1);
+                  else
+                    that._imageCount.next(total.imageCount);
+                }
+              });
+
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(that.userId, that.forumId, that.auth.uid)
+              .subscribe(registrants => {
+                if (registrants && registrants.length > 0)
+                  that.defaultRegistrant = registrants[0];
+                else {
+                  that.defaultRegistrant = null;
+
+                  const snackBarRef = that.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: `You don't have any services serving in the forum '${that.forumGroup.get('title').value}'`,
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+
+                  if (that.forumGroup.get('type').value == 'Private')
+                    that.router.navigate(['/user/forum/detail'], { queryParams: { userId: that.forumGroup.get('uid').value, forumId: that.forumGroup.get('forumId').value } });
+                  else
+                    that.router.navigate(['/forum/detail'], { queryParams: { forumId: that.forumGroup.get('forumId').value } });
+                }
+              }
+            );
+
+            // get default forum image
+            that.getDefaultForumImage();
+
+            // get forum images
+            that.getForumImagesList();
+
+            // tags for this forum
+            that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
+          }
+          catch (error) {
+            throw error;
+          }
+        }
+
+        // call load
+        load().then(() => {
+          this._loading.next(false);
+          this.changeDetector.detectChanges();
+
+          runOnceSubscription.unsubscribe();
+        })
+        .catch((error) =>{
+          console.log('initForm ' + error);
+        });
+      }
+    });
+  }
+
+  getForumImagesList (key?: any) {
+    if (this._forumImagesSubscription)
+      this._forumImagesSubscription.unsubscribe();
+
+    this._loading.next(true);
+
+    this._forumImagesSubscription = this.userForumImageService.getForumImages(this.userId, this.forumId, this.numberOfItems, key).pipe(
+      switchMap(forumImages => {
+        if (forumImages && forumImages.length > 0){
+          let observables = forumImages.map(forumImage => {
+            if (forumImage && forumImage.length > 0)
+              return of(forumImage);
+            else {
+              let tempImage = {
+                largeUrl: '../../../assets/defaultLarge.jpg',
+                name: 'No image'
+              };
+              return of(tempImage);
+            }
+          });
+    
+          return combineLatest(...observables, (...results) => {
+            return results.map((result, i) => {
+              return forumImages[i];
+            });
+          });
+        }
+        else return of([]);
+      })
+    )
+    .subscribe(forumImages => {
+      this.forumImagesArray = _.slice(forumImages, 0, this.numberOfItems);
+      this.forumImages = of(this.forumImagesArray);
+      this.nextKey = _.get(forumImages[this.numberOfItems], 'creationDate');
+      this._loading.next(false);
+    });
+  }
+
+  getDefaultForumImage () {
+    // default forum image
+    this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value)
+      .subscribe(forumImages => {
+        if (forumImages && forumImages.length > 0)
+          this.defaultForumImage = of(forumImages[0]);
+        else {
+          let tempImage = {
+            smallUrl: '../../../assets/defaultThumbnail.jpg',
+            name: 'No image'
+          };
+          this.defaultForumImage = of(tempImage);
+        }
+      }
+    );
+  }
+
+  onNext () {
+    this.prevKeys.push(_.first(this.forumImagesArray)['creationDate']);
+    this.getForumImagesList(this.nextKey);
+  }
+  
+  onPrev () {
+    const prevKey = _.last(this.prevKeys); // get last key
+    this.prevKeys = _.dropRight(this.prevKeys); // delete last key
+    this.getForumImagesList(prevKey);
+  }
+}

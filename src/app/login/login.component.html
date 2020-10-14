@@ -1,0 +1,19 @@
+<div style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+  <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+    <h4 style="flex:none">Login</h4>
+  </div>
+  <div style="flex:1">
+    <div style="display:flex;flex-direction:column;align-items:center;margin-top:20px">
+      <div style="flex:none;margin-bottom:10px">
+        <button (click)='loginWithGoogle()'>Login with Google</button>
+      </div>
+      <div style="flex:none;margin-bottom:10px">
+        <button (click)='loginWithFacebook()'>Login with Facebook</button>
+      </div>
+      <div style="flex:none;text-align:center;padding-top:10px">
+        <p style="margin-bottom:5px">Register or login with your email address</p>
+        <button [routerLink]="['/login/link']" type="button">Login with E-mail Link</button>
+      </div>
+    </div>
+  </div>
+</div>

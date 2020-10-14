@@ -1,0 +1,40 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+  <loading-spinner *ngIf="loading | async"></loading-spinner>
+  <ng-container *ngIf="!(loading | async)" style="flex:1">
+    <ng-container *ngIf="image | async;let imageItem">
+      <div style="display:flex;flex-direction:row;align-items:center">
+        <h4 contenteditable="true" [textContent]="imageItem.name" (blur)="changeImageName(imageItem, $event.target.textContent)">{{ imageItem.name }}</h4>
+        <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+          <ng-container *ngIf="nextKeyQuerystring | async; then shownextkey else nonextkey"></ng-container>
+          <ng-template #shownextkey>
+            <ng-container *ngIf="nextKeyQuerystring | async as nextKey">
+              <ng-container *ngIf="prevKeyQuerystring | async; then showinnerprevkey else noinnerprevkey"></ng-container>
+              <ng-template #showinnerprevkey>
+                <ng-container *ngIf="prevKeyQuerystring | async;let prevKey">
+                  <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey, prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+                </ng-container>
+              </ng-template>
+              <ng-template #noinnerprevkey>
+                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+              </ng-template>
+            </ng-container>
+          </ng-template>
+          <ng-template #nonextkey>
+            <ng-container *ngIf="prevKeyQuerystring | async; then showprevkey else noprevkey"></ng-container>
+            <ng-template #showprevkey>
+              <ng-container *ngIf="prevKeyQuerystring | async;let prevKey">
+                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+              </ng-container>
+            </ng-template>
+            <ng-template #noprevkey>
+              <back></back>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
+      <div *ngIf="imageItem.largeUrl | downloadImageUrl | async; let url" style="text-align:center">
+        <img [src]="url">
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

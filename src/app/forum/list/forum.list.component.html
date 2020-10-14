@@ -1,0 +1,183 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+	<form [formGroup]="forumGroup" novalidate>
+		<!-- header -->
+		<div style="flex:none">
+			<div style="display:flex;flex-direction:row;align-items:center">
+				<h4 style="flex:none">Forums(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
+				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+					<div style="flex:none;margin-right:5px">
+						<mat-checkbox formControlName="includeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="includeTagsInSearchClick()"></mat-checkbox>
+					</div>
+					<back></back>
+				</div>
+			</div>
+			<div style="border:1px solid #a0a0a0;padding:10px;margin-bottom:10px;border-radius:2px">
+				<!-- forum search -->
+				<div>
+					<mat-form-field style="width:100%">
+						<input matInput placeholder="Type a forum" [formControl]="searchForumCtrl">
+					</mat-form-field>
+				</div>
+				<!-- tag search -->
+				<div>
+					<mat-form-field style="width:100%">
+						<input matInput placeholder="Type a tag" [matAutocomplete]="autoSearchTag" [formControl]="forumSearchTagCtrl">
+						<mat-autocomplete #autoSearchTag="matAutocomplete" [displayWith]="autoSearchTagDisplayFn">
+							<mat-option *ngFor="let tag of matAutoCompleteSearchTags | async" (onSelectionChange)="searchTagsSelectionChange(tag)" [value]="tag">
+								<p>{{ tag.tag }}</p>
+							</mat-option>
+						</mat-autocomplete>
+					</mat-form-field>
+				</div>
+				<!-- show tags -->
+				<ng-container *ngIf="searchTags.length > 0; else nosearchtags">
+					<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+						<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid #ac2c2c;background-color:rgb(250, 155, 152);align-items:center"
+							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
+							<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
+							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+						</div>
+					</div>
+				</ng-container>
+				<ng-template #nosearchtags>
+					<p style="color:#999;font-size:90%">
+						<i>No Tags</i>
+					</p>
+				</ng-template>
+			</div>
+		</div>
+		<!-- search results -->
+		<loading-spinner *ngIf="loading | async"></loading-spinner>
+		<div *ngIf="!(loading | async)" style="flex:1;display:flex;flex-direction:column">
+			<ng-container *ngIf="forums | async;let forumItems">
+				<ng-container *ngIf="forumItems.length > 0; then showforums else noforums"></ng-container>
+				<ng-template #showforums>
+					<div *ngFor="let forum of forumItems; trackBy: trackForums" style="flex:none;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px">
+						<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
+							<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+							<ng-template #showdefaultforumimage>
+								<ng-container *ngIf="forum.defaultForumImage | async;let image">
+									<div style="flex:none;margin-right:10px">
+										<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+											<ng-container *ngIf="url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+											<ng-template #showimage>
+												<img [src]="url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+											</ng-template>
+											<ng-template #noimage>
+												<img [src]="url">
+											</ng-template>
+										</ng-container>
+									</div>
+								</ng-container>
+							</ng-template>
+							<div style="flex:1;margin-right:5px">
+								<div style="display:flex;flex-direction:column">
+									<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+									<ng-template #showdefaultregistrant>
+										<p style="word-break: break-all">
+											<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+										</p>
+									</ng-template>
+									<ng-template #nodefaultregistrant>
+										<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35}} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+										<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+									</ng-template>
+									<ng-container *ngIf="forum.post | async; then showpost"></ng-container>
+									<ng-template #showpost>
+										<ng-container *ngIf="forum.post | async as post">
+											<ng-container *ngIf="post.service | async; then showservice"></ng-container>
+											<ng-template #showservice>
+												<ng-container *ngIf="post.service | async as service">
+													<div style="flex:none;display:flex;flex-direction:column;margin-right:10px">
+														<div style="flex:none">
+															<p style="color:#faebd7;margin-bottom:5px" [innerHTML]="post.message | linky: { newWindow: true, className: 'linkColor' }"></p>
+														</div>
+														<div style="flex:none;display:flex;flex-direction:row">
+															<div style="flex:none;margin-right:5px;padding:3px 10px 3px 5px;display:flex;flex-direction:row;background-color:#A9C4EB;border:1px solid #007FFF">
+																<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+																<ng-template #showdefaultserviceimage>
+																	<ng-container *ngIf="service.defaultServiceImage | async;let image">
+																		<div style="flex:none;margin-right:5px">
+																			<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+																				<img [src]="url">
+																			</ng-container>
+																		</div>
+																	</ng-container>
+																</ng-template>
+																<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="flex:1;color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+																<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:1;color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+															</div>
+															<div style="flex:1;display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-end">
+																<div style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:3px;color:#FFFDD0;font-size:0.8em" matTooltip="{{ post.creationDate | date: 'MMM d, y, h:mm:ss a' }}">{{ post.creationDate | amTimeAgo }}</div>
+															</div>
+														</div>
+													</div>
+												</ng-container>
+											</ng-template>
+										</ng-container>
+									</ng-template>
+								</div>
+							</div>
+							<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+								<!-- other button controls -->
+								<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:wrap">							
+									<p style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ forum.creationDate.toDate() | amTimeAgo }}</p>
+								</div>
+								<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<ng-container *ngIf="forum.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
+									<ng-template #showpublictype>
+										<mat-icon onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+									</ng-template>
+									<ng-template #showprivatetype>
+										<mat-icon onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer" matTooltip="Private">lock</mat-icon>
+									</ng-template>
+								</div>
+								<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
+								</div>
+								<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<mat-icon onclick="event.stopPropagation()" (click)="delete(forum)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+								</div>
+								<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<mat-checkbox *ngIf="forum.title.length > 0" matTooltip="Index" [checked]="forum.indexed" (change)="indexDeindexForum(forum)"></mat-checkbox>
+									<mat-checkbox *ngIf="forum.title.length == 0" matTooltip="Index" [checked]="forum.indexed" disabled="true"></mat-checkbox>
+								</div>
+								<div style="flex:none;margin-right:5px">
+									<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+								</div>
+								<div style="flex:none;margin-right:5px">
+									<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Add Service">add_box</mat-icon>
+								</div>
+								<div style="flex:none">
+									<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Create Service">add_circle</mat-icon>
+								</div>
+							</div>
+						</div>
+						<ng-container *ngIf="forum.forumTags | async;let forumTagItems">
+							<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
+							<ng-template #showtags>
+								<div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
+									<ng-container *ngFor="let forumTag of forumTagItems">
+										<div style="flex:none;border:1px solid #ac2c2c;background-color:rgb(250, 155, 152);padding:3px;margin-right:5px;font-size:0.85em">
+											<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
+										</div>
+									</ng-container>
+								</div>
+							</ng-template>
+						</ng-container>
+					</div>
+				</ng-template>
+				<ng-template #noforums>
+					<p style="flex:none;color:#999;font-size:90%">
+						<i>No Forums</i>
+					</p>
+				</ng-template>
+			</ng-container>
+		</div>
+		<!-- paging -->
+		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+			<button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+			<button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+		</div>
+	</form>
+</div>

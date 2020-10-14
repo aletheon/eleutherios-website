@@ -1,0 +1,51 @@
+.forum {
+  background-color:rgb(250, 113, 108);
+  border:1px solid #ac2c2c;
+}
+
+.forumTag {
+  background-color:rgb(250, 155, 152);
+  border:1px solid #ac2c2c;
+}
+
+.forumHighlight {
+  background-color:rgb(250, 113, 108);
+  border:1px solid #ac2c2c;
+  animation: forumHighlight 2s;
+  border-radius: 2px;
+}
+
+@keyframes forumHighlight {
+  0% {
+    background:#ffff99;
+  }
+  100% {
+    background:rgb(250, 113, 108);
+  }
+}
+
+.service {
+  background-color:#A9C4EB;
+  border:1px solid #007FFF;
+}
+
+.serviceTag {
+  background-color:rgb(188, 194, 202);
+  border:1px solid #007FFF;
+}
+
+.serviceHighlight {
+  background-color:#A9C4EB;
+  border:1px solid #007FFF;
+  animation: serviceHighlight 2s;
+  border-radius: 2px;
+}
+
+@keyframes serviceHighlight {
+  0% {
+    background:#ffff99;
+  }
+  100% {
+    background:#A9C4EB;
+  }
+}

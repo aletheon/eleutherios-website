@@ -1,0 +1,54 @@
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<ng-container *ngIf="user | async;let userItem">
+	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+			<h4 style="flex:none">Settings</h4>
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+				<back></back>
+			</div>
+		</div>
+		<div style="flex:1">
+			<!-- START OF USER DETAILS SECTION -->
+			<form [formGroup]="userGroup" novalidate>
+				<p *ngIf="userItem.receivePushNotifications == false" style="margin-bottom:10px;padding:6px;background-color:rgb(188, 194, 202);border:1px solid #007FFF">
+					<b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).
+				</p>
+				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;padding:5px">
+					<div style="flex:1">
+						<p>Push Notifications</p>
+					</div>
+					<div style="flex:none">
+						<mat-checkbox formControlName="receivePushNotifications" (change)="pushNotificationSave()"></mat-checkbox>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;background-color:#D0D0D0;padding:5px">
+					<div style="flex:1;padding-left:20px">
+						<p>Forum Alerts</p>
+					</div>
+					<div style="flex:none">
+						<mat-checkbox formControlName="receiveForumAlertNotifications" (change)="saveChanges()"></mat-checkbox>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;padding:5px">
+					<div style="flex:1;padding-left:20px">
+						<p>Service Alerts</p>
+					</div>
+					<div style="flex:none">
+						<mat-checkbox formControlName="receiveServiceAlertNotifications" (change)="saveChanges()"></mat-checkbox>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;background-color:#D0D0D0;padding:5px">
+					<div style="flex:1;padding-left:20px">
+						<p>Forum Posts</p>
+					</div>
+					<div style="flex:none">
+						<mat-checkbox formControlName="receiveForumPostNotifications" (change)="saveChanges()"></mat-checkbox>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction:row;justify-content:flex-start;margin:20px 0 50px 0">
+					<button (click)="delete()" type="button">Remove Account</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-container>

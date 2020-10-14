@@ -1,0 +1,117 @@
+https://thinkster.io/tutorials/building-real-world-angular-2-apps/page-layout-and-routing
+
+// *********************************************************************************************
+
+> Totals
+> Users
+	- ForumCount
+	- ServiceCount
+	- NotificationCount
+	- TagCount
+	- ForumBlockCount
+	- ServiceBlockCount
+	- UserBlockCount
+	> Notifications
+		- AlertCount
+		- TagCount
+		- Tag_vegetables
+		- Tag_california
+		> Alerts
+		> Tags // ['vegetables', 'california']
+	> ForumBlocks
+	> ServiceBlocks
+	> UserBlocks
+	> Forums
+	> Services
+> Forums
+	- ForumId: string,
+	- ParentId: string, // id of the forum that his forum is being added to
+	- Uid: string, // id of the user who created this forum
+	- Type: string, // [public or private]
+	- Title: string, // title of the forum
+	- Description: string, // description of the forum
+	- Website: string, // website of the forum
+	- Indexed: boolean, // [true or false] indicates whether this forum is publicly available
+	- RegistrantCount: number, // number of services serving in this forum
+	- ForumCount: number, // number of sub-forums or requests
+	- PostCount: number, // number of posts
+	- TagCount: number,  // number of tags
+	- CreationDate: object, 
+	- LastUpdateDate: object 
+	> Tags [] // ['vegetables', 'california']
+> Services
+	- ServiceId: string,
+	- Uid: string, // id of the user who created this service
+	- Type: string, // [public or private]
+	- Title: string, // title of the service
+	- Description: string, // description of the service
+	- Website: string, // website of the service
+	- Indexed: boolean, // [true or false] indicates whether this service is publicly available
+	- ForumCount: number, // number of forums this service is serving in
+	- TagCount: number, // number of tags
+	- CreationDate: object, 
+	- LastUpdateDate: object 
+	> Tags: [] // ['vegetables', 'california']
+> Tags
+	- Tag
+	- UserId
+	- ForumCount
+	- ServiceCount
+> ForumServiceBlocks/key:forumId
+	> ForumServiceBlocks
+		- ForumServiceBlockId: string,
+		- ForumId: string, // id of the forum that is doing the blocking
+		- ServiceId: string, // id of the service that is being blocked
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> ForumUserBlocks/key:forumId
+	> ForumUserBlocks
+		- ForumUserBlockId: string,
+		- ForumId: string, // id of the forum that is doing the blocking
+		- Uid: string, // id of the user that is being blocked
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> ServiceForumBlocks/key:serviceId
+	> ServiceForumBlocks
+		- ServiceForumBlockId: string,
+		- ServiceId: string, // id of the service that is doing the blocking
+		- ForumId: string, // id of the forum that is being blocked
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> ServiceUserBlocks/key:serviceId
+	> ServiceUserBlocks
+		- ServiceUserBlockId: string,
+		- ServiceId: string, // id of the service that is doing the blocking
+		- Uid: string, // id of the user that is being blocked
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+
+> Registrants/key:forumId
+	> Registrants
+		- RegistrantId: string,
+		- ParentId: string, // id of the registrant that added this registrant
+		- ServiceId: string, // id of the service that is registering
+		- Uid: string, // id of the user who manages the service - redundancy
+		- Default: boolean, // set a default registrant to use in the forum for this user
+		- RegistrantCount: number, // number of registrants this registrant has added to the forum
+		- ForumCount: number, // number of sub-forums or requests this registrant has added to the forum
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> Posts/key:forumId
+	> Posts
+		- PostId: string,
+		- RegistrantId: string, // id of the registrant who is posting this message
+		- ServiceId: string, // id of the service who is posting this message for redundancy purposes
+		- Message: string, // message that the registrant or service is posting
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> ForumForums:/key:forumId
+	> ForumForums
+		- ForumForumId: string,
+		- ForumId: string, // id of the forum that is being added
+		- RegistrantId: string, // id of the registrant that added this forum
+		- CreationDate: object, 
+		- LastUpdateDate: object 
+> WhereServings:/key:serviceId
+	> WhereServings
+		- ForumId: string ...

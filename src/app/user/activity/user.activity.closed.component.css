@@ -1,0 +1,23 @@
+@keyframes highlight-fade {
+  0% {
+    background: #ffff99;
+  }
+  100% {
+    background: none;
+  }
+}
+.highlight {
+  animation: highlight-fade 2.5s;border-radius: 2px;
+}
+
+@keyframes fadein{
+  0%{opacity:0}
+  80%{opacity:0}
+  100%{opacity:1}
+}
+
+@-webkit-keyframes fadein{
+  0%{opacity:0}
+  80%{opacity:0}
+  100%{opacity:1}
+}

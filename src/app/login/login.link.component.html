@@ -1,0 +1,27 @@
+<form>
+	<div style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+			<h4 style="flex:1">E-mail Login Link</h4>
+			<mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+		</div>
+		<loading-spinner *ngIf="loading | async"></loading-spinner>
+		<div style="flex:1;display:flex;flex-direction:column;align-items:center">
+			<div style="flex:none;width:100%" *ngIf="emailSent" style="flex:none;width:100%;margin-bottom:10px;padding:6px;background-color:rgb(188, 194, 202);border:1px solid #007FFF">
+				We sent a login link to your email address {{ tempEmail }}.  Don't forget to check your junk mail as it may have ended up there.
+			</div>
+			<div *ngIf="errorMessage" style="flex:none;width:100%;margin-bottom:10px;padding:6px;border:1px solid red; background-color:rgb(250, 155, 152)">
+				{{ errorMessage }}
+			</div>
+			<div style="flex:none;width:250px">
+				<div style="display:flex;flex-direction:row">
+					<input id="emailAddress" type="email" placeholder="Your email address" [(ngModel)]="email" [ngModelOptions]="{standalone: true}" style="flex:none;margin-right:5px">
+					<button id="submitButton"
+									(click)="sendEmailLink()"
+									style="flex:none">
+									Submit
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

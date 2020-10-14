@@ -1,0 +1,242 @@
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<ng-container *ngIf="service | async;let serviceItem">
+	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+			<div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
+				<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+				<ng-template #showdefaultserviceimage>
+					<ng-container *ngIf="defaultServiceImage | async;let image">
+						<div style="flex:none;margin-right:10px">
+							<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+								<ng-container *ngIf="url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+								<ng-template #showimage>
+									<img [src]="url" [routerLink]="['/service/image/list']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="cursor:pointer">
+								</ng-template>
+								<ng-template #noimage>
+									<ng-container *ngIf="imageCount | async as t">
+										<ng-container [ngSwitch]="t">
+											<ng-container *ngSwitchCase="-1">
+												<img [src]="url">
+											</ng-container>
+											<ng-container *ngSwitchDefault>
+												<img [src]="url" [routerLink]="['/service/image/list']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="cursor:pointer">
+											</ng-container>
+										</ng-container>
+									</ng-container>
+								</ng-template>
+							</ng-container>
+						</div>
+					</ng-container>
+				</ng-template>
+			</div>
+			<div style="flex:none">
+				<h4 matTooltip="{{ serviceItem.title }}">{{ serviceItem.title | noTitle }}</h4>
+			</div>
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+				<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+					<p style="background-color:rgb(109, 109, 109);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ serviceItem.creationDate.toDate() | amTimeAgo }}</p>
+				</div>
+				<div style="flex:none;margin-right:5px">
+					<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
+					<ng-template #showpublicenabledtype>
+						<mat-icon onclick="event.stopPropagation()" (click)="changeType(serviceItem)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+					</ng-template>
+					<ng-template #showpublicdisabledtype>
+						<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
+					</ng-template>
+				</div>
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
+				</div>
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+					<mat-icon onclick="event.stopPropagation()" (click)="delete(serviceItem)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+				</div>
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService(serviceItem)"></mat-checkbox>
+					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
+				</div>
+				<ng-container *ngIf="id | async; then fromeditpage else backtohistorypage"></ng-container>
+				<ng-template #fromeditpage>
+					<ng-container *ngIf="id | async as id">
+						<ng-container *ngIf="returnUserId | async; then showuser"></ng-container>
+						<ng-template #showuser>
+							<ng-container *ngIf="returnUserId | async as returnUserId">
+								<ng-container *ngIf="returnType | async; then showreturntype"></ng-container>
+								<ng-template #showreturntype>
+									<ng-container *ngIf="returnType | async as returnTypeItem">
+										<mat-icon *ngIf="returnTypeItem=='Forum'" [routerLink]="['/user/forum/edit']" [queryParams]='{ userId: returnUserId, forumId: id }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem=='Notification'" [routerLink]="['/user/notification/edit']" [queryParams]='{ userId: returnUserId, notificationId: id }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem==''" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+									</ng-container>
+								</ng-template>
+							</ng-container>
+						</ng-template>
+					</ng-container>
+				</ng-template>
+				<ng-template #backtohistorypage>
+					<mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+				</ng-template>
+			</div>
+		</div>
+		<div style="flex:1">
+			<form [formGroup]="serviceGroup" novalidate>
+				<!-- review/rating -->
+				<div style="display:flex;flex-direction:row;align-items:center">
+					<div style="flex:1;display:flex;flex-direction:row;justify-content:start">
+						<div style="flex:none">
+							<star-rating-control
+								[rating]="serviceGroup.get('rate').value"
+								[showHalfStars]="true"
+								[starType]="'svg'"
+								[readOnly]="true">
+							</star-rating-control>
+						</div>
+					</div>
+					<div style="flex:none;display:flex;flex-direction:row">
+						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+							<mat-icon [routerLink]="['/service/rate/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create rate">add_circle_outline</mat-icon>
+						</div>
+						<div style="flex:none;margin-right:5px">
+							<ng-container *ngIf="rateCount | async as rateCount">
+								<ng-container [ngSwitch]="rateCount">
+									<ng-container *ngSwitchCase="-1">
+										<a [routerLink]="['/service/rate/list']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="color:#1B1B1B" matTooltip="">rates(0)</a>
+									</ng-container>
+									<ng-container *ngSwitchDefault>
+										<a [routerLink]="['/service/rate/list']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="color:#1B1B1B" matTooltip="">rates({{ rateCount }})</a>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+							<mat-icon [routerLink]="['/service/review/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create review">add_circle_outline</mat-icon>
+						</div>
+						<div style="flex:none">
+							<ng-container *ngIf="reviewCount | async as reviewCount">
+								<ng-container [ngSwitch]="reviewCount">
+									<ng-container *ngSwitchCase="-1">
+										<a [routerLink]="['/service/review/list']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="color:#1B1B1B" matTooltip="">reviews(0)</a>
+									</ng-container>
+									<ng-container *ngSwitchDefault>
+										<a [routerLink]="['/service/review/list']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="color:#1B1B1B" matTooltip="">reviews({{ reviewCount }})</a>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+						</div>
+					</div>
+				</div>
+				<!-- other -->
+				<div style="display:flex;flex-direction:column">
+					<!-- description -->
+					<mat-expansion-panel #descriptionPanel
+						(opened)="descriptionPanelEvent('expanded')"
+						(closed)="descriptionPanelEvent('contracted')"
+						class="mat-elevation-z0"
+						*ngIf="serviceItem.description.length > 0"
+						style="margin-bottom:10px">
+						<mat-expansion-panel-header style="display:flex;flex-direction:row;margin-left:-15px">
+							<mat-panel-title #descriptionPanelTitle style="flex:none">
+								{{ serviceItem.description | truncate: 80 }}
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<p style="margin-left:-15px;margin-top:-35px;padding:0px;white-space:pre-wrap">
+							<span [innerHTML]="serviceItem.description | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+						</p>
+					</mat-expansion-panel>
+					<!-- website -->
+					<div *ngIf="serviceItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
+						<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
+						<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+					</div>
+					<!-- tags -->
+					<div style="flex:none;margin-bottom:10px">
+						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
+							<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
+										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
+										<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
+									</div>
+								</div>
+							</ng-container>
+							<ng-template #noservicetags></ng-template>
+						</ng-container>
+					</div>
+					<!-- forums -->
+					<div style="flex:none;margin-bottom:10px">
+						<div style="display:flex;flex-direction:row;overflow-x:auto">
+							<ng-container *ngIf="whereServings | async;let whereServingItems">
+								<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
+								<ng-template #showwhereservings>
+									<ng-container *ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
+										<ng-container *ngIf="whereServing.forum | async;let forum">
+											<ng-container *ngIf="forum; then showforum"></ng-container>
+											<ng-template #showforum>
+												<ng-container *ngIf="forum.uid == auth.uid || forum.type == 'Public'">
+													<div style="flex:none;display:flex;flex-direction:row;padding:3px 10px 3px 5px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;align-items:center;margin-right:5px;flex-wrap:nowrap">
+														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+															<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+															<ng-template #showdefaultforumimage>
+																<ng-container *ngIf="forum.defaultForumImage | async;let image">
+																	<div style="flex:none;margin-right:5px">
+																		<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+																			<img [src]="url">
+																		</ng-container>
+																	</div>
+																</ng-container>
+															</ng-template>
+															<div style="flex:1;margin-right:5px">
+																<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+																<ng-template #showdefaultregistrant>
+																	<p style="word-break: break-all">
+																		<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
+																	</p>
+																</ng-template>
+																<ng-template #nodefaultregistrant>
+																	<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
+																	<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
+																</ng-template>
+															</div>
+														</div>
+														<div style="flex:none">
+															<mat-icon onclick="event.stopPropagation()" (click)="removeWhereServing(whereServing)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+														</div>
+													</div>
+												</ng-container>
+											</ng-template>
+										</ng-container>
+									</ng-container>
+								</ng-template>
+								<ng-template #nowhereservings>
+									<p style="flex:none;color:#999;font-size:90%">
+										<i>No Forums</i>
+									</p>
+								</ng-template>
+							</ng-container>
+						</div>
+					</div>
+					<!-- user forums -->
+					<ng-container *ngIf="userForums | async;let userForumItems">
+						<ng-container *ngIf="userForumItems.length > 0; then showservices"></ng-container>
+						<ng-template #showservices>
+							<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+								<div style="flex:none">
+									<mat-form-field>
+										<mat-select #select="matSelect" (selectionChange)="addForum()" placeholder="Add to forum" [formControl]="userForumsCtrl" style="margin-top:5px">
+											<!-- <mat-select-trigger>{{ userForumsCtrl.value }}</mat-select-trigger> -->
+											<mat-option *ngFor="let forum of userForumItems; trackBy: trackUserForums" [value]="forum" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }}</mat-option>
+										</mat-select>
+									</mat-form-field>
+								</div>
+							</div>
+						</ng-template>
+						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+							<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;margin-right:5px">Create forum</a>
+							<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left">keyboard_arrow_right</a>
+						</div>
+					</ng-container>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-container>

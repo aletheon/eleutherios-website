@@ -1,0 +1,66 @@
+
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<ng-container *ngIf="forum | async;let forumItem">
+	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow:auto;padding:10px 20px 10px 20px">
+		<form [formGroup]="forumGroup" novalidate>
+			<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
+          <ng-container *ngIf="defaultForumImage | async; then showdefaultforumimage"></ng-container>
+          <ng-template #showdefaultforumimage>
+            <ng-container *ngIf="defaultForumImage | async;let image">
+              <div style="flex:none;margin-right:10px">
+                <ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+									<img [src]="url">
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-template>
+        </div>
+        <h4 style="flex:none" matTooltip="{{ forumItem.title }}{{ forumItem.description.length > 0 ? (' - ' + forumItem.description | truncate: 80) : '' }}">{{ forumItem.title }} <i>images(<ng-container *ngIf="imageCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</i></h4>
+        <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+          <back></back>
+        </div>
+      </div>
+			<div style="flex:1">
+				<div style="display:flex;flex-direction:row;margin-bottom:10px">
+					<ng-container *ngIf="forumTags | async;let forumTagItems">
+						<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+							<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(250, 155, 152);border:1px solid #ac2c2c;align-items:center"
+									*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
+									<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
+								</div>
+							</div>
+						</ng-container>
+						<ng-template #noforumtags></ng-template>
+					</ng-container>
+				</div>
+				<ng-container *ngIf="forumImages | async;let forumImageItems">
+					<ng-container *ngIf="forumImageItems.length > 0; then showforumimages else noforumimages"></ng-container>
+					<ng-template #showforumimages>
+						<div style="display:flex;flex-direction:row;align-items:center;justify-content:center;margin-bottom:10px">
+							<div style="flex:none">
+								<mat-icon onclick="event.stopPropagation()" (click)="onPrev()" *ngIf='prevKeys?.length' style="cursor:pointer;color:#999" matTooltip="Previous">arrow_back_ios</mat-icon>
+							</div>
+							<div style="flex:none">
+								<mat-icon onclick="event.stopPropagation()" (click)="onNext()" *ngIf='nextKey' style="cursor:pointer;color:#999" matTooltip="Next">arrow_forward_ios</mat-icon>
+							</div>
+						</div>
+						<div style="display:flex;flex-direction:row;align-items:center;justify-content:center">
+							<div *ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
+								<ng-container *ngIf="forumImage.largeUrl | downloadImageUrl | async; let url">
+									<img [src]="url" matTooltip="{{ forumImage.name }}">
+								</ng-container>
+							</div>
+						</div>
+					</ng-template>
+					<ng-template #noforumimages>
+						<p style="color:#999;font-size:90%">
+							<i style="animation:2s ease 0s normal forwards 1 fadein;-webkit-animation:2s ease 0s normal forwards 1 fadein;opacity:1">No Images</i>
+						</p>
+					</ng-template>
+				</ng-container>
+			</div>
+		</form>
+	</div>
+</ng-container>

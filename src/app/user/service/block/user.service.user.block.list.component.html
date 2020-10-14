@@ -1,0 +1,68 @@
+<div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+  <!-- header -->
+  <div style="flex:none;display:flex;flex-direction:row">
+    <h4 style="flex:1">Service User Blocks(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
+    <back></back>
+  </div>
+  <!-- search results -->
+  <loading-spinner *ngIf="loading | async"></loading-spinner>
+  <div *ngIf="!(loading | async)" style="flex:1">
+    <ng-container *ngIf="serviceUserBlocks | async;let serviceUserBlockItems">
+      <ng-container *ngIf="serviceUserBlockItems.length > 0; then showserviceuserblocks else noserviceuserblocks"></ng-container>
+      <ng-template #showserviceuserblocks>
+        <div style="min-height:70px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px;padding-bottom:5px"
+          *ngFor="let serviceUserBlock of serviceUserBlockItems; trackBy: trackServiceUserBlocks">
+          <ng-container *ngIf="serviceUserBlock.forum | async; then showforum"></ng-container>
+          <ng-template #showforum>
+            <ng-container *ngIf="serviceUserBlock.forum | async as forum">
+              <div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+                <ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+								<ng-template #showdefaultforumimage>
+									<ng-container *ngIf="forum.defaultForumImage | async;let image">
+                    <div style="flex:none;margin-right:10px">
+                      <ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
+                        <ng-container *ngIf="url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+                        <ng-template #showimage>
+                          <img *ngIf="forum.type == 'Private'" [src]="url" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer">
+                          <img *ngIf="forum.type == 'Public'" [src]="url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+                        </ng-template>
+                        <ng-template #noimage>
+                          <img [src]="url">
+                        </ng-template>
+                      </ng-container>
+                    </div>
+									</ng-container>
+								</ng-template>
+                <a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:1;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+								<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:1;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+                <mat-icon onclick="event.stopPropagation()" (click)="delete(serviceUserBlock)" style="flex:none;margin-left:5px;cursor:pointer" matTooltip="Delete">delete</mat-icon>
+              </div>
+              <div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+                <ng-container *ngIf="forum.user | async; then showuser"></ng-container>
+                <ng-template #showuser>
+                  <ng-container *ngIf="forum.user | async as user">
+                    <div style="flex:none;padding:5px 5px 5px 5px;background-color:#99FF99;border:1px solid rgb(69, 221, 69);align-items:center;margin-bottom:5px">
+                      <p style="word-break: break-all;color:#1B1B1B">
+                        {{ user.displayName | noTitle }}
+                      </p>
+                    </div>
+                  </ng-container>
+                </ng-template>
+              </div>
+            </ng-container>
+          </ng-template>
+        </div>
+      </ng-template>
+      <ng-template #noserviceuserblocks>
+        <p style="color:#999;font-size:90%">
+          <i>No Service User Blocks</i>
+        </p>
+      </ng-template>
+    </ng-container>
+  </div>
+  <!-- paging -->
+  <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+    <button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+    <button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<ng-container *ngIf="forum | async;let forumItem">
+	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+			<div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
+				<ng-container *ngIf="defaultForumImage | async; then showdefaultforumimage"></ng-container>
+				<ng-template #showdefaultforumimage>
+					<ng-container *ngIf="defaultForumImage | async;let image">
+						<div style="flex:none;margin-right:10px">
+							<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
+								<ng-container *ngIf="url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+								<ng-template #showimage>
+									<img [src]="url" [routerLink]="['/anonymous/forum/image/list']" [queryParams]='{ forumId: forumItem.forumId }' style="cursor:pointer">
+								</ng-template>
+								<ng-template #noimage>
+									<img [src]="url">
+								</ng-template>
+							</ng-container>
+						</div>
+					</ng-container>
+				</ng-template>
+			</div>
+			<div style="flex:none">
+				<ng-container *ngIf="defaultRegistrant | async; then showheader else defaultheader"></ng-container>
+				<ng-template #showheader>
+					<h4><a [routerLink]="['/login']" [queryParams]='{ forumId: forumItem.forumId }' style="color:#1B1B1B">{{ forumItem.title | noTitle }}</a></h4>
+				</ng-template>
+				<ng-template #defaultheader>
+					<h4>{{ forumItem.title | noTitle }}</h4>
+				</ng-template>
+			</div>
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+				<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+					<p style="background-color:rgb(109, 109, 109);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ forumItem.creationDate.toDate() | amTimeAgo }}</p>
+				</div>
+				<back></back>
+			</div>
+		</div>
+		<div style="flex:1">
+			<form [formGroup]="forumGroup" novalidate>
+				<div style="display:flex;flex-direction:column">
+					<!-- description -->
+					<mat-expansion-panel #descriptionPanel
+						(opened)="descriptionPanelEvent('expanded')"
+						(closed)="descriptionPanelEvent('contracted')"
+						class="mat-elevation-z0"
+						*ngIf="forumItem.description.length > 0"
+						style="margin-bottom:10px">
+						<mat-expansion-panel-header style="display:flex;flex-direction:row;margin-left:-15px">
+							<mat-panel-title #descriptionPanelTitle style="flex:none">
+								{{ forumItem.description | truncate: 80 }}
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<p style="margin-left:-15px;margin-top:-35px;padding:0px;white-space:pre-wrap">
+							<span [innerHTML]="forumItem.description | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+						</p>
+					</mat-expansion-panel>
+					<!-- website -->
+					<div *ngIf="forumItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
+						<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
+						<span style="flex:none" [innerHTML]="forumItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+					</div>
+					<!-- tags -->
+					<div style="flex:none;margin-bottom:10px">
+						<ng-container *ngIf="forumTags | async;let forumTagItems">
+							<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(250, 155, 152);border:1px solid #ac2c2c;align-items:center"
+										*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
+										<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
+									</div>
+								</div>
+							</ng-container>
+							<ng-template #noforumtags></ng-template>
+						</ng-container>
+					</div>
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+            <a [routerLink]="['/login']" [queryParams]='{ forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create new service">Create new service</a>
+            <a [routerLink]="['/login']" [queryParams]='{ forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltip="Create new service">keyboard_arrow_right</a>
+          </div>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-container>
