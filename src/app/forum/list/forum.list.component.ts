@@ -71,14 +71,14 @@ export class ForumListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.forumSearchTagCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
 
       this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
-        startWith([null])
+        startWith('')
       )
       .subscribe(searchTerm => {
         this.getForumsList(searchTerm);

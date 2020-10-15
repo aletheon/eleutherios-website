@@ -28,8 +28,8 @@ import * as _ from "lodash";
   styleUrls: ['./anonymous.service.detail.component.css']
 })
 export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
-  @ViewChild('descriptionPanel', { static: true }) _descriptionPanel: MatExpansionPanel;
-  @ViewChild('descriptionPanelTitle', { static: true }) _descriptionPanelTitle: ElementRef;
+  @ViewChild('descriptionPanel', { static: false }) _descriptionPanel: MatExpansionPanel;
+  @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
   private _serviceSubscription: Subscription;

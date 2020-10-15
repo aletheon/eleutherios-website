@@ -62,14 +62,14 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.notificationSearchTagCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
       
       this._notificationSearchSubscription = this.searchNotificationCtrl.valueChanges.pipe(
-        startWith([null])
+        startWith('')
       )
       .subscribe(searchTerm => {
         this.getNotificationsList(this.type, searchTerm);

@@ -66,14 +66,14 @@ export class ServiceListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.serviceSearchTagCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
 
       this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
-        startWith([null])
+        startWith('')
       )
       .subscribe(searchTerm => {
         this.getServicesList(searchTerm);

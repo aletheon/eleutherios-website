@@ -89,7 +89,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.searchTagCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -97,7 +97,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       
       // tagSearch mat subscription
       this.matAutoCompleteTags = this.tagSearchCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )

@@ -57,7 +57,7 @@ export class TagService {
 
   public search(searchTerm: any): Observable<any[]> {
     let newSearchTerm: string = '';
-      
+
     if (typeof searchTerm === "string")
       newSearchTerm = searchTerm;
     else if (searchTerm != null)

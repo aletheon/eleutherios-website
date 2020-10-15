@@ -92,7 +92,7 @@ export class UserForumServiceNewComponent implements OnInit, OnDestroy, AfterVie
 
       // searchTag mat subscription
       this.matAutoCompleteServiceTags = this.tagServiceCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )

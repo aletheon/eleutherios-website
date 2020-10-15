@@ -55,7 +55,6 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
     private userForumRegistrantService: UserForumRegistrantService,
     private messageSharingService: MessageSharingService,
     private snackbar: MatSnackBar) {
-      console.log('loading activity open');
   }
 
   setActivityHighlight(activity) {

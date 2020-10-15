@@ -43,8 +43,8 @@ import * as _ from "lodash";
   styleUrls: ['./service.detail.component.css']
 })
 export class ServiceDetailComponent implements OnInit, OnDestroy  {
-  @ViewChild('descriptionPanel', { static: true }) _descriptionPanel: MatExpansionPanel;
-  @ViewChild('descriptionPanelTitle', { static: true }) _descriptionPanelTitle: ElementRef;
+  @ViewChild('descriptionPanel', { static: false }) _descriptionPanel: MatExpansionPanel;
+  @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
   private _routeSubscription: any;

@@ -123,14 +123,14 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
       this.tagForumCtrl = new FormControl();
 
       this.matAutoCompleteSearchServiceTags = this.serviceSearchTagCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
       
       this.matAutoCompleteForumTags = this.tagForumCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -437,7 +437,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
 
             if (that.forumGroup.get('searchPrivateServices').value == true){
               that.matAutoCompleteSearchServices = that.searchServiceCtrl.valueChanges.pipe(
-                startWith([null]),
+                startWith(''),
                 switchMap(searchTerm => 
                   that.userServiceService.search(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value)
                 )
@@ -524,7 +524,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
             }
             else {
               that.matAutoCompleteSearchServices = that.searchServiceCtrl.valueChanges.pipe(
-                startWith([null]),
+                startWith(''),
                 switchMap(searchTerm => 
                   that.serviceService.search(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
                 )
@@ -1361,7 +1361,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
     if (this.forumGroup.get('searchPrivateServices').value == true){
       // search services
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
         )
@@ -1378,7 +1378,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
     else {
       // search services
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
-        startWith([null]),
+        startWith(''),
         switchMap(searchTerm => 
           this.serviceService.search(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
         )

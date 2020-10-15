@@ -59,7 +59,7 @@ export class AppearDirective implements AfterViewInit, OnDestroy {
 
   subscribe(){
     this.subscriptionScroll = fromEvent(window, 'scroll').pipe(
-      startWith([null])
+      startWith('')
     )
     .subscribe(() => {
       this.saveScrollPos();
@@ -67,7 +67,7 @@ export class AppearDirective implements AfterViewInit, OnDestroy {
     });
 
     this.subscriptionResize = fromEvent(window, 'resize').pipe(
-      startWith([null])
+      startWith('')
     )
     .subscribe(() => {
       this.saveDimensions();
