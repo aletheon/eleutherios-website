@@ -14,7 +14,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
@@ -148,7 +148,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
             if (image){
               let getImageTotal$ = this.siteTotalService.getTotal(image.imageId);
 
-              return combineLatest(getImageTotal$).pipe(
+              return combineLatest([getImageTotal$]).pipe(
                 switchMap(results => {
                   const [imageTotal] = results;
                   
@@ -167,7 +167,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
             else return of(null);
           });
     
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return images[i];
             });

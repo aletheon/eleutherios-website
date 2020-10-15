@@ -20,7 +20,7 @@ import {
 
 import { NotificationSnackBar } from '../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -190,7 +190,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                     })
                   );
 
-                  return combineLatest(getDefaultForumImage$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImage, defaultRegistrant] = results;
 
@@ -216,7 +216,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -241,7 +241,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                     })
                   );
 
-                  return combineLatest(getDefaultServiceImage$).pipe(
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage] = results;
                       
@@ -261,7 +261,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
                 });
@@ -295,14 +295,14 @@ export class HomeComponent implements OnDestroy, OnInit {
                     })
                   );
 
-                  return combineLatest(getDefaultForumImage$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
 
                   );
                 }
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -327,7 +327,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                     })
                   );
 
-                  return combineLatest(getDefaultServiceImage$).pipe(
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage] = results;
         
@@ -347,7 +347,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
                 });
@@ -385,7 +385,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                           })
                         );
 
-                        return combineLatest(getDefaultForumImage$, getForumTags$, getDefaultRegistrant$).pipe(
+                        return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
                             const [defaultForumImage, forumTags, defaultRegistrant] = results;
               
@@ -431,7 +431,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                           })
                         );
 
-                        return combineLatest(getDefaultServiceImage$, getServiceTags$).pipe(
+                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
                             const [defaultServiceImage, serviceTags] = results;
               
@@ -460,7 +460,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 }
               });
 
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   if (alerts[i].type == 'Forum')
                     alerts[i].forum = of(result);

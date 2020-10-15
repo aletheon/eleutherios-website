@@ -583,7 +583,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
                             })
                           );
 
-                          return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                          return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                             switchMap(results => {
                               const [defaultForumImages, defaultRegistrant] = results;
                               

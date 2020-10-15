@@ -12,7 +12,7 @@ import {
   DownloadImageUrlPipe
 } from '../../shared';
 
-import { Observable, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -72,7 +72,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   );
                   let getForumTags$ = that.userForumTagService.getTags(forum.uid, forum.forumId);
 
-                  return combineLatest(getDefaultForumImage$, getForumTags$).pipe(
+                  return combineLatest([getDefaultForumImage$, getForumTags$]).pipe(
                     switchMap(results => {
                       const [defaultForumImage, forumTags] = results;
         
@@ -98,7 +98,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -124,7 +124,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   );
                   let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest(getDefaultServiceImage$, getServiceTags$).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
                       
@@ -150,7 +150,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results: any[]) => {
+              return zip(...observables, (...results: any[]) => {
                 return results.map((result, i) => {
                   return services[i];
                 });

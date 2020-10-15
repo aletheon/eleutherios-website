@@ -32,7 +32,7 @@ import {
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, combineLatest, of } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, combineLatest, of, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -606,7 +606,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                         if (service) {
                           let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                           
-                          return combineLatest(getDefaultServiceImages$).pipe(
+                          return combineLatest([getDefaultServiceImages$]).pipe(
                             switchMap(results => {
                               const [defaultServiceImages] = results;
                               
@@ -629,7 +629,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                     );
                   });
                   
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         registrants[i].service = of(result);

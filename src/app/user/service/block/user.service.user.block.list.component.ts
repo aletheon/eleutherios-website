@@ -11,7 +11,7 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -93,7 +93,7 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
                   let getDefaultForumImages$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId);
                   let getUser$ = that.userService.getUser(serviceUserBlock.userId);
 
-                  return combineLatest(getDefaultForumImages$, getUser$).pipe(
+                  return combineLatest([getDefaultForumImages$, getUser$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, user] = results;
 
@@ -121,7 +121,7 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
             );
           });
 
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               if (result)
                 serviceUserBlocks[i].forum = of(result);

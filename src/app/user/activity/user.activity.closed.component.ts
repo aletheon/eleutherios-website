@@ -11,7 +11,7 @@ import {
   DownloadImageUrlPipe
 } from '../../shared';
 
-import { Observable, Subscription, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -38,6 +38,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
     private messageSharingService: MessageSharingService) {
+      console.log('loading activity closed');
   }
 
   setActivityHighlight(activity) {
@@ -120,7 +121,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
                       let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
                       let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId);
 
-                      return combineLatest(getService$, getDefaultServiceImages$).pipe(
+                      return combineLatest([getService$, getDefaultServiceImages$]).pipe(
                         switchMap(results => {
                           const [service, defaultServiceImages] = results;
 
@@ -145,7 +146,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
                     else return of(null);
                   });
               
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       return posts[i];
                     });
@@ -155,7 +156,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
               })
             );
 
-            return combineLatest(getDefaultForumImages$, getLastPosts$).pipe(
+            return combineLatest([getDefaultForumImages$, getLastPosts$]).pipe(
               switchMap(results => {
                 const [defaultForumImages, lastPosts] = results;
                 
@@ -180,7 +181,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
             );
           });
 
-          return combineLatest(...activitiesObservables, (...results) => {
+          return zip(...activitiesObservables, (...results) => {
             return results.map((result, i) => {
               if (result)
                 activities[i].forum = of(result);

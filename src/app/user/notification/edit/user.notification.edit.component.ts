@@ -26,7 +26,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -91,7 +91,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.searchTagCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -99,7 +99,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       
       // tagSearch mat subscription
       this.matAutoCompleteTags = this.tagSearchCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -339,7 +339,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                   })
                 );
 
-                return combineLatest(getDefaultForumImages$, getForumTags$, getDefaultRegistrant$).pipe(
+                return combineLatest([getDefaultForumImages$, getForumTags$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, forumTags, defaultRegistrant] = results;
 
@@ -371,7 +371,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                 return of(null);
             });
 
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });
@@ -396,7 +396,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                 let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest(getDefaultServiceImages$, getServiceTags$).pipe(
+                return combineLatest([getDefaultServiceImages$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImages, serviceTags] = results;
 
@@ -423,7 +423,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                 return of(null);
             });
 
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
               });

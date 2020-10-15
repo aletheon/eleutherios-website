@@ -7,7 +7,6 @@ import { GoogleTagManagerService } from 'angular-google-tag-manager';
 import { MessageSharingService } from './shared';
 
 import { Observable, Subject, combineLatest } from 'rxjs';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -15,11 +14,8 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  @ViewChild('activityComponent', { static: true }) set content(ref: ViewContainerRef) {
+  @ViewChild('activityComponent', { read: ViewContainerRef }) set content(ref: ViewContainerRef) {
     if (!!ref) {
-      console.log('here ro bhere');
-
-
       this._activityComponent = ref;
       this._appLoaded.next(true);
     }
@@ -65,9 +61,7 @@ export class AppComponent implements OnInit {
     // initialize message sharing service
     this.messageSharingService.changeViewForumId('');
 
-    combineLatest(this._appLoaded).subscribe(([appLoaded]) => {
-      console.log('here rob');
-
+    combineLatest([this._appLoaded]).subscribe(appLoaded => {
       this._activitySideBarState.subscribe(state => {
         if (state){
           this.activitySideBarState = 'open';

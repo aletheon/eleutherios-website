@@ -13,7 +13,7 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -108,7 +108,7 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                           })
                         );
       
-                        return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                        return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
                             const [defaultForumImages, defaultRegistrant] = results;
                                             
@@ -135,7 +135,7 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  return combineLatest(getDefaultServiceImages$, getForum$).pipe(
+                  return combineLatest([getDefaultServiceImages$, getForum$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImages, forum] = results;
 
@@ -163,7 +163,7 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
             );
           });
 
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               if (result)
                 forumBlocks[i].service = of(result);

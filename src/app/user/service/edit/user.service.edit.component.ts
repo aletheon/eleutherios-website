@@ -33,7 +33,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap, startWith, tap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -109,7 +109,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
       // searchTag mat subscription
       this.matAutoCompleteSearchForumTags = this.tagSearchCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -117,7 +117,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       
       // tagSearch mat subscription
       this.matAutoCompleteTags = this.tagServiceCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
@@ -237,7 +237,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     })
                   );
 
-                  return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, defaultRegistrant] = results;
 
@@ -263,7 +263,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -289,7 +289,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     })
                   );
 
-                  return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, defaultRegistrant] = results;
 
@@ -315,7 +315,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -345,7 +345,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   })
                 );
 
-                return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, defaultRegistrant] = results;
 
@@ -371,7 +371,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });
@@ -397,7 +397,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   })
                 );
 
-                return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, defaultRegistrant] = results;
 
@@ -423,7 +423,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });
@@ -747,7 +747,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     })
                   );
 
-                  return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, defaultRegistrant] = results;
                       
@@ -773,7 +773,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -799,7 +799,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     })
                   );
 
-                  return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, defaultRegistrant] = results;
                       
@@ -825,7 +825,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 else return of(null);
               });
         
-              return combineLatest(...observables, (...results) => {
+              return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
                 });
@@ -1015,7 +1015,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                             })
                           );
                           
-                          return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                          return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                             switchMap(results => {
                               const [defaultForumImages, defaultRegistrant] = results;
 
@@ -1044,7 +1044,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     );
                   });
                   
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         whereServings[i].forum = of(result);
@@ -1061,7 +1061,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             if (that.serviceGroup.get('searchPrivateForums').value == true){
               // searchForum mat subscription
               that.matAutoCompleteSearchForums = that.searchForumCtrl.valueChanges.pipe(
-                startWith(null),
+                startWith([null]),
                 switchMap(searchTerm => that.userForumService.search(that.auth.uid, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
               );
 
@@ -1083,7 +1083,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                               })
                             );
 
-                            return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                            return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                               switchMap(results => {
                                 const [defaultForumImages, defaultRegistrant] = results;
 
@@ -1110,7 +1110,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                             return of(null);
                         });
 
-                        return combineLatest(...observables, (...results) => {
+                        return zip(...observables, (...results) => {
                           return results.map((result, i) => {
                             return forums[i];
                           });
@@ -1137,7 +1137,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                           })
                         );
 
-                        return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                        return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
                             const [defaultForumImages, defaultRegistrant] = results;
 
@@ -1163,7 +1163,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       else return of(null);
                     });
 
-                    return combineLatest(...observables, (...results) => {
+                    return zip(...observables, (...results) => {
                       return results.map((result, i) => {
                         return forums[i];
                       });
@@ -1176,7 +1176,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             else {
               // searchForum mat subscription
               that.matAutoCompleteSearchForums = that.searchForumCtrl.valueChanges.pipe(
-                startWith(null),
+                startWith([null]),
                 switchMap(searchTerm => that.forumService.search(searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
               );
 
@@ -1198,7 +1198,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                               })
                             );
                             
-                            return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                            return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                               switchMap(results => {
                                 const [defaultForumImages, defaultRegistrant] = results;
 
@@ -1224,7 +1224,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                           else return of(null);
                         });
 
-                        return combineLatest(...observables, (...results) => {
+                        return zip(...observables, (...results) => {
                           return results.map((result, i) => {
                             return forums[i];
                           });
@@ -1251,7 +1251,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                           })
                         );
 
-                        return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                        return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
                             const [defaultForumImages, defaultRegistrant] = results;
 
@@ -1277,7 +1277,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       else return of(null);
                     });
 
-                    return combineLatest(...observables, (...results) => {
+                    return zip(...observables, (...results) => {
                       return results.map((result, i) => {
                         return forums[i];
                       });
@@ -1438,7 +1438,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   searchPrivateForumsClick () {
     if (this.serviceGroup.get('searchPrivateForums').value == true){
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.userForumService.search(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
@@ -1461,7 +1461,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       })
                     );
                     
-                    return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                    return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
                         const [defaultForumImages, defaultRegistrant] = results;
                         
@@ -1487,7 +1487,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   else return of(null);
                 });
           
-                return combineLatest(...observables, (...results) => {
+                return zip(...observables, (...results) => {
                   return results.map((result, i) => {
                     return forums[i];
                   });
@@ -1514,7 +1514,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   })
                 );
 
-                return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, defaultRegistrant] = results;
                     
@@ -1540,7 +1540,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });
@@ -1552,7 +1552,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     }
     else {
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.forumService.search(searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
@@ -1575,7 +1575,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       })
                     );
 
-                    return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                    return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
                         const [defaultForumImages, defaultRegistrant] = results;
                         
@@ -1601,7 +1601,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   else return of(null);
                 });
           
-                return combineLatest(...observables, (...results) => {
+                return zip(...observables, (...results) => {
                   return results.map((result, i) => {
                     return forums[i];
                   });
@@ -1628,7 +1628,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   })
                 );
 
-                return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, defaultRegistrant] = results;
                     
@@ -1654,7 +1654,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });

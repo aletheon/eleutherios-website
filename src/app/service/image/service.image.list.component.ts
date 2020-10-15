@@ -17,7 +17,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -274,7 +274,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
             }
           });
     
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return serviceImages[i];
             });

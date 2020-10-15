@@ -15,7 +15,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -62,14 +62,14 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.notificationSearchTagCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
       
       this._notificationSearchSubscription = this.searchNotificationCtrl.valueChanges.pipe(
-        startWith(null)
+        startWith([null])
       )
       .subscribe(searchTerm => {
         this.getNotificationsList(this.type, searchTerm);
@@ -156,7 +156,7 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
               if (notification){
                 let getNotificationTags$ = this.userNotificationTagService.getTags(notification.uid, notification.notificationId);
       
-                return combineLatest(getNotificationTags$).pipe(
+                return combineLatest([getNotificationTags$]).pipe(
                   switchMap(results => {
                     const [notificationTags] = results;
 
@@ -172,7 +172,7 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return notifications[i];
               });
@@ -196,7 +196,7 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
               if (notification){
                 let getNotificationTags$ = this.userNotificationTagService.getTags(notification.uid, notification.notificationId);
       
-                return combineLatest(getNotificationTags$).pipe(
+                return combineLatest([getNotificationTags$]).pipe(
                   switchMap(results => {
                     const [notificationTags] = results;
 
@@ -212,7 +212,7 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return notifications[i];
               });

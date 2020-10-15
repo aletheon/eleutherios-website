@@ -15,7 +15,7 @@ import {
   Alert
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -131,7 +131,7 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
                       })
                     );
           
-                    return combineLatest(getDefaultForumImages$, getForumTags$, getDefaultRegistrant$).pipe(
+                    return combineLatest([getDefaultForumImages$, getForumTags$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
                         const [defaultForumImages, forumTags, defaultRegistrant] = results;
           
@@ -170,7 +170,7 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
                     let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                     let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
           
-                    return combineLatest(getDefaultServiceImages$, getServiceTags$).pipe(
+                    return combineLatest([getDefaultServiceImages$, getServiceTags$]).pipe(
                       switchMap(results => {
                         const [defaultServiceImages, serviceTags] = results;
           
@@ -199,7 +199,7 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
             }
           });
 
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               if (alerts[i].type == 'Forum'){
                 if (result)

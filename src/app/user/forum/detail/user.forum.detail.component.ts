@@ -31,7 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -672,7 +672,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                         if (service) {
                           let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
 
-                          return combineLatest(getDefaultServiceImages$).pipe(
+                          return combineLatest([getDefaultServiceImages$]).pipe(
                             switchMap(results => {
                               const [defaultServiceImages] = results;
 
@@ -694,7 +694,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                     );
                   });
 
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         registrants[i].service = of(result);

@@ -8,19 +8,6 @@ import {
 import { Observable, BehaviorSubject } from 'rxjs';
 import * as _ from "lodash";
 
-// class Upload {
-//   $key: string;
-//   file: File;
-//   name: string;
-//   url: string;
-//   progress: number;
-//   createdAt: Date = new Date();
-
-//   constructor (file:File) {
-//     this.file = file;
-//   }
-// };
-
 @Component({
   selector: 'user-image-new',
   templateUrl: './user.image.new.component.html',

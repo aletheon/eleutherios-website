@@ -21,7 +21,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -71,14 +71,14 @@ export class ForumListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.forumSearchTagCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
 
       this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
-        startWith(null)
+        startWith([null])
       )
       .subscribe(searchTerm => {
         this.getForumsList(searchTerm);
@@ -157,7 +157,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                           let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
                           let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId);
 
-                          return combineLatest(getService$, getDefaultServiceImages$).pipe(
+                          return combineLatest([getService$, getDefaultServiceImages$]).pipe(
                             switchMap(results => {
                               const [service, defaultServiceImages] = results;
 
@@ -181,7 +181,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                         else return of(null);
                       });
                   
-                      return combineLatest(...observables, (...results) => {
+                      return zip(...observables, (...results) => {
                         return results.map((result, i) => {
                           return posts[i];
                         });
@@ -191,7 +191,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                   })
                 );
       
-                return combineLatest(getDefaultForumImages$, getForumTags$, getDefaultRegistrant$, getLastPosts$).pipe(
+                return combineLatest([getDefaultForumImages$, getForumTags$, getDefaultRegistrant$, getLastPosts$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, forumTags, defaultRegistrant, lastPosts] = results;
       
@@ -227,7 +227,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });
@@ -269,7 +269,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                           let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
                           let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId);
 
-                          return combineLatest(getService$, getDefaultServiceImages$).pipe(
+                          return combineLatest([getService$, getDefaultServiceImages$]).pipe(
                             switchMap(results => {
                               const [service, defaultServiceImages] = results;
 
@@ -293,7 +293,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                         else return of(null);
                       });
                   
-                      return combineLatest(...observables, (...results) => {
+                      return zip(...observables, (...results) => {
                         return results.map((result, i) => {
                           return posts[i];
                         });
@@ -303,7 +303,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
                   })
                 );
       
-                return combineLatest(getDefaultForumImages$, getForumTags$, getDefaultRegistrant$, getLastPosts$).pipe(
+                return combineLatest([getDefaultForumImages$, getForumTags$, getDefaultRegistrant$, getLastPosts$]).pipe(
                   switchMap(results => {
                     const [defaultForumImages, forumTags, defaultRegistrant, lastPosts] = results;
       
@@ -339,7 +339,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
               });

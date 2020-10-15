@@ -36,7 +36,7 @@ import { NotificationSnackBar } from '../../../shared/components/notification.sn
 import { NgxAutoScroll } from "ngx-auto-scroll";
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -366,7 +366,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       })
                     );
 
-                    return combineLatest(getForum$, getDefaultRegistrant$).pipe(
+                    return combineLatest([getForum$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
                         const [forum, defaultRegistrant] = results;
 
@@ -383,7 +383,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     );
                   });
 
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         breadcrumbs[i].forum = of(result);
@@ -416,7 +416,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       })
                     );
 
-                    return combineLatest(getDefaultForumImages$, getDefaultRegistrant$).pipe(
+                    return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
                         const [defaultForumImages, defaultRegistrant] = results;
 
@@ -440,7 +440,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     );
                   });
 
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results;
                   });
                 }
@@ -456,7 +456,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId);
                     let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(registrant.uid, registrant.serviceId);
 
-                    return combineLatest(getService$, getDefaultServiceImages$).pipe(
+                    return combineLatest([getService$, getDefaultServiceImages$]).pipe(
                       switchMap(results => {
                         const [service, defaultServiceImages] = results;
 
@@ -477,7 +477,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     );
                   });
 
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         registrants[i].service = of(result);
@@ -499,7 +499,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     let getService$ = that.userServiceService.getService(post.serviceUid, post.serviceId);
                     let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId);
 
-                    return combineLatest(getService$, getDefaultServiceImages$).pipe(
+                    return combineLatest([getService$, getDefaultServiceImages$]).pipe(
                       switchMap(results => {
                         const [service, defaultServiceImages] = results;
 
@@ -520,7 +520,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     );
                   });
                   
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         posts[i].service = of(result);
@@ -566,7 +566,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     return that.userServiceService.getService(registrant.uid, registrant.serviceId);
                   });
                   
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         registrants[i].service = of(result);
@@ -576,8 +576,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     });
                   });
                 }
-                else
-                  return of([]);
+                else return of([]);
               })
             )
             .subscribe(registrants => {
@@ -893,7 +892,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                   return this.userServiceService.getService(registrant.uid, registrant.serviceId);
                 });
   
-                return combineLatest(...observables, (...results) => {
+                return zip(...observables, (...results) => {
                   return results.map((result, i) => {
                     if (result)
                       registrants[i].service = of(result);

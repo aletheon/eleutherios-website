@@ -11,7 +11,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -88,7 +88,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
             if (tag){
               let getTagTotal$ = that.siteTotalService.getTotal(tag.tagId);
     
-              return combineLatest(getTagTotal$).pipe(
+              return combineLatest([getTagTotal$]).pipe(
                 switchMap(results => {
                   const [tagTotal] = results;
                   
@@ -109,7 +109,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
             else return of(null);
           });
     
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return tags[i];
             });

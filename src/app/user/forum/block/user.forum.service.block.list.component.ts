@@ -13,7 +13,7 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -98,7 +98,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                       if (service){
                         let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
       
-                        return combineLatest(getDefaultServiceImages$).pipe(
+                        return combineLatest([getDefaultServiceImages$]).pipe(
                           switchMap(results => {
                             const [defaultServiceImages] = results;
                                             
@@ -118,6 +118,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
+
                   let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
@@ -127,7 +128,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  return combineLatest(getDefaultForumImages$, getService$, getDefaultRegistrant$).pipe(
+                  return combineLatest([getDefaultForumImages$, getService$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImages, service, defaultRegistrant] = results;
 
@@ -160,7 +161,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
             );
           });
 
-          return combineLatest(...observables, (...results) => {
+          return zip(...observables, (...results) => {
             return results.map((result, i) => {
               if (result)
                 serviceBlocks[i].forum = of(result);

@@ -17,7 +17,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -64,14 +64,14 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
 
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.serviceSearchTagCtrl.valueChanges.pipe(
-        startWith(null),
+        startWith([null]),
         switchMap(searchTerm => 
           this.tagService.search(searchTerm)
         )
       );
 
       this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
-        startWith(null)
+        startWith([null])
       )
       .subscribe(searchTerm => {
         this.getServicesList(searchTerm);
@@ -137,7 +137,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                 let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
       
-                return combineLatest(getDefaultServiceImages$, getServiceTags$).pipe(
+                return combineLatest([getDefaultServiceImages$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImages, serviceTags] = results;
                             
@@ -163,7 +163,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
               });
@@ -188,7 +188,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                 let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
       
-                return combineLatest(getDefaultServiceImages$, getServiceTags$).pipe(
+                return combineLatest([getDefaultServiceImages$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImages, serviceTags] = results;
                             
@@ -214,7 +214,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
               else return of(null);
             });
       
-            return combineLatest(...observables, (...results) => {
+            return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
               });

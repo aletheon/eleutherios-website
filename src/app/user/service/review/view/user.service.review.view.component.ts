@@ -25,7 +25,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../../shared/components/notification.snackbar.component';
 
 import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
@@ -312,7 +312,7 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                             let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                             let getServiceRate$ = that.userServiceRateService.getUserServiceRate(serviceReview.serviceReviewServiceUid, serviceReview.serviceReviewServiceId, service.uid, service.serviceId);
                   
-                            return combineLatest(getDefaultServiceImages$, getServiceRate$).pipe(
+                            return combineLatest([getDefaultServiceImages$, getServiceRate$]).pipe(
                               switchMap(results => {
                                 const [defaultServiceImages, serviceRates] = results;
                   
@@ -342,7 +342,7 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                     else return of(null);
                   });
             
-                  return combineLatest(...observables, (...results) => {
+                  return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
                         serviceReviews[i].service = of(result);
