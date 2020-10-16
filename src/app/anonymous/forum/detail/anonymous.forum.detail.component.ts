@@ -94,7 +94,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
         };
         this.defaultForumImage = of(tempImage);
       }
-    })
+    });
   }
 
   trackForumTags (index, forumTag) { return forumTag.tagId; }

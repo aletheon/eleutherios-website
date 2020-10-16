@@ -10,15 +10,15 @@ import {
   UserForumTagService,
   ForumService,
   NoTitlePipe,
-  DownloadImageUrlPipe,  // HERE ROB
   TruncatePipe
 } from '../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -199,15 +199,23 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
       switchMap(forumImages => {
         if (forumImages && forumImages.length > 0){
           let observables = forumImages.map(forumImage => {
-            if (forumImage && forumImage.length > 0)
-              return of(forumImage);
-            else {
-              let tempImage = {
-                largeUrl: '../../assets/defaultLarge.jpg',
-                name: 'No image'
-              };
-              return of(tempImage);
-            }
+            let getDownloadUrl$: Observable<any>;
+
+            if (forumImage.largeUrl)
+              getDownloadUrl$ = from(firebase.storage().ref(forumImage.largeUrl).getDownloadURL());
+
+            return combineLatest([getDownloadUrl$]).pipe(
+              switchMap(results => {
+                const [downloadUrl] = results;
+                
+                if (downloadUrl)
+                  forumImage.url = downloadUrl;
+                else
+                  forumImage.url = '../../assets/defaultLarge.jpg';
+  
+                return of(forumImage);
+              })
+            );
           });
     
           return zip(...observables, (...results) => {
@@ -229,19 +237,37 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
 
   getDefaultForumImage () {
     // default forum image
-    this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value)
-      .subscribe(forumImages => {
-        if (forumImages && forumImages.length > 0)
-          this.defaultForumImage = of(forumImages[0]);
-        else {
-          let tempImage = {
-            smallUrl: '../../assets/defaultThumbnail.jpg',
-            name: 'No image'
-          };
-          this.defaultForumImage = of(tempImage);
-        }
+    this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
+      switchMap(forumImages => {
+        let getDownloadUrl$: Observable<any>;
+
+        if (forumImages[0].smallUrl)
+          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+
+        return combineLatest([getDownloadUrl$]).pipe(
+          switchMap(results => {
+            const [downloadUrl] = results;
+            
+            if (downloadUrl)
+              forumImages[0].url = downloadUrl;
+            else
+              forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+
+            return of(forumImages[0]);
+          })
+        );
+      })
+    )
+    .subscribe(forumImage => {
+      if (forumImage)
+        this.defaultForumImage = of(forumImage);
+      else {
+        let tempImage = {
+          url: '../../assets/defaultThumbnail.jpg'
+        };
+        this.defaultForumImage = of(tempImage);
       }
-    );
+    });
   }
 
   onNext () {

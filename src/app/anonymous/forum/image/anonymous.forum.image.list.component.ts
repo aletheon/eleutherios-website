@@ -196,14 +196,6 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ********************************************************
-  // ********************************************************
-  // ********************************************************
-  // HERE ROB
-  // ********************************************************
-  // ********************************************************
-  // ********************************************************
-
   getForumImagesList (key?: any) {
     if (this._forumImagesSubscription)
       this._forumImagesSubscription.unsubscribe();
@@ -254,43 +246,38 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     // default forum image
     this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
       switchMap(forumImages => {
-        let observables = forumImages.map(forumImage => {
+        if (forumImages && forumImages.length > 0){
           let getDownloadUrl$: Observable<any>;
 
-          if (forumImage.smallUrl)
-            getDownloadUrl$ = from(firebase.storage().ref(forumImage.smallUrl).getDownloadURL());
+          if (forumImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
 
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
               
               if (downloadUrl)
-                forumImage.url = downloadUrl;
+                forumImages[0].url = downloadUrl;
               else
-                forumImage.url = '../../../../assets/defaultThumbnail.jpg';
+                forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
-              return of(forumImage);
+              return of(forumImages[0]);
             })
           );
-        });
-
-        return zip(...observables, (...results: any[]) => {
-          return results.map((result, i) => {
-            return forumImages[i];
-          });
-        });
+        }
+        else return of(null);
       })
     )
-    .subscribe(forumImages => {
-      if (forumImages && forumImages.length > 0)
-        this.defaultForumImage = of(forumImages[0]);
+    .subscribe(forumImage => {
+      if (forumImage)
+        this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
           url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }
-    });
+    })
   }
 
   onNext () {
