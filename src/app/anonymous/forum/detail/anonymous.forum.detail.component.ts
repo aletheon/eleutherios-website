@@ -10,15 +10,15 @@ import {
   AnonymousForumService,
   UserForumImageService,
   UserForumTagService,
-  DownloadImageUrlPipe,
   NoTitlePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -63,10 +63,26 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
   getDefaultForumImage () {
     this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
       switchMap(forumImages => {
-        if (forumImages && forumImages.length > 0)
-          return of(forumImages[0]);
-        else
-          return of(null);
+        if (forumImages && forumImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (forumImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                forumImages[0].url = downloadUrl;
+              else
+                forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
+
+              return of(forumImages[0]);
+            })
+          );
+        }
+        else return of(null);
       })
     )
     .subscribe(forumImage => {
@@ -74,8 +90,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
         this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
-          smallUrl: '../../../../assets/defaultThumbnail.jpg',
-          name: 'No image'
+          url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }

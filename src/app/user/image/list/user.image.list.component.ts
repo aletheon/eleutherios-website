@@ -6,7 +6,6 @@ import {
   UserImageService,
   PreviousRouteService,
   NoTitlePipe,
-  DownloadImageUrlPipe,
   TruncatePipe,
   Image
 } from '../../../shared';
@@ -14,8 +13,8 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
+import { switchMap, finalize } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -147,10 +146,14 @@ export class UserImageListComponent implements OnInit, OnDestroy {
           let observables = images.map(image => {
             if (image){
               let getImageTotal$ = this.siteTotalService.getTotal(image.imageId);
+              let getDownloadUrl$: Observable<any>;
 
-              return combineLatest([getImageTotal$]).pipe(
+              if (image.smallUrl)
+                getDownloadUrl$ = from(firebase.storage().ref(image.smallUrl).getDownloadURL());
+
+              return combineLatest([getImageTotal$, getDownloadUrl$]).pipe(
                 switchMap(results => {
-                  const [imageTotal] = results;
+                  const [imageTotal, downloadUrl] = results;
                   
                   if (imageTotal){
                     image.forumCount = imageTotal.forumCount;
@@ -159,7 +162,13 @@ export class UserImageListComponent implements OnInit, OnDestroy {
                   else {
                     image.forumCount = 0;
                     image.serviceCount = 0;
-                  }                  
+                  }    
+                  
+                  if (downloadUrl)
+                    image.url = downloadUrl;
+                  else
+                    image.url = '../../../assets/defaultThumbnail.jpg';
+
                   return of(image);
                 })
               );

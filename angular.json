@@ -19,7 +19,8 @@
               "angular-linky",
               "ngx-localforage",
               "lodash",
-              "firebase"
+              "firebase",
+              "@firebase/auth"
             ],
             "outputPath": "dist/eleutherios-website",
             "index": "src/index.html",

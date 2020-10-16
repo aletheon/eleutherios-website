@@ -8,15 +8,15 @@ import {
   AnonymousServiceService,
   UserServiceImageService,
   UserServiceTagService,
-  DownloadImageUrlPipe,
   TruncatePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -206,15 +206,23 @@ export class AnonymousServiceImageListComponent implements OnInit, OnDestroy {
       switchMap(serviceImages => {
         if (serviceImages && serviceImages.length > 0){
           let observables = serviceImages.map(serviceImage => {
-            if (serviceImage && serviceImage.length > 0)
-              return of(serviceImage);
-            else {
-              let tempImage = {
-                largeUrl: '../../../../assets/defaultLarge.jpg',
-                name: 'No image'
-              };
-              return of(tempImage);
-            }
+            let getDownloadUrl$: Observable<any>;
+
+            if (serviceImage.largeUrl)
+              getDownloadUrl$ = from(firebase.storage().ref(serviceImage.largeUrl).getDownloadURL());
+
+            return combineLatest([getDownloadUrl$]).pipe(
+              switchMap(results => {
+                const [downloadUrl] = results;
+                
+                if (downloadUrl)
+                  serviceImage.url = downloadUrl;
+                else
+                  serviceImage.url = '../../../../assets/defaultLarge.jpg';
+  
+                return of(serviceImage);
+              })
+            );
           });
     
           return zip(...observables, (...results) => {
@@ -236,19 +244,40 @@ export class AnonymousServiceImageListComponent implements OnInit, OnDestroy {
 
   getDefaultServiceImage () {
     // default service image
-    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
-      .subscribe(serviceImages => {
-        if (serviceImages && serviceImages.length > 0)
-          this.defaultServiceImage = of(serviceImages[0]);
-        else {
-          let tempImage = {
-            smallUrl: '../../../../assets/defaultThumbnail.jpg',
-            name: 'No image'
-          };
-          this.defaultServiceImage = of(tempImage);
+    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).pipe(
+      switchMap(serviceImages => {
+        if (serviceImages && serviceImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (serviceImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                serviceImages[0].url = downloadUrl;
+              else
+                serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
+
+              return of(serviceImages[0]);
+            })
+          );
         }
+        else return of(null);
+      })
+    )
+    .subscribe(serviceImage => {
+      if (serviceImage)
+        this.defaultServiceImage = of(serviceImage);
+      else {
+        let tempImage = {
+          url: '../../../../assets/defaultThumbnail.jpg'
+        };
+        this.defaultServiceImage = of(tempImage);
       }
-    );
+    });
   }
 
   onNext () {

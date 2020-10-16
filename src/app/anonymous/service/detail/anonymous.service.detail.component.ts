@@ -10,16 +10,15 @@ import {
   AnonymousServiceService,
   UserServiceImageService,
   UserServiceTagService,
-  DownloadImageUrlPipe,
   NoTitlePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -64,10 +63,26 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
     // default service image
     this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).pipe(
       switchMap(serviceImages => {
-        if (serviceImages && serviceImages.length > 0)
-          return of(serviceImages[0]);
-        else
-          return of(null);
+        if (serviceImages && serviceImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (serviceImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                serviceImages[0].url = downloadUrl;
+              else
+                serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
+
+              return of(serviceImages[0]);
+            })
+          );
+        }
+        else return of(null);
       })
     )
     .subscribe(serviceImage => {
@@ -75,8 +90,7 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
         this.defaultServiceImage = of(serviceImage);
       else {
         let tempImage = {
-          smallUrl: '../../../../assets/defaultThumbnail.jpg',
-          name: 'No image'
+          url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultServiceImage = of(tempImage);
       }

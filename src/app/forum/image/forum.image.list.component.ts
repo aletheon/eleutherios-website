@@ -10,7 +10,7 @@ import {
   UserForumTagService,
   ForumService,
   NoTitlePipe,
-  DownloadImageUrlPipe,
+  DownloadImageUrlPipe,  // HERE ROB
   TruncatePipe
 } from '../../shared';
 
