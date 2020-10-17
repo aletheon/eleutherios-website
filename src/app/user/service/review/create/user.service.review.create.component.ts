@@ -18,16 +18,15 @@ import {
   ServiceReview,
   Service,
   ServiceRate,
-  NoTitlePipe,
-  DownloadImageUrlPipe
+  NoTitlePipe
 } from '../../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../../shared/components/notification.snackbar.component';
 
-import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -373,21 +372,42 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getDefaultServiceImage () {
+  getDefaultServiceImage () {
     // default service image
-    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
-      .subscribe(serviceImages => {
-        if (serviceImages && serviceImages.length > 0)
-          this.defaultServiceImage = of(serviceImages[0]);
-        else {
-          let tempImage = {
-            smallUrl: '../../../assets/defaultThumbnail.jpg',
-            name: 'No image'
-          };
-          this.defaultServiceImage = of(tempImage);
+    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).pipe(
+      switchMap(serviceImages => {
+        if (serviceImages && serviceImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (serviceImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                serviceImages[0].url = downloadUrl;
+              else
+                serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
+
+              return of(serviceImages[0]);
+            })
+          );
         }
+        else return of(null);
+      })
+    )
+    .subscribe(serviceImage => {
+      if (serviceImage)
+        this.defaultServiceImage = of(serviceImage);
+      else {
+        let tempImage = {
+          url: '../../../../assets/defaultThumbnail.jpg'
+        };
+        this.defaultServiceImage = of(tempImage);
       }
-    );
+    });
   }
 
   private getUserServiceReviewsList (userId: string, key?: any) {
@@ -404,19 +424,41 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
               return this.userServiceService.getService(serviceReview.serviceUid, serviceReview.serviceId).pipe(
                 switchMap(service => {
                   if (service){
-                    let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                     let getServiceRate$ = this.userServiceRateService.getUserServiceRate(serviceReview.serviceReviewServiceUid, serviceReview.serviceReviewServiceId, service.uid, service.serviceId);
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+
+                          if (serviceImages[0].smallUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+                              
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
           
-                    return combineLatest([getDefaultServiceImages$, getServiceRate$]).pipe(
+                    return combineLatest([getDefaultServiceImage$, getServiceRate$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImages, serviceRates] = results;
+                        const [defaultServiceImage, serviceRates] = results;
           
-                        if (defaultServiceImages && defaultServiceImages.length > 0)
-                          service.defaultServiceImage = of(defaultServiceImages[0]);
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            smallUrl: '../../../assets/defaultThumbnail.jpg',
-                            name: 'No image'
+                            url: '../../../assets/defaultThumbnail.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }

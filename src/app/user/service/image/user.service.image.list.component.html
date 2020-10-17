@@ -8,9 +8,7 @@
           <ng-template #showdefaultserviceimage>
             <ng-container *ngIf="defaultServiceImage | async;let image">
               <div style="flex:none;margin-right:10px">
-                <ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-									<img [src]="url">
-                </ng-container>
+                <img [src]="image.url">
               </div>
             </ng-container>
           </ng-template>
@@ -47,9 +45,7 @@
 						</div>
 						<div style="display:flex;flex-direction:row;align-items:center;justify-content:center">
 							<div *ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
-								<ng-container *ngIf="serviceImage.largeUrl | downloadImageUrl | async; let url">
-									<img [src]="url" matTooltip="{{ serviceImage.name }}">
-								</ng-container>
+								<img [src]="image.url" matTooltip="{{ serviceImage.name }}">
 							</div>
 						</div>
 					</ng-template>

@@ -15,9 +15,7 @@
 					<ng-template #showdefaultserviceimage>
 						<ng-container *ngIf="defaultServiceImage | async;let image">
 							<div style="flex:none;margin-right:10px">
-								<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-									<img [src]="url">
-								</ng-container>
+								<img [src]="image.url">
 							</div>
 						</ng-container>
 					</ng-template>
@@ -121,9 +119,7 @@
 									*ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
 									<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 										<div style="flex:none;margin-right:5px">
-											<ng-container *ngIf="serviceImage.smallUrl | downloadImageUrl | async; let url">
-												<img [src]="url" matTooltip="{{ serviceImage.name }}">
-											</ng-container>
+											<img [src]="serviceImage.url" matTooltip="{{ serviceImage.name }}">
 										</div>
 									</div>
 									<div style="flex:none;display:flex;flex-direction:column;align-items:center">
@@ -154,9 +150,7 @@
 											*ngFor="let image of imageItems; trackBy: trackImages">
 											<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 												<div style="flex:none;margin-right:5px">
-													<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-														<img [src]="url">
-													</ng-container>
+													<img [src]="image.url">
 												</div>
 											</div>
 											<div style="flex:none">
@@ -194,9 +188,7 @@
 												<ng-template #showdefaultforumimage>
 													<ng-container *ngIf="forum.defaultForumImage | async;let image">
 														<div style="flex:none;margin-right:5px">
-															<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
-																<img [src]="url">
-															</ng-container>
+															<img [src]="image.url">
 														</div>
 													</ng-container>
 												</ng-template>
@@ -297,9 +289,7 @@
 											<ng-template #showdefaultforumimage>
 												<ng-container *ngIf="forum.defaultForumImage | async;let image">
 													<div style="flex:none;margin-right:10px">
-														<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
-															<img [src]="url">
-														</ng-container>
+														<img [src]="image.url">
 													</div>
 												</ng-container>
 											</ng-template>
