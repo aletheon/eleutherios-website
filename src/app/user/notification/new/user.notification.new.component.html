@@ -91,9 +91,7 @@
 										<ng-template #showdefaultforumimage>
 											<ng-container *ngIf="result.defaultForumImage | async;let image">
 												<div style="flex:none;margin-right:10px">
-													<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-														<img [src]="url">
-													</ng-container>
+													<img [src]="image.url">
 												</div>
 											</ng-container>
 										</ng-template>
@@ -146,9 +144,7 @@
 										<ng-template #showdefaultserviceimage>
 											<ng-container *ngIf="result.defaultServiceImage | async;let image">
 												<div style="flex:none;margin-right:10px">
-													<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-														<img [src]="url">
-													</ng-container>
+													<img [src]="image.url">
 												</div>
 											</ng-container>
 										</ng-template>

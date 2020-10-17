@@ -32,9 +32,7 @@
           </ng-template>
         </div>
       </div>
-      <div *ngIf="imageItem.largeUrl | downloadImageUrl | async; let url" style="text-align:center">
-        <img [src]="url">
-      </div>
+      <img [src]="imageItem.url">
     </ng-container>
   </ng-container>
 </div>

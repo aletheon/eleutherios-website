@@ -323,10 +323,72 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
               that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
 
               // images
-              that.images = that.userImageService.getImages(that.auth.uid, 1000, null); // smallUrl
+              that.images = that.userImageService.getImages(that.auth.uid, 1000, null).pipe(
+                switchMap(images => {
+                  if (images && images.length > 0){
+                    let observables = images.map(image => {
+                      let getDownloadUrl$: Observable<any>;
+          
+                      if (image.smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(image.smallUrl).getDownloadURL());
+          
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            image.url = downloadUrl;
+                          else
+                            image.url = '../../../assets/defaultThumbnail.jpg';
+            
+                          return of(image);
+                        })
+                      );
+                    });
+              
+                    return zip(...observables, (...results) => {
+                      return results.map((result, i) => {
+                        return images[i];
+                      });
+                    });
+                  }
+                  else return of([]);
+                })
+              );
 
               // forum images
-              that.forumImages = that.userForumImageService.getForumImages(forum.uid, forum.forumId, 1000, null) // smallUrl
+              that.forumImages = that.userForumImageService.getForumImages(forum.uid, forum.forumId, 1000, null).pipe(
+                switchMap(forumImages => {
+                  if (forumImages && forumImages.length > 0){
+                    let observables = forumImages.map(forumImage => {
+                      let getDownloadUrl$: Observable<any>;
+          
+                      if (forumImage.smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(forumImage.smallUrl).getDownloadURL());
+          
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            forumImage.url = downloadUrl;
+                          else
+                            forumImage.url = '../../../assets/defaultThumbnail.jpg';
+            
+                          return of(forumImage);
+                        })
+                      );
+                    });
+              
+                    return zip(...observables, (...results) => {
+                      return results.map((result, i) => {
+                        return forumImages[i];
+                      });
+                    });
+                  }
+                  else return of([]);
+                })
+              );
 
               // services serving in the forum
               that.registrants = that.userForumRegistrantService.getRegistrants(forum.uid, forum.forumId).pipe(

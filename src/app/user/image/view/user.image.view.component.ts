@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import {
   UserImageService,
   NoTitlePipe,
-  DownloadImageUrlPipe,
   TruncatePipe,
   Image
 } from '../../../shared';
@@ -13,7 +12,9 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -91,7 +92,30 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
 
       if (params['imageId'] && params['imageId'].length > 0){
         this._imageId = params['imageId'];
-        this._image = this.userImageService.getImage(this.auth.uid, this._imageId);
+        this._image = this.userImageService.getImage(this.auth.uid, this._imageId).pipe(
+          switchMap(image => {
+            if (image){
+              let getDownloadUrl$: Observable<any>;
+
+              if (image.largeUrl)
+                getDownloadUrl$ = from(firebase.storage().ref(image.largeUrl).getDownloadURL());
+
+              return combineLatest([getDownloadUrl$]).pipe(
+                switchMap(results => {
+                  const [downloadUrl] = results;
+                  
+                  if (downloadUrl)
+                    image.url = downloadUrl;
+                  else
+                    image.url = '../../../assets/defaultLarge.jpg';
+    
+                  return of(image);
+                })
+              );
+            }
+            else return of(null);
+          })
+        );
         this.initForm();
       }
       else {

@@ -24,7 +24,6 @@ import {
   Registrant,
   Tag,
   NoTitlePipe,
-  DownloadImageUrlPipe,
   TruncatePipe
 } from '../../../shared';
 
@@ -32,9 +31,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelect } from '@angular/material/select';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap, startWith, tap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -329,10 +328,26 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 if (service){
                   let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                     switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0)
-                        return of(serviceImages[0]);
-                      else
-                        return of(null);
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
                     })
                   );
 
@@ -344,8 +359,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -372,18 +386,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             if (services && services.length > 0){
               let observables = services.map(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
 
-                  return combineLatest([getDefaultServiceImages$]).pipe(
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImages] = results;
+                      const [defaultServiceImage] = results;
                       
-                      if (defaultServiceImages && defaultServiceImages.length > 0)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -590,18 +626,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       if (services && services.length > 0) {
                         let observables = services.map(service => {
                           if (service) {
-                            let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                              switchMap(serviceImages => {
+                                if (serviceImages && serviceImages.length > 0){
+                                  let getDownloadUrl$: Observable<any>;
+          
+                                  if (serviceImages[0].tinyUrl)
+                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+          
+                                  return combineLatest([getDownloadUrl$]).pipe(
+                                    switchMap(results => {
+                                      const [downloadUrl] = results;
+                                      
+                                      if (downloadUrl)
+                                        serviceImages[0].url = downloadUrl;
+                                      else
+                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                        
+                                      return of(serviceImages[0]);
+                                    })
+                                  );
+                                }
+                                else return of(null);
+                              })
+                            );
 
-                            return combineLatest([getDefaultServiceImages$]).pipe(
+                            return combineLatest([getDefaultServiceImage$]).pipe(
                               switchMap(results => {
-                                const [defaultServiceImages] = results;
+                                const [defaultServiceImage] = results;
 
-                                if (defaultServiceImages && defaultServiceImages.length > 0)
-                                  service.defaultServiceImage = of(defaultServiceImages[0]);
+                                if (defaultServiceImage)
+                                  service.defaultServiceImage = of(defaultServiceImage);
                                 else {
                                   let tempImage = {
-                                    tinyUrl: '../../../assets/defaultTiny.jpg',
-                                    name: 'No image'
+                                    url: '../../../assets/defaultTiny.jpg'
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
@@ -630,18 +688,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
                       if (service) {
-                        let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                        let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                          switchMap(serviceImages => {
+                            if (serviceImages && serviceImages.length > 0){
+                              let getDownloadUrl$: Observable<any>;
+      
+                              if (serviceImages[0].tinyUrl)
+                                getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+      
+                              return combineLatest([getDownloadUrl$]).pipe(
+                                switchMap(results => {
+                                  const [downloadUrl] = results;
+                                  
+                                  if (downloadUrl)
+                                    serviceImages[0].url = downloadUrl;
+                                  else
+                                    serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                    
+                                  return of(serviceImages[0]);
+                                })
+                              );
+                            }
+                            else return of(null);
+                          })
+                        );
 
-                        return combineLatest([getDefaultServiceImages$]).pipe(
+                        return combineLatest([getDefaultServiceImage$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImages] = results;
+                            const [defaultServiceImage] = results;
 
-                            if (defaultServiceImages && defaultServiceImages.length > 0)
-                              service.defaultServiceImage = of(defaultServiceImages[0]);
+                            if (defaultServiceImage)
+                              service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                tinyUrl: '../../../assets/defaultTiny.jpg',
-                                name: 'No image'
+                                url: '../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -675,18 +755,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       if (services && services.length > 0) {
                         let observables = services.map(service => {
                           if (service) {
-                            let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                              switchMap(serviceImages => {
+                                if (serviceImages && serviceImages.length > 0){
+                                  let getDownloadUrl$: Observable<any>;
+          
+                                  if (serviceImages[0].tinyUrl)
+                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+          
+                                  return combineLatest([getDownloadUrl$]).pipe(
+                                    switchMap(results => {
+                                      const [downloadUrl] = results;
+                                      
+                                      if (downloadUrl)
+                                        serviceImages[0].url = downloadUrl;
+                                      else
+                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                        
+                                      return of(serviceImages[0]);
+                                    })
+                                  );
+                                }
+                                else return of(null);
+                              })
+                            );
 
-                            return combineLatest([getDefaultServiceImages$]).pipe(
+                            return combineLatest([getDefaultServiceImage$]).pipe(
                               switchMap(results => {
-                                const [defaultServiceImages] = results;
+                                const [defaultServiceImage] = results;
 
-                                if (defaultServiceImages && defaultServiceImages.length > 0)
-                                  service.defaultServiceImage = of(defaultServiceImages[0]);
+                                if (defaultServiceImage)
+                                  service.defaultServiceImage = of(defaultServiceImage);
                                 else {
                                   let tempImage = {
-                                    tinyUrl: '../../../assets/defaultTiny.jpg',
-                                    name: 'No image'
+                                    url: '../../../assets/defaultTiny.jpg'
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
@@ -715,18 +817,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
                       if (service) {
-                        let getDefaultServiceImages$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                        let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                          switchMap(serviceImages => {
+                            if (serviceImages && serviceImages.length > 0){
+                              let getDownloadUrl$: Observable<any>;
+      
+                              if (serviceImages[0].tinyUrl)
+                                getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+      
+                              return combineLatest([getDownloadUrl$]).pipe(
+                                switchMap(results => {
+                                  const [downloadUrl] = results;
+                                  
+                                  if (downloadUrl)
+                                    serviceImages[0].url = downloadUrl;
+                                  else
+                                    serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                    
+                                  return of(serviceImages[0]);
+                                })
+                              );
+                            }
+                            else return of(null);
+                          })
+                        );
 
-                        return combineLatest([getDefaultServiceImages$]).pipe(
+                        return combineLatest([getDefaultServiceImage$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImages] = results;
+                            const [defaultServiceImage] = results;
 
-                            if (defaultServiceImages && defaultServiceImages.length > 0)
-                              service.defaultServiceImage = of(defaultServiceImages[0]);
+                            if (defaultServiceImage)
+                              service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                tinyUrl: '../../../assets/defaultTiny.jpg',
-                                name: 'No image'
+                                url: '../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -846,18 +970,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             if (services && services.length > 0){
               let observables = services.map(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
 
-                  return combineLatest([getDefaultServiceImages$]).pipe(
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImages] = results;
+                      const [defaultServiceImage] = results;
                       
-                      if (defaultServiceImages && defaultServiceImages.length > 0)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -884,18 +1030,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             if (services && services.length > 0){
               let observables = services.map(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
 
-                  return combineLatest([getDefaultServiceImages$]).pipe(
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImages] = results;
+                      const [defaultServiceImage] = results;
                       
-                      if (defaultServiceImages && defaultServiceImages.length > 0)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -926,18 +1094,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
           if (services && services.length > 0){
             let observables = services.map(service => {
               if (service){
-                let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-                return combineLatest([getDefaultServiceImages$]).pipe(
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImages] = results;
+                    const [defaultServiceImage] = results;
                     
-                    if (defaultServiceImages && defaultServiceImages.length > 0)
-                      service.defaultServiceImage = of(defaultServiceImages[0]);
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        tinyUrl: '../../../assets/defaultTiny.jpg',
-                        name: 'No image'
+                        url: '../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -964,18 +1154,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
           if (services && services.length > 0){
             let observables = services.map(service => {
               if (service){
-                let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-                return combineLatest([getDefaultServiceImages$]).pipe(
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImages] = results;
+                    const [defaultServiceImage] = results;
                     
-                    if (defaultServiceImages && defaultServiceImages.length > 0)
-                      service.defaultServiceImage = of(defaultServiceImages[0]);
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        tinyUrl: '../../../assets/defaultTiny.jpg',
-                        name: 'No image'
+                        url: '../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -1001,10 +1213,26 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   getDefaultForumImage () {
     this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
       switchMap(forumImages => {
-        if (forumImages && forumImages.length > 0)
-          return of(forumImages[0]);
-        else
-          return of(null);
+        if (forumImages && forumImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (forumImages[0].tinyUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                forumImages[0].url = downloadUrl;
+              else
+                forumImages[0].url = '../../../assets/defaultTiny.jpg';
+
+              return of(forumImages[0]);
+            })
+          );
+        }
+        else return of(null);
       })
     )
     .subscribe(forumImage => {
@@ -1012,8 +1240,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
-          tinyUrl: '../../../assets/defaultTiny.jpg',
-          name: 'No image'
+          url: '../../../assets/defaultTiny.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }
@@ -1038,18 +1265,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               if (services && services.length > 0){
                 let observables = services.map(service => {
                   if (service){
-                    let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+    
+                          if (serviceImages[0].tinyUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+    
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+                              
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
           
-                    return combineLatest([getDefaultServiceImages$]).pipe(
+                    return combineLatest([getDefaultServiceImage$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImages] = results;
+                        const [defaultServiceImage] = results;
                         
-                        if (defaultServiceImages && defaultServiceImages.length > 0)
-                          service.defaultServiceImage = of(defaultServiceImages[0]);
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            tinyUrl: '../../../assets/defaultTiny.jpg',
-                            name: 'No image'
+                            url: '../../../assets/defaultTiny.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }
@@ -1077,18 +1326,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
           if (services && services.length > 0){
             let observables = services.map(service => {
               if (service){
-                let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-                return combineLatest([getDefaultServiceImages$]).pipe(
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImages] = results;
+                    const [defaultServiceImage] = results;
                     
-                    if (defaultServiceImages && defaultServiceImages.length > 0)
-                      service.defaultServiceImage = of(defaultServiceImages[0]);
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        tinyUrl: '../../../assets/defaultTiny.jpg',
-                        name: 'No image'
+                        url: '../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -1124,18 +1395,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               if (services && services.length > 0){
                 let observables = services.map(service => {
                   if (service){
-                    let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+    
+                          if (serviceImages[0].tinyUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+    
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+                              
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
 
-                    return combineLatest([getDefaultServiceImages$]).pipe(
+                    return combineLatest([getDefaultServiceImage$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImages] = results;
+                        const [defaultServiceImage] = results;
                         
-                        if (defaultServiceImages && defaultServiceImages.length > 0)
-                          service.defaultServiceImage = of(defaultServiceImages[0]);
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            tinyUrl: '../../../assets/defaultTiny.jpg',
-                            name: 'No image'
+                            url: '../../../assets/defaultTiny.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }
@@ -1163,18 +1456,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
           if (services && services.length > 0){
             let observables = services.map(service => {
               if (service){
-                let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-                return combineLatest([getDefaultServiceImages$]).pipe(
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImages] = results;
+                    const [defaultServiceImage] = results;
                     
-                    if (defaultServiceImages && defaultServiceImages.length > 0)
-                      service.defaultServiceImage = of(defaultServiceImages[0]);
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        tinyUrl: '../../../assets/defaultTiny.jpg',
-                        name: 'No image'
+                        url: '../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -1212,18 +1527,40 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             return this.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
               switchMap(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+  
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+  
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
 
-                  return combineLatest([getDefaultServiceImages$]).pipe(
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImages] = results;
+                      const [defaultServiceImage] = results;
                       
-                      if (defaultServiceImages && defaultServiceImages.length > 0)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }

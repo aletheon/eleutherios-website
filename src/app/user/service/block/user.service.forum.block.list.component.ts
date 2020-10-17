@@ -13,8 +13,9 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -94,11 +95,9 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
             return that.userServiceService.getService(forumBlock.serviceUid, forumBlock.serviceId).pipe(
               switchMap(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                   let getForum$ = this.userForumService.getForum(forumBlock.forumUid, forumBlock.forumId).pipe(
                     switchMap(forum => {
                       if (forum){
-                        let getDefaultForumImages$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId);
                         let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
                           switchMap(registrants => {
                             if (registrants && registrants.length > 0)
@@ -107,17 +106,40 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                               return of(null);
                           })
                         );
+                        let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                          switchMap(forumImages => {
+                            if (forumImages && forumImages.length > 0){
+                              let getDownloadUrl$: Observable<any>;
+        
+                              if (forumImages[0].tinyUrl)
+                                getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+        
+                              return combineLatest([getDownloadUrl$]).pipe(
+                                switchMap(results => {
+                                  const [downloadUrl] = results;
+                                  
+                                  if (downloadUrl)
+                                    forumImages[0].url = downloadUrl;
+                                  else
+                                    forumImages[0].url = '../../../assets/defaultTiny.jpg';
+                    
+                                  return of(forumImages[0]);
+                                })
+                              );
+                            }
+                            else return of(null);
+                          })
+                        );
       
-                        return combineLatest([getDefaultForumImages$, getDefaultRegistrant$]).pipe(
+                        return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
-                            const [defaultForumImages, defaultRegistrant] = results;
+                            const [defaultForumImage, defaultRegistrant] = results;
                                             
-                            if (defaultForumImages && defaultForumImages.length > 0)
-                              forum.defaultForumImage = of(defaultForumImages[0]);
+                            if (defaultForumImage)
+                              forum.defaultForumImage = of(defaultForumImage);
                             else {
                               let tempImage = {
-                                tinyUrl: '../../../assets/defaultTiny.jpg',
-                                name: 'No image'
+                                url: '../../../assets/defaultTiny.jpg'
                               };
                               forum.defaultForumImage = of(tempImage);
                             }
@@ -135,16 +157,40 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  return combineLatest([getDefaultServiceImages$, getForum$]).pipe(
-                    switchMap(results => {
-                      const [defaultServiceImages, forum] = results;
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
 
-                      if (defaultServiceImages)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
+                  return combineLatest([getDefaultServiceImage$, getForum$]).pipe(
+                    switchMap(results => {
+                      const [defaultServiceImage, forum] = results;
+
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }

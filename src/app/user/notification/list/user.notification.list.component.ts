@@ -8,8 +8,7 @@ import {
   UserNotificationService,
   UserNotificationTagService,
   TagService,
-  NoTitlePipe,
-  DownloadImageUrlPipe
+  NoTitlePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';

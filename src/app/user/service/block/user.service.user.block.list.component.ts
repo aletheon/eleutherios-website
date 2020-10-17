@@ -11,8 +11,9 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -90,19 +91,41 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
             return that.userForumService.getForum(serviceUserBlock.forumUid, serviceUserBlock.forumId).pipe(
               switchMap(forum => {
                 if (forum){
-                  let getDefaultForumImages$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId);
                   let getUser$ = that.userService.getUser(serviceUserBlock.userId);
+                  let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                    switchMap(forumImages => {
+                      if (forumImages && forumImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+  
+                        if (forumImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+  
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              forumImages[0].url = downloadUrl;
+                            else
+                              forumImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(forumImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
 
-                  return combineLatest([getDefaultForumImages$, getUser$]).pipe(
+                  return combineLatest([getDefaultForumImage$, getUser$]).pipe(
                     switchMap(results => {
-                      const [defaultForumImages, user] = results;
+                      const [defaultForumImage, user] = results;
 
-                      if (defaultForumImages && defaultForumImages.length > 0)
-                        forum.defaultForumImage = of(defaultForumImages[0]);
+                      if (defaultForumImage)
+                        forum.defaultForumImage = of(defaultForumImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         forum.defaultForumImage = of(tempImage);
                       }
