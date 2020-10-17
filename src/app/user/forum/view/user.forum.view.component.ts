@@ -46,10 +46,10 @@ import * as _ from "lodash";
   styleUrls: ['./user.forum.view.component.css']
 })
 export class UserForumViewComponent implements OnInit, OnDestroy  {
-  @ViewChild(NgxAutoScroll, { static: true }) test: NgxAutoScroll;
+  @ViewChild(NgxAutoScroll, { static: false }) test: NgxAutoScroll;
   // @ViewChild('scrollMe', { static: false }) scrollMeContainer: ElementRef;
-  @ViewChild('audioSound', { static: true }) audioSound: ElementRef;
-  @ViewChild('descriptionPanelTitle', { static: true }) descriptionPanelTitle: ElementRef;
+  @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
+  @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;

@@ -27,8 +27,7 @@ import {
   ServiceBlock,
   ServiceUserBlock,
   Tag,
-  NoTitlePipe,
-  DownloadImageUrlPipe
+  NoTitlePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -36,9 +35,9 @@ import { MatSelect } from '@angular/material/select';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap, startWith, tap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -47,7 +46,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.forum.forum.new.component.css']
 })
 export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('main', { static: true }) titleRef: ElementRef;
+  @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _parentForumSubscription: Subscription;
   private _forumSubscription: Subscription;

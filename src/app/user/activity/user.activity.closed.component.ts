@@ -21,7 +21,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.activity.closed.component.css']
 })
 export class UserActivityClosedComponent implements OnInit, OnDestroy {
-  @ViewChild('audioSound', { static: true }) audioSound: ElementRef;
+  @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   private _userTotalSubscription: Subscription;
   private _subscription: Subscription;
   private _viewForumIdSubscription: Subscription;

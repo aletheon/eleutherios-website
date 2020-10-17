@@ -43,7 +43,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.service.edit.component.css']
 })
 export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewInit  {
-  @ViewChild('main', { static: true }) titleRef: ElementRef;
+  @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;

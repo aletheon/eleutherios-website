@@ -35,7 +35,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.notification.new.component.css']
 })
 export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterViewInit  {
-  @ViewChild('main', { static: true }) titleRef: ElementRef;
+  @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
   private _notificationSubscription: Subscription;

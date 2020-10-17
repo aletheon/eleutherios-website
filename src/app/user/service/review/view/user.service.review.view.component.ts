@@ -35,7 +35,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.service.review.view.component.css']
 })
 export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
-  @ViewChild('main', { static: true }) reviewRef: ElementRef;
+  @ViewChild('main', { static: false }) reviewRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
   private _serviceSubscription: Subscription;

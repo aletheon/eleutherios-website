@@ -37,7 +37,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.forum.service.new.component.css']
 })
 export class UserForumServiceNewComponent implements OnInit, OnDestroy, AfterViewInit  {
-  @ViewChild('main', { static: true }) titleRef: ElementRef;
+  @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _forumSubscription: Subscription;
   private _serviceSubscription: Subscription;
