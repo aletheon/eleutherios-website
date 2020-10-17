@@ -25,16 +25,15 @@ import {
   UserForumRegistrantService,
   Registrant,
   Service,
-  DownloadImageUrlPipe,
   NoTitlePipe
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import * as firebase from 'firebase/app';
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -389,19 +388,40 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
 
   getDefaultServiceImage () {
     // default service image
-    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
-      .subscribe(serviceImages => {
-        if (serviceImages && serviceImages.length > 0)
-          this.defaultServiceImage = of(serviceImages[0]);
-        else {
-          let tempImage = {
-            smallUrl: '../../../assets/defaultThumbnail.jpg',
-            name: 'No image'
-          };
-          this.defaultServiceImage = of(tempImage);
+    this._defaultServiceImageSubscription = this.userServiceImageService.getDefaultServiceImages(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).pipe(
+      switchMap(serviceImages => {
+        if (serviceImages && serviceImages.length > 0){
+          let getDownloadUrl$: Observable<any>;
+
+          if (serviceImages[0].smallUrl)
+            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+          return combineLatest([getDownloadUrl$]).pipe(
+            switchMap(results => {
+              const [downloadUrl] = results;
+              
+              if (downloadUrl)
+                serviceImages[0].url = downloadUrl;
+              else
+                serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+
+              return of(serviceImages[0]);
+            })
+          );
         }
+        else return of(null);
+      })
+    )
+    .subscribe(serviceImage => {
+      if (serviceImage)
+        this.defaultServiceImage = of(serviceImage);
+      else {
+        let tempImage = {
+          url: '../../../assets/defaultThumbnail.jpg'
+        };
+        this.defaultServiceImage = of(tempImage);
       }
-    );
+    });
   }
 
   ngOnDestroy () {
@@ -665,18 +685,40 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                     return that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
                       switchMap(forum => {
                         if (forum) {
-                          let getDefaultForumImages$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId);
+                          let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                            switchMap(forumImages => {
+                              if (forumImages && forumImages.length > 0){
+                                let getDownloadUrl$: Observable<any>;
+          
+                                if (forumImages[0].tinyUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+          
+                                return combineLatest([getDownloadUrl$]).pipe(
+                                  switchMap(results => {
+                                    const [downloadUrl] = results;
+                                    
+                                    if (downloadUrl)
+                                      forumImages[0].url = downloadUrl;
+                                    else
+                                      forumImages[0].url = '../../../assets/defaultTiny.jpg';
+                      
+                                    return of(forumImages[0]);
+                                  })
+                                );
+                              }
+                              else return of(null);
+                            })
+                          );
 
-                          return combineLatest([getDefaultForumImages$]).pipe(
+                          return combineLatest([getDefaultForumImage$]).pipe(
                             switchMap(results => {
-                              const [defaultForumImages] = results;
+                              const [defaultForumImage] = results;
 
-                              if (defaultForumImages && defaultForumImages.length > 0)
-                                forum.defaultForumImage = of(defaultForumImages[0]);
+                              if (defaultForumImage)
+                                forum.defaultForumImage = of(defaultForumImage);
                               else {
                                 let tempImage = {
-                                  tinyUrl: '../../../assets/defaultTiny.jpg',
-                                  name: 'No image'
+                                  url: '../../../assets/defaultTiny.jpg'
                                 };
                                 forum.defaultForumImage = of(tempImage);
                               }
@@ -684,8 +726,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                             })
                           );
                         }
-                        else
-                          return of(null);
+                        else return of(null);
                       })
                     );
                   });
