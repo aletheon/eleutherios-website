@@ -17,9 +17,7 @@
           <ng-template #showdefaultforumimage>
             <ng-container *ngIf="activity.defaultForumImage | async;let image">
               <div style="flex:none">
-                <ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
-                  <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="url" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
-                </ng-container>
+                <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="image.url" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
               </div>
             </ng-container>
           </ng-template>

@@ -7,24 +7,22 @@
 				<ng-template #showdefaultforumimage>
 					<ng-container *ngIf="defaultForumImage | async;let image">
 						<div style="flex:none;margin-right:10px">
-							<ng-container *ngIf="image.smallUrl | downloadImageUrl | async; let url">
-								<ng-container *ngIf="url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-								<ng-template #showimage>
-									<img [src]="url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
-								</ng-template>
-								<ng-template #noimage>
-									<ng-container *ngIf="imageCount | async as t">
-										<ng-container [ngSwitch]="t">
-											<ng-container *ngSwitchCase="-1">
-												<img [src]="url">
-											</ng-container>
-											<ng-container *ngSwitchDefault>
-												<img [src]="url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
-											</ng-container>
+							<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-template #showimage>
+								<img [src]="image.url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
+							</ng-template>
+							<ng-template #noimage>
+								<ng-container *ngIf="imageCount | async as t">
+									<ng-container [ngSwitch]="t">
+										<ng-container *ngSwitchCase="-1">
+											<img [src]="image.url">
+										</ng-container>
+										<ng-container *ngSwitchDefault>
+											<img [src]="image.url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
 										</ng-container>
 									</ng-container>
-								</ng-template>
-							</ng-container>
+								</ng-container>
+							</ng-template>
 						</div>
 					</ng-container>
 				</ng-template>
@@ -159,9 +157,7 @@
 																<ng-template #showdefaultserviceimage>
 																	<ng-container *ngIf="service.defaultServiceImage | async;let image">
 																		<div style="flex:none;margin-right:5px">
-																			<ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
-																				<img [src]="url">
-																			</ng-container>
+																			<img [src]="image.url">
 																		</div>
 																	</ng-container>
 																</ng-template>

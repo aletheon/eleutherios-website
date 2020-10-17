@@ -7,12 +7,12 @@ import {
   UserForumPostService,
   UserForumImageService,
   UserServiceImageService,
-  MessageSharingService,
-  DownloadImageUrlPipe
+  MessageSharingService
 } from '../../shared';
 
-import { Observable, Subscription, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -110,7 +110,30 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
             activity.fullTitle = activity.title;
 
             // get the image for this forum
-            let getDefaultForumImages$ = this.userForumImageService.getDefaultForumImages(activity.uid, activity.forumId);
+            let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(activity.uid, activity.forumId).pipe(
+              switchMap(forumImages => {
+                if (forumImages && forumImages.length > 0){
+                  let getDownloadUrl$: Observable<any>;
+
+                  if (forumImages[0].tinyUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+                      
+                      if (downloadUrl)
+                        forumImages[0].url = downloadUrl;
+                      else
+                        forumImages[0].url = '../../../assets/defaultTiny.jpg';
+        
+                      return of(forumImages[0]);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            );
 
             // subscribe to any newly create forum posts
             let getLastPosts$ = this.userForumPostService.getLastPosts(activity.uid, activity.forumId, 1).pipe(
@@ -119,19 +142,41 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
                   let observables = posts.map(post => {
                     if (post){
                       let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
-                      let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId);
+                      let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
+                        switchMap(serviceImages => {
+                          if (serviceImages && serviceImages.length > 0){
+                            let getDownloadUrl$: Observable<any>;
 
-                      return combineLatest([getService$, getDefaultServiceImages$]).pipe(
+                            if (serviceImages[0].tinyUrl)
+                              getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                            return combineLatest([getDownloadUrl$]).pipe(
+                              switchMap(results => {
+                                const [downloadUrl] = results;
+                                
+                                if (downloadUrl)
+                                  serviceImages[0].url = downloadUrl;
+                                else
+                                  serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                  
+                                return of(serviceImages[0]);
+                              })
+                            );
+                          }
+                          else return of(null);
+                        })
+                      );
+
+                      return combineLatest([getService$, getDefaultServiceImage$]).pipe(
                         switchMap(results => {
-                          const [service, defaultServiceImages] = results;
+                          const [service, defaultServiceImage] = results;
 
                           if (service){
-                            if (defaultServiceImages && defaultServiceImages.length > 0)
-                              service.defaultServiceImage = of(defaultServiceImages[0]);
+                            if (defaultServiceImage)
+                              service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                tinyUrl: '../../../assets/defaultTiny.jpg',
-                                name: 'No image'
+                                url: '../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -156,9 +201,9 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
               })
             );
 
-            return combineLatest([getDefaultForumImages$, getLastPosts$]).pipe(
+            return combineLatest([getDefaultForumImage$, getLastPosts$]).pipe(
               switchMap(results => {
-                const [defaultForumImages, lastPosts] = results;
+                const [defaultForumImage, lastPosts] = results;
                 
                 if (lastPosts && lastPosts.length > 0){
                   activity.postMessage = lastPosts[0].message;
@@ -167,12 +212,11 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
                 }
                 else activity.post = of(null);
 
-                if (defaultForumImages && defaultForumImages.length > 0)
-                  activity.defaultForumImage = of(defaultForumImages[0]);
+                if (defaultForumImage)
+                  activity.defaultForumImage = of(defaultForumImage);
                 else {
                   let tempImage = {
-                    tinyUrl: '../../../assets/defaultTiny.jpg',
-                    name: 'No image'
+                    url: '../../../assets/defaultTiny.jpg'
                   };
                   activity.defaultForumImage = of(tempImage);
                 }

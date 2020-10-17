@@ -15,8 +15,9 @@ import {
   Alert
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -120,7 +121,6 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
               return this.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
                 switchMap(forum => {
                   if (forum){
-                    let getDefaultForumImages$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId);
                     let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
                     let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
                       switchMap(registrants => {
@@ -130,17 +130,40 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
                           return of(null);
                       })
                     );
+                    let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                      switchMap(forumImages => {
+                        if (forumImages && forumImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+
+                          if (forumImages[0].smallUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+                              
+                              if (downloadUrl)
+                                forumImages[0].url = downloadUrl;
+                              else
+                                forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                
+                              return of(forumImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
           
-                    return combineLatest([getDefaultForumImages$, getForumTags$, getDefaultRegistrant$]).pipe(
+                    return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
                       switchMap(results => {
-                        const [defaultForumImages, forumTags, defaultRegistrant] = results;
+                        const [defaultForumImage, forumTags, defaultRegistrant] = results;
           
-                        if (defaultForumImages && defaultForumImages.length > 0)
-                          forum.defaultForumImage = of(defaultForumImages[0]);
+                        if (defaultForumImage)
+                          forum.defaultForumImage = of(defaultForumImage);
                         else {
                           let tempImage = {
-                            smallUrl: '../../../assets/defaultThumbnail.jpg',
-                            name: 'No image'
+                            url: '../../../assets/defaultThumbnail.jpg'
                           };
                           forum.defaultForumImage = of(tempImage);
                         }
@@ -167,19 +190,41 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
               return this.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
                 switchMap(service => {
                   if (service){
-                    let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
                     let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+
+                          if (serviceImages[0].smallUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+                              
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
           
-                    return combineLatest([getDefaultServiceImages$, getServiceTags$]).pipe(
+                    return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImages, serviceTags] = results;
+                        const [defaultServiceImage, serviceTags] = results;
           
-                        if (defaultServiceImages && defaultServiceImages.length > 0)
-                          service.defaultServiceImage = of(defaultServiceImages[0]);
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            smallUrl: '../../../assets/defaultThumbnail.jpg',
-                            name: 'No image'
+                            url: '../../../assets/defaultThumbnail.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }

@@ -20,16 +20,14 @@
 								<ng-template #showdefaultserviceimage>
 									<ng-container *ngIf="service.defaultServiceImage | async;let image">
                     <div style="flex:none;margin-right:10px">
-                      <ng-container *ngIf="image.tinyUrl | downloadImageUrl | async; let url">
-                        <ng-container *ngIf="url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
-                        <ng-template #showimage>
-                          <img *ngIf="service.type == 'Private'" [src]="url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="cursor:pointer">
-                          <img *ngIf="service.type == 'Public'" [src]="url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
-                        </ng-template>
-                        <ng-template #noimage>
-                          <img [src]="url">
-                        </ng-template>
-                      </ng-container>
+                      <ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+                      <ng-template #showimage>
+                        <img *ngIf="service.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="cursor:pointer">
+                        <img *ngIf="service.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
+                      </ng-template>
+                      <ng-template #noimage>
+                        <img [src]="image.url">
+                      </ng-template>
                     </div>
 									</ng-container>
                 </ng-template>

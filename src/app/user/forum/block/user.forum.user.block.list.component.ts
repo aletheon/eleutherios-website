@@ -11,8 +11,9 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -90,19 +91,41 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
             return that.userServiceService.getService(forumUserBlock.serviceUid, forumUserBlock.serviceId).pipe(
               switchMap(service => {
                 if (service){
-                  let getDefaultServiceImages$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId);
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+              
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
                   let getUser$ = that.userService.getUser(forumUserBlock.userId);
 
-                  return combineLatest([getDefaultServiceImages$, getUser$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getUser$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImages, user] = results;
+                      const [defaultServiceImage, user] = results;
 
-                      if (defaultServiceImages && defaultServiceImages.length > 0)
-                        service.defaultServiceImage = of(defaultServiceImages[0]);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          tinyUrl: '../../../assets/defaultTiny.jpg',
-                          name: 'No image'
+                          url: '../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
