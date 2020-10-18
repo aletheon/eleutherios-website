@@ -111,7 +111,7 @@ export class AuthService {
           receiveForumAlertNotifications: false,
           receiveServiceAlertNotifications: false,
           receiveForumPostNotifications: false,
-          receiveAlphaNotification: true,
+          receiveAlphaNotification: false,
           creationDate: firebase.firestore.FieldValue.serverTimestamp(),
           lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
         };

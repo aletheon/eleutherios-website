@@ -87,16 +87,4 @@
       </div>
     </ng-template>
   </div>
-  <ng-container *ngIf="auth.user | async">
-    <ng-container *ngIf="auth.user | async as user">
-      <div *ngIf="user.receiveAlphaNotification == true" style="display:flex;flex-direction:row;padding:10px;background-color:rgb(228, 227, 181);border:1px solid rgb(255, 94, 0)">
-        <div style="flex:1">
-          Eleutherios, is a prototype of a global cooperative forum or circular economy.  Help us establish, Eleutherios, by reporting any <a href="https://www.facebook.com/groups/2982366048442234/" style="color:#1B1B1B;text-decoration:underline" target="_blank">bugs</a> or <a href="https://github.com/aletheon/eleutherios-alpha/issues" style="color:#1B1B1B;text-decoration:underline" target="_blank">issues</a>, thankyou.
-        </div>
-        <div style="flex:none">
-          <button mat-button (click)="changeReceiveAlphaNotification(user)">OK</button>
-        </div>
-      </div>
-    </ng-container>
-  </ng-container>
 </header>
