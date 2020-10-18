@@ -38,7 +38,6 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
     private messageSharingService: MessageSharingService) {
-      console.log('loading activity closed');
   }
 
   setActivityHighlight(activity) {
