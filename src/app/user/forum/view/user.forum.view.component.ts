@@ -41,12 +41,10 @@ import * as _ from "lodash";
 
 @Component({
   selector: 'user-forum-view',
-  templateUrl: './user.forum.view.component.html',
   styleUrls: ['./user.forum.view.component.css']
 })
 export class UserForumViewComponent implements OnInit, OnDestroy  {
-  @ViewChild(NgxAutoScroll, { static: false }) test: NgxAutoScroll;
-  // @ViewChild('scrollMe', { static: false }) scrollMeContainer: ElementRef;
+  @ViewChild( NgxAutoScroll, { static: false }) ngxAutoScroller: NgxAutoScroll;
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
