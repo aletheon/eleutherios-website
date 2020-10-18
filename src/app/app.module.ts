@@ -28,7 +28,6 @@ import { BackModule } from './shared/';
 import { PipeModule } from './shared/';
 import { CoreModule } from './core/core.module';
 import { FacebookModule } from 'ngx-facebook';
-import { LocalForageModule } from 'ngx-localforage';
 
 // common
 
@@ -111,8 +110,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserSettingModule,
     UserTagModule,
     StarRatingModule.forRoot(),
-    FacebookModule.forRoot(),
-    LocalForageModule.forRoot()
+    FacebookModule.forRoot()
   ],
   providers: [AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
   bootstrap: [AppComponent],

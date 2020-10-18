@@ -42,5 +42,4 @@ export * from './tag.service';
 export * from './site.total.service';
 export * from './message.sharing.service';
 export * from './push.message.service';
-export * from './local-cache.service';
 export * from './previous.route.service';
