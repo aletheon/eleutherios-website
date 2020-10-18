@@ -733,10 +733,13 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
 
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
+                      whereServings[i].type = result.type;
+
                       if (result)
                         whereServings[i].forum = of(result);
-                      else
+                      else 
                         whereServings[i].forum = of(null);
+
                       return whereServings[i];
                     });
                   });
@@ -745,12 +748,8 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
               }),
               map(whereServings => {
                 return whereServings.filter(whereServing => {
-                  if (whereServing.forum) {
-                    if (whereServing.forum.value.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.forum.value.uid)
-                      return true;
-                    else
-                      return false;
-                  }
+                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
+                    return true;
                   else
                     return false;
                 }).map(whereServing => {
