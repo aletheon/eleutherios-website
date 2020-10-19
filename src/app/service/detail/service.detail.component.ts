@@ -167,7 +167,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
     console.log('Payment Request is not Available');
   }
 
-  public createPaymentIntent(): Observable<PaymentIntent> {
+  createPaymentIntent(): Observable<PaymentIntent> {
     // Replace this with your own custom implementation 
     // to perform a Payment Intent Creation
     // You will need your own Server to do that
@@ -613,21 +613,6 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
         this.router.navigate(['/']);
       }
     });
-  }
-
-  createToken(): void {
-    const name = this.stripeTest.get('name').value;
-    this.stripeService
-      .createToken(this.card.element, { name })
-      .subscribe((result) => {
-        if (result.token) {
-          // Use the token
-          console.log(result.token.id);
-        } else if (result.error) {
-          // Error creating the token
-          console.log(result.error.message);
-        }
-      });
   }
 
   private initForm () {
