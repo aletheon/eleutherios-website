@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef 
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import {
@@ -30,6 +30,11 @@ import {
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
+import { StripeService, StripeCardComponent } from 'ngx-stripe';
+import {
+  StripeCardElementOptions,
+  StripeElementsOptions
+} from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
@@ -44,6 +49,7 @@ import * as _ from "lodash";
 export class ServiceDetailComponent implements OnInit, OnDestroy  {
   @ViewChild('descriptionPanel', { static: false }) _descriptionPanel: MatExpansionPanel;
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
+  @ViewChild(StripeCardComponent) card: StripeCardComponent;
 
   private _loading = new BehaviorSubject(false);
   private _routeSubscription: any;
@@ -62,6 +68,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
   public rateCount: Observable<number> = this._rateCount.asObservable();
   public reviewCount: Observable<number> = this._reviewCount.asObservable();
   public serviceGroup: FormGroup;
+  public stripeTest: FormGroup;
   public userForums: Observable<any[]>;
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
@@ -73,6 +80,25 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
   public defaultReview: Observable<any>;
+
+  public cardOptions: StripeCardElementOptions = {
+    style: {
+      base: {
+        iconColor: '#666EE8',
+        color: '#31325F',
+        fontWeight: '300',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSize: '18px',
+        '::placeholder': {
+          color: '#CFD7E0'
+        }
+      }
+    }
+  };
+
+  public elementsOptions: StripeElementsOptions = {
+    locale: 'en'
+  };
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -94,6 +120,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
     private route: ActivatedRoute,
     private snackbar: MatSnackBar,
     private location: Location,
+    private stripeService: StripeService,
     private changeDetector : ChangeDetectorRef) {
       this.userForumsCtrl = new FormControl();
   }
@@ -510,8 +537,27 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
     });
   }
 
+  createToken(): void {
+    const name = this.stripeTest.get('name').value;
+    this.stripeService
+      .createToken(this.card.element, { name })
+      .subscribe((result) => {
+        if (result.token) {
+          // Use the token
+          console.log(result.token.id);
+        } else if (result.error) {
+          // Error creating the token
+          console.log(result.error.message);
+        }
+      });
+  }
+
   private initForm () {
     const that = this;
+
+    this.stripeTest = this.fb.group({
+      name: ['', [Validators.required]]
+    });
     
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
