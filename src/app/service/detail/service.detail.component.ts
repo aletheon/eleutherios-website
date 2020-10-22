@@ -90,7 +90,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   paymentRequest: any;
   prButton: any;
 
-  @ViewChild('payElement') payElement;
+  // @ViewChild('payElement') payElement;
 
   // public paymentRequestOptions = {
   //   country: 'ES',

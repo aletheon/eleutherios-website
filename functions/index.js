@@ -27,7 +27,6 @@ const stripe = require('stripe')(functions.config().stripe.secret);
 // Ctrl + K, Ctrl + 0 on Windows and Linux = FOLD ALL
 // Ctrl + K, Ctrl + J on Windows and Linux = UNFOLD ALL
 
-
 exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
   const customer = await stripe.customers.create({ email: user.email });
   const intent = await stripe.setupIntents.create({
@@ -40,8 +39,6 @@ exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
   });
   return;
 });
-
-
 
 
 // IMAGE UPLOAD

@@ -29,8 +29,6 @@ import {
   NoTitlePipe
 } from '../../../shared';
 
-// here rob, have to enable end user to disable the parent association attached to this forum if there is one
-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
