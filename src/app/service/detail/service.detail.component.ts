@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -49,7 +49,7 @@ import * as _ from "lodash";
   templateUrl: './service.detail.component.html',
   styleUrls: ['./service.detail.component.css']
 })
-export class ServiceDetailComponent implements OnInit, OnDestroy  {
+export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy  {
   @ViewChild('descriptionPanel', { static: false }) _descriptionPanel: MatExpansionPanel;
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
@@ -83,99 +83,108 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
   public defaultServiceImage: Observable<any>;
   public defaultReview: Observable<any>;
 
-  public paymentRequestOptions = {
-    country: 'ES',
-    currency: 'eur',
-    total: {
-      label: 'Demo Total',
-      amount: 1099,
-    },
-    requestPayerName: true,
-    requestPayerEmail: true,
-  };
+  @Input() amount: number;
+  @Input() lablel: string;
 
-  public elementsOptions: StripeElementsOptions = {
-    locale: 'es',
-  };
+  elements: any;
+  paymentRequest: any;
+  prButton: any;
 
-  public onPaymentMethod(ev: PaymentRequestPaymentMethodEvent) {
-    this.createPaymentIntent()
-      .pipe(
-        switchMap((pi) => {
-          return this.stripeService
-            .confirmCardPayment(
-              pi.client_secret,
-              { payment_method: ev.paymentMethod.id },
-              { handleActions: false }
-            )
-            .pipe(
-              switchMap((confirmResult) => {
-                if (confirmResult.error) {
-                  // Report to the browser that the payment failed, 
-                  // prompting it to re-show the payment interface, 
-                  // or show an error message and close the payment.
-                  ev.complete('fail');
-                  return of({
-                    error: new Error('Error Confirming the payment'),
-                  });
-                } else {
-                  // Report to the browser that the confirmation was 
-                  // successful, prompting it to close the browser 
-                  // payment method collection interface.
-                  ev.complete('success');
-                  // Let Stripe.js handle the rest of the payment flow.
-                  return this.stripeService.confirmCardPayment(
-                    pi.client_secret
-                  );
-                }
-              })
-            );
-        })
-      )
-      .subscribe((result) => {
-        if (result.error) {
-          // The payment failed -- ask your customer for a new payment method.
-        } else {
-          // The payment has succeeded.
-        }
-      });
-  }
+  @ViewChild('payElement') payElement;
 
-  public onShippingAddressChange(ev: PaymentRequestShippingAddressEvent) {
-    if (ev.shippingAddress.country !== 'US') {
-      ev.updateWith({ status: 'invalid_shipping_address' });
-    } else {
-      // Replace this with your own custom implementation if needed
-      fetch('/calculateShipping', {
-        data: JSON.stringify({
-          shippingAddress: ev.shippingAddress,
-        }),
-      } as any)
-        .then((response) => response.json())
-        .then((result) =>
-          ev.updateWith({
-            status: 'success',
-            shippingOptions: result.supportedShippingOptions,
-          })
-        );
-    }
-  }
+  // public paymentRequestOptions = {
+  //   country: 'ES',
+  //   currency: 'eur',
+  //   total: {
+  //     label: 'Demo Total',
+  //     amount: 1099,
+  //   },
+  //   requestPayerName: true,
+  //   requestPayerEmail: true,
+  // };
 
-  public onNotAvailable() {
-    // Subscribe to this event in case you want to act
-    // base on availability
-    console.log('Payment Request is not Available');
-  }
+  // public elementsOptions: StripeElementsOptions = {
+  //   locale: 'es',
+  // };
 
-  createPaymentIntent(): Observable<PaymentIntent> {
-    // Replace this with your own custom implementation 
-    // to perform a Payment Intent Creation
-    // You will need your own Server to do that
-    return this.http.post<PaymentIntent>(
-      '/create-payment-intent',
-      { amount: this.paymentRequestOptions.total.amount }
-    );
-  }
+  // public onPaymentMethod(ev: PaymentRequestPaymentMethodEvent) {
+  //   this.createPaymentIntent()
+  //     .pipe(
+  //       switchMap((pi) => {
+  //         return this.stripeService
+  //           .confirmCardPayment(
+  //             pi.client_secret,
+  //             { payment_method: ev.paymentMethod.id },
+  //             { handleActions: false }
+  //           )
+  //           .pipe(
+  //             switchMap((confirmResult) => {
+  //               if (confirmResult.error) {
+  //                 // Report to the browser that the payment failed, 
+  //                 // prompting it to re-show the payment interface, 
+  //                 // or show an error message and close the payment.
+  //                 ev.complete('fail');
+  //                 return of({
+  //                   error: new Error('Error Confirming the payment'),
+  //                 });
+  //               } else {
+  //                 // Report to the browser that the confirmation was 
+  //                 // successful, prompting it to close the browser 
+  //                 // payment method collection interface.
+  //                 ev.complete('success');
+  //                 // Let Stripe.js handle the rest of the payment flow.
+  //                 return this.stripeService.confirmCardPayment(
+  //                   pi.client_secret
+  //                 );
+  //               }
+  //             })
+  //           );
+  //       })
+  //     )
+  //     .subscribe((result) => {
+  //       if (result.error) {
+  //         // The payment failed -- ask your customer for a new payment method.
+  //       } else {
+  //         // The payment has succeeded.
+  //       }
+  //     });
+  // }
+
+  // public onShippingAddressChange(ev: PaymentRequestShippingAddressEvent) {
+  //   if (ev.shippingAddress.country !== 'US') {
+  //     ev.updateWith({ status: 'invalid_shipping_address' });
+  //   } else {
+  //     // Replace this with your own custom implementation if needed
+  //     fetch('/calculateShipping', {
+  //       data: JSON.stringify({
+  //         shippingAddress: ev.shippingAddress,
+  //       }),
+  //     } as any)
+  //       .then((response) => response.json())
+  //       .then((result) =>
+  //         ev.updateWith({
+  //           status: 'success',
+  //           shippingOptions: result.supportedShippingOptions,
+  //         })
+  //       );
+  //   }
+  // }
+
+  // public onNotAvailable() {
+  //   // Subscribe to this event in case you want to act
+  //   // base on availability
+  //   console.log('Payment Request is not Available');
+  // }
+
+  // createPaymentIntent(): Observable<PaymentIntent> {
+  //   // Replace this with your own custom implementation 
+  //   // to perform a Payment Intent Creation
+  //   // You will need your own Server to do that
+  //   return this.http.post<PaymentIntent>(
+  //     '/create-payment-intent',
+  //     { amount: this.paymentRequestOptions.total.amount }
+  //   );
+  // }
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -545,6 +554,29 @@ export class ServiceDetailComponent implements OnInit, OnDestroy  {
   trackServiceTags (index, serviceTag) { return serviceTag.tagId; }
   trackWhereServings (index, whereServing) { return whereServing.forumId; }
   trackUserForums (index, forum) { return forum.forumId; }
+
+  ngAfterViewInit () {
+    const that = this;
+
+    let intervalId = setInterval(function() {
+      if (that._loading.getValue() == false) {
+        clearInterval(intervalId);
+
+        // that.paymentRequest = that.stripeService.can({
+        //   country: 'US',
+        //   currency: 'usd'
+        // });
+
+        // if (that.forumGroup.get('title') && that.forumGroup.get('title').value.length == 0){
+        //   // set focus
+        //   for (let i in that.forumGroup.controls) {
+        //     that.forumGroup.controls[i].markAsTouched();
+        //   }
+        //   that.titleRef.nativeElement.focus();
+        // }
+      }
+    }, 500);
+  }
 
   ngOnInit () {
     this._loading.next(true);

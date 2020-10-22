@@ -2,6 +2,7 @@
   <header>
     <layout-header></layout-header>
   </header>
+  <app-payments></app-payments>
   <ng-container *ngIf="auth.user | async; then authenticated else guest"></ng-container>
   <ng-template #authenticated>
     <mat-sidenav-container autosize="true" style="flex:1;min-height:0px;height:100%">

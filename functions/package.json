@@ -15,6 +15,7 @@
   "dependencies": {
     "@google-cloud/storage": "^5.3.0",
     "@types/async": "^3.2.3",
+    "@types/stripe": "^7.13.24",
     "@types/uuid": "^8.3.0",
     "async": "^3.2.0",
     "child-process-promise": "^2.2.1",

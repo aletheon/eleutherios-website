@@ -92,12 +92,15 @@
 					</div>
 					<div style="flex:none;display:flex;flex-direction:row">
 						<div style="flex:none;margin-right:5px">
-							<ngx-stripe-payment-request-button
+							<div #payElement>
+								
+							</div>
+							<!-- <ngx-stripe-payment-request-button
 								[paymentOptions]="paymentRequestOptions"
 								(paymentMethod)="onPaymentMethod($event)"
 								(shippingaddresschange)="onShippingAddressChange($event)"
 								(notavailable)="onNotAvailable()"
-							></ngx-stripe-payment-request-button>
+							></ngx-stripe-payment-request-button> -->
 						</div>
 						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
 							<mat-icon [routerLink]="['/service/rate/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create rate">add_circle_outline</mat-icon>
