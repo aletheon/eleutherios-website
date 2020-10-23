@@ -45,14 +45,11 @@ iv.   angular cli (npm install -g @angular/cli)
 
 ### 1. Cloning Eleutherios
 
-The easiest way to get Eleutherios up and running on your machine is to fork it, then clone your fork into a new angular project.
+The easiest way to get Eleutherios up and running on your machine is to clone it.
 
 ```bash
-i.    git clone https://github.com/aletheon/eleutherios-alpha.git eleutherios-alpha-clone
-ii.   create a new angular firebase project e.g. my-eleutherios
+i.    git clone https://github.com/aletheon/eleutherios-website.git eleutherios-website
 ```
-
-Go here for instructions on how to setup a Angular Firebase project: https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md
 
 ```bash
 iii.  copy the eleutherios-clone files to your my-eleutherios replacing any duplicate files such as README.md, .gitignore and package.json.
