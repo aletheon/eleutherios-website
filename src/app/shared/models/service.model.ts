@@ -9,7 +9,7 @@ export interface Service {
   default: boolean, // whether this service is the default service for the owner
   indexed: boolean, // whether this service is indexed or hidden
   rate: number,  // average rating of the service for sorting purposes
-  paymentType: string, // [free|paid]
+  paymentType: string, // [Free|Paid]
   amount: number, // amount to pay for this service
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
