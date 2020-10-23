@@ -7476,11 +7476,6 @@ exports.deleteUserServiceImage = functions.firestore.document("users/{userId}/se
 			});
 		}
 	).then(() => {
-    console.log('image.tinyUrl ' + image.tinyUrl);
-    console.log('image.smallUrl ' + image.smallUrl);
-    console.log('image.mediumUrl ' + image.mediumUrl);
-    console.log('image.largeUrl ' + image.tinyUrl);
-
     return removeImage(image.tinyUrl).then(() => {
       return removeImage(image.smallUrl).then(() => {
         return removeImage(image.mediumUrl).then(() => {
@@ -12656,12 +12651,7 @@ exports.deleteUserForumImage = functions.firestore.document("users/{userId}/foru
 					return Promise.resolve();
 			});
 		}
-	).then(() => {
-    console.log('image.tinyUrl ' + image.tinyUrl);
-    console.log('image.smallUrl ' + image.smallUrl);
-    console.log('image.mediumUrl ' + image.mediumUrl);
-    console.log('image.largeUrl ' + image.tinyUrl);
-    
+	).then(() => {    
     return removeImage(image.tinyUrl).then(() => {
       return removeImage(image.smallUrl).then(() => {
         return removeImage(image.mediumUrl).then(() => {
