@@ -49,9 +49,8 @@ The easiest way to get Eleutherios up and running is to clone it to your machine
 
 ```bash
 i.    git clone https://github.com/aletheon/eleutherios-website.git eleutherios-website
-ii.   copy the eleutherios-clone files to your my-eleutherios replacing any duplicate files such as README.md, .gitignore and package.json.
-iii.  run npm install to install dependencies
-iv.   create a new folder in your src folder called environments to hold your firebase database configuration files environment.prod.ts and environment.ts:
+ii.   run npm install to install dependencies
+iii.  create a new folder in your src folder called environments to hold your environment (environment.prod.ts and environment.ts) variables:
 ```
 
 ```bash
@@ -71,18 +70,18 @@ export const environment = {
   stripe: "xxxxxxxxxxxxx",
   googleTagManagerId: "xxxxxxxxxxxxx"
 };
-
 ```
 
 ### 2. Login to firebase and deploy functions folder
 
-Eleutherios uses functions to modify the behavior of the system and its data before or after it is created, updated or deleted in the system.  It's important that functions are enabled in your firebase project.
+Eleutherios uses functions to modify the behavior of the system and its data before or after it is created, updated or deleted in the system.  If you are planning on doing work on the backend API, then you should install firebase functions to help you test your work before committing it.
 
 ```bash
-i.    firebase login
-ii.   firebase init
-        a. setup functions
-iii.  firebase deploy --only functions
+i.   cd functions
+ii.  firebase login
+iii. firebase init
+       a. setup functions
+iv.  firebase deploy --only functions
 ```
 
 If you want to modify the behavior of the functions then you can test it on your firebase server first, before you check it into the master.
