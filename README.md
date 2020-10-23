@@ -45,17 +45,16 @@ iv.   angular cli (npm install -g @angular/cli)
 
 ### 1. Cloning Eleutherios
 
-The easiest way to get Eleutherios up and running on your machine is to clone it.
+The easiest way to get Eleutherios up and running is to clone it to your machine.
 
 ```bash
 i.    git clone https://github.com/aletheon/eleutherios-website.git eleutherios-website
+ii.   copy the eleutherios-clone files to your my-eleutherios replacing any duplicate files such as README.md, .gitignore and package.json.
+iii.  run npm install to install dependencies
+iv.   create a new folder in your src folder called environments to hold your firebase database configuration files environment.prod.ts and environment.ts:
 ```
 
 ```bash
-iii.  copy the eleutherios-clone files to your my-eleutherios replacing any duplicate files such as README.md, .gitignore and package.json.
-iv.   run npm install to install dependencies
-v.    create a new folder in your src folder called environments to hold your firebase database configuration files environment.prod.ts and environment.ts:
-
 export const environment = {
   production: true | false,
   firebase: {
