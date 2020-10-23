@@ -83,8 +83,6 @@ iii. firebase login
 iv.  firebase deploy --only functions
 ```
 
-If you want to modify the behavior of the functions then you can test it on your firebase server first, before you check it into the master.
-
 ### 3. Setup firebase
 
 It's important to setup your firebase backend to work with the source code.
