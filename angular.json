@@ -20,7 +20,8 @@
               "ngx-localforage",
               "lodash",
               "firebase",
-              "@firebase/auth"
+              "@firebase/auth",
+              "@angular/fire/firestore"
             ],
             "outputPath": "dist/eleutherios-website",
             "index": "src/index.html",

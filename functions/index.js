@@ -20,7 +20,9 @@ admin.initializeApp(functions.config().firebase);
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
 
-const stripe = require('stripe')(functions.config().stripe.secret);
+const stripe = require('stripe')(functions.config().stripe.secret, {
+  apiVersion: '2020-03-02',
+});
 
 // https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 
@@ -259,7 +261,40 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 				reject(error);
 			});
 		});
-	}
+  }
+  
+  var createCustomerPaymentInfo = function () {
+    return new Promise((resolve, reject) => {
+      console.log('createCustomerPaymentInfo');
+
+      stripe.customers.create({
+        email: user.email,
+      })
+      .then(customer => {
+        console.log('customer ' + JSON.stringify(customer));
+
+        admin.firestore().collection("users").doc(userId).get().then(doc => {
+          if (doc.exists){
+            doc.ref.update({
+              stripe_customerId: customer.id
+            }).then(() => {
+              resolve();
+            })
+            .catch(error => {
+              reject(error);
+            });
+          }
+          else resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  }
 
 	return admin.firestore().collection('users').select()
 		.get().then(snapshot => {
@@ -272,7 +307,12 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 		}
 	).then(() => {
 		return createUserTotals().then(() => {
-			return Promise.resolve();
+			return createCustomerPaymentInfo().then(() => {
+        return Promise.resolve();
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
 		})
 		.catch(error => {
 			return Promise.reject(error);
@@ -302,7 +342,19 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 				reject(error);
 			});
 		});
-	}
+  }
+  
+  var deleteCustomerPaymentInfo = function () {
+    return new Promise((resolve, reject) => {
+      stripe.customers.del(user)
+      .then(response => {
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  }
 
 	return admin.firestore().collection('users').select()
 		.get().then(snapshot => {
@@ -325,7 +377,12 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 		// ********************************************************************************
 		// ********************************************************************************
 		return removeUserTotals().then(() => {
-			return Promise.resolve();
+			return deleteCustomerPaymentInfo().then(() => {
+        return Promise.resolve();
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
 		})
 		.catch(error => {
 			return Promise.reject(error);
