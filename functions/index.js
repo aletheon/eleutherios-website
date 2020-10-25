@@ -20,11 +20,10 @@ admin.initializeApp(functions.config().firebase);
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
 
+// https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 const stripe = require('stripe')(functions.config().stripe.secret, {
   apiVersion: '2020-03-02',
 });
-
-// https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 
 // Ctrl + K, Ctrl + 0 on Windows and Linux = FOLD ALL
 // Ctrl + K, Ctrl + J on Windows and Linux = UNFOLD ALL
@@ -265,14 +264,10 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
   
   var createCustomerPaymentInfo = function () {
     return new Promise((resolve, reject) => {
-      console.log('createCustomerPaymentInfo');
-
       stripe.customers.create({
         email: user.email,
       })
       .then(customer => {
-        console.log('customer ' + JSON.stringify(customer));
-
         admin.firestore().collection("users").doc(userId).get().then(doc => {
           if (doc.exists){
             doc.ref.update({
@@ -346,13 +341,21 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
   
   var deleteCustomerPaymentInfo = function () {
     return new Promise((resolve, reject) => {
-      stripe.customers.del(user)
-      .then(response => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
+      if (user.stripe_customerId){
+        stripe.customers.del(user.stripe_customerId).then(response => {
+          // https://stripe.com/docs/api/customers/delete
+          // {
+          //   "id": "cus_IGWncbQ978qiJc",
+          //   "object": "customer",
+          //   "deleted": true
+          // }
+          resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      }
+      else resolve();
     });
   }
 
@@ -364,33 +367,33 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 				else
 					return Promise.resolve();
 			});
-		}
-	)
-	.then(() => {
-		// ********************************************************************************
-		// ********************************************************************************
-		// ********************************************************************************
-		// ********************************************************************************
-		// have to remove all of the end users records here
-		// ********************************************************************************
-		// ********************************************************************************
-		// ********************************************************************************
-		// ********************************************************************************
-		return removeUserTotals().then(() => {
-			return deleteCustomerPaymentInfo().then(() => {
-        return Promise.resolve();
+		})
+    .then(() => {
+      // ********************************************************************************
+      // ********************************************************************************
+      // ********************************************************************************
+      // ********************************************************************************
+      // have to remove all of the end users records
+      // ********************************************************************************
+      // ********************************************************************************
+      // ********************************************************************************
+      // ********************************************************************************
+      return removeUserTotals().then(() => {
+        return deleteCustomerPaymentInfo().then(() => {
+          return Promise.resolve();
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
       })
       .catch(error => {
         return Promise.reject(error);
       });
-		})
-		.catch(error => {
-			return Promise.reject(error);
-		});
-	})
-	.catch(error => {
-		return Promise.reject(error);
-	});
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    }
+  );
 });
 
 // ACTIVITY
@@ -14013,3 +14016,98 @@ exports.deleteTag = functions.firestore.document('tags/{tagId}').onDelete((snap,
     return Promise.reject(error);
   });
 });
+
+
+
+// exports.events = functions.https.onRequest((request, response) => {
+//   response.send("Endpoint for Stripe Webhooks!");
+// });
+
+// exports.createOrder = functions.firestore.document("users/{userId}/orders/{orderId}").onCreate((snap, context) => {
+//   //   const percentageOfTransaction = 0.05 // percentage charge on a business for using the platform
+//   //   const application_fee_amount = Math.round((amount * percentageOfTransaction) * 100) 
+//   //   const cost = Math.round(amount * 100);
+//   //   const descriptor = 'brief description of transaction';
+//   //   const description = 'a more detailed description' 
+
+//   var order = snap.data();
+//   var orderId = context.params.orderId;
+  
+//   var createStripeCharge = function () {
+// 		return new Promise((resolve, reject) => {
+//       stripe.charges.create({
+//         customer: order.stripe_customerId, // service receiving payment
+//         amount: order.cost,
+//         application_fee_amount: order.application_fee_amount,
+//         description: order.description,
+//         statement_descriptor: order.descriptor,
+//         currency: order.currency,
+//         transfer_data: {
+//           destination: order.destination_stripe_customerId // service making payment
+//         }
+//       })
+//       .then(charge => {
+//         // HERE ROB
+//         resolve();
+//       })
+//       .catch(error => {
+//         reject(error);
+//       });
+// 		});
+//   }
+  
+//   // return admin.firestore().collection('users').select()
+// 	// 	.get().then(snapshot => {
+// 	// 		return admin.database().ref("totals").child('user').once("value", totalSnapshot => {
+// 	// 			if (totalSnapshot.exists())
+// 	// 				return admin.database().ref("totals").child('user').update({ count: snapshot.size });
+// 	// 			else
+// 	// 				return Promise.resolve();
+// 	// 		});
+// 	// 	}
+// 	// ).then(() => {
+// 	// 	return createUserTotals().then(() => {
+// 	// 		return createCustomerPaymentInfo().then(() => {
+//   //       return Promise.resolve();
+//   //     })
+//   //     .catch(error => {
+//   //       return Promise.reject(error);
+//   //     });
+// 	// 	})
+// 	// 	.catch(error => {
+// 	// 		return Promise.reject(error);
+// 	// 	});
+// 	// })
+// 	// .catch(error => {
+// 	// 	return Promise.reject(error);
+// 	// });
+// });
+
+// export async function preAuthorizeCharge(customer: string, amount: number, accountId: string, metadata: any = {}) {
+//   const percentageOfTransaction = 0.05 // percentage charge on a business for using the platform
+//   const application_fee_amount = Math.round((amount * percentageOfTransaction) * 100) 
+//   const cost = Math.round(amount * 100);
+//   const descriptor = 'brief description of transaction';
+//   const description = 'a more detailed description' 
+
+//   try {
+//     const charge = await stripe.charges.create({
+//       customer: customer.stripe_customer_id,
+//       amount: cost,
+//       application_fee_amount,
+//       description,
+//       statement_descriptor: descriptor,
+//       currency: 'usd',
+//       transfer_data: {
+//         destination: accountId // <-- this is where you specify the business accountId
+//       },
+//       metadata,
+//       capture: false,
+//       receipt_email: customer.email
+//     })
+
+//     return charge
+//   } catch (err) {
+//     throw err
+//   }
+// }
