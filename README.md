@@ -66,8 +66,6 @@ export const environment = {
     appId: "xxxxxxxxxxxxx",
     measurementId: "xxxxxxxxxxxxx"
   },
-  application_fee: 9.99,
-  stripe: "xxxxxxxxxxxxx",
   googleTagManagerId: "xxxxxxxxxxxxx"
 };
 ```
