@@ -65,8 +65,7 @@ export const environment = {
     messagingSenderId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     appId: "xxxxxxxxxxxxx",
     measurementId: "xxxxxxxxxxxxx"
-  },
-  googleTagManagerId: "xxxxxxxxxxxxx"
+  }
 };
 ```
 
