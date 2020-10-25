@@ -16,7 +16,7 @@ Forum (Food)
             Service (Fastpost couriers)
 ```
 
-In this example, Eleutherios is scaling or serializing the forum or conversation (Food/Pick up + drop off/Healthcare worker to deliver food), that people or businesses are having.  Not the service or work, that they are trying to perform. People or businesses, still provide the same product or service in the world, but within the same forum or conversation.
+In this example, Eleutherios is scaling or serializing the forum or conversation (Food/Pick up + drop off/Healthcare worker to deliver food), that people or businesses are having.  Not the service or work, that they are trying to provide or perform. People or businesses, still provide the same product or service in the world, but within the same forum or conversation.
 
 #### Features:
 
