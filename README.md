@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or circular economy, that enables people or businesses to serve (give or receive from) one another at scale, via the internet.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, that enables people or businesses to serve (give or receive from) one another at scale, via the internet.
 
 People or businesses, sign up with Eleutherios and add their product or service to the site. Other people or businesses (customers) search or get notified, whenever a new product or service is added and can order it, by having a conversation (forum or chat) with the person or business providing it.
 
