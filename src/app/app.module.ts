@@ -10,6 +10,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireFunctionsModule } from '@angular/fire/functions';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MomentModule } from 'angular2-moment';
 import { FlexLayoutModule } from "@angular/flex-layout";
@@ -86,6 +87,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireStorageModule,
+    AngularFireFunctionsModule,
     ReactiveFormsModule,
     MomentModule,
     FlexLayoutModule,

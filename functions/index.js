@@ -20,6 +20,13 @@ admin.initializeApp(functions.config().firebase);
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
 
+// stripe variables:
+// -----------------
+// stripe.key=
+// stripe.secret=
+// stripe.test.secret=
+// stripe.test.key=
+
 // https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 const stripe = require('stripe')(functions.config().stripe.secret, {
   apiVersion: '2020-03-02',
