@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, that enables people or businesses to serve (give or receive from) one another at scale, via the internet.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, that enables people or businesses to serve (B2B) one another at scale, via the internet.
 
 For example, if a person is hungry and quarantined at home.  They could register with Eleutherios and create a forum, for some food. A grocery store owner, could register as a service and subscribe to the forum and ask the person, what food they wanted? After listening to their request, the grocery store owner could gather the food, from their store and scale the forum, by creating a sub-forum, for a delivery service to delivery the food. The delivery service, could scale the sub-forum again and create another sub-forum, for a healthcare worker to be the person, that delivers the food to the person.
 
@@ -20,12 +20,12 @@ In this example, Eleutherios is scaling or serializing the forum or conversation
 
 #### Features:
 
-* Forum in forum (redundancy/resilience).
+* Forum in forum (scalability/resilience).
 * Tags for filtering forums or services (search).
 * Alerts to keep end users informed, when new forums or services are created in the system (notifications).
 * Blocking to prevent unwanted services or users, from serving in forums they have been asked not to serve in, or for requesting services they have been asked, not to request (accountability).
 * Service ratings/reviews (accountability).
-* B2B or shared manifest (scalability).
+* B2B or shared manifest (redundancy).
 * AI (automation).
 
 Eleutherios, is built with an HTML/javascript (Angular) frontend and node.js (nosql/firebase) backend.

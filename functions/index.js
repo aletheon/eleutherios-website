@@ -28,12 +28,40 @@ admin.firestore().settings(settings);
 // stripe.test.key=
 
 // https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
-const stripe = require('stripe')(functions.config().stripe.secret, {
-  apiVersion: '2020-03-02',
+// const stripe = require('stripe')(functions.config().stripe.secret, {
+//   apiVersion: '2020-03-02',
+// });
+
+const stripe = require("stripe")(functions.config().keys.webhooks);
+const endpointSecret = functions.config().keys.signing;
+
+exports.events = functions.https.onRequest((request, response) => {
+  let sig = request.headers["stripe-signature"];
+
+  try {
+    let event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
+    
+    return admin.database().ref('/events').push(event) // Add the event to the database
+      .then((snapshot) => {
+        // Return a successful response to acknowledge the event was processed successfully
+        return response.json({ received: true, ref: snapshot.ref.toString() });
+      })
+      .catch((err) => {
+        console.error(err) // Catch any errors saving to the database
+        return response.status(500).end();
+      });
+  }
+  catch (err) {
+    return response.status(400).end(); // Signing signature failure, return an error 400
+  }
 });
 
-// Ctrl + K, Ctrl + 0 on Windows and Linux = FOLD ALL
-// Ctrl + K, Ctrl + J on Windows and Linux = UNFOLD ALL
+exports.exampleDatabaseTrigger = functions.database.ref('/events/{eventId}').onCreate((snapshot, context) => {
+  return console.log({
+    eventId: context.params.eventId,
+    data: snapshot.val()
+  });
+});
 
 // IMAGE UPLOAD
 
