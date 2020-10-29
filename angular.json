@@ -21,7 +21,8 @@
               "lodash",
               "firebase",
               "@firebase/auth",
-              "@angular/fire/firestore"
+              "@angular/fire/firestore",
+              "@firebase/functions"
             ],
             "outputPath": "dist/eleutherios-website",
             "index": "src/index.html",
