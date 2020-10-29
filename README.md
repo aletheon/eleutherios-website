@@ -20,7 +20,7 @@ In this example, Eleutherios is scaling or serializing the forum or conversation
 
 #### Features:
 
-* Forum in forum (scalability/resilience)
+* Forum in forum (scalability)
 * Tags for filtering forums or services (search)
 * Alerts to keep end users informed when new forums or services are created in the system (notify)
 * Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
