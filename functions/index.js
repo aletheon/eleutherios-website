@@ -41,7 +41,7 @@ exports.events = functions.https.onRequest((request, response) => {
   try {
     let event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
     
-    return admin.database().ref('/events').push(event) // Add the event to the database
+    return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
         // Return a successful response to acknowledge the event was processed successfully
         return response.json({ received: true, ref: snapshot.ref.toString() });
@@ -56,7 +56,7 @@ exports.events = functions.https.onRequest((request, response) => {
   }
 });
 
-exports.exampleDatabaseTrigger = functions.database.ref('/events/{eventId}').onCreate((snapshot, context) => {
+exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
   return console.log({
     eventId: context.params.eventId,
     data: snapshot.val()
