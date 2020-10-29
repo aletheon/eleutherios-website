@@ -20,13 +20,14 @@ In this example, Eleutherios is scaling or serializing the forum or conversation
 
 #### Features:
 
-* Forum in forum (scalability/resilience).
-* Tags for filtering forums or services (search).
-* Alerts to keep end users informed, when new forums or services are created in the system (notifications).
-* Blocking to prevent unwanted services or users, from serving in forums they have been asked not to serve in, or for requesting services they have been asked, not to request (accountability).
-* Service ratings/reviews (accountability).
-* B2B or shared manifest (redundancy).
-* AI (automation).
+* Forum in forum (scalability/resilience)
+* Tags for filtering forums or services (search)
+* Alerts to keep end users informed when new forums or services are created in the system (notify)
+* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
+* Service ratings/reviews (trust)
+* Payments (resilience)
+* B2B or shared manifest/process (redundancy)
+* AI (automation)
 
 Eleutherios, is built with an HTML/javascript (Angular) frontend and node.js (nosql/firebase) backend.
 

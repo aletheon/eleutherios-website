@@ -35,6 +35,10 @@ admin.firestore().settings(settings);
 const stripe = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
+exports.addMessage = functions.https.onCall((data, context) => {
+  return Promise.resolve();
+});
+
 exports.events = functions.https.onRequest((request, response) => {
   let sig = request.headers["stripe-signature"];
 
