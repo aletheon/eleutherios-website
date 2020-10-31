@@ -4,10 +4,10 @@
       <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
       <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
       <ng-template #showloggedinlogo>
-        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/']">Eleutherios(alpha)</h4>  
+        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/']">Eleutherios alpha</h4>  
       </ng-template>
       <ng-template #showloggedoutlogo>
-        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/anonymous/home']">Eleutherios (alpha)</h4>  
+        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/anonymous/home']">Eleutherios alpha</h4>  
       </ng-template>
     </div>
     <div style="flex:1;text-align:center">

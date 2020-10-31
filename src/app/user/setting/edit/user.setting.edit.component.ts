@@ -130,6 +130,17 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     );
   }
 
+  stripeConnect () {
+    const snackBarRef = this.snackbar.openFromComponent(
+      NotificationSnackBar,
+      {
+        duration: 12000,
+        data: 'To do: Onboard user as a stripe connect customer',
+        panelClass: ['red-snackbar']
+      }
+    );
+  }
+
   ngOnDestroy () {
     if (this._userSubscription)
       this._userSubscription.unsubscribe();

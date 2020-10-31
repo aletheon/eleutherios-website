@@ -45,7 +45,10 @@
 						<mat-checkbox formControlName="receiveForumPostNotifications" (change)="saveChanges()"></mat-checkbox>
 					</div>
 				</div>
-				<div style="display:flex;flex-direction:row;justify-content:flex-start;margin:20px 0 50px 0">
+				<div style="display:flex;flex-direction:row;justify-content:flex-end" matTooltip="Connect with stripe">
+					<img src="../../../../assets/blue-on-dark.png" (click)="stripeConnect()" style="cursor:pointer" />
+				</div>
+				<div style="display:flex;flex-direction:row;justify-content:flex-start">
 					<button (click)="delete()" type="button">Remove Account</button>
 				</div>
 			</form>

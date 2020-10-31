@@ -60,12 +60,74 @@ exports.events = functions.https.onRequest((request, response) => {
   }
 });
 
+exports.onboardStripeUser = functions.https.onRequest((request, response) => {
+  try {
+    stripe.accounts.create({
+      type: 'standard',
+      requested_capabilities: ['card_payments', 'transfers']
+    }).then(() => {
+
+    })
+    .catch(error => {
+      reject(error);
+    });
+    // let event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
+    
+    // return admin.database().ref("events").push(event) // Add the event to the database
+    //   .then((snapshot) => {
+    //     // Return a successful response to acknowledge the event was processed successfully
+    //     return response.json({ received: true, ref: snapshot.ref.toString() });
+    //   })
+    //   .catch((err) => {
+    //     console.error(err) // Catch any errors saving to the database
+    //     return response.status(500).end();
+    //   }
+    // );
+  }
+  catch (err) {
+    return response.status(400).end(); // Signing signature failure, return an error 400
+  }
+});
+
 exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
   return console.log({
     eventId: context.params.eventId,
     data: snapshot.val()
   });
 });
+
+function generateAccountLink(accountID, origin) {
+  return stripe.accountLinks
+    .create({
+      type: "account_onboarding",
+      account: accountID,
+      refresh_url: `${origin}/onboard-user/refresh`,
+      return_url: `${origin}/success.html`,
+    })
+    .then((link) => link.url);
+};
+
+// stripe.accounts.create(
+//   {
+//     type: 'standard',
+//     country: 'US',
+//     email: email,
+//     requested_capabilities: [
+//       'card_payments',
+//       'transfers',
+//     ],
+//   },
+//     function(err, account) {
+//       if (err) {
+//         console.log("Couldn't create stripe account: " + err)
+//         reject(err)
+//     }
+
+//     console.log("ACCOUNT: " + account.id)
+//     response.body = {success: account.id}
+//     return res.send(response)
+//   }
+// );
 
 // IMAGE UPLOAD
 

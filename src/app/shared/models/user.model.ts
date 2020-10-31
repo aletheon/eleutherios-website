@@ -3,6 +3,7 @@ export interface User {
   email: string, // email of the user
   displayName?: string, // display name
   stripe_customerId: string,
+  stripe_accountId: string,
   fcmToken: string,
   receivePushNotifications: boolean,
   receiveForumAlertNotifications: boolean,
