@@ -32,18 +32,21 @@ admin.firestore().settings(settings);
 //   apiVersion: '2020-03-02',
 // });
 
-const stripe = require("stripe")(functions.config().keys.webhooks);
+const stripe = require("stripe")(functions.config().stripe.secret);
+const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
 exports.addMessage = functions.https.onCall((data, context) => {
-  return Promise.resolve();
+  const uid = context.auth && context.auth.uid;
+  const message = data.message;
+  return Promise.resolve(`${uid} sent a message of ${message}`);
 });
 
 exports.events = functions.https.onRequest((request, response) => {
   let sig = request.headers["stripe-signature"];
 
   try {
-    let event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
+    let event = stripeWebhook.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
     
     return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
