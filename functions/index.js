@@ -36,6 +36,17 @@ const stripe = require("stripe")(functions.config().stripe.secret);
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
+function generateAccountLink(accountID, origin) {
+  return stripe.accountLinks
+    .create({
+      type: "account_onboarding",
+      account: accountID,
+      refresh_url: `${origin}/onboard-user/refresh`,
+      return_url: `${origin}/success.html`,
+    })
+    .then((link) => link.url);
+};
+
 exports.addMessage = functions.https.onCall((data, context) => {
   const uid = context.auth && context.auth.uid;
   const message = data.message;
@@ -63,35 +74,6 @@ exports.events = functions.https.onRequest((request, response) => {
   }
 });
 
-exports.onboardStripeUser = functions.https.onRequest((request, response) => {
-  try {
-    stripe.accounts.create({
-      type: 'standard',
-      requested_capabilities: ['card_payments', 'transfers']
-    }).then(() => {
-
-    })
-    .catch(error => {
-      reject(error);
-    });
-    // let event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
-    
-    // return admin.database().ref("events").push(event) // Add the event to the database
-    //   .then((snapshot) => {
-    //     // Return a successful response to acknowledge the event was processed successfully
-    //     return response.json({ received: true, ref: snapshot.ref.toString() });
-    //   })
-    //   .catch((err) => {
-    //     console.error(err) // Catch any errors saving to the database
-    //     return response.status(500).end();
-    //   }
-    // );
-  }
-  catch (err) {
-    return response.status(400).end(); // Signing signature failure, return an error 400
-  }
-});
-
 exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
   return console.log({
     eventId: context.params.eventId,
@@ -99,16 +81,22 @@ exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCr
   });
 });
 
-function generateAccountLink(accountID, origin) {
-  return stripe.accountLinks
-    .create({
-      type: "account_onboarding",
-      account: accountID,
-      refresh_url: `${origin}/onboard-user/refresh`,
-      return_url: `${origin}/success.html`,
-    })
-    .then((link) => link.url);
-};
+// exports.onboardStripeUser = functions.https.onRequest((request, response) => {
+//   try {
+//     stripe.accounts.create({
+//       type: 'standard',
+//       requested_capabilities: ['card_payments', 'transfers']
+//     }).then(() => {
+
+//     })
+//     .catch(error => {
+//       reject(error);
+//     });
+//   }
+//   catch (err) {
+//     return response.status(400).end(); // Signing signature failure, return an error 400
+//   }
+// });
 
 // stripe.accounts.create(
 //   {
@@ -364,36 +352,36 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 				reject(error);
 			});
 		});
-  }
+  };
   
-  // var createCustomerPaymentInfo = function () {
-  //   return new Promise((resolve, reject) => {
-  //     stripe.customers.create({
-  //       email: user.email,
-  //     })
-  //     .then(customer => {
-  //       admin.firestore().collection("users").doc(userId).get().then(doc => {
-  //         if (doc.exists){
-  //           doc.ref.update({
-  //             stripe_customerId: customer.id
-  //           }).then(() => {
-  //             resolve();
-  //           })
-  //           .catch(error => {
-  //             reject(error);
-  //           });
-  //         }
-  //         else resolve();
-  //       })
-  //       .catch(error => {
-  //         reject(error);
-  //       });
-  //     })
-  //     .catch(error => {
-  //       reject(error);
-  //     });
-  //   });
-  // }
+  var createCustomer = function () {
+    return new Promise((resolve, reject) => {
+      stripe.customers.create({
+        email: user.email,
+      })
+      .then(customer => {
+        admin.firestore().collection("users").doc(userId).get().then(doc => {
+          if (doc.exists){
+            doc.ref.update({
+              stripe_customerId: customer.id
+            }).then(() => {
+              resolve();
+            })
+            .catch(error => {
+              reject(error);
+            });
+          }
+          else resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
 
 	return admin.firestore().collection('users').select()
 		.get().then(snapshot => {
@@ -406,7 +394,12 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 		}
 	).then(() => {
 		return createUserTotals().then(() => {
-			return Promise.resolve();
+			return createCustomer().then(() => {
+        return Promise.resolve();
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
 		})
 		.catch(error => {
 			return Promise.reject(error);
@@ -436,27 +429,27 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 				reject(error);
 			});
 		});
-  }
+  };
   
-  // var deleteCustomerPaymentInfo = function () {
-  //   return new Promise((resolve, reject) => {
-  //     if (user.stripe_customerId){
-  //       stripe.customers.del(user.stripe_customerId).then(response => {
-  //         // https://stripe.com/docs/api/customers/delete
-  //         // {
-  //         //   "id": "cus_IGWncbQ978qiJc",
-  //         //   "object": "customer",
-  //         //   "deleted": true
-  //         // }
-  //         resolve();
-  //       })
-  //       .catch(error => {
-  //         reject(error);
-  //       });
-  //     }
-  //     else resolve();
-  //   });
-  // }
+  var deleteCustomer = function () {
+    return new Promise((resolve, reject) => {
+      if (user.stripe_customerId){
+        stripe.customers.del(user.stripe_customerId).then(response => {
+          // https://stripe.com/docs/api/customers/delete
+          // {
+          //   "id": "cus_IGWncbQ978qiJc",
+          //   "object": "customer",
+          //   "deleted": true
+          // }
+          resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      }
+      else resolve();
+    });
+  };
 
 	return admin.firestore().collection('users').select()
 		.get().then(snapshot => {
@@ -478,7 +471,12 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
       // ********************************************************************************
       // ********************************************************************************
       return removeUserTotals().then(() => {
-        return Promise.resolve();
+        return deleteCustomer().then(() => {
+          return Promise.resolve();
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
       })
       .catch(error => {
         return Promise.reject(error);

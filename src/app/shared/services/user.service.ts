@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireFunctions } from '@angular/fire/functions';
 import { User } from '../models/user.model';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
 
+
 @Injectable()
 export class UserService {
-  constructor(private afs: AngularFirestore) { }
+  constructor(private afs: AngularFirestore, private fun: AngularFireFunctions ) { }
 
   // *********************************************************************
   // public methods
@@ -69,6 +71,19 @@ export class UserService {
       .catch(error => {
         reject(error);
       });
+    });
+  }
+
+  public onboardCustomer (parentUserId: string) {
+    return new Promise((resolve, reject) => {
+      const addMessageFunction = this.fun.httpsCallable('addMessage');
+
+      addMessageFunction({ message: 'howdy doody time' }).subscribe(response => {
+        if (response)
+          resolve(response);
+        else
+          reject('Unknown error occurred');
+      })
     });
   }
 
