@@ -46,8 +46,8 @@
           </div>
           <!-- receive posts -->
           <div style="flex:none;margin-right:5px">
-            <mat-icon *ngIf="activity.receivePosts == true" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)">radio_button_checked</mat-icon>
-            <mat-icon *ngIf="activity.receivePosts == false" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)">radio_button_unchecked</mat-icon>
+            <mat-icon *ngIf="activity.receivePosts == true" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)" style="cursor:pointer">radio_button_checked</mat-icon>
+            <mat-icon *ngIf="activity.receivePosts == false" matTooltip="Receive Messages" (click)="changeReceivePosts(activity)" style="cursor:pointer">radio_button_unchecked</mat-icon>
           </div>
           <!-- remove activity, block types -->
           <div style="flex:none">

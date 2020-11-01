@@ -38,6 +38,9 @@
 					<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+					<mat-icon [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+				</div>
+				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete(forumItem)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
