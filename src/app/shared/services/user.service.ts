@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { Http, Headers } from '@angular/http';
 import { User } from '../models/user.model';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
-
+import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class UserService {
-  constructor(private afs: AngularFirestore, private fun: AngularFireFunctions ) { }
+  constructor(private afs: AngularFirestore, private fun: AngularFireFunctions, private http: Http ) { }
 
   // *********************************************************************
   // public methods
@@ -36,7 +37,7 @@ export class UserService {
           resolve();
         }, 2500);
       })
-      .catch(error => {
+      .catch(error => { 
         reject(error);
       });
     });
@@ -76,18 +77,17 @@ export class UserService {
 
   public onboardCustomer (parentUserId: string) {
     return new Promise((resolve, reject) => {
-      
+      const url = 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUser';
 
+      firebase.auth().currentUser.getIdToken()
+        .then(authToken => {
+          const headers = new Headers({'Authorization': 'Bearer ' + authToken });
+          const myUID    = { uid: parentUserId };    // success 200 response
+          const notMyUID = { uid: 'testabce123456' }; // error 403 response
 
-
-      // const addMessageFunction = this.fun.httpsCallable('addMessage');
-
-      // addMessageFunction({ message: 'howdy doody time' }).subscribe(response => {
-      //   if (response)
-      //     resolve(response);
-      //   else
-      //     reject('Unknown error occurred');
-      // })
+          return this.http.post(url, myUID, { headers: headers }).toPromise()
+        })
+        .then(res => console.log(res))
     });
   }
 
