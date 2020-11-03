@@ -75,7 +75,7 @@ export class UserService {
     });
   }
 
-  public onboardCustomer (parentUserId: string) {
+  public onboardCustomer (parentUserId: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const url = 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUser';
 
@@ -87,8 +87,8 @@ export class UserService {
 
           return this.http.post(url, myUID, { headers: headers }).toPromise()
         })
-        .then(res => {
-          resolve();
+        .then(data => {
+          resolve(data);
         })
         .catch(error => {
           reject(error);

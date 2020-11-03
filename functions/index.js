@@ -110,7 +110,7 @@ exports.onboardStripeUser = functions.https.onRequest((req, res) => {
       
             return generateAccountLink(stripeAccount.id).then(link => {
               if (link)
-                res.redirect(link);
+                res.status(200).send({ url: link });
               else
                 res.status(500).send({ error: 'An unknown error occurred creating the account' });
             })

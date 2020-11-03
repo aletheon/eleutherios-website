@@ -131,12 +131,12 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   }
 
   stripeConnect () {
-    this.userService.onboardCustomer(this.auth.uid).then(() => {
+    this.userService.onboardCustomer(this.auth.uid).then(data => {
       const snackBarRef = this.snackbar.openFromComponent(
         NotificationSnackBar,
         {
           duration: 12000,
-          data: 'Success',
+          data: 'Got onboard url ' + data.url,
           panelClass: ['green-snackbar']
         }
       );
