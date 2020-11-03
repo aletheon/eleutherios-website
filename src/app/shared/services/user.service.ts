@@ -76,14 +76,18 @@ export class UserService {
 
   public onboardCustomer (parentUserId: string) {
     return new Promise((resolve, reject) => {
-      const addMessageFunction = this.fun.httpsCallable('addMessage');
+      
 
-      addMessageFunction({ message: 'howdy doody time' }).subscribe(response => {
-        if (response)
-          resolve(response);
-        else
-          reject('Unknown error occurred');
-      })
+
+
+      // const addMessageFunction = this.fun.httpsCallable('addMessage');
+
+      // addMessageFunction({ message: 'howdy doody time' }).subscribe(response => {
+      //   if (response)
+      //     resolve(response);
+      //   else
+      //     reject('Unknown error occurred');
+      // })
     });
   }
 

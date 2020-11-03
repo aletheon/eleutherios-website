@@ -1,6 +1,8 @@
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 const functions = require('firebase-functions');
+const admin = require('firebase-admin'); // The Firebase Admin SDK to access the Firebase Realtime Database. 
+admin.initializeApp(functions.config().firebase);
 const async = require('async');
 const _ = require('lodash');
 const uuidV4 = require('uuidv4');
@@ -11,34 +13,29 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const cors = require('cors')({ origin: true });
 const session = require("express-session");
 const spawn = require('child-process-promise').spawn;
+const app = express();
 const gcs = new Storage();
 const info = functions.config().info;
-
-// The Firebase Admin SDK to access the Firebase Realtime Database. https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
-const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
-
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
-
-// initialize stripe
-const stripe = require("stripe")(functions.config().stripe.secret);
+const stripe = require("stripe")(functions.config().stripe.secret); // initialize stripe  
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
-
-// initialize express server
-const app = express();
 
 // initialize session
 app.use(
   session({
-    secret: "5GYaWLCh4nN6MyhBKhpKqn8WKZW2",
+    secret: functions.config().keys.session,
     resave: false,
     saveUninitialized: true,
   })
 );
+
+// https://gomakethings.com/how-to-use-async-and-await-with-vanilla-javascript/
+// https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 
 exports.events = functions.https.onRequest((req, res) => {
   let sig = req.headers["stripe-signature"];
@@ -68,115 +65,125 @@ exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCr
   });
 });
 
-exports.onboardStripeUser = functions.https.onRequest((req, res) => {
-  var stripeAccount = null;
-  var stripeLink = null;
+exports.addMessage = functions.https.onCall((data, context) => {
+  const uid = context.auth && context.auth.uid;
+  const message = data.message;
+  return Promise.resolve(`${uid} sent a message of ${message}`);
+});
 
-  if (!(req.method === 'POST')) {
+exports.onboardStripeUser = functions.https.onRequest((req, res) => {
+  if (req.method !== 'POST') {
     return res.status(403).send('Forbidden!');
   }
 
-  var createAccount = function () {
-    return new Promise((resolve, reject) => {
-      stripe.accounts.create({
-        type: "standard"
-      })
-      .then(account => {
-        if (account)
-          stripeAccount = account;
-        
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
+  return cors(req, res, () => {
+    var stripeAccount = null;
+    var requestedUid = req.body.uid;     // resource the user is requsting to modify
+    var authToken = validateHeader(req); // current user encrypted
 
-  var getAccountLink = function () {
-    return new Promise((resolve, reject) => {
-      stripe.accountLinks.create({
-        type: 'account_onboarding',
-        account: stripeAccount.id,
-        refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
-        return_url: 'http://localhost:4200/user/setting/edit?success'
-      }).then(link => {
-        if (link)
-          stripeLink = link.url;
-        
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      })
-    });
-  };
-
-  return createAccount().then(() => {
-    if (account){
-      req.session.accountId = account.id;
-
-      return getAccountLink().then(() => {
-        if (stripeLink)
-          return res.redirect(stripeLink);
-        else
-          return res.status(500).send({ error: 'An unknown error occurred creating the account' });
-      })
-      .catch(error => {
-        return res.status(500).send({ error: error.message });
-      });
+    if (!authToken) {
+      return res.status(403).send('Unuthorized! Missing auth token!')
     }
-    else return res.status(500).send({ error: 'An unknown error occurred creating the account' });
-  })
-  .catch(error => {
-    return res.status(500).send({ error: error.message });
+
+    var createAccount = function () {
+      return new Promise((resolve, reject) => {
+        stripe.accounts.create({
+          type: "standard"
+        })
+        .then(account => {
+          if (account)
+            stripeAccount = account;
+          
+          resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      });
+    };
+      
+    return decodeAuthToken(authToken).then(uid => {
+      if (uid === requestedUid) {
+        return createAccount().then(() => {
+          if (stripeAccount){
+            req.session.accountId = stripeAccount.id;
+      
+            return generateAccountLink(stripeAccount.id).then(link => {
+              if (link)
+                res.redirect(link);
+              else
+                res.status(500).send({ error: 'An unknown error occurred creating the account' });
+            })
+            .catch(error => {
+              res.status(500).send({ error: error.message });
+            });
+          }
+          else res.status(500).send({ error: 'An unknown error occurred creating the account' });
+        })
+        .catch(error => {
+          res.status(500).send({ error: error.message });
+        });
+      } else {
+        res.status(403).send({ error: 'Unauthorized to edit other user data' })
+      }
+    })
+    .catch(error => {
+      res.status(500).send({ error: error.message });
+    });
   });
 });
 
 exports.onboardStripeUserRefresh = functions.https.onRequest((req, res) => {
   var stripeLink = null;
 
-  if (!(req.method === 'GET'))
+  if (req.method !== 'GET')
     return res.status(403).send('Forbidden!');
   
   if (!req.session.accountId) 
     return res.status(500).send({ error: 'No accountId' });
 
-  var getAccountLink = function () {
-    return new Promise((resolve, reject) => {
-      stripe.accountLinks.create({
-        type: 'account_onboarding',
-        account: req.session.accountId,
-        refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
-        return_url: 'http://localhost:4200/user/setting/edit?success'
-      }).then(link => {
-        if (link)
-          stripeLink = link.url;
-        
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      })
+  return cors(req, res, () => {  
+    return generateAccountLink(req.session.accountId).then(link => {
+      if (link)
+        res.redirect(link);
+      else
+        res.status(500).send({ error: 'An unknown error occurred creating the account' });
+    })
+    .catch(error => {
+      res.status(500).send({ error: error.message });
     });
-  };
-
-  return getAccountLink().then(() => {
-    if (stripeLink)
-      return res.redirect(stripeLink);
-    else
-      return res.status(500).send({ error: 'An unknown error occurred creating the account' });
-  })
-  .catch(error => {
-    return res.status(500).send({ error: error.message });
   });
 });
 
-exports.addMessage = functions.https.onCall((data, context) => {
-  const uid = context.auth && context.auth.uid;
-  const message = data.message;
-  return Promise.resolve(`${uid} sent a message of ${message}`);
-});
+function generateAccountLink(accountId) {
+  return stripe.accountLinks
+    .create({
+      type: "account_onboarding",
+      account: accountId,
+      refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
+      return_url: 'http://localhost:4200/user/setting/edit?success'
+    })
+    .then((link) => link.url);
+}
+
+// Helper to validate auth header is present
+function validateHeader(req) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    console.log('auth header found')
+    return req.headers.authorization.split('Bearer ')[1]
+  }
+}
+
+// Helper to decode token to firebase UID (returns promise)
+function decodeAuthToken(authToken) {
+  return admin.auth()
+    .verifyIdToken(authToken)
+    .then(decodedToken => {
+      // decode the current user's auth token
+      return decodedToken.uid;
+    }
+  );
+}
 
 // IMAGE UPLOAD
 
