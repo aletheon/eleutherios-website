@@ -76,7 +76,7 @@ exports.onboardStripeUser = functions.https.onRequest((req, res) => {
     return res.status(403).send('Forbidden!');
   }
 
-  return cors(req, res, () => {
+  cors(req, res, () => {
     var stripeAccount = null;
     var requestedUid = req.body.uid;     // resource the user is requsting to modify
     var authToken = validateHeader(req); // current user encrypted
@@ -140,7 +140,7 @@ exports.onboardStripeUserRefresh = functions.https.onRequest((req, res) => {
   if (!req.session.accountId) 
     return res.status(500).send({ error: 'No accountId' });
 
-  return cors(req, res, () => {  
+  cors(req, res, () => {  
     return generateAccountLink(req.session.accountId).then(link => {
       if (link)
         res.redirect(link);

@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
-import { Http, Headers } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
-import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class UserService {
-  constructor(private afs: AngularFirestore, private fun: AngularFireFunctions, private http: Http ) { }
+  constructor(private afs: AngularFirestore, private fun: AngularFireFunctions, private http: HttpClient ) { }
 
   // *********************************************************************
   // public methods
@@ -81,7 +80,7 @@ export class UserService {
 
       firebase.auth().currentUser.getIdToken()
         .then(authToken => {
-          const headers = new Headers({'Authorization': 'Bearer ' + authToken });
+          const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
           const myUID    = { uid: parentUserId };    // success 200 response
           const notMyUID = { uid: 'testabce123456' }; // error 403 response
 
