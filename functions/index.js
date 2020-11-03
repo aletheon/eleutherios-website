@@ -134,8 +134,6 @@ exports.onboardStripeUser = functions.https.onRequest((req, res) => {
 });
 
 exports.onboardStripeUserRefresh = functions.https.onRequest((req, res) => {
-  var stripeLink = null;
-
   if (req.method !== 'GET')
     return res.status(403).send('Forbidden!');
   
