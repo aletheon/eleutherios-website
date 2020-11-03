@@ -87,7 +87,12 @@ export class UserService {
 
           return this.http.post(url, myUID, { headers: headers }).toPromise()
         })
-        .then(res => console.log(res))
+        .then(res => {
+          resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
     });
   }
 
