@@ -10,67 +10,54 @@ const { Storage } = require('@google-cloud/storage');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const session = require("express-session");
 const spawn = require('child-process-promise').spawn;
 const gcs = new Storage();
+const info = functions.config().info;
 
-// The Firebase Admin SDK to access the Firebase Realtime Database. 
+// The Firebase Admin SDK to access the Firebase Realtime Database. https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
 
-// stripe variables:
-// -----------------
-// stripe.key=
-// stripe.secret=
-// stripe.test.secret=
-// stripe.test.key=
-
-// https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
-// const stripe = require('stripe')(functions.config().stripe.secret, {
-//   apiVersion: '2020-03-02',
-// });
-
+// initialize stripe
 const stripe = require("stripe")(functions.config().stripe.secret);
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
-function generateAccountLink(accountID, origin) {
-  return stripe.accountLinks
-    .create({
-      type: "account_onboarding",
-      account: accountID,
-      refresh_url: `${origin}/onboard-user/refresh`,
-      return_url: `${origin}/success.html`,
-    })
-    .then((link) => link.url);
-};
+// initialize express server
+const app = express();
 
-exports.addMessage = functions.https.onCall((data, context) => {
-  const uid = context.auth && context.auth.uid;
-  const message = data.message;
-  return Promise.resolve(`${uid} sent a message of ${message}`);
-});
+// initialize session
+app.use(
+  session({
+    secret: "5GYaWLCh4nN6MyhBKhpKqn8WKZW2",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
-exports.events = functions.https.onRequest((request, response) => {
-  let sig = request.headers["stripe-signature"];
+exports.events = functions.https.onRequest((req, res) => {
+  let sig = req.headers["stripe-signature"];
 
   try {
-    let event = stripeWebhook.webhooks.constructEvent(request.rawBody, sig, endpointSecret); // Validate the request
+    let event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     
     return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
         // Return a successful response to acknowledge the event was processed successfully
-        return response.json({ received: true, ref: snapshot.ref.toString() });
+        return res.json({ received: true, ref: snapshot.ref.toString() });
       })
-      .catch((err) => {
-        console.error(err) // Catch any errors saving to the database
-        return response.status(500).end();
+      .catch((error) => {
+        console.error(error) // Catch any errors saving to the database
+        return res.status(500).end();
       });
   }
-  catch (err) {
-    return response.status(400).end(); // Signing signature failure, return an error 400
+  catch (error) {
+    return res.status(400).end(); // Signing signature failure, return an error 400
   }
 });
 
@@ -81,44 +68,115 @@ exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCr
   });
 });
 
-// exports.onboardStripeUser = functions.https.onRequest((request, response) => {
-//   try {
-//     stripe.accounts.create({
-//       type: 'standard',
-//       requested_capabilities: ['card_payments', 'transfers']
-//     }).then(() => {
+exports.onboardStripeUser = functions.https.onRequest((req, res) => {
+  var stripeAccount = null;
+  var stripeLink = null;
 
-//     })
-//     .catch(error => {
-//       reject(error);
-//     });
-//   }
-//   catch (err) {
-//     return response.status(400).end(); // Signing signature failure, return an error 400
-//   }
-// });
+  if (!(req.method === 'POST')) {
+    return res.status(403).send('Forbidden!');
+  }
 
-// stripe.accounts.create(
-//   {
-//     type: 'standard',
-//     country: 'US',
-//     email: email,
-//     requested_capabilities: [
-//       'card_payments',
-//       'transfers',
-//     ],
-//   },
-//     function(err, account) {
-//       if (err) {
-//         console.log("Couldn't create stripe account: " + err)
-//         reject(err)
-//     }
+  var createAccount = function () {
+    return new Promise((resolve, reject) => {
+      stripe.accounts.create({
+        type: "standard"
+      })
+      .then(account => {
+        if (account)
+          stripeAccount = account;
+        
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
 
-//     console.log("ACCOUNT: " + account.id)
-//     response.body = {success: account.id}
-//     return res.send(response)
-//   }
-// );
+  var getAccountLink = function () {
+    return new Promise((resolve, reject) => {
+      stripe.accountLinks.create({
+        type: 'account_onboarding',
+        account: stripeAccount.id,
+        refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
+        return_url: 'http://localhost:4200/user/setting/edit?success'
+      }).then(link => {
+        if (link)
+          stripeLink = link.url;
+        
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      })
+    });
+  };
+
+  return createAccount().then(() => {
+    if (account){
+      req.session.accountId = account.id;
+
+      return getAccountLink().then(() => {
+        if (stripeLink)
+          return res.redirect(stripeLink);
+        else
+          return res.status(500).send({ error: 'An unknown error occurred creating the account' });
+      })
+      .catch(error => {
+        return res.status(500).send({ error: error.message });
+      });
+    }
+    else return res.status(500).send({ error: 'An unknown error occurred creating the account' });
+  })
+  .catch(error => {
+    return res.status(500).send({ error: error.message });
+  });
+});
+
+exports.onboardStripeUserRefresh = functions.https.onRequest((req, res) => {
+  var stripeLink = null;
+
+  if (!(req.method === 'GET'))
+    return res.status(403).send('Forbidden!');
+  
+  if (!req.session.accountId) 
+    return res.status(500).send({ error: 'No accountId' });
+
+  var getAccountLink = function () {
+    return new Promise((resolve, reject) => {
+      stripe.accountLinks.create({
+        type: 'account_onboarding',
+        account: req.session.accountId,
+        refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
+        return_url: 'http://localhost:4200/user/setting/edit?success'
+      }).then(link => {
+        if (link)
+          stripeLink = link.url;
+        
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      })
+    });
+  };
+
+  return getAccountLink().then(() => {
+    if (stripeLink)
+      return res.redirect(stripeLink);
+    else
+      return res.status(500).send({ error: 'An unknown error occurred creating the account' });
+  })
+  .catch(error => {
+    return res.status(500).send({ error: error.message });
+  });
+});
+
+exports.addMessage = functions.https.onCall((data, context) => {
+  const uid = context.auth && context.auth.uid;
+  const message = data.message;
+  return Promise.resolve(`${uid} sent a message of ${message}`);
+});
 
 // IMAGE UPLOAD
 
@@ -358,12 +416,13 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
     return new Promise((resolve, reject) => {
       stripe.customers.create({
         email: user.email,
+        metadata: { userId: userId }
       })
       .then(customer => {
         admin.firestore().collection("users").doc(userId).get().then(doc => {
           if (doc.exists){
             doc.ref.update({
-              stripe_customerId: customer.id
+              stripeCustomerId: customer.id
             }).then(() => {
               resolve();
             })
@@ -433,8 +492,8 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
   
   var deleteCustomer = function () {
     return new Promise((resolve, reject) => {
-      if (user.stripe_customerId){
-        stripe.customers.del(user.stripe_customerId).then(response => {
+      if (user.stripeCustomerId){
+        stripe.customers.del(user.stripeCustomerId).then(response => {
           // https://stripe.com/docs/api/customers/delete
           // {
           //   "id": "cus_IGWncbQ978qiJc",

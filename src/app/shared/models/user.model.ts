@@ -2,8 +2,8 @@ export interface User {
   uid: string,
   email: string, // email of the user
   displayName?: string, // display name
-  stripe_customerId: string,
-  stripe_accountId: string,
+  stripeCustomerId: string,
+  stripeAccountId: string,
   fcmToken: string,
   receivePushNotifications: boolean,
   receiveForumAlertNotifications: boolean,
