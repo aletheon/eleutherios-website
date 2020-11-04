@@ -51,7 +51,7 @@ app.post("/onboard-user", async (req, res) => {
     let authToken = validateHeader(req); // current user encrypted
 
     if (!authToken) {
-      res.status(403).send('Unuthorized! Missing auth token!')
+      res.status(403).send('Unauthorized access, missing auth token.');
     }
 
     const uid = await decodeAuthToken(authToken);
@@ -59,11 +59,14 @@ app.post("/onboard-user", async (req, res) => {
     if (uid === requestedUid) {
       const origin = `${req.headers.origin}`;
       const accountLinkURL = await generateAccountLink(account.id, origin);
+
+      console.log('Got accountId ' + req.session.accountId);
+      console.log('Got uid ' + uid);
     
       console.log('onboarding user accountLinkURL ' + accountLinkURL);
       res.send({ url: accountLinkURL });
     } else {
-      res.status(403).send('Unauthorized to edit other user data')
+      res.status(403).send('Unauthorized access');
     }
   } catch (err) {
     res.status(500).send({
