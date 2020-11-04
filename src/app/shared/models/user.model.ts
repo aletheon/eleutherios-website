@@ -4,6 +4,7 @@ export interface User {
   displayName?: string, // display name
   stripeCustomerId: string,
   stripeAccountId: string,
+  stripeOnboardingStatus: string, // [complete,pending,failed]
   fcmToken: string,
   receivePushNotifications: boolean,
   receiveForumAlertNotifications: boolean,

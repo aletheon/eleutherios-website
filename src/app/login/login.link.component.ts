@@ -143,6 +143,7 @@ export class LoginLinkComponent implements OnInit {
                     displayName: user.displayName,
                     stripeCustomerId: '',
                     stripeAccountId: '',
+                    stripeOnboardingStatus: '',
                     fcmToken: '',
                     receivePushNotifications: false,
                     receiveForumAlertNotifications: false,

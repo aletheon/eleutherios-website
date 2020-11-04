@@ -108,6 +108,7 @@ export class AuthService {
           displayName: user.displayName,
           stripeCustomerId: '',
           stripeAccountId: '',
+          stripeOnboardingStatus: '',
           fcmToken: '',
           receivePushNotifications: false,
           receiveForumAlertNotifications: false,

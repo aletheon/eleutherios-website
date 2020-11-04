@@ -26,14 +26,6 @@ const stripe = require("stripe")(functions.config().stripe.secret); // initializ
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
-// app.use(function(req, res, next) {
-//   res.setHeader('Content-Type', 'application/json');
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//   res.header("Access-Control-Allow-Methods", "GET, POST");
-//   next();
-// });
-
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
 
@@ -50,17 +42,17 @@ app.use(
   })
 );
 
+// initialize session
 app.post("/onboard-user", async (req, res) => {
   try {
     console.log('in onboarding user');
     const account = await stripe.accounts.create({type: "standard"});
     req.session.accountId = account.id;
 
-    console.log('req.session.accountId ' + req.session.accountId);
     const origin = `${req.headers.origin}`;
     const accountLinkURL = await generateAccountLink(account.id, origin);
 
-    console.log('accountLinkURL ' + accountLinkURL);
+    console.log('onboarding user accountLinkURL ' + accountLinkURL);
     res.send({ url: accountLinkURL });
   } catch (err) {
     res.status(500).send({
@@ -70,6 +62,8 @@ app.post("/onboard-user", async (req, res) => {
 });
 
 app.get("/onboard-user/refresh", async (req, res) => {
+  console.log('in onboarding user refresh');
+
   if (!req.session.accountId) {
     res.redirect("/");
     return;
@@ -77,8 +71,9 @@ app.get("/onboard-user/refresh", async (req, res) => {
   try {
     const { accountId } = req.session;
     const origin = `${req.secure ? "https://" : "https://"}${req.headers.host}`;
-
     const accountLinkURL = await generateAccountLink(accountId, origin);
+
+    console.log('onboarding user refresh accountLinkURL ' + accountLinkURL);
     res.redirect(accountLinkURL);
   } catch (err) {
     res.status(500).send({
@@ -93,7 +88,7 @@ function generateAccountLink(accountId, origin) {
       type: "account_onboarding",
       account: accountId,
       refresh_url: `${origin}/onboard-user/refresh`,
-      return_url: `${origin}/success.html`,
+      return_url: `http://localhost:4200/user/setting/edit?onboarding=true`,
     })
     .then((link) => link.url);
 };
