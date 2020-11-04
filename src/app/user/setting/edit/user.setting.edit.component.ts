@@ -132,6 +132,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
   stripeConnect () {
     this.userService.onboardCustomer(this.auth.uid).then(data => {
+      console.log("got data " + JSON.stringify(data));
+      
       const snackBarRef = this.snackbar.openFromComponent(
         NotificationSnackBar,
         {

@@ -26,6 +26,14 @@ const stripe = require("stripe")(functions.config().stripe.secret); // initializ
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
+// app.use(function(req, res, next) {
+//   res.setHeader('Content-Type', 'application/json');
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   res.header("Access-Control-Allow-Methods", "GET, POST");
+//   next();
+// });
+
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
 
