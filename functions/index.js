@@ -1,5 +1,3 @@
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
 const functions = require('firebase-functions');
 const admin = require('firebase-admin'); // The Firebase Admin SDK to access the Firebase Realtime Database. 
 const firebase = admin.initializeApp(functions.config().firebase);
@@ -42,7 +40,7 @@ app.use(
   })
 );
 
-// initialize session
+// onboard-user
 app.post("/onboard-user", async (req, res) => {
   try {
     console.log('in onboarding user');
@@ -61,6 +59,7 @@ app.post("/onboard-user", async (req, res) => {
   }
 });
 
+// onboard-user/refresh
 app.get("/onboard-user/refresh", async (req, res) => {
   console.log('in onboarding user refresh');
 
@@ -82,6 +81,7 @@ app.get("/onboard-user/refresh", async (req, res) => {
   }
 });
 
+// generateAccountLink
 function generateAccountLink(accountId, origin) {
   return stripe.accountLinks
     .create({
@@ -93,8 +93,10 @@ function generateAccountLink(accountId, origin) {
     .then((link) => link.url);
 };
 
+// export app as stripe API
 exports.stripe = functions.https.onRequest(app);
 
+// listen to strip events
 exports.stripeEvents = functions.https.onRequest((req, res) => {
   let sig = req.headers["stripe-signature"];
 
