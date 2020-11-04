@@ -3,7 +3,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
 import {
@@ -49,7 +48,6 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private router: Router,
     private snackbar: MatSnackBar,
-    private location: Location,
     private changeDetector : ChangeDetectorRef) {
   }
 

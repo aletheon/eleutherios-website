@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import {
   SiteTotalService,
@@ -64,7 +63,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location,
     private snackbar: MatSnackBar) {
   }
 
@@ -134,7 +132,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
   stripeConnect () {
     this.userService.onboardCustomer(this.auth.uid).then(data => {
-      console.log("got data " + JSON.stringify(data));
       window.location.href = data.url;
     })
     .catch(error => {
