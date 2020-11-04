@@ -78,32 +78,24 @@ export class UserService {
     return new Promise((resolve, reject) => {
       console.log('onboarding user with uid ' + parentUserId);
       
-      // const proxyurl = "https://cors-anywhere.herokuapp.com/";
       const url = 'https://us-central1-eleutherios-website.cloudfunctions.net/stripe/onboard-user';
 
-      this.http.post(url, parentUserId).toPromise().then(data => {
-        resolve(data);
-      })
-      .catch(error => {
-        reject(error);
-      });
+      firebase.auth().currentUser.getIdToken()
+        .then(authToken => {
+          console.log('got authToken ' + authToken);
 
-      // firebase.auth().currentUser.getIdToken()
-      //   .then(authToken => {
-      //     console.log('got authToken ' + authToken);
+          const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
+          const myUid    = { uid: parentUserId };    // success 200 response
+          const notMyUid = { uid: 'testabce123456' }; // error 403 response
 
-      //     const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
-      //     const myUid    = { uid: parentUserId };    // success 200 response
-      //     const notMyUid = { uid: 'testabce123456' }; // error 403 response
-
-      //     return this.http.post(url, myUid, { headers: headers }).toPromise();
-      //   })
-      //   .then(data => {
-      //     resolve(data);
-      //   })
-      //   .catch(error => {
-      //     reject(error);
-      //   });
+          return this.http.post(url, myUid, { headers: headers }).toPromise();
+        })
+        .then(data => {
+          resolve(data);
+        })
+        .catch(error => {
+          reject(error);
+        });
     });
   }
 

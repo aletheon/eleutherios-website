@@ -47,11 +47,24 @@ app.post("/onboard-user", async (req, res) => {
     const account = await stripe.accounts.create({type: "standard"});
     req.session.accountId = account.id;
 
-    const origin = `${req.headers.origin}`;
-    const accountLinkURL = await generateAccountLink(account.id, origin);
+    let requestedUid = req.body.uid;     // resource the user is requsting to modify
+    let authToken = validateHeader(req); // current user encrypted
 
-    console.log('onboarding user accountLinkURL ' + accountLinkURL);
-    res.send({ url: accountLinkURL });
+    if (!authToken) {
+      res.status(403).send('Unuthorized! Missing auth token!')
+    }
+
+    const uid = await decodeAuthToken(authToken);
+
+    if (uid === requestedUid) {
+      const origin = `${req.headers.origin}`;
+      const accountLinkURL = await generateAccountLink(account.id, origin);
+    
+      console.log('onboarding user accountLinkURL ' + accountLinkURL);
+      res.send({ url: accountLinkURL });
+    } else {
+      res.status(403).send('Unauthorized to edit other user data')
+    }
   } catch (err) {
     res.status(500).send({
       error: err.message,
@@ -91,6 +104,25 @@ function generateAccountLink(accountId, origin) {
       return_url: `http://localhost:4200/user/setting/edit?onboarding=true`,
     })
     .then((link) => link.url);
+};
+
+// Helper to validate auth header is present
+function validateHeader(req) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    console.log('auth header found')
+    return req.headers.authorization.split('Bearer ')[1]
+  }
+};
+
+// Helper to decode token to firebase UID (returns promise)
+function decodeAuthToken(authToken) {
+  return admin.auth()
+    .verifyIdToken(authToken)
+    .then(decodedToken => {
+      // decode the current user's auth token
+      return decodedToken.uid;
+    }
+  );
 };
 
 // export app as stripe API
