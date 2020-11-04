@@ -136,7 +136,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         NotificationSnackBar,
         {
           duration: 12000,
-          data: 'Got onboard url ' + data.url,
+          data: data.url,
           panelClass: ['green-snackbar']
         }
       );

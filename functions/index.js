@@ -2,7 +2,7 @@
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 const functions = require('firebase-functions');
 const admin = require('firebase-admin'); // The Firebase Admin SDK to access the Firebase Realtime Database. 
-admin.initializeApp(functions.config().firebase);
+const firebase = admin.initializeApp(functions.config().firebase);
 const async = require('async');
 const _ = require('lodash');
 const uuidV4 = require('uuidv4');
@@ -13,8 +13,9 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const cors = require('cors')({ origin: true });
+const cors = require('cors');
 const session = require("express-session");
+const FirestoreStore = require('firestore-store')(session);
 const spawn = require('child-process-promise').spawn;
 const app = express();
 const gcs = new Storage();
@@ -25,19 +26,73 @@ const stripe = require("stripe")(functions.config().stripe.secret); // initializ
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 
+// Automatically allow cross-origin requests
+app.use(cors({ origin: true }));
+
 // initialize session
 app.use(
   session({
-    secret: functions.config().keys.session,
-    resave: false,
-    saveUninitialized: true,
+    store: new FirestoreStore({
+      database: firebase.firestore()
+    }),
+    name: '__session', // required for Cloud Functions/Cloud Run
+    secret: 'keyboard cat',
+    resave: true,
+    saveUninitialized: true
   })
 );
 
-// https://gomakethings.com/how-to-use-async-and-await-with-vanilla-javascript/
-// https://github.com/firebase/functions-samples/blob/master/stripe/functions/index.js
+app.post("/onboard-user", async (req, res) => {
+  try {
+    console.log('in onboarding user');
+    const account = await stripe.accounts.create({type: "standard"});
+    req.session.accountId = account.id;
 
-exports.events = functions.https.onRequest((req, res) => {
+    console.log('req.session.accountId ' + req.session.accountId);
+    const origin = `${req.headers.origin}`;
+    const accountLinkURL = await generateAccountLink(account.id, origin);
+
+    console.log('accountLinkURL ' + accountLinkURL);
+    res.send({ url: accountLinkURL });
+  } catch (err) {
+    res.status(500).send({
+      error: err.message,
+    });
+  }
+});
+
+app.get("/onboard-user/refresh", async (req, res) => {
+  if (!req.session.accountId) {
+    res.redirect("/");
+    return;
+  }
+  try {
+    const { accountId } = req.session;
+    const origin = `${req.secure ? "https://" : "https://"}${req.headers.host}`;
+
+    const accountLinkURL = await generateAccountLink(accountId, origin);
+    res.redirect(accountLinkURL);
+  } catch (err) {
+    res.status(500).send({
+      error: err.message,
+    });
+  }
+});
+
+function generateAccountLink(accountId, origin) {
+  return stripe.accountLinks
+    .create({
+      type: "account_onboarding",
+      account: accountId,
+      refresh_url: `${origin}/onboard-user/refresh`,
+      return_url: `${origin}/success.html`,
+    })
+    .then((link) => link.url);
+};
+
+exports.stripe = functions.https.onRequest(app);
+
+exports.stripeEvents = functions.https.onRequest((req, res) => {
   let sig = req.headers["stripe-signature"];
 
   try {
@@ -58,130 +113,12 @@ exports.events = functions.https.onRequest((req, res) => {
   }
 });
 
-exports.exampleDatabaseTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
+exports.stripeEventsTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
   return console.log({
     eventId: context.params.eventId,
     data: snapshot.val()
   });
 });
-
-exports.addMessage = functions.https.onCall((data, context) => {
-  const uid = context.auth && context.auth.uid;
-  const message = data.message;
-  return Promise.resolve(`${uid} sent a message of ${message}`);
-});
-
-exports.onboardStripeUser = functions.https.onRequest((req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(403).send('Forbidden!');
-  }
-
-  cors(req, res, () => {
-    var stripeAccount = null;
-    var requestedUid = req.body.uid;     // resource the user is requsting to modify
-    var authToken = validateHeader(req); // current user encrypted
-
-    if (!authToken) {
-      return res.status(403).send('Unuthorized! Missing auth token!')
-    }
-
-    var createAccount = function () {
-      return new Promise((resolve, reject) => {
-        stripe.accounts.create({
-          type: "standard"
-        })
-        .then(account => {
-          if (account)
-            stripeAccount = account;
-          
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      });
-    };
-      
-    return decodeAuthToken(authToken).then(uid => {
-      if (uid === requestedUid) {
-        return createAccount().then(() => {
-          if (stripeAccount){
-            req.session.accountId = stripeAccount.id;
-      
-            return generateAccountLink(stripeAccount.id).then(link => {
-              if (link)
-                res.status(200).send({ url: link });
-              else
-                res.status(500).send({ error: 'An unknown error occurred creating the account' });
-            })
-            .catch(error => {
-              res.status(500).send({ error: error.message });
-            });
-          }
-          else res.status(500).send({ error: 'An unknown error occurred creating the account' });
-        })
-        .catch(error => {
-          res.status(500).send({ error: error.message });
-        });
-      } else {
-        res.status(403).send({ error: 'Unauthorized to edit other user data' })
-      }
-    })
-    .catch(error => {
-      res.status(500).send({ error: error.message });
-    });
-  });
-});
-
-exports.onboardStripeUserRefresh = functions.https.onRequest((req, res) => {
-  if (req.method !== 'GET')
-    return res.status(403).send('Forbidden!');
-  
-  if (!req.session.accountId) 
-    return res.status(500).send({ error: 'No accountId' });
-
-  cors(req, res, () => {  
-    return generateAccountLink(req.session.accountId).then(link => {
-      if (link)
-        res.redirect(link);
-      else
-        res.status(500).send({ error: 'An unknown error occurred creating the account' });
-    })
-    .catch(error => {
-      res.status(500).send({ error: error.message });
-    });
-  });
-});
-
-function generateAccountLink(accountId) {
-  return stripe.accountLinks
-    .create({
-      type: "account_onboarding",
-      account: accountId,
-      refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/onboardStripeUserRefresh',
-      return_url: 'http://localhost:4200/user/setting/edit?success'
-    })
-    .then((link) => link.url);
-}
-
-// Helper to validate auth header is present
-function validateHeader(req) {
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-    console.log('auth header found')
-    return req.headers.authorization.split('Bearer ')[1]
-  }
-}
-
-// Helper to decode token to firebase UID (returns promise)
-function decodeAuthToken(authToken) {
-  return admin.auth()
-    .verifyIdToken(authToken)
-    .then(decodedToken => {
-      // decode the current user's auth token
-      return decodedToken.uid;
-    }
-  );
-}
 
 // IMAGE UPLOAD
 
