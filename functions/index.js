@@ -68,9 +68,7 @@ app.post("/onboard-user", async (req, res) => {
       res.status(403).send('Unauthorized access');
     }
   } catch (error) {
-    res.status(500).send({
-      error: error.message,
-    });
+    res.status(500).send(error.message);
   }
 });
 
@@ -90,9 +88,7 @@ app.get("/onboard-user/refresh", async (req, res) => {
     console.log('onboarding user refresh accountLinkURL ' + accountLinkURL);
     res.redirect(accountLinkURL);
   } catch (error) {
-    res.status(500).send({
-      error: error.message,
-    });
+    res.status(500).send(error.message);
   }
 });
 
