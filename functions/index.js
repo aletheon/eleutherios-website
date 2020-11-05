@@ -60,6 +60,7 @@ app.post("/onboard-user", async (req, res) => {
       const accountLinkURL = await generateAccountLink(account.id, origin);
       const updateUser = await admin.firestore().collection('users').doc(uid).update({
         stripeAccountId: req.session.accountId,
+        stripeOnboardingStatus: '',
         lastUpdateDate: FieldValue.serverTimestamp()
       });
       res.send({ url: accountLinkURL });
