@@ -139,10 +139,11 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         NotificationSnackBar,
         {
           duration: 12000,
-          data: error,
+          data: error.error,
           panelClass: ['red-snackbar']
         }
       );
+      console.log('error message ' + JSON.stringify(error));
     })
   }
 

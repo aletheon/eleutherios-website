@@ -85,10 +85,7 @@ export class UserService {
           console.log('got authToken ' + authToken);
 
           const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
-          const myUid    = { uid: parentUserId };    // success 200 response
-          const notMyUid = { uid: 'testabce123456' }; // error 403 response
-
-          return this.http.post(url, myUid, { headers: headers }).toPromise();
+          return this.http.post(url, { uid: parentUserId }, { headers: headers }).toPromise();
         })
         .then(data => {
           resolve(data);
