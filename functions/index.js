@@ -53,9 +53,8 @@ app.post("/onboard-user", async (req, res) => {
     if (!authToken) {
       res.status(403).send('Unauthorized access');
     }
-
+    
     const uid = await decodeAuthToken(authToken);
-
     if (uid === requestedUid) {
       const origin = `${req.headers.origin}`;
       const accountLinkURL = await generateAccountLink(account.id, origin);
