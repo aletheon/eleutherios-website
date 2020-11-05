@@ -53,7 +53,7 @@ app.post("/onboard-user", async (req, res) => {
     if (!authToken) {
       res.status(403).send('Unauthorized access');
     }
-    
+
     const uid = await decodeAuthToken(authToken);
     if (uid === requestedUid) {
       const origin = `${req.headers.origin}`;
@@ -402,7 +402,8 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
         admin.firestore().collection("users").doc(userId).get().then(doc => {
           if (doc.exists){
             doc.ref.update({
-              stripeCustomerId: customer.id
+              stripeCustomerId: customer.id,
+              lastUpdateDate: FieldValue.serverTimestamp()
             }).then(() => {
               resolve();
             })
