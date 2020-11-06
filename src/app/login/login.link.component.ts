@@ -37,7 +37,7 @@ export class LoginLinkComponent implements OnInit {
   ngOnInit() {
     this.user = this.afAuth.authState;
     const url = this.router.url;
-
+    
     let emailAddressElement = <HTMLInputElement> document.getElementById("emailAddress");
     let submitButtonElement = <HTMLButtonElement> document.getElementById("submitButton");
 

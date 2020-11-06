@@ -55,6 +55,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   public serviceUserBlockCount: Observable<number> = this._serviceUserBlockCount.asObservable();
   public userGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public stripeButtonDisabled: boolean = false;
 
   constructor(private auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -131,20 +132,26 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   }
 
   stripeConnect () {
-    this.userService.onboardCustomer(this.auth.uid).then(data => {
-      window.location.href = data.url;
-    })
-    .catch(error => {
-      const snackBarRef = this.snackbar.openFromComponent(
-        NotificationSnackBar,
-        {
-          duration: 12000,
-          data: error.error,
-          panelClass: ['red-snackbar']
-        }
-      );
-      console.log('error message ' + JSON.stringify(error));
-    })
+    if (this.stripeButtonDisabled == false){
+      this.stripeButtonDisabled = true;
+
+      this.userService.onboardCustomer(this.auth.uid).then(data => {
+        window.location.href = data.url;
+      })
+      .catch(error => {
+        this.stripeButtonDisabled = false;
+
+        const snackBarRef = this.snackbar.openFromComponent(
+          NotificationSnackBar,
+          {
+            duration: 12000,
+            data: error.error,
+            panelClass: ['red-snackbar']
+          }
+        );
+        console.log('error message ' + JSON.stringify(error));
+      });
+    }
   }
 
   ngOnDestroy () {
@@ -159,6 +166,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
+      let onboarding = params['onboarding'];
+
       this.userService.exists(this.auth.uid).then(exists => {
         if (exists){
           this.user = this.userService.getUser(this.auth.uid);
