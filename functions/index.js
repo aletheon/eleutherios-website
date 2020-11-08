@@ -132,6 +132,23 @@ exports.stripeEvents = functions.https.onRequest((req, res) => {
 
   try {
     let event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
+    const intent = event.data.object;
+    const id = intent.id; // this looks like the paymentId that you can use to update 
+    const metadata = intent.metadata; // { userId: userId, serviceId: serviceId }
+
+    switch(event.type) {
+      case 'payment_intent.created':
+        console.log('got payment_intent.created');
+        break;
+      case 'payment_intent.succeeded':
+        console.log('got payment_intent.succeeded');
+        break;
+      case 'payment_intent.payment_failed':
+        console.log('got payment_intent.payment_failed');
+        break;
+      default:
+        console.log('got type ' + event.type);
+    }
     
     return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
@@ -141,19 +158,21 @@ exports.stripeEvents = functions.https.onRequest((req, res) => {
       .catch((error) => {
         console.error(error) // Catch any errors saving to the database
         return res.status(500).end();
-      });
+      }
+    );
   }
   catch (error) {
     return res.status(400).end(); // Signing signature failure, return an error 400
   }
 });
 
-exports.stripeEventsTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
-  return console.log({
-    eventId: context.params.eventId,
-    data: snapshot.val()
-  });
-});
+// exports.stripeEventsTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
+//   // console.log({
+//   //   eventId: context.params.eventId,
+//   //   data: snapshot.val()
+//   // });
+//   return Promise.resolve();
+// });
 
 // IMAGE UPLOAD
 

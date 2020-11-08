@@ -114,7 +114,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserTagModule,
     StarRatingModule.forRoot(),
     FacebookModule.forRoot(),
-    NgxStripeModule.forRoot(environment.stripeTest_publishable_key)
+    NgxStripeModule.forRoot(environment.stripeTestKey)
   ],
   providers: [AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
   bootstrap: [AppComponent],

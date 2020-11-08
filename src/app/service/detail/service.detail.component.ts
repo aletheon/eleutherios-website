@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { environment } from '../../../environments/environment';
 import {
   ClickEvent
 } from 'angular-star-rating';
@@ -43,6 +44,8 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, map } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+
+declare var Stripe: any;
 
 @Component({
   selector: 'service-detail',
@@ -579,6 +582,9 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit () {
+    // Stripe public key
+    const stripe = Stripe(environment.stripeTestKey);
+
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
