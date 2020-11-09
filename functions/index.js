@@ -126,7 +126,7 @@ function decodeAuthToken(authToken) {
 // export app as stripe API
 exports.stripe = functions.https.onRequest(app);
 
-// listen to strip events
+// listen to strip webhook events
 exports.stripeEvents = functions.https.onRequest((req, res) => {
   let sig = req.headers["stripe-signature"];
 
@@ -136,19 +136,24 @@ exports.stripeEvents = functions.https.onRequest((req, res) => {
     const id = intent.id; // this looks like the paymentId that you can use to update 
     const metadata = intent.metadata; // { userId: userId, serviceId: serviceId }
 
-    switch(event.type) {
-      case 'payment_intent.created':
-        console.log('got payment_intent.created');
-        break;
-      case 'payment_intent.succeeded':
-        console.log('got payment_intent.succeeded');
-        break;
-      case 'payment_intent.payment_failed':
-        console.log('got payment_intent.payment_failed');
-        break;
-      default:
-        console.log('got type ' + event.type);
-    }
+    // 1) fetch payment from user created payment collection
+    // 2) fetch payment from user received payment collection
+    // 3) fetch all payments created/received update totals accordingly
+    // 3) update payments
+
+    // switch(event.type) {
+    //   case 'payment_intent.created':
+    //     console.log('got payment_intent.created');
+    //     break;
+    //   case 'payment_intent.succeeded':
+    //     console.log('got payment_intent.succeeded');
+    //     break;
+    //   case 'payment_intent.payment_failed':
+    //     console.log('got payment_intent.payment_failed');
+    //     break;
+    //   default:
+    //     console.log('got type ' + event.type);
+    // }
     
     return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
@@ -165,14 +170,6 @@ exports.stripeEvents = functions.https.onRequest((req, res) => {
     return res.status(400).end(); // Signing signature failure, return an error 400
   }
 });
-
-// exports.stripeEventsTrigger = functions.database.ref("events/{eventId}").onCreate((snapshot, context) => {
-//   // console.log({
-//   //   eventId: context.params.eventId,
-//   //   data: snapshot.val()
-//   // });
-//   return Promise.resolve();
-// });
 
 // IMAGE UPLOAD
 
@@ -397,7 +394,11 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 				forumBlockCount: 0, // number of forums this user has blocked
 				serviceBlockCount: 0, // number of services this user has blocked
 				forumUserBlockCount: 0, // number of forum users this user has blocked
-				serviceUserBlockCount: 0 // number of service users this user has blocked
+        serviceUserBlockCount: 0, // number of service users this user has blocked
+        createdPaymentCount: 0, // number of payments this user has created
+        receivedPaymentCount: 0, // number of payments this user has received
+        createdPaymentAmount: 0, // total payments this user has created
+        receivedPaymentAmount: 0 // total payments this user has received
 			})
 			.then(() => {
 				resolve();
@@ -543,6 +544,30 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
     }
   );
 });
+
+// users/{userId}/createdpayments/{paymentId}
+// users/{userId}/receivedpayments/{paymentId}
+
+// ********************************************************************************
+// createUserCreatedPayment
+// ********************************************************************************
+exports.createUserPayment = functions.firestore.document("users/{userId}/createdpayments/{createdPaymentId}").onCreate((snap, context) => {
+  var payment = snap.data();
+  var userId = context.params.userId;
+  var createdPaymentId = context.params.createdPaymentId;
+
+  return admin.firestore().collection(`users/${userId}/payments`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(userId).update({ createdPaymentCount: snapshot.size });
+        else
+          return Promise.resolve();
+      });
+    }
+  );
+});
+
 
 // ACTIVITY
 

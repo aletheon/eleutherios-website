@@ -1047,6 +1047,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   private initForm () {
     const that = this;
+
     this.serviceGroup = this.fb.group({
       serviceId:                      [''],
       uid:                            [''],
@@ -1058,6 +1059,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       default:                        [''],
       indexed:                        [''],
       rate:                           [''],
+      paymentType:                    [''],
+      paymentSubType:                 [''],
+      amount:                         [''],
       includeDescriptionInDetailPage: [''],
       includeImagesInDetailPage:      [''],
       includeTagsInDetailPage:        [''],
@@ -2109,6 +2113,10 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           website: this.serviceGroup.get('website').value.trim(),
           default: this.serviceGroup.get('default').value,
           indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
+          rate: this.serviceGroup.get('rate').value,
+          paymentType: this.serviceGroup.get('paymentType').value,
+          paymentSubType: this.serviceGroup.get('paymentSubType').value,
+          amount: this.serviceGroup.get('amount').value,
           includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
           includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
           includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,
