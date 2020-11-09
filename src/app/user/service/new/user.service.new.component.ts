@@ -1049,7 +1049,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       indexed: false,
       rate: 0,
       paymentType: 'Free',
-      paymentSubType: 'Fixed',
+      paymentSubType: '',
       amount: 0,
       includeDescriptionInDetailPage: false,
       includeImagesInDetailPage: false,

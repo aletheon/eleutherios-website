@@ -374,7 +374,7 @@ export class UserForumServiceNewComponent implements OnInit, OnDestroy, AfterVie
         indexed: false,
         rate: 0,
         paymentType: 'Free',
-        paymentSubType: 'Fixed',
+        paymentSubType: '',
         amount: 0,
         includeDescriptionInDetailPage: false,
         includeImagesInDetailPage: false,

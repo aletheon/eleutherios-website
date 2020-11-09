@@ -395,10 +395,10 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 				serviceBlockCount: 0, // number of services this user has blocked
 				forumUserBlockCount: 0, // number of forum users this user has blocked
         serviceUserBlockCount: 0, // number of service users this user has blocked
-        createdPaymentCount: 0, // number of payments this user has created
-        receivedPaymentCount: 0, // number of payments this user has received
-        createdPaymentAmount: 0, // total payments this user has created
-        receivedPaymentAmount: 0 // total payments this user has received
+        paymentCount: 0, // number of payments this user has created
+        receiptCount: 0, // number of payments this user has received
+        paymentAmount: 0, // total payments this user has created
+        receiptAmount: 0 // total payments this user has received
 			})
 			.then(() => {
 				resolve();
@@ -545,22 +545,19 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
   );
 });
 
-// users/{userId}/createdpayments/{paymentId}
-// users/{userId}/receivedpayments/{paymentId}
-
 // ********************************************************************************
-// createUserCreatedPayment
+// createUserPayment
 // ********************************************************************************
-exports.createUserPayment = functions.firestore.document("users/{userId}/createdpayments/{createdPaymentId}").onCreate((snap, context) => {
+exports.createUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onCreate((snap, context) => {
   var payment = snap.data();
   var userId = context.params.userId;
-  var createdPaymentId = context.params.createdPaymentId;
+  var paymentId = context.params.paymentId;
 
   return admin.firestore().collection(`users/${userId}/payments`).select()
     .get().then(snapshot => {
       return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
         if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ createdPaymentCount: snapshot.size });
+          return admin.database().ref("totals").child(userId).update({ paymentCount: snapshot.size });
         else
           return Promise.resolve();
       });
@@ -568,6 +565,65 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/created
   );
 });
 
+// ********************************************************************************
+// deleteUserPayment
+// ********************************************************************************
+exports.deleteUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onDelete((snap, context) => {
+  var payment = snap.data();
+  var userId = context.params.userId;
+  var paymentId = context.params.paymentId;
+
+  return admin.firestore().collection(`users/${userId}/payments`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(userId).update({ paymentCount: snapshot.size });
+        else
+          return Promise.resolve();
+      });
+    }
+  );
+});
+
+// ********************************************************************************
+// createUserReceipt
+// ********************************************************************************
+exports.createUserReceipt = functions.firestore.document("users/{userId}/receipts/{receiptId}").onCreate((snap, context) => {
+  var receipt = snap.data();
+  var userId = context.params.userId;
+  var receiptId = context.params.receiptId;
+
+  return admin.firestore().collection(`users/${userId}/receipts`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(userId).update({ receiptCount: snapshot.size });
+        else
+          return Promise.resolve();
+      });
+    }
+  );
+});
+
+// ********************************************************************************
+// deleteUserReceipt
+// ********************************************************************************
+exports.deleteUserReceipt = functions.firestore.document("users/{userId}/receipts/{receiptId}").onDelete((snap, context) => {
+  var receipt = snap.data();
+  var userId = context.params.userId;
+  var receiptId = context.params.receiptId;
+
+  return admin.firestore().collection(`users/${userId}/receipts`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(userId).update({ receiptCount: snapshot.size });
+        else
+          return Promise.resolve();
+      });
+    }
+  );
+});
 
 // ACTIVITY
 
@@ -8072,7 +8128,6 @@ exports.createUserServiceReviewComment = functions.firestore.document("users/{us
     return Promise.reject(error);
   });
 });
-
 
 // ********************************************************************************
 // updateUserServiceReviewComment
