@@ -13,6 +13,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const session = require("express-session");
+const { startsWith } = require('lodash');
 const FirestoreStore = require('firestore-store')(session);
 const spawn = require('child-process-promise').spawn;
 const app = express();
@@ -136,10 +137,14 @@ exports.stripeEvents = functions.https.onRequest((req, res) => {
     const id = intent.id; // this looks like the paymentId that you can use to update 
     const metadata = intent.metadata; // { userId: userId, serviceId: serviceId }
 
+    // 0) payment_intent
     // 1) fetch payment from user created payment collection
     // 2) fetch payment from user received payment collection
     // 3) fetch all payments created/received update totals accordingly
     // 3) update payments
+
+    // if (event.type is payment_intent)
+    //    update both payment and receipt
 
     // switch(event.type) {
     //   case 'payment_intent.created':
@@ -552,6 +557,45 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
   var payment = snap.data();
   var userId = context.params.userId;
   var paymentId = context.params.paymentId;
+
+  // 0) Create user receipt at time of user payment
+  // 1) Get users customerId
+  // 2) Fetch customer from stripe
+  // 3) Populate paymentIntent.currency with customer.currency value
+
+  // HERE ROB HAVE TO CALL stripe.paymentIntents.create API metadata { paymentId, uid, serviceId, merchantId, merchantServiceId }
+  var createStripePaymentIntent = function () {
+    return new Promise((resolve, reject) => {
+      stripe.paymentIntents.create({
+        amount: payment.amount,
+        currency: 'usd', // HERE ROB HAVE TO FETCH THIS FROM CUSTOMER CURRENCY!!!!
+        metadata: { userId: userId, paymentId: paymentId }
+      })
+      .then(customer => {
+        admin.firestore().collection("users").doc(userId).get().then(doc => {
+          if (doc.exists){
+            doc.ref.update({
+              stripeCustomerId: customer.id,
+              lastUpdateDate: FieldValue.serverTimestamp()
+            }).then(() => {
+              resolve();
+            })
+            .catch(error => {
+              reject(error);
+            });
+          }
+          else resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
+
 
   return admin.firestore().collection(`users/${userId}/payments`).select()
     .get().then(snapshot => {
