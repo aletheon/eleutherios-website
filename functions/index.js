@@ -550,63 +550,63 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
   );
 });
 
+
+// HERE ROB
+
+
 // ********************************************************************************
 // createUserPayment
 // ********************************************************************************
-exports.createUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onCreate((snap, context) => {
-  var payment = snap.data();
-  var userId = context.params.userId;
-  var paymentId = context.params.paymentId;
+exports.createUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onCreate(async (snap, context) => {
+  const payment = snap.data();
+  const userId = context.params.userId;
+  const paymentId = context.params.paymentId;
 
-  // 0) Create user receipt at time of user payment
-  // 1) Get users customerId
-  // 2) Fetch customer from stripe
-  // 3) Populate paymentIntent.currency with customer.currency value
+  let updatePaymentCount = async function() {
+    try {
+      const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).select().get();
+      const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
 
-  // HERE ROB HAVE TO CALL stripe.paymentIntents.create API metadata { paymentId, uid, serviceId, merchantId, merchantServiceId }
-  var createStripePaymentIntent = function () {
-    return new Promise((resolve, reject) => {
-      stripe.paymentIntents.create({
-        amount: payment.amount,
-        currency: 'usd', // HERE ROB HAVE TO FETCH THIS FROM CUSTOMER CURRENCY!!!!
-        metadata: { userId: userId, paymentId: paymentId }
-      })
-      .then(customer => {
-        admin.firestore().collection("users").doc(userId).get().then(doc => {
-          if (doc.exists){
-            doc.ref.update({
-              stripeCustomerId: customer.id,
-              lastUpdateDate: FieldValue.serverTimestamp()
-            }).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
+      if (totalSnapshot.exists())
+        return await admin.database().ref("totals").child(userId).update({ paymentCount: paymentSnapshot.size });
+      else
+        return;
+    }
+    catch (error) {
+      throw new Error(error);
+    }
   };
 
+  try {
+    // update payment count
+    await updatePaymentCount();
 
-  return admin.firestore().collection(`users/${userId}/payments`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ paymentCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
-    }
-  );
+    // get user
+    const userSnapshot = await admin.firestore().collection('users').doc(payment.uid).get();
+    const user = userSnapshot.data();
+
+    // Create a charge using the paymentId as the idempotency key
+    // to protect against double charges.
+    const idempotencyKey = paymentId;
+    const paymentIntent = await stripe.paymentIntents.create(
+      {
+        amount: payment.amount,
+        currency: 'usd',
+        customer: user.stripeCustomerId,
+        metadata: { userId: userId, paymentId: paymentId }
+      },
+      { idempotencyKey }
+    );
+    // If the result is successful, write it back to the database.
+    await snap.ref.set({ paymentIntent: paymentIntent });
+  } catch (error) {
+    // We want to capture errors and render them in a user-friendly way, while
+    // still logging an exception with StackDriver
+    // console.log(error);
+    // await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
+    // await reportError(error, { user: context.params.userId });
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************

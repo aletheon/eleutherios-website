@@ -30,6 +30,7 @@ export * from './user.service.review.comment.service';
 export * from './user.service.created.rate.service';
 export * from './user.service.created.review.service';
 export * from './user.service.created.comment.service';
+export * from './user.payment.service';
 
 // public
 export * from './forum.service';
