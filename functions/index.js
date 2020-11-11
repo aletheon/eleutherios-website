@@ -598,9 +598,11 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
       },
       { idempotencyKey }
     );
+    
     // If the result is successful, write it back to the database.
     return await snap.ref.set({ paymentIntent: paymentIntent });
-  } catch (error) {
+  }
+  catch (error) {
     return Promise.reject(error);
   }
 });
