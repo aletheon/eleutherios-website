@@ -577,18 +577,24 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     // update payment count
     const updatePayment = await updatePaymentCount();
 
-    // get user
-    const userSnapshot = await admin.firestore().collection('users').doc(payment.uid).get();
-    const user = userSnapshot.data();
+    // get customer
+    const customerSnapshot = await admin.firestore().collection('users').doc(payment.uid).get();
+    const customer = customerSnapshot.data();
+
+    // get merchant
+    const merchantSnapshot = await admin.firestore().collection('users').doc(payment.merchantUid).get();
+    const merchant = merchantSnapshot.data();
 
     // Create a charge using the paymentId as the idempotency key to protect against double charges.
     const idempotencyKey = paymentId;
-    const paymentIntent = await stripe.paymentIntents.create(
-      {
+    const paymentIntent = await stripe.paymentIntents.create({
         amount: payment.amount,
         currency: 'usd',
-        customer: user.stripeCustomerId,
+        customer: customer.stripeCustomerId,
+        application_fee_amount: 0,
         metadata: { userId: userId, paymentId: paymentId }
+      }, {
+        stripeAccount: merchant.stripeAccountId,
       },
       { idempotencyKey }
     );

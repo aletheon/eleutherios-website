@@ -65,6 +65,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   public serviceGroup: FormGroup;
   public types: string[] = ['Public', 'Private'];
   public blockTypes: string[] = ['Remove', 'Block Forum', 'Block User'];
+  public paymentTypes: string[] = ['Free', 'Paid', 'Donate'];
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public matAutoCompleteSearchForums: Observable<any[]>;
@@ -1170,10 +1171,72 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
             // images
-            that.images = that.userImageService.getImages(that.auth.uid, 1000, null);
+            that.images = that.userImageService.getImages(that.auth.uid, 1000, null).pipe(
+              switchMap(images => {
+                if (images && images.length > 0){
+                  let observables = images.map(image => {
+                    let getDownloadUrl$: Observable<any>;
+        
+                    if (image.smallUrl)
+                      getDownloadUrl$ = from(firebase.storage().ref(image.smallUrl).getDownloadURL());
+        
+                    return combineLatest([getDownloadUrl$]).pipe(
+                      switchMap(results => {
+                        const [downloadUrl] = results;
+                        
+                        if (downloadUrl)
+                          image.url = downloadUrl;
+                        else
+                          image.url = '../../../assets/defaultThumbnail.jpg';
+          
+                        return of(image);
+                      })
+                    );
+                  });
+            
+                  return zip(...observables, (...results) => {
+                    return results.map((result, i) => {
+                      return images[i];
+                    });
+                  });
+                }
+                else return of([]);
+              })
+            );
 
             // service images
-            that.serviceImages = that.userServiceImageService.getServiceImages(service.uid, service.serviceId, 1000, null);
+            that.serviceImages = that.userServiceImageService.getServiceImages(service.uid, service.serviceId, 1000, null).pipe(
+              switchMap(serviceImages => {
+                if (serviceImages && serviceImages.length > 0){
+                  let observables = serviceImages.map(serviceImage => {
+                    let getDownloadUrl$: Observable<any>;
+        
+                    if (serviceImage.smallUrl)
+                      getDownloadUrl$ = from(firebase.storage().ref(serviceImage.smallUrl).getDownloadURL());
+        
+                    return combineLatest([getDownloadUrl$]).pipe(
+                      switchMap(results => {
+                        const [downloadUrl] = results;
+                        
+                        if (downloadUrl)
+                          serviceImage.url = downloadUrl;
+                        else
+                          serviceImage.url = '../../../assets/defaultThumbnail.jpg';
+          
+                        return of(serviceImage);
+                      })
+                    );
+                  });
+            
+                  return zip(...observables, (...results) => {
+                    return results.map((result, i) => {
+                      return serviceImages[i];
+                    });
+                  });
+                }
+                else return of([]);
+              })
+            );
 
             that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
               switchMap(whereServings => {

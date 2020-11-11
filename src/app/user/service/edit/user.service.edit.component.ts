@@ -1183,9 +1183,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             );
 
             // service images
-            that.serviceImages = that.userServiceImageService.getServiceImages(service.uid, service.serviceId, 1000, null);
-
-            // forum images
             that.serviceImages = that.userServiceImageService.getServiceImages(service.uid, service.serviceId, 1000, null).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
@@ -1218,7 +1215,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 else return of([]);
               })
             );
-
 
             // where servings
             that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
