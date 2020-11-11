@@ -1,10 +1,10 @@
 export interface Payment {
   paymentId: string,
-  uid: string, // id of the user creating the payment
   amount: number, // amount to pay
-  serviceId: string, // id of the service creating the payment
-  merchantUid: string, // id of the user receiving the payment
-  merchantServiceId: string, // id of the service receiving the payment
+  buyerUid: string, // id of the user creating the payment
+  buyerServiceId: string, // id of the service creating the payment
+  sellerUid: string, // id of the user receiving the payment
+  sellerServiceId: string, // id of the service receiving the payment
   paymentIntent: object,
   lastUpdateDate: object,
   creationDate: object

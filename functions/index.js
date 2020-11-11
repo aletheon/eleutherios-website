@@ -578,14 +578,14 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     const updatePayment = await updatePaymentCount();
 
     // get customer
-    const customerSnapshot = await admin.firestore().collection('users').doc(payment.uid).get();
+    const customerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
     const customer = customerSnapshot.data();
 
-    // get merchant
-    const merchantSnapshot = await admin.firestore().collection('users').doc(payment.merchantUid).get();
-    const merchant = merchantSnapshot.data();
+    // get sellter
+    const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
+    const seller = sellerSnapshot.data();
 
-    // Create a charge using the paymentId as the idempotency key to protect against double charges.
+    // Create a charge using the paymentId as the idempotency key and stripeAccountId as the seller
     const idempotencyKey = paymentId;
     const paymentIntent = await stripe.paymentIntents.create({
         amount: payment.amount,
@@ -594,7 +594,7 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
         application_fee_amount: 0,
         metadata: { userId: userId, paymentId: paymentId }
       }, {
-        stripeAccount: merchant.stripeAccountId,
+        stripeAccount: seller.stripeAccountId,
       },
       { idempotencyKey }
     );
