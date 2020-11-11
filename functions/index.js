@@ -550,10 +550,6 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
   );
 });
 
-
-// HERE ROB
-
-
 // ********************************************************************************
 // createUserPayment
 // ********************************************************************************
@@ -579,14 +575,13 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
 
   try {
     // update payment count
-    await updatePaymentCount();
+    const updatePayment = await updatePaymentCount();
 
     // get user
     const userSnapshot = await admin.firestore().collection('users').doc(payment.uid).get();
     const user = userSnapshot.data();
 
-    // Create a charge using the paymentId as the idempotency key
-    // to protect against double charges.
+    // Create a charge using the paymentId as the idempotency key to protect against double charges.
     const idempotencyKey = paymentId;
     const paymentIntent = await stripe.paymentIntents.create(
       {
@@ -598,13 +593,8 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
       { idempotencyKey }
     );
     // If the result is successful, write it back to the database.
-    await snap.ref.set({ paymentIntent: paymentIntent });
+    return await snap.ref.set({ paymentIntent: paymentIntent });
   } catch (error) {
-    // We want to capture errors and render them in a user-friendly way, while
-    // still logging an exception with StackDriver
-    // console.log(error);
-    // await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
-    // await reportError(error, { user: context.params.userId });
     return Promise.reject(error);
   }
 });
@@ -612,21 +602,23 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
 // ********************************************************************************
 // deleteUserPayment
 // ********************************************************************************
-exports.deleteUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onDelete((snap, context) => {
-  var payment = snap.data();
-  var userId = context.params.userId;
-  var paymentId = context.params.paymentId;
+exports.deleteUserPayment = functions.firestore.document("users/{userId}/payments/{paymentId}").onDelete(async (snap, context) => {
+  const payment = snap.data();
+  const userId = context.params.userId;
+  const paymentId = context.params.paymentId;
 
-  return admin.firestore().collection(`users/${userId}/payments`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ paymentCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
-    }
-  );
+  try {
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
+
+    if (totalSnapshot.exists())
+      return await admin.database().ref("totals").child(userId).update({ paymentCount: paymentSnapshot.size });
+    else
+      return;
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
