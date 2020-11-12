@@ -6,6 +6,7 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import {
   SiteTotalService,
   UserActivityService,
+  UserService,
   UserServiceTagService,
   UserForumServiceBlockService,
   UserServiceForumBlockService,
@@ -56,6 +57,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   private _addingTag = new BehaviorSubject(false);
 
   public service: Observable<any>;
+  public user: Observable<any>;
   public defaultServiceImage: Observable<any>;
   public forumCount: Observable<number> = this._forumCount.asObservable();
   public tagCount: Observable<number> = this._tagCount.asObservable();
@@ -63,6 +65,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public serviceGroup: FormGroup;
   public types: string[] = ['Public', 'Private'];
   public blockTypes: string[] = ['Remove', 'Block Forum', 'Block User'];
+  public paymentTypes: string[] = ['Free', 'Payment', 'Donation'];
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public matAutoCompleteSearchForums: Observable<any[]>;
@@ -82,6 +85,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(public auth: AuthService, 
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
+    private userService: UserService,
     private userActivityService: UserActivityService,
     private userServiceTagService: UserServiceTagService,
     private userServiceImageService: UserServiceImageService,
@@ -1015,6 +1019,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       this.userServiceService.exists(this.auth.uid, params['serviceId']).then(exists => {
         if (exists){
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
+          this.user = this.userService.getUser(this.auth.uid);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;
           this.initForm();

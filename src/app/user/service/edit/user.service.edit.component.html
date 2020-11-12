@@ -34,11 +34,24 @@
 					<div style="flex:1">
 						<mat-form-field style="width:150px">
 							<mat-select formControlName="type" #select="matSelect" (selectionChange)="saveChanges()">
-								<!-- <mat-select-trigger>{{ select.selected?.value }}</mat-select-trigger> -->
 								<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
 							</mat-select>
 						</mat-form-field>
 					</div>
+				</div>
+				<div style="display:flex;flex-direction:row;align-items:center">
+					<div style="flex:1">
+						<mat-form-field style="width:150px">
+							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
+								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+					<ng-container *ngIf="user | async;let userItem">
+						{{ userItem.uid }}
+					</ng-container>
 				</div>
 				<div>
 					<mat-form-field style="width:100%">
