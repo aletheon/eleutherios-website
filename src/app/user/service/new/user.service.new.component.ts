@@ -33,8 +33,8 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, startWith, tap } from 'rxjs/operators';
+import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+import { switchMap, startWith, tap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -1176,9 +1176,45 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 if (images && images.length > 0){
                   let observables = images.map(image => {
                     let getDownloadUrl$: Observable<any>;
-        
-                    if (image.smallUrl)
-                      getDownloadUrl$ = from(firebase.storage().ref(image.smallUrl).getDownloadURL());
+                    let genericRetryStrategy = ({
+                      maxRetryAttempts = 3,
+                      scalingDuration = 1000,
+                      excludedStatusCodes = []
+                    }: {
+                      maxRetryAttempts?: number,
+                      scalingDuration?: number,
+                      excludedStatusCodes?: number[]
+                    } = {}) => (attempts: Observable<any>) => {
+                      return attempts.pipe(
+                        mergeMap((error, i) => {
+                          const retryAttempt = i + 1;
+                          // if maximum number of retries have been met
+                          // or response is a status code we don't wish to retry, throw error
+                          if (
+                            retryAttempt > maxRetryAttempts ||
+                            excludedStatusCodes.find(e => e === error.status)
+                          ) {
+                            return throwError(error);
+                          }
+                          // retry after 1s, 2s, etc...
+                          return timer(retryAttempt * scalingDuration);
+                        })
+                      );
+                    };
+
+                    if (image.smallUrl){
+                      // defer image download url as it may not have arrived yet
+                      getDownloadUrl$ = defer(() => firebase.storage().ref(image.smallUrl).getDownloadURL())
+                        .pipe(
+                          retryWhen(genericRetryStrategy({
+                            maxRetryAttempts: 25
+                          })),
+                          catchError(error => of(error))
+                        ).pipe(mergeMap(url => {
+                          return of(url);
+                        }
+                      ));
+                    }
         
                     return combineLatest([getDownloadUrl$]).pipe(
                       switchMap(results => {
