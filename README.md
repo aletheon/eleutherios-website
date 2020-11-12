@@ -112,7 +112,7 @@ Discuss or provide feedback.
 https://www.facebook.com/groups/2982366048442234/
 
 Help fix bugs or resolve issues.
-https://github.com/aletheon/eleutherios-alpha/issues
+https://github.com/aletheon/eleutherios-website/issues
 
 Make a donation to the Eleutherios open source project.
 https://opencollective.com/eleutherios
