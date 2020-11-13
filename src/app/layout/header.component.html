@@ -47,7 +47,7 @@
             <button mat-menu-item [matMenuTriggerFor]="forums">Forums({{ total.forumCount }})</button>
             <button mat-menu-item [matMenuTriggerFor]="services">Services({{ total.serviceCount }})</button>
             <button mat-menu-item [matMenuTriggerFor]="notifications">Notifications({{ total.notificationCount }})</button>
-            <button mat-menu-item [matMenuTriggerFor]="images">Images({{ total.imageCount }})</button>
+            <button mat-menu-item [routerLink]="['/user/image/list']">Images({{ total.imageCount }})</button>
             <button mat-menu-item [routerLink]="['/user/tag/list']">Tags({{ total.tagCount }})</button>
             <button mat-menu-item [routerLink]="['/user/alert/list']">Alerts({{ total.alertCount }})</button>
             <button mat-menu-item [routerLink]="['/user/service/block/forum/list']">Service Forum Blocks({{ total.forumBlockCount }})</button>
@@ -69,10 +69,6 @@
         <mat-menu #notifications="matMenu">
           <button mat-menu-item [routerLink]="['/user/notification/new']">New</button>
           <button mat-menu-item [routerLink]="['/user/notification/list']">List</button>
-        </mat-menu>
-        <mat-menu #images="matMenu">
-          <button mat-menu-item [routerLink]="['/user/image/new']">New</button>
-          <button mat-menu-item [routerLink]="['/user/image/list']">List</button>
         </mat-menu>
         <mat-menu #tags="matMenu">
           <button mat-menu-item [routerLink]="['/user/tag/list']">List</button>

@@ -48,7 +48,7 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+				<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
 					<ng-container *ngIf="user | async;let userItem">
 						<!-- show payment controls -->
 						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">

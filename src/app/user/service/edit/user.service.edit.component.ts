@@ -65,7 +65,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public serviceGroup: FormGroup;
   public types: string[] = ['Public', 'Private'];
   public blockTypes: string[] = ['Remove', 'Block Forum', 'Block User'];
-  public paymentTypes: string[] = ['Free', 'Payment', 'Donation'];
+  public paymentTypes: string[] = ['Free', 'Payment'];
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public matAutoCompleteSearchForums: Observable<any[]>;
