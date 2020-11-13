@@ -17,7 +17,6 @@ import { PipeModule } from '../../shared';
 import { MomentModule } from 'angular2-moment';
 
 import { UserImageListComponent } from './list/user.image.list.component';
-import { UserImageNewComponent } from './new/user.image.new.component';
 import { UserImageViewComponent } from './view/user.image.view.component';
 
 import {
@@ -47,7 +46,6 @@ import {
   ],
   declarations: [
     UserImageListComponent,
-    UserImageNewComponent,
     UserImageViewComponent
   ],
   providers: [

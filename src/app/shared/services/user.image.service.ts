@@ -144,12 +144,28 @@ export class UserImageService {
     );
   }
   
-  public getImages (parentUserId: string, numberOfItems: number, key?: any): Observable<any[]> {
+  public getImages (parentUserId: string, numberOfItems: number, key?: any, direction?: string): Observable<any[]> {
     let collectionName: string = `users/${parentUserId}/images`;
 
-    if (!key)
-      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate').limit(numberOfItems+1)).valueChanges();
-    else
-      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate').startAt(key).limit(numberOfItems+1)).valueChanges();
+    if (direction){
+      if (direction.toLowerCase() == 'asc'){
+        if (key)
+          return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'asc').startAt(key).limit(numberOfItems+1)).valueChanges();
+        else
+          return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'asc').limit(numberOfItems+1)).valueChanges();
+      }
+      else {
+        if (key)
+          return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').startAt(key).limit(numberOfItems+1)).valueChanges();
+        else
+          return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').limit(numberOfItems+1)).valueChanges();
+      }
+    }
+    else {
+      if (key)
+        return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'asc').startAt(key).limit(numberOfItems+1)).valueChanges();
+      else
+        return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'asc').limit(numberOfItems+1)).valueChanges();
+    }
   }
 }

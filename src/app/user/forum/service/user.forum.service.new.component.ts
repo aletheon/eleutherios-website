@@ -531,7 +531,7 @@ export class UserForumServiceNewComponent implements OnInit, OnDestroy, AfterVie
             that.serviceTags = that.userServiceTagService.getTags(that.auth.uid, service.serviceId);
 
             // images
-            that.images = that.userImageService.getImages(that.auth.uid, 1000, null).pipe(
+            that.images = that.userImageService.getImages(that.auth.uid, 1000, null, 'desc').pipe(
               switchMap(images => {
                 if (images && images.length > 0){
                   let observables = images.map(image => {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import {
@@ -7,7 +7,8 @@ import {
   PreviousRouteService,
   NoTitlePipe,
   TruncatePipe,
-  Image
+  Image,
+  Upload
 } from '../../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -24,6 +25,7 @@ import * as _ from "lodash";
   styleUrls: ['./user.image.list.component.css']
 })
 export class UserImageListComponent implements OnInit, OnDestroy {
+  @ViewChild('uploadFile', { static: false }) uploadFile: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
   private _subscription: Subscription;
@@ -36,6 +38,8 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   public images: Observable<any[]> = of([]);
   public imagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
+  public selectedFiles: FileList;
+  public currentUpload: Upload;
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -43,7 +47,22 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     private previousRouteService: PreviousRouteService,
     private route: ActivatedRoute,
     private snackbar: MatSnackBar) {
-    }
+  }
+
+  detectFiles (event) {
+    this.selectedFiles = event.target.files;
+  }
+
+  uploadSingle () {
+    let file = this.selectedFiles.item(0);
+    this.currentUpload = new Upload(file);
+    this.userImageService.create(this.auth.uid, this.currentUpload)
+  }
+
+  clearUpload () {
+    this.uploadFile.nativeElement.value = "";
+    this.currentUpload = null;
+  }
 
   ngOnDestroy () {
     if (this._subscription)
@@ -140,7 +159,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userImageService.getImages(this.auth.uid, this.numberItems, key).pipe(
+    this._subscription = this.userImageService.getImages(this.auth.uid, this.numberItems, key, 'desc').pipe(
       switchMap(images => {
         if (images && images.length > 0){
           let observables = images.map(image => {

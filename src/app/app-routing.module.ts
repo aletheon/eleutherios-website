@@ -35,7 +35,6 @@ import { ServiceReviewViewComponent } from './service/review/view/service.review
 
 // user
 
-import { UserImageNewComponent } from './user/image/new/user.image.new.component';
 import { UserImageListComponent } from './user/image/list/user.image.list.component';
 import { UserImageViewComponent } from './user/image/view/user.image.view.component';
 import { UserServiceNewComponent } from './user/service/new/user.service.new.component';
@@ -179,11 +178,6 @@ const routes: Routes = [
   // **********************************************
   // user routines
   // **********************************************
-  {
-    path: 'user/image/new',
-    component: UserImageNewComponent,
-    canActivate: [AuthGuard]
-  },
   {
     path: 'user/image/list',
     component: UserImageListComponent,

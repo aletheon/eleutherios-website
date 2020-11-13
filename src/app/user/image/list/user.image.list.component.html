@@ -1,8 +1,31 @@
 <div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
 	<!-- header -->
-	<div style="flex:none;display:flex;flex-direction:row">
-		<h4 style="flex:1">Images(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
-		<back></back>
+	<div style="flex:none">
+		<div style="display:flex;flex-direction:row;align-items:center">
+			<h4 style="flex:1">Images(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
+			<back></back>
+		</div>
+		<div style="border:1px solid #a0a0a0;padding:10px;margin-bottom:10px;border-radius:2px">
+			<div *ngIf="currentUpload">
+				<div style="display:flex;flex-direction:row">
+					<div style="flex:1">
+						<div class="progress">
+							<div class="progress-bar progress-bar-animated" [ngStyle]="{ 'width': currentUpload?.progress + '%' }"></div>
+						</div>
+					</div>
+					<div style="flex:none">
+						<mat-icon onclick="event.stopPropagation()" (click)="clearUpload()" style="cursor:pointer" matTooltip="Clear">clear</mat-icon>
+					</div>
+				</div>
+        <div>Progress: {{currentUpload?.name}} | {{currentUpload?.progress}}% Complete</div>
+      </div>
+      <div style="display:flex;flex-direction:row">
+        <label style="flex:1">
+          <input #uploadFile type="file" (change)="detectFiles($event)">
+        </label>
+        <button style="flex:none" [disabled]="!selectedFiles" (click)="uploadSingle()">Upload</button>
+      </div>
+		</div>
 	</div>
 	<!-- search results -->
 	<loading-spinner *ngIf="loading | async"></loading-spinner>
