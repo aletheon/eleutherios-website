@@ -50,7 +50,15 @@
 				</div>
 				<div *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
 					<ng-container *ngIf="user | async;let userItem">
-						{{ userItem.uid }}
+						<!-- show payment controls -->
+						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
+							{{ userItem.uid }}
+						</ng-container>
+						<ng-template #onboarduser>
+							<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="border:none;padding:0;margin:0">
+								<img src="../../../../assets/blue-on-dark.png" matTooltip="Connect with stripe" />
+							</button>
+						</ng-template>
 					</ng-container>
 				</div>
 				<div>
