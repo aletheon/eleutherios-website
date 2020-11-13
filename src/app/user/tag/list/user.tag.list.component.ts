@@ -146,7 +146,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
             });
           }
           else {
-            let message = "Cannot remove the tag, it is being used by ";
+            let message = "Unable to delete tag, it is currently used by ";
   
             if (total.forumCount > 0)
               message += `${total.forumCount} forum(s), `;

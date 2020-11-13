@@ -264,7 +264,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
           });
         }
         else {
-          let message = "Cannot remove the image, it is being used by ";
+          let message = "Unable to delete image, it is currently used by ";
 
           if (total.forumCount > 0)
             message += `${total.forumCount} forum(s), `;
