@@ -55,7 +55,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   public serviceUserBlockCount: Observable<number> = this._serviceUserBlockCount.asObservable();
   public userGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
-  public stripeButtonDisabled: boolean = false;
 
   constructor(private auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -129,29 +128,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         panelClass: ['red-snackbar']
       }
     );
-  }
-
-  stripeConnect () {
-    if (this.stripeButtonDisabled == false){
-      this.stripeButtonDisabled = true;
-
-      this.userService.onboardCustomer(this.auth.uid).then(data => {
-        window.location.href = data.url;
-      })
-      .catch(error => {
-        this.stripeButtonDisabled = false;
-
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 12000,
-            data: error.error,
-            panelClass: ['red-snackbar']
-          }
-        );
-        console.log('error message ' + JSON.stringify(error));
-      });
-    }
   }
 
   ngOnDestroy () {

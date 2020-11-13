@@ -81,7 +81,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public searchForumIncludeTagsInSearch: boolean;
   public searchPrivateForums: boolean;
   public loading: Observable<boolean> = this._loading.asObservable();
-  
+  public stripeButtonDisabled: boolean = false;
+
   constructor(public auth: AuthService, 
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -970,6 +971,29 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           })
         );
       }
+    }
+  }
+
+  stripeConnect () {
+    if (this.stripeButtonDisabled == false){
+      this.stripeButtonDisabled = true;
+
+      this.userService.onboardCustomer(this.auth.uid, 'http://localhost:4200/user/service/edit?onboarding=true').then(data => {
+        window.location.href = data.url;
+      })
+      .catch(error => {
+        this.stripeButtonDisabled = false;
+
+        const snackBarRef = this.snackbar.openFromComponent(
+          NotificationSnackBar,
+          {
+            duration: 12000,
+            data: error.error,
+            panelClass: ['red-snackbar']
+          }
+        );
+        console.log('error message ' + JSON.stringify(error));
+      });
     }
   }
 

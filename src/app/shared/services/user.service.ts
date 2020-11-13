@@ -74,7 +74,7 @@ export class UserService {
     });
   }
 
-  public onboardCustomer (parentUserId: string): Promise<any> {
+  public onboardCustomer (parentUserId: string, returnUrl: string): Promise<any> {
     return new Promise((resolve, reject) => {
       console.log('onboarding user with uid ' + parentUserId);
       
@@ -85,7 +85,7 @@ export class UserService {
           console.log('got authToken ' + authToken);
 
           const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
-          return this.http.post(url, { uid: parentUserId }, { headers: headers }).toPromise();
+          return this.http.post(url, { uid: parentUserId, returnUrl: returnUrl }, { headers: headers }).toPromise();
         })
         .then(data => {
           resolve(data);

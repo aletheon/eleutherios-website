@@ -47,6 +47,7 @@ app.post("/onboard-user", async (req, res) => {
     console.log('in onboarding user');
     const account = await stripe.accounts.create({type: "standard"});
     req.session.accountId = account.id;
+    req.session.returnUrl = req.body.returnUrl;
 
     let requestedUid = req.body.uid;     // resource the user is requsting to modify
     let authToken = validateHeader(req); // current user encrypted
@@ -58,7 +59,7 @@ app.post("/onboard-user", async (req, res) => {
     const uid = await decodeAuthToken(authToken);
     if (uid === requestedUid) {
       const origin = `${req.headers.origin}`;
-      const accountLinkURL = await generateAccountLink(account.id, origin);
+      const accountLinkURL = await generateAccountLink(account.id, origin, req.session.returnUrl);
       const updateUser = await admin.firestore().collection('users').doc(uid).update({
         stripeAccountId: req.session.accountId,
         stripeOnboardingStatus: '',
@@ -82,9 +83,10 @@ app.get("/onboard-user/refresh", async (req, res) => {
     return;
   }
   try {
-    const { accountId } = req.session;
+    const accountId = req.session.accountId;
+    const returnUrl = req.session.returnUrl;
     const origin = `${req.secure ? "https://" : "https://"}${req.headers.host}`;
-    const accountLinkURL = await generateAccountLink(accountId, origin);
+    const accountLinkURL = await generateAccountLink(accountId, origin, returnUrl);
 
     console.log('onboarding user refresh accountLinkURL ' + accountLinkURL);
     res.redirect(accountLinkURL);
@@ -94,13 +96,13 @@ app.get("/onboard-user/refresh", async (req, res) => {
 });
 
 // generateAccountLink
-function generateAccountLink(accountId, origin) {
+function generateAccountLink(accountId, origin, returnUrl) {
   return stripe.accountLinks
     .create({
       type: "account_onboarding",
       account: accountId,
       refresh_url: `${origin}/onboard-user/refresh`,
-      return_url: `http://localhost:4200/user/setting/edit?onboarding=true`,
+      return_url: returnUrl,
     })
     .then((link) => link.url);
 };
