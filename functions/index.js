@@ -579,11 +579,14 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     // update payment count
     const updatePayment = await updatePaymentCount();
 
-    // get customer
-    const customerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
-    const customer = customerSnapshot.data();
+    // get buyer
+    const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
+    const buyer = buyerSnapshot.data();
 
-    // get sellter
+    // get customer
+    const stripeCustomer = await stripe.customers.retrieve({ id: buyer.stripeCustomerId });
+
+    // get seller
     const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
     const seller = sellerSnapshot.data();
 
@@ -591,8 +594,8 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     const idempotencyKey = paymentId;
     const paymentIntent = await stripe.paymentIntents.create({
         amount: payment.amount,
-        currency: 'usd',
-        customer: customer.stripeCustomerId,
+        currency: stripeCustomer.currency,
+        customer: buyer.stripeCustomerId,
         application_fee_amount: 0,
         metadata: { userId: userId, paymentId: paymentId }
       }, {
