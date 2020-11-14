@@ -48,6 +48,20 @@
 						</mat-form-field>
 					</div>
 				</div>
+				<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+					<ng-container *ngIf="user | async;let userItem">
+						<!-- show payment controls -->
+						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
+							<p>Show amount: $0.00</p>
+							<p>Stripe fees</p>
+						</ng-container>
+						<ng-template #onboarduser>
+							<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0">
+								<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="right" matTooltip="Receive payments in 135+ countries using Stripe" />
+							</button>
+						</ng-template>
+					</ng-container>
+				</div>
 				<div>
 					<mat-form-field style="width:100%">
 						<input

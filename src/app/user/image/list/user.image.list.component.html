@@ -21,9 +21,9 @@
       </div>
       <div style="display:flex;flex-direction:row">
         <label style="flex:1">
-          <input #uploadFile type="file" (change)="detectFiles($event)">
+          <input #uploadFile type="file" (change)="detectFiles($event)" accept="image/*">
         </label>
-        <button style="flex:none" [disabled]="!selectedFiles" (click)="uploadSingle()">Upload</button>
+        <button style="flex:none" [disabled]="disableButton" (click)="uploadSingle()">Upload</button>
       </div>
 		</div>
 	</div>

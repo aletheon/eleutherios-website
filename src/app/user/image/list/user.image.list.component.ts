@@ -40,6 +40,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   public total: Observable<number> = this._total.asObservable();
   public selectedFiles: FileList;
   public currentUpload: Upload;
+  public disableButton: boolean = true;
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -50,16 +51,27 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   }
 
   detectFiles (event) {
-    this.selectedFiles = event.target.files;
+    if (event.target.files.length > 0){
+      const file: File = event.target.files[0];
+      var pattern = /image-*/;
+
+      if (file.type.match(pattern)) {
+        this.disableButton = false;
+        this.selectedFiles = event.target.files;
+      }
+    }
+    else this.disableButton = true;
   }
 
   uploadSingle () {
+    this.disableButton = true;
     let file = this.selectedFiles.item(0);
     this.currentUpload = new Upload(file);
-    this.userImageService.create(this.auth.uid, this.currentUpload)
+    this.userImageService.create(this.auth.uid, this.currentUpload);
   }
 
   clearUpload () {
+    this.disableButton = true;
     this.uploadFile.nativeElement.value = "";
     this.currentUpload = null;
   }

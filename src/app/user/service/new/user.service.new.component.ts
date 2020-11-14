@@ -5,6 +5,7 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import {
   SiteTotalService,
   UserActivityService,
+  UserService,
   UserForumTagService,
   UserServiceTagService,
   UserForumServiceBlockService,
@@ -81,11 +82,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   public searchForumIncludeTagsInSearch: boolean;
   public searchPrivateForums: boolean;
   public loading: Observable<boolean> = this._loading.asObservable();
-  public serviceId: string;
+  public stripeButtonDisabled: boolean = false;
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userActivityService: UserActivityService,
+    private userService: UserService,
     private userForumTagService: UserForumTagService,
     private userServiceTagService: UserServiceTagService,
     private userForumBlockService: UserForumBlockService,
@@ -999,6 +1001,41 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     }
   }
 
+  stripeConnect () {
+    if (this.serviceGroup.status != 'VALID') {
+      console.log('service is not valid, cannot save to database');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.titleRef.nativeElement.focus();
+      }, 500);
+    }
+    else {
+      if (this.stripeButtonDisabled == false){
+        this.stripeButtonDisabled = true;
+  
+        this.userService.onboardCustomer(this.auth.uid, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
+          window.location.href = data.url;
+        })
+        .catch(error => {
+          this.stripeButtonDisabled = false;
+  
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 12000,
+              data: error.error,
+              panelClass: ['red-snackbar']
+            }
+          );
+          console.log('error message ' + JSON.stringify(error));
+        });
+      }
+    }
+  }
+
   ngOnDestroy () {
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
@@ -1108,8 +1145,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     // run once subscription
     const runOnceSubscription = this.service.subscribe(service => {
       if (service){
-        this.serviceId = service.serviceId;
-
         let load = async function(){
           try {
             // service totals

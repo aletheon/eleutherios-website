@@ -56,9 +56,12 @@
 							<p>Stripe fees</p>
 						</ng-container>
 						<ng-template #onboarduser>
-							<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0">
-								<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="right" matTooltip="Receive payments in 135+ countries using Stripe" />
-							</button>
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
+									<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="below" matTooltip="Receive payments in 135+ countries using Stripe" />
+								</button>
+								<mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
+							</div>
 						</ng-template>
 					</ng-container>
 				</div>
