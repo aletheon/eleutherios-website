@@ -185,37 +185,36 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   addImage (image) {
-    if (this.serviceGroup.get('title').hasError('required')) {
-      console.log('title error');
+    if (this.serviceGroup.status != 'VALID') {
+      if (this.serviceGroup.get('title').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.serviceGroup.controls) {
+            this.serviceGroup.controls[i].markAsTouched();
+          }
+          this.titleRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.serviceGroup.get('paymentType').value == 'Payment'){
+        if (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max')){
+          setTimeout(() => {
+            for (let i in this.serviceGroup.controls) {
+              this.serviceGroup.controls[i].markAsTouched();
+            }
+            if (this.amountRef) this.amountRef.nativeElement.focus();
+          }, 500);
+          return;
+        }
+      }
+    }
 
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
-        }
-        this.titleRef.nativeElement.focus();
-      }, 500);
-      return;
-    }
-    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
-      console.log('amount error');
-
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
-        }
-        this.amountRef.nativeElement.focus();
-      }, 500);
-      return;
-    }
-    else {
-      this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
-        if (!exists){
-          image.default = false;
-          this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image);
-        }
-        else console.log('image already exists in service');
-      });
-    }
+    this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
+      if (!exists){
+        image.default = false;
+        this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image);
+      }
+      else console.log('image already exists in service');
+    });
   }
 
   removeServiceImage (serviceImage) {
@@ -587,170 +586,169 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   // register service in forum
   addForum (forum) {
-    if (this.serviceGroup.get('title').hasError('required')) {
-      console.log('title error');
-
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
+    if (this.serviceGroup.status != 'VALID') {
+      if (this.serviceGroup.get('title').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.serviceGroup.controls) {
+            this.serviceGroup.controls[i].markAsTouched();
+          }
+          this.titleRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.serviceGroup.get('paymentType').value == 'Payment'){
+        if (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max')){
+          setTimeout(() => {
+            for (let i in this.serviceGroup.controls) {
+              this.serviceGroup.controls[i].markAsTouched();
+            }
+            if (this.amountRef) this.amountRef.nativeElement.focus();
+          }, 500);
+          return;
         }
-        this.titleRef.nativeElement.focus();
-      }, 500);
-      return;
+      }
     }
-    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
-      console.log('amount error');
+    
+    if (this.serviceGroup.get('title').value.length > 0){
+      this.userForumServiceBlockService.serviceIsBlocked(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
+        .then((serviceBlocked) => {
+          if (!serviceBlocked) {
+            this.userServiceUserBlockService.userIsBlocked(forum.uid, forum.forumId, this.serviceGroup.get('uid').value)
+              .then((serviceUserBlock) => {
+                if (!serviceUserBlock) {
+                  this.userServiceForumBlockService.forumIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.forumId)
+                    .then((forumBlocked) => {
+                      if (!forumBlocked) {
+                        this.userForumUserBlockService.userIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.uid)
+                          .then((forumUserBlock) => {
+                            if (!forumUserBlock) {
+                              this.userForumRegistrantService.serviceIsServingInForum(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
+                                .then((isServing) => {
+                                  if (!isServing) {
+                                    const newRegistrant: Registrant = {
+                                      registrantId: '',
+                                      parentId: '',
+                                      serviceId: this.serviceGroup.get('serviceId').value,
+                                      uid: this.serviceGroup.get('uid').value,
+                                      forumId: forum.forumId,
+                                      forumUid: forum.uid,
+                                      default: false,
+                                      indexed: this.serviceGroup.get('indexed').value,
+                                      creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+                                      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+                                    };
 
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
-        }
-        this.amountRef.nativeElement.focus();
-      }, 500);
-      return;
-    }
-    else {
-      if (this.serviceGroup.get('title').value.length > 0){
-        this.userForumServiceBlockService.serviceIsBlocked(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
-          .then((serviceBlocked) => {
-            if (!serviceBlocked) {
-              this.userServiceUserBlockService.userIsBlocked(forum.uid, forum.forumId, this.serviceGroup.get('uid').value)
-                .then((serviceUserBlock) => {
-                  if (!serviceUserBlock) {
-                    this.userServiceForumBlockService.forumIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.forumId)
-                      .then((forumBlocked) => {
-                        if (!forumBlocked) {
-                          this.userForumUserBlockService.userIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.uid)
-                            .then((forumUserBlock) => {
-                              if (!forumUserBlock) {
-                                this.userForumRegistrantService.serviceIsServingInForum(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
-                                  .then((isServing) => {
-                                    if (!isServing) {
-                                      const newRegistrant: Registrant = {
-                                        registrantId: '',
-                                        parentId: '',
-                                        serviceId: this.serviceGroup.get('serviceId').value,
-                                        uid: this.serviceGroup.get('uid').value,
-                                        forumId: forum.forumId,
-                                        forumUid: forum.uid,
-                                        default: false,
-                                        indexed: this.serviceGroup.get('indexed').value,
-                                        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-                                        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-                                      };
+                                    this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.serviceGroup.get('uid').value)
+                                      .then(registrant => {
+                                        if (registrant == null)
+                                          newRegistrant.default = true;
 
-                                      this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.serviceGroup.get('uid').value)
-                                        .then(registrant => {
-                                          if (registrant == null)
-                                            newRegistrant.default = true;
-
-                                          this.userForumRegistrantService.create(forum.uid, forum.forumId, newRegistrant).then(() => {
-                                            // do something
-                                          })
-                                          .catch(error => {
-                                            const snackBarRef = this.snackbar.openFromComponent(
-                                              NotificationSnackBar,
-                                              {
-                                                duration: 8000,
-                                                data: error.message,
-                                                panelClass: ['red-snackbar']
-                                              }
-                                            );
-                                          });
-                                        }
-                                      )
-                                      .catch(error => {
-                                        console.error(error);
-                                      });
-                                    }
-                                    else {
-                                      const snackBarRef = this.snackbar.openFromComponent(
-                                        NotificationSnackBar,
-                                        {
-                                          duration: 8000,
-                                          data: `'${this.serviceGroup.get('title').value}' is already serving in the forum '${forum.title}'`,
-                                          panelClass: ['red-snackbar']
-                                        }
-                                      );
-                                    }
-                                  })
-                                  .catch((error) => {
-                                    console.log("error adding service to forum " + JSON.stringify(error));
+                                        this.userForumRegistrantService.create(forum.uid, forum.forumId, newRegistrant).then(() => {
+                                          // do something
+                                        })
+                                        .catch(error => {
+                                          const snackBarRef = this.snackbar.openFromComponent(
+                                            NotificationSnackBar,
+                                            {
+                                              duration: 8000,
+                                              data: error.message,
+                                              panelClass: ['red-snackbar']
+                                            }
+                                          );
+                                        });
+                                      }
+                                    )
+                                    .catch(error => {
+                                      console.error(error);
+                                    });
                                   }
-                                );
-                              }
-                              else {
-                                const snackBarRef = this.snackbar.openFromComponent(
-                                  NotificationSnackBar,
-                                  {
-                                    duration: 8000,
-                                    data: `The user of the forum '${forum.title}' has been blocked from requesting the service '${this.serviceGroup.get('title').value}'`,
-                                    panelClass: ['red-snackbar']
+                                  else {
+                                    const snackBarRef = this.snackbar.openFromComponent(
+                                      NotificationSnackBar,
+                                      {
+                                        duration: 8000,
+                                        data: `'${this.serviceGroup.get('title').value}' is already serving in the forum '${forum.title}'`,
+                                        panelClass: ['red-snackbar']
+                                      }
+                                    );
                                   }
-                                );
-                              }
+                                })
+                                .catch((error) => {
+                                  console.log("error adding service to forum " + JSON.stringify(error));
+                                }
+                              );
                             }
-                          );
-                        }
-                        else {
-                          const snackBarRef = this.snackbar.openFromComponent(
-                            NotificationSnackBar,
-                            {
-                              duration: 8000,
-                              data: `The forum '${forum.title}' has been blocked from requesting the service '${this.serviceGroup.get('title').value}'`,
-                              panelClass: ['red-snackbar']
+                            else {
+                              const snackBarRef = this.snackbar.openFromComponent(
+                                NotificationSnackBar,
+                                {
+                                  duration: 8000,
+                                  data: `The user of the forum '${forum.title}' has been blocked from requesting the service '${this.serviceGroup.get('title').value}'`,
+                                  panelClass: ['red-snackbar']
+                                }
+                              );
                             }
-                          );
-                        }
+                          }
+                        );
                       }
-                    );
-                  }
-                  else {
-                    const snackBarRef = this.snackbar.openFromComponent(
-                      NotificationSnackBar,
-                      {
-                        duration: 8000,
-                        data: `The user of the service '${this.serviceGroup.get('title').value}' has been blocked from serving in the forum '${forum.title}'`,
-                        panelClass: ['red-snackbar']
+                      else {
+                        const snackBarRef = this.snackbar.openFromComponent(
+                          NotificationSnackBar,
+                          {
+                            duration: 8000,
+                            data: `The forum '${forum.title}' has been blocked from requesting the service '${this.serviceGroup.get('title').value}'`,
+                            panelClass: ['red-snackbar']
+                          }
+                        );
                       }
-                    );
-                  }
-                })
-                .catch(error => {
+                    }
+                  );
+                }
+                else {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: error.message,
+                      data: `The user of the service '${this.serviceGroup.get('title').value}' has been blocked from serving in the forum '${forum.title}'`,
                       panelClass: ['red-snackbar']
                     }
                   );
                 }
-              );
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: `The service '${this.serviceGroup.get('title').value}' has been blocked from serving in the forum '${forum.title}'`,
-                  panelClass: ['red-snackbar']
-                }
-              );
-            }
+              })
+              .catch(error => {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: error.message,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: `Service is missing a title`,
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: `The service '${this.serviceGroup.get('title').value}' has been blocked from serving in the forum '${forum.title}'`,
+                panelClass: ['red-snackbar']
+              }
+            );
           }
-        );
-      }
+        }
+      );
+    }
+    else {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: `Service is missing a title`,
+          panelClass: ['red-snackbar']
+        }
+      );
     }
   }
 
@@ -1004,8 +1002,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   stripeConnect () {
     if (this.serviceGroup.get('title').hasError('required')) {
-      console.log('title error');
-
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
@@ -1014,38 +1010,26 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       }, 500);
       return;
     }
-    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
-      console.log('amount error');
 
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
-        }
-        this.amountRef.nativeElement.focus();
-      }, 500);
-      return;
-    }
-    else {
-      if (this.stripeButtonDisabled == false){
-        this.stripeButtonDisabled = true;
-  
-        this.userService.onboardCustomer(this.auth.uid, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
-          window.location.href = data.url;
-        })
-        .catch(error => {
-          this.stripeButtonDisabled = false;
-  
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 12000,
-              data: error.error,
-              panelClass: ['red-snackbar']
-            }
-          );
-          console.log('error message ' + JSON.stringify(error));
-        });
-      }
+    if (this.stripeButtonDisabled == false){
+      this.stripeButtonDisabled = true;
+
+      this.userService.onboardCustomer(this.auth.uid, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
+        window.location.href = data.url;
+      })
+      .catch(error => {
+        this.stripeButtonDisabled = false;
+
+        const snackBarRef = this.snackbar.openFromComponent(
+          NotificationSnackBar,
+          {
+            duration: 12000,
+            data: error.error,
+            panelClass: ['red-snackbar']
+          }
+        );
+        console.log('error message ' + JSON.stringify(error));
+      });
     }
   }
 
@@ -1077,12 +1061,18 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       if (that._loading.getValue() == false) {
         clearInterval(intervalId);
 
-        if (that.serviceGroup.get('title') && that.serviceGroup.get('title').value.length == 0){
-          // set focus
+        if (that.serviceGroup.get('title').hasError('required')) {
           for (let i in that.serviceGroup.controls) {
             that.serviceGroup.controls[i].markAsTouched();
           }
-          that.titleRef.nativeElement.focus();
+          that.titleRef.nativeElement.focus();  
+        }
+        
+        if (that.serviceGroup.get('paymentType').value == 'Payment'){
+          for (let i in that.serviceGroup.controls) {
+            that.serviceGroup.controls[i].markAsTouched();
+          }
+          that.amountRef.nativeElement.focus();
         }
       }
     }, 500);
@@ -2206,32 +2196,30 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   saveChanges () {
-    if (this.serviceGroup.get('title').hasError('required')) {
-      console.log('title error');
-
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
+    if (this.serviceGroup.status != 'VALID') {
+      if (this.serviceGroup.get('title').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.serviceGroup.controls) {
+            this.serviceGroup.controls[i].markAsTouched();
+          }
+          this.titleRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.serviceGroup.get('paymentType').value == 'Payment'){
+        if (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max')){
+          setTimeout(() => {
+            for (let i in this.serviceGroup.controls) {
+              this.serviceGroup.controls[i].markAsTouched();
+            }
+            if (this.amountRef) this.amountRef.nativeElement.focus();
+          }, 500);
+          return;
         }
-        this.titleRef.nativeElement.focus();
-      }, 500);
-      return;
-    }
-    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
-      console.log('amount error');
-
-      setTimeout(() => {
-        for (let i in this.serviceGroup.controls) {
-          this.serviceGroup.controls[i].markAsTouched();
-        }
-        this.amountRef.nativeElement.focus();
-      }, 500);
-      return;
+      }
     }
 
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
-
-    console.log('amount after ' + this.serviceGroup.get('amount').value);
 
     if (tempTitle.length <= 100){
       if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){

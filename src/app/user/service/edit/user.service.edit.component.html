@@ -1,55 +1,55 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="service | async;let serviceItem">
-	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
-		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-			<h4 style="flex:none">Edit Service</h4>
-			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-				<back></back>
+<ng-container *ngIf="user | async;let userItem">
+	<ng-container *ngIf="service | async;let serviceItem">
+		<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+			<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+				<h4 style="flex:none">Edit Service</h4>
+				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+					<back></back>
+				</div>
 			</div>
-		</div>
-		<div style="flex:1">
-			<!-- START OF SERVICE DETAILS SECTION -->
-			<form [formGroup]="serviceGroup" novalidate>
-				<div style="display:flex;flex-direction:row;align-items:center">
-					<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-					<ng-template #showdefaultserviceimage>
-						<ng-container *ngIf="defaultServiceImage | async;let image">
-							<div style="flex:none;margin-right:10px">
-								<img [src]="image.url">
-							</div>
-						</ng-container>
-					</ng-template>
-					<div style="flex:1">
-						{{ serviceGroup.get('title').value }}
+			<div style="flex:1">
+				<!-- START OF SERVICE DETAILS SECTION -->	
+				<form [formGroup]="serviceGroup" novalidate>
+					<div style="display:flex;flex-direction:row;align-items:center">
+						<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+						<ng-template #showdefaultserviceimage>
+							<ng-container *ngIf="defaultServiceImage | async;let image">
+								<div style="flex:none;margin-right:10px">
+									<img [src]="image.url">
+								</div>
+							</ng-container>
+						</ng-template>
+						<div style="flex:1">
+							{{ serviceGroup.get('title').value }}
+						</div>
+						<div style="flex:none">
+							<mat-slide-toggle
+								formControlName="indexed"
+								matTooltip="Index"
+								(change)="saveChanges()">
+							</mat-slide-toggle>
+						</div>
 					</div>
-					<div style="flex:none">
-						<mat-slide-toggle
-							formControlName="indexed"
-							matTooltip="Index"
-							(change)="saveChanges()">
-						</mat-slide-toggle>
+					<div style="display:flex;flex-direction:row;align-items:center">
+						<div style="flex:1">
+							<mat-form-field style="width:150px">
+								<mat-select formControlName="type" #select="matSelect" (selectionChange)="saveChanges()">
+									<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
 					</div>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center">
-					<div style="flex:1">
-						<mat-form-field style="width:150px">
-							<mat-select formControlName="type" #select="matSelect" (selectionChange)="saveChanges()">
-								<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
-							</mat-select>
-						</mat-form-field>
+					<div style="display:flex;flex-direction:row;align-items:center">
+						<div style="flex:1">
+							<mat-form-field style="width:150px">
+								<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
+									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
 					</div>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center">
-					<div style="flex:1">
-						<mat-form-field style="width:150px">
-							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
-								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
-							</mat-select>
-						</mat-form-field>
-					</div>
-				</div>
-				<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-					<ng-container *ngIf="user | async;let userItem">
+					<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
 						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
 							<mat-form-field style="width:10.7%">
 								<input
@@ -70,160 +70,263 @@
 							</mat-form-field>
 						</ng-container>
 						<ng-template #onboarduser>
-							<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0">
-								<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="right" />
-							</button>
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
+									<img src="../../../../assets/blue-on-dark.png" />
+								</button>
+								<mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
+							</div>
 						</ng-template>
-					</ng-container>
-				</div>
-				<div>
-					<mat-form-field style="width:100%">
-						<input
-							matInput
-							#main
-							placeholder="Title"
-							formControlName="title"
-							(change)="saveChanges()">
-						<mat-error *ngIf="!serviceGroup.get('title').valid || serviceGroup.get('title').touched">
-							Title is required
-						</mat-error>
-					</mat-form-field>
-				</div>
-				<div>
-					<mat-form-field style="width:100%">
-						<textarea 
-							matInput
-							placeholder="Description"
-							formControlName="description"
-							(change)="saveChanges()">
-						</textarea>
-					</mat-form-field>
-				</div>
-				<div>
-					<mat-form-field style="width:100%">
-						<input
-							matInput
-							placeholder="Website"
-							formControlName="website"
-							(change)="saveChanges()">
-					</mat-form-field>
-				</div>
-				<!-- START OF TAGS SECTION -->
-				<div style="margin-bottom:20px">
-					<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
-					<ng-container *ngIf="serviceTags | async;let serviceTagItems">
-						<div *ngIf="serviceTagItems.length > 0; else noservicetags">
-							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
-									*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
-									<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
-									<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+					</div>
+					<div>
+						<mat-form-field style="width:100%">
+							<input
+								matInput
+								#main
+								placeholder="Title"
+								formControlName="title"
+								(change)="saveChanges()">
+							<mat-error *ngIf="!serviceGroup.get('title').valid || serviceGroup.get('title').touched">
+								Title is required
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div>
+						<mat-form-field style="width:100%">
+							<textarea 
+								matInput
+								placeholder="Description"
+								formControlName="description"
+								(change)="saveChanges()">
+							</textarea>
+						</mat-form-field>
+					</div>
+					<div>
+						<mat-form-field style="width:100%">
+							<input
+								matInput
+								placeholder="Website"
+								formControlName="website"
+								(change)="saveChanges()">
+						</mat-form-field>
+					</div>
+					<!-- START OF TAGS SECTION -->
+					<div style="margin-bottom:20px">
+						<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
+						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
+							<div *ngIf="serviceTagItems.length > 0; else noservicetags">
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
+										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
+										<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
+										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+									</div>
 								</div>
 							</div>
-						</div>
-						<ng-template #noservicetags>
-							<p style="color:#999;font-size:90%">
-								<i>No Tags</i>
-							</p>
-						</ng-template>
-					</ng-container>
-					<div style="display:flex;flex-direction:row;align-items:center">
-						<div style="flex:1;margin-right:20px">
-							<mat-form-field style="width:100%">
-								<input matInput placeholder="Type a tag" [matAutocomplete]="autoServiceTags" [formControl]="tagServiceCtrl">
-								<mat-autocomplete #autoServiceTags="matAutocomplete" [displayWith]="autoServiceTagsDisplayFn">
-									<mat-option *ngFor="let tag of matAutoCompleteTags | async" (onSelectionChange)="serviceTagsSelectionChange(tag)" [value]="tag">
-										<p>{{ tag.tag }}</p>
-									</mat-option>
-								</mat-autocomplete>
-							</mat-form-field>
-						</div>
-						<div style="flex:none">
-							<i class="material-icons" (click)="createServiceTag()" style="cursor:pointer" matTooltip="Create tag">add</i>
-						</div>
-					</div>
-				</div>
-				<!-- START OF IMAGES SECTION -->
-				<div style="margin-bottom:20px">
-					<h5 style="padding:0px">Images(<ng-container *ngIf="imageCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
-					<!-- service images -->
-					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-						<ng-container *ngIf="serviceImages | async;let serviceImageItems">
-							<ng-container *ngIf="serviceImageItems.length > 0; then showserviceimages else noserviceimages"></ng-container>
-							<ng-template #showserviceimages>
-								<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap"
-									*ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
-									<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-										<div style="flex:none;margin-right:5px">
-											<img [src]="serviceImage.url" matTooltip="{{ serviceImage.name }}">
-										</div>
-									</div>
-									<div style="flex:none;display:flex;flex-direction:column;align-items:center">
-										<div style="flex:none">
-											<mat-icon onclick="event.stopPropagation()" (click)="removeServiceImage(serviceImage)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-										</div>
-										<div style="flex:none">
-											<mat-checkbox matTooltip="Set Default" matTooltipPosition="above" [checked]="serviceImage.default" (change)="setDefaultServiceImage(serviceImage)"></mat-checkbox>
-										</div>
-									</div>
-								</div>
-							</ng-template>
-							<ng-template #noserviceimages>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Images</i>
+							<ng-template #noservicetags>
+								<p style="color:#999;font-size:90%">
+									<i>No Tags</i>
 								</p>
 							</ng-template>
 						</ng-container>
+						<div style="display:flex;flex-direction:row;align-items:center">
+							<div style="flex:1;margin-right:20px">
+								<mat-form-field style="width:100%">
+									<input matInput placeholder="Type a tag" [matAutocomplete]="autoServiceTags" [formControl]="tagServiceCtrl">
+									<mat-autocomplete #autoServiceTags="matAutocomplete" [displayWith]="autoServiceTagsDisplayFn">
+										<mat-option *ngFor="let tag of matAutoCompleteTags | async" (onSelectionChange)="serviceTagsSelectionChange(tag)" [value]="tag">
+											<p>{{ tag.tag }}</p>
+										</mat-option>
+									</mat-autocomplete>
+								</mat-form-field>
+							</div>
+							<div style="flex:none">
+								<i class="material-icons" (click)="createServiceTag()" style="cursor:pointer" matTooltip="Create tag">add</i>
+							</div>
+						</div>
 					</div>
-					<!-- images -->
-					<div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px">
-						<div style="display:flex;flex-direction:row">
-							<ng-container *ngIf="images | async;let imageItems">
-								<ng-container *ngIf="imageItems.length > 0; then showimages else noimages"></ng-container>
-								<ng-template #showimages>
-									<div style="flex:1;display:flex;flex-direction:row;overflow-x:auto">
-										<div style="flex:none;display:flex;flex-direction:row;align-items:flex-start;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap"
-											*ngFor="let image of imageItems; trackBy: trackImages">
-											<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-												<div style="flex:none;margin-right:5px">
-													<img [src]="image.url">
-												</div>
+					<!-- START OF IMAGES SECTION -->
+					<div style="margin-bottom:20px">
+						<h5 style="padding:0px">Images(<ng-container *ngIf="imageCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
+						<!-- service images -->
+						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+							<ng-container *ngIf="serviceImages | async;let serviceImageItems">
+								<ng-container *ngIf="serviceImageItems.length > 0; then showserviceimages else noserviceimages"></ng-container>
+								<ng-template #showserviceimages>
+									<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap"
+										*ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
+										<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+											<div style="flex:none;margin-right:5px">
+												<img [src]="serviceImage.url" matTooltip="{{ serviceImage.name }}">
+											</div>
+										</div>
+										<div style="flex:none;display:flex;flex-direction:column;align-items:center">
+											<div style="flex:none">
+												<mat-icon onclick="event.stopPropagation()" (click)="removeServiceImage(serviceImage)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
 											</div>
 											<div style="flex:none">
-												<mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+												<mat-checkbox matTooltip="Set Default" matTooltipPosition="above" [checked]="serviceImage.default" (change)="setDefaultServiceImage(serviceImage)"></mat-checkbox>
 											</div>
 										</div>
 									</div>
 								</ng-template>
-								<ng-template #noimages>
-									<div style="flex:1;display:flex;flex-direction:row;align-items:center">
-										<div style="flex:1;color:#999;font-size:90%">
-											<i>No Results</i>
-										</div>
-									</div>
+								<ng-template #noserviceimages>
+									<p style="flex:none;color:#999;font-size:90%">
+										<i>No Images</i>
+									</p>
 								</ng-template>
 							</ng-container>
 						</div>
+						<!-- images -->
+						<div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px">
+							<div style="display:flex;flex-direction:row">
+								<ng-container *ngIf="images | async;let imageItems">
+									<ng-container *ngIf="imageItems.length > 0; then showimages else noimages"></ng-container>
+									<ng-template #showimages>
+										<div style="flex:1;display:flex;flex-direction:row;overflow-x:auto">
+											<div style="flex:none;display:flex;flex-direction:row;align-items:flex-start;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap"
+												*ngFor="let image of imageItems; trackBy: trackImages">
+												<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+													<div style="flex:none;margin-right:5px">
+														<img [src]="image.url">
+													</div>
+												</div>
+												<div style="flex:none">
+													<mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+												</div>
+											</div>
+										</div>
+									</ng-template>
+									<ng-template #noimages>
+										<div style="flex:1;display:flex;flex-direction:row;align-items:center">
+											<div style="flex:1;color:#999;font-size:90%">
+												<i>No Results</i>
+											</div>
+										</div>
+									</ng-template>
+								</ng-container>
+							</div>
+						</div>
 					</div>
-				</div>
-				<!-- START OF FORUMS SECTION -->
-				<div style="margin-bottom:20px">
-					<h5 style="margin:5px 0 15px 0;padding:0px">Forums(<ng-container *ngIf="forumCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
-					<!-- whereServings -->
-					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-						<ng-container *ngIf="whereServings | async;let whereServingItems">
-							<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
-							<ng-template #showwhereservings>
-								<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;align-items:center;margin:0 5px 0 0"
-									*ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
-									<ng-container *ngIf="whereServing.forum | async;let forum">
-										<ng-container *ngIf="forum; then showforum"></ng-container>
-										<ng-template #showforum>
-											<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+					<!-- START OF FORUMS SECTION -->
+					<div style="margin-bottom:20px">
+						<h5 style="margin:5px 0 15px 0;padding:0px">Forums(<ng-container *ngIf="forumCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
+						<!-- whereServings -->
+						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+							<ng-container *ngIf="whereServings | async;let whereServingItems">
+								<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
+								<ng-template #showwhereservings>
+									<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;align-items:center;margin:0 5px 0 0"
+										*ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
+										<ng-container *ngIf="whereServing.forum | async;let forum">
+											<ng-container *ngIf="forum; then showforum"></ng-container>
+											<ng-template #showforum>
+												<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+													<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+													<ng-template #showdefaultforumimage>
+														<ng-container *ngIf="forum.defaultForumImage | async;let image">
+															<div style="flex:none;margin-right:5px">
+																<img [src]="image.url">
+															</div>
+														</ng-container>
+													</ng-template>
+													<div style="flex:1;margin-right:5px">
+														<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+														<ng-template #showdefaultregistrant>
+															<p style="word-break: break-all">
+																<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															</p>
+														</ng-template>
+														<ng-template #nodefaultregistrant>
+															<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														</ng-template>
+													</div>
+													<div style="flex:none">
+														<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
+														<ng-template #showblockcontrol>
+															<mat-form-field style="width:120px">
+																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
+																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+																</mat-select>
+															</mat-form-field>
+														</ng-template>
+														<ng-template #noblockcontrol>
+															<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+														</ng-template>
+													</div>
+												</div>
+											</ng-template>
+										</ng-container>
+									</div>
+								</ng-template>
+								<ng-template #nowhereservings>
+									<p style="flex:none;color:#999;font-size:90%">
+										<i>No Forums</i>
+									</p>
+								</ng-template>
+							</ng-container>
+						</div>
+						<!-- search -->
+						<div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px">
+							<!-- forum -->
+							<div style="text-align:right">
+								<mat-checkbox formControlName="searchPrivateForums" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateForumsClick()" style="margin-right:10px"></mat-checkbox>
+								<mat-checkbox formControlName="searchForumIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchForumIncludeTagsInSearchClick()"></mat-checkbox>
+							</div>
+							<div>
+								<mat-form-field style="width:100%">
+									<input matInput placeholder="Type a forum" [matAutocomplete]="autoSearchForum" [formControl]="searchForumCtrl">
+									<mat-autocomplete #autoSearchForum="matAutocomplete" [displayWith]="autoSearchForumDisplayFn">
+										<mat-option *ngFor="let forum of matAutoCompleteSearchForums | async" [value]="forum">
+											<p matTooltip="{{ forum.title }}">{{ forum.title }}</p>
+										</mat-option>
+									</mat-autocomplete>
+								</mat-form-field>
+							</div>
+							<!-- tag -->
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<div style="flex:1">
+									<mat-form-field style="width:100%">
+										<input matInput placeholder="Type a tag" [matAutocomplete]="autoSearchForumTags" [formControl]="tagSearchCtrl">
+										<mat-autocomplete #autoSearchForumTags="matAutocomplete" [displayWith]="autoSearchForumTagsDisplayFn">
+											<mat-option *ngFor="let tag of matAutoCompleteSearchForumTags | async" (onSelectionChange)="searchForumTagsSelectionChange(tag)" [value]="tag">
+												<p>{{ tag.tag }}</p>
+											</mat-option>
+										</mat-autocomplete>
+									</mat-form-field>
+								</div>
+								<div style="flex:none">
+									<i class="material-icons" (click)="createSearchTag()" style="cursor:pointer" matTooltip="Create tag">add</i>
+								</div>
+							</div>
+							<!-- tag results -->
+							<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+								<ng-container *ngIf="searchTags.length > 0; then showsearchtags else nosearchtags"></ng-container>
+								<ng-template #showsearchtags>
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid #ac2c2c;background-color:rgb(152, 250, 173);align-items:center"
+										*ngFor="let tag of searchTags; trackBy: trackSearchTags">
+										<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
+										<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+									</div>
+								</ng-template>
+								<ng-template #nosearchtags>
+									<p style="flex:none;color:#999;font-size:90%">
+										<i>No Tags</i>
+									</p>
+								</ng-template>
+							</div>
+							<!-- search results -->
+							<div style="display:flex;flex-direction:column">
+								<ng-container *ngIf="searchForumResults | async;let searchForumResultItems">
+									<div *ngIf="searchForumResultItems.length > 0; then showsearchforumresults else nosearchforumresults"></div>
+									<ng-template #showsearchforumresults>
+										<div *ngFor="let forum of searchForumResultItems; trackBy: trackSearchForumResults" style="flex:none;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px">
+											<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
 												<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 												<ng-template #showdefaultforumimage>
 													<ng-container *ngIf="forum.defaultForumImage | async;let image">
-														<div style="flex:none;margin-right:5px">
+														<div style="flex:none;margin-right:10px">
 															<img [src]="image.url">
 														</div>
 													</ng-container>
@@ -232,129 +335,29 @@
 													<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
 													<ng-template #showdefaultregistrant>
 														<p style="word-break: break-all">
-															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
 														</p>
 													</ng-template>
 													<ng-template #nodefaultregistrant>
-														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
 													</ng-template>
 												</div>
-												<div style="flex:none">
-													<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
-													<ng-template #showblockcontrol>
-														<mat-form-field style="width:120px">
-															<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
-																<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-															</mat-select>
-														</mat-form-field>
-													</ng-template>
-													<ng-template #noblockcontrol>
-														<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-													</ng-template>
-												</div>
+												<mat-icon onclick="event.stopPropagation()" (click)="addForum(forum)" style="flex:none;cursor:pointer" matTooltip="Add">add</mat-icon>
 											</div>
-										</ng-template>
-									</ng-container>
-								</div>
-							</ng-template>
-							<ng-template #nowhereservings>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Forums</i>
-								</p>
-							</ng-template>
-						</ng-container>
-					</div>
-					<!-- search -->
-					<div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px">
-						<!-- forum -->
-						<div style="text-align:right">
-							<mat-checkbox formControlName="searchPrivateForums" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateForumsClick()" style="margin-right:10px"></mat-checkbox>
-							<mat-checkbox formControlName="searchForumIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchForumIncludeTagsInSearchClick()"></mat-checkbox>
-						</div>
-						<div>
-							<mat-form-field style="width:100%">
-								<input matInput placeholder="Type a forum" [matAutocomplete]="autoSearchForum" [formControl]="searchForumCtrl">
-								<mat-autocomplete #autoSearchForum="matAutocomplete" [displayWith]="autoSearchForumDisplayFn">
-									<mat-option *ngFor="let forum of matAutoCompleteSearchForums | async" [value]="forum">
-										<p matTooltip="{{ forum.title }}">{{ forum.title }}</p>
-									</mat-option>
-								</mat-autocomplete>
-							</mat-form-field>
-						</div>
-						<!-- tag -->
-						<div style="display:flex;flex-direction:row;align-items:center">
-							<div style="flex:1">
-								<mat-form-field style="width:100%">
-									<input matInput placeholder="Type a tag" [matAutocomplete]="autoSearchForumTags" [formControl]="tagSearchCtrl">
-									<mat-autocomplete #autoSearchForumTags="matAutocomplete" [displayWith]="autoSearchForumTagsDisplayFn">
-										<mat-option *ngFor="let tag of matAutoCompleteSearchForumTags | async" (onSelectionChange)="searchForumTagsSelectionChange(tag)" [value]="tag">
-											<p>{{ tag.tag }}</p>
-										</mat-option>
-									</mat-autocomplete>
-								</mat-form-field>
-							</div>
-							<div style="flex:none">
-								<i class="material-icons" (click)="createSearchTag()" style="cursor:pointer" matTooltip="Create tag">add</i>
-							</div>
-						</div>
-						<!-- tag results -->
-						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-							<ng-container *ngIf="searchTags.length > 0; then showsearchtags else nosearchtags"></ng-container>
-							<ng-template #showsearchtags>
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid #ac2c2c;background-color:rgb(152, 250, 173);align-items:center"
-									*ngFor="let tag of searchTags; trackBy: trackSearchTags">
-									<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
-									<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
-								</div>
-							</ng-template>
-							<ng-template #nosearchtags>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Tags</i>
-								</p>
-							</ng-template>
-						</div>
-						<!-- search results -->
-						<div style="display:flex;flex-direction:column">
-							<ng-container *ngIf="searchForumResults | async;let searchForumResultItems">
-								<div *ngIf="searchForumResultItems.length > 0; then showsearchforumresults else nosearchforumresults"></div>
-								<ng-template #showsearchforumresults>
-									<div *ngFor="let forum of searchForumResultItems; trackBy: trackSearchForumResults" style="flex:none;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px">
-										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-											<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-											<ng-template #showdefaultforumimage>
-												<ng-container *ngIf="forum.defaultForumImage | async;let image">
-													<div style="flex:none;margin-right:10px">
-														<img [src]="image.url">
-													</div>
-												</ng-container>
-											</ng-template>
-											<div style="flex:1;margin-right:5px">
-												<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
-												<ng-template #showdefaultregistrant>
-													<p style="word-break: break-all">
-														<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													</p>
-												</ng-template>
-												<ng-template #nodefaultregistrant>
-													<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-												</ng-template>
-											</div>
-											<mat-icon onclick="event.stopPropagation()" (click)="addForum(forum)" style="flex:none;cursor:pointer" matTooltip="Add">add</mat-icon>
 										</div>
-									</div>
-								</ng-template>
-								<ng-template #nosearchforumresults>
-									<p style="flex:none;color:#999;font-size:90%">
-										<i>No Results</i>
-									</p>
-								</ng-template>
-							</ng-container>
+									</ng-template>
+									<ng-template #nosearchforumresults>
+										<p style="flex:none;color:#999;font-size:90%">
+											<i>No Results</i>
+										</p>
+									</ng-template>
+								</ng-container>
+							</div>
 						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			</div>
 		</div>
-	</div>
+	</ng-container>
 </ng-container>
