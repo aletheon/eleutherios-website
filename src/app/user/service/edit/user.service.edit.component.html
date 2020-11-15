@@ -50,18 +50,28 @@
 				</div>
 				<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
 					<ng-container *ngIf="user | async;let userItem">
-						<!-- show payment controls -->
 						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
-							<p>Show amount: $0.00</p>
-							<p>Stripe fees</p>
+							<mat-form-field style="width:10.7%">
+								<input
+									matInput
+									placeholder="#.##"
+									formControlName="amount"
+									(change)="saveChanges()"/>
+								<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
+									Amount required
+								</mat-error>
+								<mat-error *ngIf="serviceGroup.get('amount').hasError('min')">
+									Must be greater than 0.49
+								</mat-error>
+								<mat-error *ngIf="serviceGroup.get('amount').hasError('max')">
+									Must be less than 999999.99
+								</mat-error>
+							</mat-form-field>
 						</ng-container>
 						<ng-template #onboarduser>
-							<div style="display:flex;flex-direction:row;align-items:center">
-								<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
-									<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="below" matTooltip="Receive payments in 135+ countries using Stripe" />
-								</button>
-								<mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
-							</div>
+							<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0">
+								<img src="../../../../assets/blue-on-dark.png" matTooltipPosition="right" />
+							</button>
 						</ng-template>
 					</ng-container>
 				</div>

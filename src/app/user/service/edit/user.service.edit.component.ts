@@ -29,6 +29,7 @@ import {
   Registrant
 } from '../../../shared';
 
+import { CurrencyPipe } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
@@ -106,6 +107,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     private forumService: ForumService,
     private fb: FormBuilder, 
     private router: Router,
+    private currencyPipe: CurrencyPipe,
     private snackbar: MatSnackBar) {
       this.searchForumCtrl = new FormControl();
       this.tagSearchCtrl = new FormControl();
@@ -1047,7 +1049,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       }
     }, 500);
   }
-  
+ 
   ngOnInit () {
     this._loading.next(true);
 
@@ -1102,7 +1104,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       rate:                           [''],
       paymentType:                    [''],
       paymentSubType:                 [''],
-      amount:                         [''],
+      amount:                         ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       includeDescriptionInDetailPage: [''],
       includeImagesInDetailPage:      [''],
       includeTagsInDetailPage:        [''],
@@ -1111,6 +1113,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       lastUpdateDate:                 [''],
       creationDate:                   ['']
     });
+
     this.serviceGroup.get('searchPrivateForums').setValue(this.searchPrivateForums);
     this.serviceGroup.get('searchForumIncludeTagsInSearch').setValue(this.searchForumIncludeTagsInSearch);
 
@@ -1118,6 +1121,11 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     this._serviceSubscription = this.service.subscribe(service => {
       if (service){
         this.serviceGroup.patchValue(service);
+
+        // use pipe to display currency
+        this.serviceGroup.patchValue({
+          amount: this.currencyPipe.transform(service.amount, '', '', '1.2-2').replace(/,/g, '')
+        }, { emitEvent: false });
 
         if (service.title.length == 0)
           that.serviceGroup.get('indexed').disable();
@@ -2162,7 +2170,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   saveChanges () {
     if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+      console.log('service is not valid, cannot save to database here');
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
@@ -2173,6 +2181,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
+
+    console.log('amount ' +this.serviceGroup.get('amount').value);
 
     if (tempTitle.length <= 100){
       if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){

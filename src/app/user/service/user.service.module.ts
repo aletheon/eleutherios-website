@@ -32,6 +32,8 @@ import { UserServiceDetailComponent } from './detail/user.service.detail.compone
 import { UserServiceForumBlockListComponent } from './block/user.service.forum.block.list.component';
 import { UserServiceUserBlockListComponent } from './block/user.service.user.block.list.component';
 
+import { CurrencyPipe } from '@angular/common';
+
 import {
   SiteTotalService,
   UserForumTagService,
@@ -97,7 +99,8 @@ import {
     UserServiceService,
     UserTagService,
     ServiceService,
-    TagService
+    TagService,
+    CurrencyPipe
   ],
   exports: []
 })

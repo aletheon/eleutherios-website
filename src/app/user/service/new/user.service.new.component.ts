@@ -31,6 +31,7 @@ import {
   NoTitlePipe
 } from '../../../shared';
 
+import { CurrencyPipe } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
@@ -106,7 +107,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     private userTagService: UserTagService,
     private tagService: TagService,
     private fb: FormBuilder, 
-
+    private currencyPipe: CurrencyPipe,
     private router: Router,
     private snackbar: MatSnackBar) {
       this.searchForumCtrl = new FormControl();
@@ -1118,7 +1119,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       rate:                           [''],
       paymentType:                    [''],
       paymentSubType:                 [''],
-      amount:                         [''],
+      amount:                         ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       includeDescriptionInDetailPage: [''],
       includeImagesInDetailPage:      [''],
       includeTagsInDetailPage:        [''],
@@ -1134,6 +1135,11 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     this._serviceSubscription = this.service.subscribe(service => {
       if (service){
         this.serviceGroup.patchValue(service);
+
+        // use pipe to display currency
+        this.serviceGroup.patchValue({
+          amount: this.currencyPipe.transform(service.amount, '', '', '1.2-2').replace(/,/g, '')
+        }, { emitEvent: false });
 
         if (service.title.length == 0)
           that.serviceGroup.get('indexed').disable();
