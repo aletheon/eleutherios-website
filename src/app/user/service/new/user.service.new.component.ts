@@ -47,6 +47,7 @@ import * as _ from "lodash";
 })
 export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
+  @ViewChild('amount', { static: false }) amountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -185,8 +186,8 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   addImage (image) {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
 
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
@@ -194,6 +195,18 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
@@ -576,14 +589,27 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   addForum (forum) {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
+
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       if (this.serviceGroup.get('title').value.length > 0){
@@ -1003,8 +1029,8 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   stripeConnect () {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
 
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
@@ -1012,6 +1038,18 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       if (this.stripeButtonDisabled == false){
@@ -2178,13 +2216,25 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   saveChanges () {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
+
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
         }
         this.titleRef.nativeElement.focus();
+      }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
       }, 500);
       return;
     }

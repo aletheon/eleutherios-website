@@ -45,6 +45,7 @@ import * as _ from "lodash";
 })
 export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
+  @ViewChild('amount', { static: false }) amountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -184,8 +185,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   addImage (image) {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
 
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
@@ -193,6 +194,18 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
@@ -574,14 +587,27 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   // register service in forum
   addForum (forum) {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
+
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       if (this.serviceGroup.get('title').value.length > 0){
@@ -977,8 +1003,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   stripeConnect () {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
 
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
@@ -986,6 +1012,18 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         }
         this.titleRef.nativeElement.focus();
       }, 500);
+      return;
+    }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
     }
     else {
       if (this.stripeButtonDisabled == false){
@@ -2168,8 +2206,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   saveChanges () {
-    if (this.serviceGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database here');
+    if (this.serviceGroup.get('title').hasError('required')) {
+      console.log('title error');
+
       setTimeout(() => {
         for (let i in this.serviceGroup.controls) {
           this.serviceGroup.controls[i].markAsTouched();
@@ -2178,10 +2217,21 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       }, 500);
       return;
     }
+    else if (this.amountRef && (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max'))){
+      console.log('amount error');
+
+      setTimeout(() => {
+        for (let i in this.serviceGroup.controls) {
+          this.serviceGroup.controls[i].markAsTouched();
+        }
+        this.amountRef.nativeElement.focus();
+      }, 500);
+      return;
+    }
 
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
 
-    console.log('amount ' +this.serviceGroup.get('amount').value);
+    console.log('amount after ' + this.serviceGroup.get('amount').value);
 
     if (tempTitle.length <= 100){
       if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
@@ -2197,7 +2247,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
           rate: this.serviceGroup.get('rate').value,
           paymentType: this.serviceGroup.get('paymentType').value,
-          amount: this.serviceGroup.get('amount').value,
+          amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : this.serviceGroup.get('amount').value,
           includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
           includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
           includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,
