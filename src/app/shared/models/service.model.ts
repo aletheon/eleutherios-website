@@ -9,8 +9,7 @@ export interface Service {
   default: boolean, // whether this service is the default service for the owner
   indexed: boolean, // whether this service is indexed or hidden
   rate: number,  // average rating of the service for sorting purposes
-  paymentType: string, // [Free|Payment|Donation]
-  paymentSubType: string, // [Fixed|Subscription]
+  paymentType: string, // [Free|Payment|Donation|Subscription]
   amount: number, // amount to pay for this service { min: 0.50 USD, max: 999,999.99 }
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
