@@ -22,7 +22,6 @@ export class AuthService {
     private router: Router,
     private userService: UserService
   ) {
-    // get auth data, then get firestore user document || null
     this.user = this.afAuth.authState.pipe(
       switchMap(user => {
         if (user){
@@ -126,10 +125,16 @@ export class AuthService {
     });
   }
 
-  signOut() {
-    this.afAuth.signOut().then(() => {
-      this.uid = '';
-      this.router.navigate(['/login']);
-    });
+  async signOut() {
+    try {
+      await this.afAuth.signOut();
+      this.router.navigate(['/login']).then(() => {
+        this.uid = '';
+      });
+      return true;
+    } catch (error) {
+      console.log('Sign out failed', error);
+      return false;
+    }
   }
 }

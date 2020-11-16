@@ -16,6 +16,11 @@ import { switchMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
+
+// HERE ROB SWAP all Free services to green and paid to blue
+// background-color:#99FF99;border:1px solid rgb(69, 221, 69)
+// background-color:#A9C4EB;border:1px solid #007FFF
+
 @Component({
   selector: 'app-anonymous-home',
   templateUrl: './anonymous.home.component.html',
@@ -200,6 +205,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
       this._loading.next(false);
     })
     .catch((error) =>{
+      console.log('here rob ' + error);
       this.router.navigate(['/login']);
     });
   }

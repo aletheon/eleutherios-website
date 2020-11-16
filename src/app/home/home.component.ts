@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { AuthService } from '../core/auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -45,7 +46,8 @@ export class HomeComponent implements OnDestroy, OnInit {
   public alertsNumberOfItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
 
-  constructor(public auth: AuthService,
+  constructor(public afAuth: AngularFireAuth,
+    public auth: AuthService,
     private userServiceService: UserServiceService,
     private userForumService: UserForumService,
     private userAlertService: UserAlertService,
