@@ -109,6 +109,7 @@ export class AuthService {
           stripeCustomerId: '',
           stripeAccountId: '',
           stripeOnboardingStatus: '',
+          stripeCurrency: '',
           fcmToken: '',
           receivePushNotifications: false,
           receiveForumAlertNotifications: false,

@@ -142,8 +142,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      let onboarding = params['onboarding'];
-
       this.userService.exists(this.auth.uid).then(exists => {
         if (exists){
           this.user = this.userService.getUser(this.auth.uid);

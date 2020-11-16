@@ -84,6 +84,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public searchPrivateForums: boolean;
   public loading: Observable<boolean> = this._loading.asObservable();
   public stripeButtonDisabled: boolean = false;
+  public tempCurrency: string = 'nzd';
 
   constructor(public auth: AuthService, 
     private route: ActivatedRoute,
@@ -1067,21 +1068,16 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           }
           that.titleRef.nativeElement.focus();  
         }
-        
-        if (that.serviceGroup.get('paymentType').value == 'Payment'){
-          for (let i in that.serviceGroup.controls) {
-            that.serviceGroup.controls[i].markAsTouched();
-          }
-          that.amountRef.nativeElement.focus();
-        }
       }
-    }, 500);
+    }, 100);
   }
  
   ngOnInit () {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
+      let onboarding = params['onboarding'];
+
       this.userServiceService.exists(this.auth.uid, params['serviceId']).then(exists => {
         if (exists){
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);

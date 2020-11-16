@@ -5,6 +5,7 @@ export interface User {
   stripeCustomerId: string,
   stripeAccountId: string,
   stripeOnboardingStatus: string, // [complete,pending,failed]
+  stripeCurrency: string, // [usd, nzd, aud etc]
   fcmToken: string,
   receivePushNotifications: boolean,
   receiveForumAlertNotifications: boolean,

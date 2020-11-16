@@ -61,8 +61,9 @@ app.post("/onboard-user", async (req, res) => {
       const origin = `${req.headers.origin}`;
       const accountLinkURL = await generateAccountLink(account.id, origin, req.session.returnUrl);
       const updateUser = await admin.firestore().collection('users').doc(uid).update({
-        stripeAccountId: req.session.accountId,
+        stripeAccountId: account.id,
         stripeOnboardingStatus: '',
+        stripeCurrency: account.default_currency ? account.default_currency : 'usd',
         lastUpdateDate: FieldValue.serverTimestamp()
       });
       res.send({ url: accountLinkURL });
@@ -583,9 +584,6 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
     const buyer = buyerSnapshot.data();
 
-    // get customer
-    const stripeCustomer = await stripe.customers.retrieve({ id: buyer.stripeCustomerId });
-
     // get seller
     const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
     const seller = sellerSnapshot.data();
@@ -594,7 +592,7 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     const idempotencyKey = paymentId;
     const paymentIntent = await stripe.paymentIntents.create({
         amount: payment.amount,
-        currency: stripeCustomer.currency,
+        currency: seller.currency,
         customer: buyer.stripeCustomerId,
         application_fee_amount: 0,
         metadata: { userId: userId, paymentId: paymentId }
