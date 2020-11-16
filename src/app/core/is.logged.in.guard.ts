@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AuthService } from './auth.service';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 
 import { Observable,  } from 'rxjs';
@@ -7,12 +7,12 @@ import { map, take, tap } from 'rxjs/operators';
 
 @Injectable()
 export class IsLoggedIn implements CanActivate {
-  constructor(private afAuth: AngularFireAuth, private router: Router){}
+  constructor(private auth: AuthService, private router: Router){}
 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-      return this.afAuth.user.pipe(
+      return this.auth.user.pipe(
         take(1),
         map(user => !user),
         tap(NotLoggedIn => {
