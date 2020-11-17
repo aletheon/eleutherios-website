@@ -61,8 +61,8 @@
       <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h4>
       <div style="flex:50%;flex-grow:1;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
         <ng-container *ngFor="let service of publicServiceItems; trackBy: trackPublicServices">
-          <div class="service" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
-            <div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
+          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+            <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>
                 <ng-container *ngIf="service.defaultServiceImage | async;let image">
@@ -97,9 +97,7 @@
               <ng-template #showtags>
                 <div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
                   <ng-container *ngFor="let serviceTag of serviceTagItems">
-                    <div style="flex:none;background-color:rgb(188, 194, 202);border:1px solid #007FFF;padding:3px;margin-right:5px;font-size:0.85em">
-                      <p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
-                    </div>
+                    <span class="label label-default">{{ serviceTag.tag }}</span>
                   </ng-container>
                 </div>
               </ng-template>

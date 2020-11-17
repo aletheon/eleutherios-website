@@ -91,7 +91,7 @@
 															<p style="color:#faebd7;margin-bottom:5px" [innerHTML]="post.message | linky: { newWindow: true, className: 'linkColor' }"></p>
 														</div>
 														<div style="flex:none;display:flex;flex-direction:row">
-															<div style="flex:none;margin-right:5px;padding:3px 10px 3px 5px;display:flex;flex-direction:row;background-color:#A9C4EB;border:1px solid #007FFF">
+															<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;margin-right:5px;display:flex;flex-direction:row">
 																<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 																<ng-template #showdefaultserviceimage>
 																	<ng-container *ngIf="service.defaultServiceImage | async;let image">

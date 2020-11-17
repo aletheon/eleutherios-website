@@ -76,14 +76,10 @@ export class UserService {
 
   public onboardCustomer (parentUserId: string, returnUrl: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      console.log('onboarding user with uid ' + parentUserId);
-      
       const url = 'https://us-central1-eleutherios-website.cloudfunctions.net/stripe/onboard-user';
 
       firebase.auth().currentUser.getIdToken()
         .then(authToken => {
-          console.log('got authToken ' + authToken);
-
           const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
           return this.http.post(url, { uid: parentUserId, returnUrl: returnUrl }, { headers: headers }).toPromise();
         })

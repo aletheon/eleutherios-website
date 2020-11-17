@@ -72,6 +72,7 @@ export class UserServiceImageService {
   }
 
   public getServiceImages (parentUserId: string, serviceId: string, numberOfItems: number, key?: any): Observable<any[]> {
+    console.log('getServiceImages');
     let collectionName: string = `users/${parentUserId}/services/${serviceId}/images`;
 
     if (!key)

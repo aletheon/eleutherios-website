@@ -125,16 +125,14 @@ export class AuthService {
     });
   }
 
-  async signOut() {
-    try {
-      await this.afAuth.signOut();
+  signOut() {
+    this.afAuth.signOut().then(() => {
       this.router.navigate(['/login']).then(() => {
-        this.uid = '';
+        this.uid = '';  
       });
-      return true;
-    } catch (error) {
+    })
+    .catch(error => {
       console.log('Sign out failed', error);
-      return false;
-    }
+    });
   }
 }

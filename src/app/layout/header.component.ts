@@ -35,14 +35,6 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  changeReceiveAlphaNotification (user: User) {
-    user.receiveAlphaNotification = !user.receiveAlphaNotification;
-
-    this.userService.update(user.uid, user).then(() => {
-      // do something
-    });
-  }
-
   logout() {
     this.auth.signOut();
   }

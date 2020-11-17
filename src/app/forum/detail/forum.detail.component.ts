@@ -409,7 +409,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
@@ -424,7 +424,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     )
     .subscribe(forumImage => {
       if (forumImage)
-        this.defaultForumImage = forumImage
+        this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
           url: '../../assets/defaultThumbnail.jpg'

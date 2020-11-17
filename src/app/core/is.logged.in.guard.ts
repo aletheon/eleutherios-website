@@ -16,8 +16,9 @@ export class IsLoggedIn implements CanActivate {
         take(1),
         map(user => !user),
         tap(NotLoggedIn => {
-          if (!NotLoggedIn)
+          if (!NotLoggedIn){
             this.router.navigate(['/anonymous/home']);
+          }
         })
       );  
   }
