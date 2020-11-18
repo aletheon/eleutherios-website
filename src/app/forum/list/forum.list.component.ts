@@ -170,75 +170,10 @@ export class ForumListComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
-
-                // subscribe to any newly create forum posts
-                let getLastPosts$ = this.userForumPostService.getLastPosts(forum.uid, forum.forumId, 1).pipe(
-                  switchMap(posts => {
-                    if (posts && posts.length > 0){
-                      let observables = posts.map(post => {
-                        if (post){
-                          let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
-                          let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
-                            switchMap(serviceImages => {
-                              if (serviceImages && serviceImages.length > 0){
-                                let getDownloadUrl$: Observable<any>;
-
-                                if (serviceImages[0].tinyUrl)
-                                  getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                                return combineLatest([getDownloadUrl$]).pipe(
-                                  switchMap(results => {
-                                    const [downloadUrl] = results;
-                                    
-                                    if (downloadUrl)
-                                      serviceImages[0].url = downloadUrl;
-                                    else
-                                      serviceImages[0].url = '../../assets/defaultTiny.jpg';
-                      
-                                    return of(serviceImages[0]);
-                                  })
-                                );
-                              }
-                              else return of(null);
-                            })
-                          );
-
-                          return combineLatest([getService$, getDefaultServiceImage$]).pipe(
-                            switchMap(results => {
-                              const [service, defaultServiceImage] = results;
-
-                              if (service){
-                                if (defaultServiceImage)
-                                  service.defaultServiceImage = of(defaultServiceImage);
-                                else {
-                                  let tempImage = {
-                                    url: '../../assets/defaultTiny.jpg'
-                                  };
-                                  service.defaultServiceImage = of(tempImage);
-                                }
-                                post.service = of(service);
-                              }
-                              else post.service = of(null);                                    
-                              return of(post);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      });
-                  
-                      return zip(...observables, (...results) => {
-                        return results.map((result, i) => {
-                          return posts[i];
-                        });
-                      });
-                    }
-                    else return of([]);
-                  })
-                );
       
-                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$, getLastPosts$]).pipe(
+                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
-                    const [defaultForumImage, forumTags, defaultRegistrant, lastPosts] = results;
+                    const [defaultForumImage, forumTags, defaultRegistrant] = results;
       
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
@@ -258,11 +193,6 @@ export class ForumListComponent implements OnInit, OnDestroy {
                       forum.defaultRegistrant = of(defaultRegistrant);
                     else
                       forum.defaultRegistrant = of(null);
-
-                    if (lastPosts && lastPosts.length > 0)
-                      forum.post = of(lastPosts[0]);
-                    else
-                      forum.post = of(null);
 
                     return of(forum);
                   })

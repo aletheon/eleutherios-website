@@ -26,7 +26,7 @@
             </div>
             <div *ngIf="forum.uid == auth.uid" style="flex:none"> 
               <!-- other button controls -->
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="cursor:pointer" matTooltip="Delete">close</mat-icon>
+              <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
           </div>
         </ng-container>
@@ -58,7 +58,7 @@
             </div>
             <div *ngIf="service.uid == auth.uid" style="flex:none">
               <!-- other button controls -->
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="cursor:pointer" matTooltip="Delete">close</mat-icon>
+              <mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="cursor:pointer;flex:none;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
           </div>
         </ng-container>
@@ -111,10 +111,10 @@
                     <p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ forum.creationDate.toDate() | amTimeAgo }}</p>
                   </div>
                   <div style="flex:none;margin-right:5px">
-                    <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+                    <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
                   </div>
                   <div style="flex:none;margin-right:5px">
-                    <mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+                    <mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
                   </div>
                 </div>
               </div>
@@ -167,14 +167,14 @@
                     <p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
                   </div>
                   <div style="flex:none;margin-right:5px">
-                      <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+                      <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
                     </div>
                   <div style="flex:none;margin-right:5px">
-                    <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
-                    <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+                    <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+                    <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
                   </div>
                   <div style="flex:none">
-                    <mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer" matTooltip="Create forum">add</mat-icon>
+                    <mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add</mat-icon>
                   </div>
                 </div>
               </div>
@@ -230,12 +230,12 @@
               <!-- other button controls -->
               <ng-container *ngIf="forum.type == 'Public'; then showpublicforumtype else showprivateforumtype"></ng-container>
               <ng-template #showpublicforumtype>
-                <mat-icon onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+                <mat-icon onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
               </ng-template>
               <ng-template #showprivateforumtype>
-                <mat-icon onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer" matTooltip="Private">lock</mat-icon>
+                <mat-icon onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
               </ng-template>
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="cursor:pointer" matTooltip="Delete">close</mat-icon>
+              <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
           </div>
         </ng-container>
@@ -269,12 +269,12 @@
               <!-- other button controls -->
               <ng-container *ngIf="service.type == 'Public'; then showpublicservicetype else showprivateservicetype"></ng-container>
               <ng-template #showpublicservicetype>
-                <mat-icon onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+                <mat-icon onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
               </ng-template>
               <ng-template #showprivateservicetype>
-                <mat-icon onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="cursor:pointer" matTooltip="Private">lock</mat-icon>
+                <mat-icon onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
               </ng-template>
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="cursor:pointer" matTooltip="Delete">close</mat-icon>
+              <mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
           </div>
         </ng-container>
