@@ -28,8 +28,8 @@
 				</ng-template>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
-				<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
-					<p style="background-color:rgb(109, 109, 109);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ forumItem.creationDate.toDate() | amTimeAgo }}</p>
+				<div class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<back></back>
 			</div>
@@ -62,11 +62,10 @@
 					<div style="flex:none;margin-bottom:10px">
 						<ng-container *ngIf="forumTags | async;let forumTagItems">
 							<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
-								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(250, 155, 152);border:1px solid #ac2c2c;align-items:center"
-										*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
-										<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
-									</div>
+								<div style="flex:none;display:flex;flex-direction:row">
+									<ng-container *ngFor="let forumTag of forumTagItems">
+										<span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
+									</ng-container>
 								</div>
 							</ng-container>
 							<ng-template #noforumtags></ng-template>
