@@ -121,12 +121,9 @@
               <ng-container *ngIf="forum.forumTags | async;let forumTagItems">
                 <ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
                 <ng-template #showtags>
-                  <div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
+                  <div style="flex:none;display:flex;flex-direction:row">
                     <ng-container *ngFor="let forumTag of forumTagItems">
-                      <span class="label label-default">{{ forumTag.tag }}</span>
-                      <!-- <div style="flex:none;border:1px solid #ac2c2c;background-color:rgb(250, 155, 152);padding:3px;margin-right:5px;font-size:0.85em">
-                        <p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
-                      </div> -->
+                      <span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
                     </ng-container>
                   </div>
                 </ng-template>
@@ -164,7 +161,9 @@
                       </star-rating-control>
                   </div>
                   <div style="flex:none;margin-right:5px">
-                    <p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
+                    <div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+                      {{ service.creationDate.toDate() | amTimeAgo }}
+                    </div>
                   </div>
                   <div style="flex:none;margin-right:5px">
                       <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
@@ -181,12 +180,9 @@
               <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
                 <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
                 <ng-template #showtags>
-                  <div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
+                  <div style="flex:none;display:flex;flex-direction:row">
                     <ng-container *ngFor="let serviceTag of serviceTagItems">
-                      <span class="label label-default">{{ serviceTag.tag }}</span>
-                      <!-- <div style="flex:none;background-color:rgb(188, 194, 202);border:1px solid #007FFF;padding:3px;margin-right:5px;font-size:0.85em">
-                        <p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
-                      </div> -->
+                      <span [ngClass]="serviceItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
                     </ng-container>
                   </div>
                 </ng-template>

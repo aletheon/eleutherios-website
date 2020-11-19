@@ -23,10 +23,9 @@
 					<ng-container *ngIf="serviceTags | async;let serviceTagItems">
 						<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
 							<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
-									*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
-									<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
-								</div>
+								<ng-container *ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
+									<span [ngClass]="serviceItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+								</ng-container>
 							</div>
 						</ng-container>
 						<ng-template #noservicetags></ng-template>

@@ -49,6 +49,9 @@
 								<ng-container *ngIf="forum.service | async; then showservice"></ng-container>
 								<ng-template #showservice>
 									<ng-container *ngIf="forum.service | async as service">
+
+										<!-- HERE ROB -->
+
 										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:#A9C4EB;border:1px solid #007FFF;align-items:center;margin-right:10px">
 											<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 											<ng-template #showdefaultserviceimage>
