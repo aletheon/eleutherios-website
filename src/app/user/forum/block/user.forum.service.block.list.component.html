@@ -10,12 +10,12 @@
 		<ng-container *ngIf="forumServiceBlocks | async;let forumServiceBlockItems">
 			<ng-container *ngIf="forumServiceBlockItems.length > 0; then showforumserviceblocks else noforumserviceblocks"></ng-container>
 			<ng-template #showforumserviceblocks>
-				<div style="min-height:70px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px;padding-bottom:5px"
+				<div class="alert alert-forum" style="margin-bottom:5px"
 					*ngFor="let forumServiceBlock of forumServiceBlockItems; trackBy: trackForumServiceBlocks">
 					<ng-container *ngIf="forumServiceBlock.forum | async; then showforum"></ng-container>
 					<ng-template #showforum>
 						<ng-container *ngIf="forumServiceBlock.forum | async as forum">
-							<div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+							<div style="display:flex;flex-direction:row">
 								<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 								<ng-template #showdefaultforumimage>
 									<ng-container *ngIf="forum.defaultForumImage | async;let image">
@@ -45,14 +45,11 @@
 								</div>
 								<mat-icon onclick="event.stopPropagation()" (click)="delete(forumServiceBlock)" style="flex:none;margin-left:5px;cursor:pointer" matTooltip="Delete">delete</mat-icon>
 							</div>
-							<div style="display:flex;flex-direction:row;padding:5px 5px 3px 5px">
+							<div style="display:flex;flex-direction:row">
 								<ng-container *ngIf="forum.service | async; then showservice"></ng-container>
 								<ng-template #showservice>
 									<ng-container *ngIf="forum.service | async as service">
-
-										<!-- HERE ROB -->
-
-										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:#A9C4EB;border:1px solid #007FFF;align-items:center;margin-right:10px">
+										<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:10px">
 											<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 											<ng-template #showdefaultserviceimage>
 												<ng-container *ngIf="service.defaultServiceImage | async;let image">
