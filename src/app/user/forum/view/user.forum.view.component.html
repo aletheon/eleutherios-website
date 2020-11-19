@@ -99,7 +99,7 @@
 		</ng-container>
 		<div style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
 			<ng-container *ngIf="forumTags | async;let forumTagItems">
-				<ng-container *ngIf="forumTagItems.length > 0; showtags; else noforumtags"></ng-container>
+				<ng-container *ngIf="forumTagItems.length > 0; then showtags else noforumtags"></ng-container>
 				<ng-template #showtags>
 					<div style="flex:none;display:flex;flex-direction:row">
 						<ng-container *ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
