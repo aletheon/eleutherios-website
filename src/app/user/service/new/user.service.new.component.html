@@ -118,9 +118,9 @@
 					<ng-container *ngIf="serviceTags | async;let serviceTagItems">
 						<div *ngIf="serviceTagItems.length > 0; else noservicetags">
 							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
+								<div [ngClass]="serviceItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
-									<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
+									<span>{{ serviceTag.tag }}</span>
 									<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
 							</div>
@@ -218,49 +218,50 @@
 						<ng-container *ngIf="whereServings | async;let whereServingItems">
 							<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
 							<ng-template #showwhereservings>
-								<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;align-items:center;margin:0 5px 0 0"
-									*ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
-									<ng-container *ngIf="whereServing.forum | async;let forum">
-										<ng-container *ngIf="forum; then showforum"></ng-container>
-										<ng-template #showforum>
-											<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-												<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-												<ng-template #showdefaultforumimage>
-													<ng-container *ngIf="forum.defaultForumImage | async;let image">
-														<div style="flex:none;margin-right:5px">
-															<img [src]="image.url">
-														</div>
-													</ng-container>
-												</ng-template>
-												<div style="flex:1;margin-right:5px">
-													<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
-													<ng-template #showdefaultregistrant>
-														<p style="word-break: break-all">
-															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-														</p>
+								<ng-container *ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
+									<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+										<ng-container *ngIf="whereServing.forum | async;let forum">
+											<ng-container *ngIf="forum; then showforum"></ng-container>
+											<ng-template #showforum>
+												<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+													<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+													<ng-template #showdefaultforumimage>
+														<ng-container *ngIf="forum.defaultForumImage | async;let image">
+															<div style="flex:none;margin-right:5px">
+																<img [src]="image.url">
+															</div>
+														</ng-container>
 													</ng-template>
-													<ng-template #nodefaultregistrant>
-														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													</ng-template>
+													<div style="flex:1;margin-right:5px">
+														<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+														<ng-template #showdefaultregistrant>
+															<p style="word-break: break-all">
+																<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															</p>
+														</ng-template>
+														<ng-template #nodefaultregistrant>
+															<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														</ng-template>
+													</div>
+													<div style="flex:none">
+														<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
+														<ng-template #showblockcontrol>
+															<mat-form-field style="width:120px">
+																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
+																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+																</mat-select>
+															</mat-form-field>
+														</ng-template>
+														<ng-template #noblockcontrol>
+															<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
+														</ng-template>
+													</div>
 												</div>
-												<div style="flex:none">
-													<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
-													<ng-template #showblockcontrol>
-														<mat-form-field style="width:120px">
-															<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
-																<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-															</mat-select>
-														</mat-form-field>
-													</ng-template>
-													<ng-template #noblockcontrol>
-														<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-													</ng-template>
-												</div>
-											</div>
-										</ng-template>
-									</ng-container>
-								</div>
+											</ng-template>
+										</ng-container>
+									</div>
+								</ng-container>
 							</ng-template>
 							<ng-template #nowhereservings>
 								<p style="flex:none;color:#999;font-size:90%">
@@ -306,9 +307,9 @@
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 							<ng-container *ngIf="searchTags.length > 0; then showsearchtags else nosearchtags"></ng-container>
 							<ng-template #showsearchtags>
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid #ac2c2c;background-color:rgb(152, 250, 173);align-items:center"
+								<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let tag of searchTags; trackBy: trackSearchTags">
-									<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
+									<span>{{ tag.tag }}</span>
 									<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
 							</ng-template>
@@ -323,31 +324,33 @@
 							<ng-container *ngIf="searchForumResults | async;let searchForumResultItems">
 								<div *ngIf="searchForumResultItems.length > 0; then showsearchforumresults else nosearchforumresults"></div>
 								<ng-template #showsearchforumresults>
-									<div *ngFor="let forum of searchForumResultItems; trackBy: trackSearchForumResults" style="flex:none;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:5px">
-										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-											<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-											<ng-template #showdefaultforumimage>
-												<ng-container *ngIf="forum.defaultForumImage | async;let image">
-													<div style="flex:none;margin-right:10px">
-														<img [src]="image.url">
-													</div>
-												</ng-container>
-											</ng-template>
-											<div style="flex:1;margin-right:5px">
-												<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
-												<ng-template #showdefaultregistrant>
-													<p style="word-break: break-all">
-														<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													</p>
+									<ng-container *ngFor="let forum of searchForumResultItems; trackBy: trackSearchForumResults">
+										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+											<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+												<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+												<ng-template #showdefaultforumimage>
+													<ng-container *ngIf="forum.defaultForumImage | async;let image">
+														<div style="flex:none;margin-right:10px">
+															<img [src]="image.url">
+														</div>
+													</ng-container>
 												</ng-template>
-												<ng-template #nodefaultregistrant>
-													<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-												</ng-template>
+												<div style="flex:1;margin-right:5px">
+													<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
+													<ng-template #showdefaultregistrant>
+														<p style="word-break: break-all">
+															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														</p>
+													</ng-template>
+													<ng-template #nodefaultregistrant>
+														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+													</ng-template>
+												</div>
+												<mat-icon onclick="event.stopPropagation()" (click)="addForum(forum)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Add">add</mat-icon>
 											</div>
-											<mat-icon onclick="event.stopPropagation()" (click)="addForum(forum)" style="flex:none;cursor:pointer" matTooltip="Add">add</mat-icon>
 										</div>
-									</div>
+									</ng-container>
 								</ng-template>
 								<ng-template #nosearchforumresults>
 									<p style="flex:none;color:#999;font-size:90%">

@@ -34,8 +34,8 @@
 				<ng-container *ngIf="requestService | async;let serviceItem">
 					<ng-container *ngIf="serviceItem; then showrequestservice"></ng-container>
 					<ng-template #showrequestservice>
-						<div style="display:flex;flex-direction:row;align-items:center;border:1px solid red; background-color:orange;padding:5px;margin-top:10px">
-							<div style="flex:none;padding:3px 10px 3px 5px;display:flex;flex-direction:row;background-color:#A9C4EB;border:1px solid #007FFF;align-items:center;margin-right:5px">
+						<div class="alert alert-warning" style="display:flex;flex-direction:row;align-items:center;margin-top:10px">
+							<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
 								<ng-container *ngIf="serviceItem.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 								<ng-template #showdefaultserviceimage>
 									<ng-container *ngIf="serviceItem.defaultServiceImage | async;let image">
@@ -46,10 +46,10 @@
 								</ng-template>
 								<div style="flex:1;color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ serviceItem.title }}{{ serviceItem.description.length > 0 ? (' - ' + serviceItem.description | truncate: 80) : '' }}">{{ serviceItem.title | truncate: 35 }}</div>
 								<div style="flex:none">
-									<mat-icon onclick="event.stopPropagation()" (click)="addService(serviceItem)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+									<mat-icon onclick="event.stopPropagation()" (click)="addService(serviceItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add">add</mat-icon>
 								</div>
 								<div style="flex:none">
-									<mat-icon onclick="event.stopPropagation()" (click)="removeRequestService(serviceItem.serviceId)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+									<mat-icon onclick="event.stopPropagation()" (click)="removeRequestService(serviceItem.serviceId)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
 								</div>
 							</div>
 						</div>
@@ -103,9 +103,9 @@
 					<ng-container *ngIf="forumTags | async;let forumTagItems">
 						<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
 							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(250, 155, 152);border:1px solid #ac2c2c;align-items:center"
+								<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
-									<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
+									<span>{{ forumTag.tag }}</span>
 									<i class="material-icons" (click)="removeForumTag(forumTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
 							</div>
@@ -203,41 +203,42 @@
 						<ng-container *ngIf="registrants | async;let registrantItems">
 							<ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
 							<ng-template #showregistrants>
-								<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;background-color:#A9C4EB;border:1px solid #007FFF;align-items:center;margin:0 5px 0 0;flex-wrap:nowrap"
-									*ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
+								<ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
 									<ng-container *ngIf="registrant.service | async;let service">
 										<ng-container *ngIf="service; then showservice"></ng-container>
 										<ng-template #showservice>
-											<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-												<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-												<ng-template #showdefaultserviceimage>
-													<ng-container *ngIf="service.defaultServiceImage | async;let image">
-														<div style="flex:none;margin-right:5px">
-															<img [src]="image.url">
-														</div>
-													</ng-container>
-												</ng-template>
-												<p style="flex:1;margin-right:5px">
-													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
-													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
-												</p>
-												<div style="flex:none">
-													<ng-container *ngIf="auth.uid != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
-													<ng-template #showblockcontrol>
-														<mat-form-field style="width:120px">
-															<mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
-																<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-															</mat-select>
-														</mat-form-field>
+											<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+												<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+													<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+													<ng-template #showdefaultserviceimage>
+														<ng-container *ngIf="service.defaultServiceImage | async;let image">
+															<div style="flex:none;margin-right:5px">
+																<img [src]="image.url">
+															</div>
+														</ng-container>
 													</ng-template>
-													<ng-template #noblockcontrol>
-														<mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-													</ng-template>
+													<p style="flex:1;margin-right:5px">
+														<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+														<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+													</p>
+													<div style="flex:none">
+														<ng-container *ngIf="auth.uid != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
+														<ng-template #showblockcontrol>
+															<mat-form-field style="width:120px">
+																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
+																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+																</mat-select>
+															</mat-form-field>
+														</ng-template>
+														<ng-template #noblockcontrol>
+															<mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
+														</ng-template>
+													</div>
 												</div>
 											</div>
 										</ng-template>
 									</ng-container>
-								</div>
+								</ng-container>
 							</ng-template>
 							<ng-template #noregistrants>
 								<p style="flex:none;color:#999;font-size:90%">
@@ -283,9 +284,9 @@
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 							<ng-container *ngIf="searchServiceTags.length > 0; then showsearchservicetags else nosearchservicetags"></ng-container>
 							<ng-template #showsearchservicetags>
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(188, 194, 202);border:1px solid #007FFF;align-items:center"
+								<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
-									<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
+									<span>{{ tag.tag }}</span>
 									<i class="material-icons" (click)="removeSearchServiceTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
 							</ng-template>
@@ -300,25 +301,27 @@
 							<ng-container *ngIf="searchServiceResults | async;let searchServiceResultItems">
 								<div *ngIf="searchServiceResultItems.length > 0; then showsearchserviceresults else nosearchserviceresults"></div>
 								<ng-template #showsearchserviceresults>
-									<div *ngFor="let service of searchServiceResultItems; trackBy: trackSearchServiceResults" style="flex:none;display:flex;flex-direction:column;background-color:#A9C4EB;border:1px solid #007FFF;margin-bottom:5px">
-										<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-											<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-											<ng-template #showdefaultserviceimage>
-												<ng-container *ngIf="service.defaultServiceImage | async;let image">
-													<div style="flex:none;margin-right:10px">
-														<img [src]="image.url">
-													</div>
-												</ng-container>
-											</ng-template>
-											<p style="flex:1;margin-right:5px">
-												<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
-												<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
-											</p>
-											<div style="flex:none">
-												<mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+									<ng-container *ngFor="let service of searchServiceResultItems; trackBy: trackSearchServiceResults">
+										<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+											<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+												<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+												<ng-template #showdefaultserviceimage>
+													<ng-container *ngIf="service.defaultServiceImage | async;let image">
+														<div style="flex:none;margin-right:10px">
+															<img [src]="image.url">
+														</div>
+													</ng-container>
+												</ng-template>
+												<p style="flex:1;margin-right:5px">
+													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
+													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
+												</p>
+												<div style="flex:none">
+													<mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+												</div>
 											</div>
 										</div>
-									</div>
+									</ng-container>
 								</ng-template>
 								<ng-template #nosearchserviceresults>
 									<p style="flex:none;color:#999;font-size:90%">
