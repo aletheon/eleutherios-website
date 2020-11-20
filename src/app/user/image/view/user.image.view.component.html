@@ -11,11 +11,11 @@
               <ng-container *ngIf="prevKeyQuerystring | async; then showinnerprevkey else noinnerprevkey"></ng-container>
               <ng-template #showinnerprevkey>
                 <ng-container *ngIf="prevKeyQuerystring | async;let prevKey">
-                  <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey, prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+                  <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey, prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
                 </ng-container>
               </ng-template>
               <ng-template #noinnerprevkey>
-                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ nextKey: nextKey }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
               </ng-template>
             </ng-container>
           </ng-template>
@@ -23,7 +23,7 @@
             <ng-container *ngIf="prevKeyQuerystring | async; then showprevkey else noprevkey"></ng-container>
             <ng-template #showprevkey>
               <ng-container *ngIf="prevKeyQuerystring | async;let prevKey">
-                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+                <mat-icon [routerLink]="['/user/image/list']" [queryParams]='{ prevKey: prevKey }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
               </ng-container>
             </ng-template>
             <ng-template #noprevkey>

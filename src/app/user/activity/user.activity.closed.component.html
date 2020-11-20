@@ -9,20 +9,21 @@
   <ng-container *ngIf="activityItems.length > 0; then showactivity else noactivity"></ng-container>
   <ng-template #showactivity>
     <div style="display:flex;flex-direction:column;align-items:flex-start">
-      <div style="flex:none;display:flex;flex-direction:column;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c;margin-bottom:7px;" [ngClass]="activity.highlight == true ? 'highlight' : ''"
-        *ngFor="let activity of activityItems; trackBy: trackActivities">
-        <!-- forum image -->
-        <div style="flex:none;display:flex;flex-direction:row;align-items:center">
-          <ng-container *ngIf="activity.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-          <ng-template #showdefaultforumimage>
-            <ng-container *ngIf="activity.defaultForumImage | async;let image">
-              <div style="flex:none">
-                <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="image.url" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
-              </div>
-            </ng-container>
-          </ng-template>
+      <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
+        <div [ngClass]="activity.highlight == true ? 'alert alert-danger highlight' : 'alert alert-danger'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:8px">
+          <!-- forum image -->
+          <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+            <ng-container *ngIf="activity.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+            <ng-template #showdefaultforumimage>
+              <ng-container *ngIf="activity.defaultForumImage | async;let image">
+                <div style="flex:none">
+                  <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="image.url" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
+                </div>
+              </ng-container>
+            </ng-template>
+          </div>
         </div>
-      </div>
+      </ng-container>
     </div>
   </ng-template>
   <ng-template #noactivity>

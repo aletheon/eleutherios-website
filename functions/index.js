@@ -98,11 +98,13 @@ app.get("/onboard-user/refresh", async (req, res) => {
 
 // generateAccountLink
 function generateAccountLink(accountId, origin, returnUrl) {
+  console.log('generateAccountLink ' + `${origin}/onboard-user/refresh`);
+
   return stripe.accountLinks
     .create({
       type: "account_onboarding",
       account: accountId,
-      refresh_url: `${origin}/onboard-user/refresh`,
+      refresh_url: 'https://us-central1-eleutherios-website.cloudfunctions.net/stripe/onboard-user/refresh', // `${origin}/onboard-user/refresh`
       return_url: returnUrl,
     })
     .then((link) => link.url);

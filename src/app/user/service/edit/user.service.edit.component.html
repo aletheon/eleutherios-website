@@ -5,7 +5,7 @@
 			<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 				<h4 style="flex:none">Edit Service</h4>
 				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-					<back></back>
+					<mat-icon (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 				</div>
 			</div>
 			<div style="flex:1">
@@ -121,10 +121,10 @@
 						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
 							<div *ngIf="serviceTagItems.length > 0">
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-									<div [ngClass]="serviceItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
+									<div [ngClass]="serviceGroup.get('paymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
 										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
-										<span>{{ serviceTag.tag }}</span>
-										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+										<span style="color:#1B1B1B">{{ serviceTag.tag }}</span>
+										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove tag">close</i>
 									</div>
 								</div>
 							</div>
@@ -217,11 +217,11 @@
 								<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
 								<ng-template #showwhereservings>
 									<ng-container *ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
-										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+										<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 											<ng-container *ngIf="whereServing.forum | async;let forum">
 												<ng-container *ngIf="forum; then showforum"></ng-container>
 												<ng-template #showforum>
-													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center">
+													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px">
 														<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 														<ng-template #showdefaultforumimage>
 															<ng-container *ngIf="forum.defaultForumImage | async;let image">
@@ -307,7 +307,7 @@
 									<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 										<span>{{ tag.tag }}</span>
-										<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+										<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove tag">close</i>
 									</div>
 								</ng-container>
 							</div>
@@ -317,7 +317,7 @@
 									<div *ngIf="searchForumResultItems.length > 0; then showsearchforumresults else nosearchforumresults"></div>
 									<ng-template #showsearchforumresults>
 										<ng-container *ngFor="let forum of searchForumResultItems; trackBy: trackSearchForumResults">
-											<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+											<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
 												<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 													<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 													<ng-template #showdefaultforumimage>

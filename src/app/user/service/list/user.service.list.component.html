@@ -54,7 +54,7 @@
 				<ng-template #showservices>
 					<ng-container *ngFor="let service of serviceItems; trackBy: trackServices">
 						<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
-							<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+							<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-bottom:5px;flex-wrap:wrap">
 								<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 								<ng-template #showdefaultserviceimage>
 									<ng-container *ngIf="service.defaultServiceImage | async;let image">

@@ -54,7 +54,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   private _postCount = new BehaviorSubject(0);
   private _tagCount = new BehaviorSubject(0);
   private _imageCount = new BehaviorSubject(0);
-
+  
   public defaultRegistrant: Observable<any>;
   public forum: Observable<any>;
   public registrantCount: Observable<number> = this._registrantCount.asObservable();

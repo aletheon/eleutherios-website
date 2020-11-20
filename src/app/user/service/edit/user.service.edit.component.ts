@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
 import {
   SiteTotalService,
   UserActivityService,
@@ -57,6 +58,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   private _tempSearchTags: string[] = [];
   private _settingDefaultServiceImage: boolean = false;
   private _addingTag = new BehaviorSubject(false);
+  private _onboarding: boolean = false;
 
   public service: Observable<any>;
   public user: Observable<any>;
@@ -110,6 +112,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     private fb: FormBuilder, 
     private router: Router,
     private currencyPipe: CurrencyPipe,
+    private location: Location,
     private snackbar: MatSnackBar) {
       this.searchForumCtrl = new FormControl();
       this.tagSearchCtrl = new FormControl();
@@ -1077,6 +1080,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
     this.route.queryParams.subscribe((params: Params) => {
       let onboarding = params['onboarding'];
+
+      if (onboarding)
+        this._onboarding = true;
 
       this.userServiceService.exists(this.auth.uid, params['serviceId']).then(exists => {
         if (exists){
@@ -2271,5 +2277,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         }
       );
     }
+  }
+
+  public navigateBack () {
+    if (this._onboarding)
+      this.router.navigate(['/']);
+    else
+      this.location.back();
   }
 }

@@ -56,10 +56,10 @@
 								<ng-container *ngIf="returnType | async; then showreturntype"></ng-container>
 								<ng-template #showreturntype>
 									<ng-container *ngIf="returnType | async as returnTypeItem">
-										<mat-icon *ngIf="returnTypeItem=='Service'" [routerLink]="['/user/service/edit']" [queryParams]='{ userId: returnUserId, serviceId: id }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
-										<mat-icon *ngIf="returnTypeItem=='Forum'" [routerLink]="['/user/forum/edit']" [queryParams]='{ userId: returnUserId, forumId: id }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
-										<mat-icon *ngIf="returnTypeItem=='Notification'" [routerLink]="['/user/notification/edit']" [queryParams]='{ userId: returnUserId, notificationId: id }' style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
-										<mat-icon *ngIf="returnTypeItem==''" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem=='Service'" [routerLink]="['/user/service/edit']" [queryParams]='{ userId: returnUserId, serviceId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem=='Forum'" [routerLink]="['/user/forum/edit']" [queryParams]='{ userId: returnUserId, forumId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem=='Notification'" [routerLink]="['/user/notification/edit']" [queryParams]='{ userId: returnUserId, notificationId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
+										<mat-icon *ngIf="returnTypeItem==''" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 									</ng-container>
 								</ng-template>
 							</ng-container>
@@ -67,7 +67,7 @@
 					</ng-container>
 				</ng-template>
 				<ng-template #backtohistorypage>
-					<mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer" matTooltip="Back">keyboard_backspace</mat-icon>
+					<mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 				</ng-template>
 			</div>
 		</div>
@@ -153,7 +153,7 @@
 									</ng-container>
 								</div>
 								<div style="display:flex;flex-direction:row;align-items:center">
-									<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+									<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px">
 										<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 										<ng-template #showdefaultserviceimage>
 											<ng-container *ngIf="service.defaultServiceImage | async;let image">
