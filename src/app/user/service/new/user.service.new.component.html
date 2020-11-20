@@ -305,19 +305,13 @@
 						</div>
 						<!-- tag results -->
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-							<ng-container *ngIf="searchTags.length > 0; then showsearchtags else nosearchtags"></ng-container>
-							<ng-template #showsearchtags>
+							<ng-container *ngIf="searchTags.length > 0;">
 								<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 									<span>{{ tag.tag }}</span>
 									<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
-							</ng-template>
-							<ng-template #nosearchtags>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Tags</i>
-								</p>
-							</ng-template>
+							</ng-container>
 						</div>
 						<!-- search results -->
 						<div style="display:flex;flex-direction:column">

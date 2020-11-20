@@ -44,7 +44,7 @@
 				<div style="margin-bottom:20px">
 					<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 					<ng-container *ngIf="notificationTags | async;let notificationTagItems">
-						<div *ngIf="notificationTagItems.length > 0; else nonotificationtags">
+						<div *ngIf="notificationTagItems.length > 0">
 							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 								<div style="flex:none;margin-right:5px" *ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
 									<div [ngClass]="notificationItem.type == 'Forum' ? 'forumTag' : 'serviceTag'" style="display:flex;flex-direction:row;align-items:center;padding:3px">
@@ -54,11 +54,6 @@
 								</div>
 							</div>
 						</div>
-						<ng-template #nonotificationtags>
-							<p style="color:#999;font-size:90%">
-								<i>No Tags</i>
-							</p>
-						</ng-template>
 					</ng-container>
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1;margin-right:20px">

@@ -101,7 +101,7 @@
 				<div style="margin-bottom:20px">
 					<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 					<ng-container *ngIf="forumTags | async;let forumTagItems">
-						<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+						<ng-container *ngIf="forumTagItems.length > 0">
 							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 								<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
@@ -110,11 +110,6 @@
 								</div>
 							</div>
 						</ng-container>
-						<ng-template #noforumtags>
-							<p style="color:#999;font-size:90%">
-								<i>No Tags</i>
-							</p>
-						</ng-template>
 					</ng-container>
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1;margin-right:20px">
@@ -282,19 +277,13 @@
 						</div>
 						<!-- tag results -->
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-							<ng-container *ngIf="searchServiceTags.length > 0; then showsearchservicetags else nosearchservicetags"></ng-container>
-							<ng-template #showsearchservicetags>
+							<ng-container *ngIf="searchServiceTags.length > 0;">
 								<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 									*ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
 									<span>{{ tag.tag }}</span>
 									<i class="material-icons" (click)="removeSearchServiceTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
 								</div>
-							</ng-template>
-							<ng-template #nosearchservicetags>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Tags</i>
-								</p>
-							</ng-template>
+							</ng-container>
 						</div>
 						<!-- search results -->
 						<div style="display:flex;flex-direction:column">
