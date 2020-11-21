@@ -2313,11 +2313,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       }
     }
 
-    // here rob
-    // 1) check if serviceForum exists
-    // 2) check if index etc is all okay, then add service to forum
-
-
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
@@ -2343,14 +2338,20 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         };
         
         this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 5000,
-              data: 'Service saved',
-              panelClass: ['green-snackbar']
-            }
-          );
+          if (window.localStorage.getItem('serviceForum')){
+            let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
+            this.addForum(serviceForum);
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 5000,
+                data: 'Service saved',
+                panelClass: ['green-snackbar']
+              }
+            );
+          }
         });
       }
       else {
