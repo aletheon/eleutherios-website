@@ -813,6 +813,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
   removeServiceForum () {
     this.serviceForum = of(null);
+    window.localStorage.removeItem('serviceForum');
   }
 
   autoServiceTagsDisplayFn (tag: any): string {
@@ -1097,7 +1098,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
           for (let i in that.serviceGroup.controls) {
             that.serviceGroup.controls[i].markAsTouched();
           }
-          that.titleRef.nativeElement.focus();  
+          that.titleRef.nativeElement.focus();
         }
         else if (that.serviceGroup.get('paymentType').value == 'Payment'){
           for (let i in that.serviceGroup.controls) {
@@ -1106,7 +1107,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
           that.amountRef.nativeElement.focus();
         }
       }
-    }, 1000);
+    }, 2500);
   }
   
   ngOnInit () {
@@ -1209,8 +1210,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
             // check if service is being created for a new forum
             let serviceForum = window.localStorage.getItem('serviceForum');
-
-            console.log('serviceForum ' + serviceForum);
 
             if (serviceForum){
               let userId = JSON.parse(serviceForum).uid;
@@ -2313,6 +2312,11 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
       }
     }
+
+    // here rob
+    // 1) check if serviceForum exists
+    // 2) check if index etc is all okay, then add service to forum
+
 
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
 

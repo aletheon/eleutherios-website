@@ -5,9 +5,9 @@
 			<ng-container *ngIf="serviceForum | async;then showForum else noforum"></ng-container>
 			<ng-template #showForum>
 				<ng-container *ngIf="serviceForum | async;let forumItem">
-					<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-						<h4 style="flex:none;margin-right:5px">Create service in </h4>
-						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px">
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:center">
+						<h4 style="flex:none;margin-right:5px;padding:0px">Create service in </h4>
+						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0px">
 							<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 								<ng-container *ngIf="forumItem.defaultForumImage | async">
 									<ng-container *ngIf="forumItem.defaultForumImage | async;let image">
