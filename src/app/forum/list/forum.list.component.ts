@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import {
   SiteTotalService,
@@ -65,6 +66,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
     private forumService: ForumService,
     private tagService: TagService,
     private snackbar: MatSnackBar,
+    private router: Router,
     private fb: FormBuilder) {
       this.searchForumCtrl = new FormControl();
       this.forumSearchTagCtrl = new FormControl();
@@ -477,6 +479,11 @@ export class ForumListComponent implements OnInit, OnDestroy {
         }
       );
     });
+  }
+
+  createNewService(forum) {
+    window.localStorage.setItem('serviceForum', JSON.stringify(forum));
+    this.router.navigate(['/user/service/new']);
   }
 
   onNext () {

@@ -434,6 +434,11 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  createNewService(forum) {
+    window.localStorage.setItem('serviceForum', JSON.stringify(forum));
+    this.router.navigate(['/user/service/new']);
+  }
+
   trackForumTags (index, forumTag) { return forumTag.tagId; }
 
   trackRegistrants (index, registrant) { return registrant.registrantId; }

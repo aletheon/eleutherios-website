@@ -88,8 +88,6 @@ app.get("/onboard-user/refresh", async (req, res) => {
     const returnUrl = req.session.returnUrl;
     const origin = `${req.secure ? "https://" : "https://"}${req.headers.host}`;
     const accountLinkURL = await generateAccountLink(accountId, origin, returnUrl);
-
-    console.log('onboarding user refresh accountLinkURL ' + accountLinkURL);
     res.redirect(accountLinkURL);
   } catch (error) {
     res.status(500).send(error.message);
@@ -98,8 +96,6 @@ app.get("/onboard-user/refresh", async (req, res) => {
 
 // generateAccountLink
 function generateAccountLink(accountId, origin, returnUrl) {
-  console.log('generateAccountLink ' + `${origin}/onboard-user/refresh`);
-
   return stripe.accountLinks
     .create({
       type: "account_onboarding",

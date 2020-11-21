@@ -198,8 +198,8 @@
 							</div>
 						</ng-template>
 						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
-							<a [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px">Create new service</a>
-							<a [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons">keyboard_arrow_right</a>
+							<a onclick="event.stopPropagation()" (click)="createNewService(forumItem)" style="flex:none;color:#1B1B1B;margin-right:5px;cursor:pointer">Create new service</a>
+							<a onclick="event.stopPropagation()" (click)="createNewService(forumItem)" style="flex:none;color:#1B1B1B;text-decoration:none;cursor:pointer" class="material-icons">keyboard_arrow_right</a>
 						</div>
 						<ng-container *ngIf="defaultRegistrant | async; then showothercontrols else noothercontrols"></ng-container>
 						<ng-template #showothercontrols>

@@ -114,7 +114,7 @@
 										<mat-icon style="cursor:pointer;color:#1B1B1B" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Add Service">add_box</mat-icon>
 									</div>
 									<div style="flex:none">
-										<mat-icon style="cursor:pointer;color:#1B1B1B" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Create Service">add_circle</mat-icon>
+										<mat-icon onclick="event.stopPropagation()" (click)="createNewService(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Create Service">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>
