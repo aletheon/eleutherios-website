@@ -74,7 +74,7 @@ export class UserForumRegistrantService {
   public serviceIsServingInForum(parentUserId: string, forumId: string, serviceId: string): Observable<boolean>{
     return this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`, (ref) => ref.where('serviceId', '==', serviceId).limit(1)).valueChanges().pipe(
       switchMap(registrants => {
-        if (registrants)
+        if (registrants.length > 0)
           return of(true);
         else
           return of(false);

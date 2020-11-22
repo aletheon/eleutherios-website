@@ -1059,6 +1059,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this._serviceForumSubscription)
       this._serviceForumSubscription.unsubscribe();
+
+    // remove serviceForum if we have one so it doesn't show up next time user creates a service
+    window.localStorage.removeItem('serviceForum');
   }
 
   trackServiceTags (index, serviceTag) { return serviceTag.tagId; }
@@ -1198,23 +1201,62 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               });
 
             // check if service is being created for a new forum
-            let serviceForum = window.localStorage.getItem('serviceForum');
+            let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
 
             if (serviceForum){
-              let userId = JSON.parse(serviceForum).uid;
-              let forumId = JSON.parse(serviceForum).forumId;
+              let userId = serviceForum.uid;
+              let forumId = serviceForum.forumId;
         
               // check forum exists
               that._serviceForumSubscription = that.userForumService.getForum(userId, forumId).pipe(
                 switchMap(forum =>{
                   if (forum && forum.title.length > 0){
                     // check if already serving in forum
-                    that.userForumRegistrantService.serviceIsServingInForum(userId, forumId, service.serviceId).pipe(
+                    return that.userForumRegistrantService.serviceIsServingInForum(userId, forumId, service.serviceId).pipe(
                       switchMap(isServing => {
-                        if (!isServing)
-                          return of(forum);
-                        else
-                          return of(null);
+                        if (!isServing){
+                          let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                            switchMap(forumImages => {
+                              if (forumImages && forumImages.length > 0){
+                                let getDownloadUrl$: Observable<any>;
+          
+                                if (forumImages[0].tinyUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+          
+                                return combineLatest([getDownloadUrl$]).pipe(
+                                  switchMap(results => {
+                                    const [downloadUrl] = results;
+                                    
+                                    if (downloadUrl)
+                                      forumImages[0].url = downloadUrl;
+                                    else
+                                      forumImages[0].url = '../../../assets/defaultTiny.jpg';
+                      
+                                    return of(forumImages[0]);
+                                  })
+                                );
+                              }
+                              else return of(null);
+                            })
+                          );
+
+                          return combineLatest([getDefaultForumImage$]).pipe(
+                            switchMap(results => {
+                              const [defaultForumImage] = results;
+
+                              if (defaultForumImage)
+                                forum.defaultForumImage = of(defaultForumImage);
+                              else {
+                                let tempImage = {
+                                  url: '../../../assets/defaultTiny.jpg'
+                                };
+                                forum.defaultForumImage = of(tempImage);
+                              }    
+                              return of(forum);
+                            })
+                          );
+                        }
+                        else return of(null);
                       })
                     );
                   }

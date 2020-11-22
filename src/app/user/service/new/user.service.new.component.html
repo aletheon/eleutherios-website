@@ -274,11 +274,9 @@
 														<div style="flex:none">
 															<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
 															<ng-template #showblockcontrol>
-																<mat-form-field style="width:120px">
-																	<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
-																		<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-																	</mat-select>
-																</mat-form-field>
+																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
+																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+																</mat-select>
 															</ng-template>
 															<ng-template #noblockcontrol>
 																<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>

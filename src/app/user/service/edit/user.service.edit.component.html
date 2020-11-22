@@ -8,9 +8,6 @@
 					<div style="flex:none;display:flex;flex-direction:row;justify-content:center">
 						<h4 style="flex:none;margin-right:5px;padding:0px">Create service in </h4>
 						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0px">
-
-							<!-- HERE ROB HAVE TO INCLUDE THE EDIT SIDE OF THIS EQUATION -->
-
 							<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 								<ng-container *ngIf="forumItem.defaultForumImage | async">
 									<ng-container *ngIf="forumItem.defaultForumImage | async;let image">
@@ -283,11 +280,9 @@
 														<div style="flex:none">
 															<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
 															<ng-template #showblockcontrol>
-																<mat-form-field style="width:120px">
-																	<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
-																		<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-																	</mat-select>
-																</mat-form-field>
+																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
+																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+																</mat-select>
 															</ng-template>
 															<ng-template #noblockcontrol>
 																<mat-icon onclick="event.stopPropagation()" (click)="removeForum(whereServing)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
