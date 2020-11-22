@@ -29,7 +29,6 @@ import { UserForumForumNewComponent } from './forum/user.forum.forum.new.compone
 import { UserForumImageListComponent } from './image/user.forum.image.list.component';
 import { UserForumListComponent } from './list/user.forum.list.component';
 import { UserForumNewComponent } from './new/user.forum.new.component';
-import { UserForumServiceNewComponent } from './service/user.forum.service.new.component';
 import { UserForumServiceAddComponent } from './service/user.forum.service.add.component';
 import { UserForumViewComponent } from './view/user.forum.view.component';
 
@@ -89,7 +88,6 @@ import {
     UserForumImageListComponent,
     UserForumListComponent,
     UserForumNewComponent,
-    UserForumServiceNewComponent,
     UserForumServiceAddComponent,
     UserForumViewComponent
   ],

@@ -53,7 +53,6 @@ import { UserForumNewComponent } from './user/forum/new/user.forum.new.component
 import { UserForumEditComponent } from './user/forum/edit/user.forum.edit.component';
 import { UserForumListComponent } from './user/forum/list/user.forum.list.component';
 import { UserForumForumNewComponent } from './user/forum/forum/user.forum.forum.new.component';
-import { UserForumServiceNewComponent } from './user/forum/service/user.forum.service.new.component';
 import { UserForumServiceAddComponent } from './user/forum/service/user.forum.service.add.component';
 import { UserForumDetailComponent } from './user/forum/detail/user.forum.detail.component';
 import { UserForumImageListComponent } from './user/forum/image/user.forum.image.list.component';
@@ -266,11 +265,6 @@ const routes: Routes = [
   {
     path: 'user/forum/forum/new',
     component: UserForumForumNewComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user/forum/service/new',
-    component: UserForumServiceNewComponent,
     canActivate: [AuthGuard]
   },
   {
