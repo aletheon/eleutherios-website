@@ -11,19 +11,6 @@ export class UserWhereServingService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public serviceIsServingInForum (parentUserId: string, serviceId: string, forumId: string): Promise<boolean>{
-    return new Promise<boolean>((resolve, reject) => {
-      const whereServingRef = this.afs.collection(`users/${parentUserId}/services/${serviceId}/whereservings`).doc(forumId);
-
-      whereServingRef.ref.get().then(doc => {
-        if (doc.exists)
-          resolve(true);
-        else
-          resolve(false);
-      });
-    });
-  }
-
   public getWhereServings (parentUserId: string, serviceId: string): Observable<any[]> {
     return this.afs.collection<any>(`users/${parentUserId}/services/${serviceId}/whereservings`, ref => ref.orderBy('creationDate', 'desc')).valueChanges();
   }

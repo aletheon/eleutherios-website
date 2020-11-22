@@ -212,7 +212,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                           this.userForumUserBlockService.userIsBlocked(this.userServicesCtrl.value.uid, this.userServicesCtrl.value.serviceId, this.forumGroup.get('uid').value)
                             .then(forumUserBlocked => {
                               if (!forumUserBlocked) {
-                                this.userForumRegistrantService.serviceIsServingInForum(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.userServicesCtrl.value.serviceId)
+                                this.userForumRegistrantService.serviceIsServingInForumFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.userServicesCtrl.value.serviceId)
                                   .then(isServing => {
                                     if (!isServing) {
                                       const newRegistrant: Registrant = {

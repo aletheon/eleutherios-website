@@ -52,6 +52,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   private _totalSubscription: Subscription;
   private _searchForumSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
+  private _serviceForumSubscription: Subscription;
   private _forumCount = new BehaviorSubject(0);
   private _tagCount = new BehaviorSubject(0);
   private _imageCount = new BehaviorSubject(0);
@@ -62,6 +63,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   public service: Observable<any>;
   public user: Observable<any>;
+  public serviceForum: Observable<any>;
   public defaultServiceImage: Observable<any>;
   public forumCount: Observable<number> = this._forumCount.asObservable();
   public tagCount: Observable<number> = this._tagCount.asObservable();
@@ -626,7 +628,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                         this.userForumUserBlockService.userIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.uid)
                           .then((forumUserBlock) => {
                             if (!forumUserBlock) {
-                              this.userForumRegistrantService.serviceIsServingInForum(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
+                              this.userForumRegistrantService.serviceIsServingInForumFromPromise(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
                                 .then((isServing) => {
                                   if (!isServing) {
                                     const newRegistrant: Registrant = {
@@ -785,6 +787,11 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         console.error(error);
       }
     );
+  }
+
+  removeServiceForum () {
+    this.serviceForum = of(null);
+    window.localStorage.removeItem('serviceForum');
   }
 
   autoServiceTagsDisplayFn (tag: any): string {
@@ -1049,6 +1056,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this._defaultServiceImageSubscription)
       this._defaultServiceImageSubscription.unsubscribe();
+
+    if (this._serviceForumSubscription)
+      this._serviceForumSubscription.unsubscribe();
   }
 
   trackServiceTags (index, serviceTag) { return serviceTag.tagId; }
@@ -1186,6 +1196,34 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     that._imageCount.next(total.imageCount);
                 }
               });
+
+            // check if service is being created for a new forum
+            let serviceForum = window.localStorage.getItem('serviceForum');
+
+            if (serviceForum){
+              let userId = JSON.parse(serviceForum).uid;
+              let forumId = JSON.parse(serviceForum).forumId;
+        
+              // check forum exists
+              that._serviceForumSubscription = that.userForumService.getForum(userId, forumId).pipe(
+                switchMap(forum =>{
+                  if (forum && forum.title.length > 0){
+                    // check if already serving in forum
+                    that.userForumRegistrantService.serviceIsServingInForum(userId, forumId, service.serviceId).pipe(
+                      switchMap(isServing => {
+                        if (!isServing)
+                          return of(forum);
+                        else
+                          return of(null);
+                      })
+                    );
+                  }
+                  else return of(null);
+                })
+              ).subscribe(forum => {
+                that.serviceForum = of(forum);
+              });
+            }
 
             // default service image
             that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
@@ -2246,14 +2284,21 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         };
         
         this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 5000,
-              data: 'Service saved',
-              panelClass: ['green-snackbar']
-            }
-          );
+          if (window.localStorage.getItem('serviceForum')){
+            let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
+            window.localStorage.removeItem('serviceForum');
+            this.addForum(serviceForum);
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 5000,
+                data: 'Service saved',
+                panelClass: ['green-snackbar']
+              }
+            );
+          }
         });
       }
       else {

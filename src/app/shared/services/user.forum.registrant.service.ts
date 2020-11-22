@@ -3,7 +3,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
 
 import * as firebase from 'firebase/app';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class UserForumRegistrantService {
@@ -54,9 +55,9 @@ export class UserForumRegistrantService {
   
   public getDefaultUserRegistrant(parentUserId: string, forumId: string, userId: string): Observable<any[]>{
     return this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`, (ref) => ref.where('uid', '==', userId).where('default', '==', true).limit(1)).valueChanges();
-  } 
+  }
 
-  public serviceIsServingInForum(parentUserId: string, forumId: string, serviceId: string): Promise<boolean>{
+  public serviceIsServingInForumFromPromise(parentUserId: string, forumId: string, serviceId: string): Promise<boolean>{
     return new Promise<boolean>((resolve, reject) => {
       const registrantRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`).ref.where('serviceId', '==', serviceId);
       registrantRef.get().then(querySnapshot => {
@@ -68,6 +69,17 @@ export class UserForumRegistrantService {
         reject(error);
       });
     });
+  }
+
+  public serviceIsServingInForum(parentUserId: string, forumId: string, serviceId: string): Observable<boolean>{
+    return this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`, (ref) => ref.where('serviceId', '==', serviceId).limit(1)).valueChanges().pipe(
+      switchMap(registrants => {
+        if (registrants)
+          return of(true);
+        else
+          return of(false);
+      })
+    );
   }
 
   public exists(parentUserId: string, forumId: string, serviceId: string): Promise<boolean> {

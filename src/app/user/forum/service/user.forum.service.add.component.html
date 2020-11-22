@@ -4,9 +4,22 @@
     <form [formGroup]="forumGroup" novalidate>
       <!-- header -->
       <div style="flex:none">
-        <div style="display:flex;flex-direction:row;align-items:center">
-          <h4 [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="flex:none;cursor:pointer">Add service to {{ forumItem.title }}</h4>
-          <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+        <div style="display:flex;flex-direction:row;justify-content:center;margin-bottom:5px">
+          <h4 style="flex:none;margin-right:5px;padding:0px">Add service to </h4>
+          <div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0px">
+            <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+              <ng-container *ngIf="defaultForumImage | async;let image">
+                <div style="flex:none;margin-right:5px">
+                  <img [src]="image.url">
+                </div>
+              </ng-container>
+              <p style="flex:none;margin-right:5px">
+                <a *ngIf="forumItem.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B" matTooltip="{{ forumItem.title }}{{ forumItem.description.length > 0 ? (' - ' + forumItem.description | truncate: 80) : '' }}">{{ forumItem.title | truncate: 35 }}</a>
+                <a *ngIf="forumItem.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B" matTooltip="{{ forumItem.title }}{{ forumItem.description.length > 0 ? (' - ' + forumItem.description | truncate: 80) : '' }}">{{ forumItem.title | truncate: 35 }}</a>
+              </p>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
             <back></back>
           </div>
         </div>
@@ -102,7 +115,7 @@
                   <ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
                   <ng-template #showservice>
                     <ng-container *ngIf="registrant.service | async;let service">
-                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-bottom:5px;flex-wrap:nowrap">
                         <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                         <ng-template #showdefaultserviceimage>
                           <ng-container *ngIf="service.defaultServiceImage | async;let image">
@@ -116,16 +129,17 @@
                           <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
                         </p>
                         <div style="flex:none">
-                          <ng-container *ngIf="auth.uid != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
-                          <ng-template #showblockcontrol>
-                            <mat-form-field style="width:120px">
+                          <ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
+                          <ng-template #showforumowner>
+                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>  
+                          </ng-template>
+                          <ng-template #shownotforumowner>
+                            <ng-container *ngIf="auth.uid == service.uid; then showblockcontrol"></ng-container>
+                            <ng-template #showblockcontrol>
                               <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
                                 <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
                               </mat-select>
-                            </mat-form-field>
-                          </ng-template>
-                          <ng-template #noblockcontrol>
-                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
+                            </ng-template>
                           </ng-template>
                         </div>
                       </div>

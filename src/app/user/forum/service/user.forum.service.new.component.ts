@@ -747,7 +747,7 @@ export class UserForumServiceNewComponent implements OnInit, OnDestroy, AfterVie
         this.userServiceService.update(this.auth.uid, this.serviceGroup.get('serviceId').value, data).then(() => {
           // get or create the registrant if it doesn't exist
           // this will only be done once
-          this.userForumRegistrantService.serviceIsServingInForum(this._userId, this._forumId, this.serviceGroup.get('serviceId').value).then(isServing => {
+          this.userForumRegistrantService.serviceIsServingInForumFromPromise(this._userId, this._forumId, this.serviceGroup.get('serviceId').value).then(isServing => {
             if (isServing == false) {
               if (this.serviceGroup.get('title').value.length > 0){
                 const newRegistrant: Registrant = {

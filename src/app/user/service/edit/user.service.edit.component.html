@@ -2,12 +2,50 @@
 <ng-container *ngIf="user | async;let userItem">
 	<ng-container *ngIf="service | async;let serviceItem">
 		<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
-			<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+			<ng-container *ngIf="serviceForum | async;then showForum else noforum"></ng-container>
+			<ng-template #showForum>
+				<ng-container *ngIf="serviceForum | async;let forumItem">
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:center">
+						<h4 style="flex:none;margin-right:5px;padding:0px">Create service in </h4>
+						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0px">
+
+							<!-- HERE ROB HAVE TO INCLUDE THE EDIT SIDE OF THIS EQUATION -->
+
+							<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+								<ng-container *ngIf="forumItem.defaultForumImage | async">
+									<ng-container *ngIf="forumItem.defaultForumImage | async;let image">
+										<div style="flex:none;margin-right:5px">
+											<img [src]="image.url">
+										</div>
+									</ng-container>
+								</ng-container>
+								<p style="flex:none;margin-right:5px">
+									<a *ngIf="forumItem.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B" matTooltip="{{ forumItem.title }}{{ forumItem.description.length > 0 ? (' - ' + forumItem.description | truncate: 80) : '' }}">{{ forumItem.title | truncate: 35 }}</a>
+									<a *ngIf="forumItem.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B" matTooltip="{{ forumItem.title }}{{ forumItem.description.length > 0 ? (' - ' + forumItem.description | truncate: 80) : '' }}">{{ forumItem.title | truncate: 35 }}</a>
+								</p>
+								<i class="material-icons" (click)="removeServiceForum()" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Remove tag">close</i>
+							</div>
+						</div>
+						<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+							<back></back>
+						</div>
+					</div>
+				</ng-container>
+			</ng-template>
+			<ng-template #noforum>
+				<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+					<h4 style="flex:none">Edit Service</h4>
+					<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+						<back></back>
+					</div>
+				</div>
+			</ng-template>
+			<!-- <div style="flex:none;display:flex;flex-direction:row;align-items:center">
 				<h4 style="flex:none">Edit Service</h4>
 				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
 					<mat-icon (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 				</div>
-			</div>
+			</div> -->
 			<div style="flex:1">
 				<!-- START OF SERVICE DETAILS SECTION -->	
 				<form [formGroup]="serviceGroup" novalidate>

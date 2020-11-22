@@ -328,7 +328,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                           this.userForumUserBlockService.userIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, this.userForumsCtrl.value.uid)
                             .then(forumUserBlock => {
                               if (!forumUserBlock) {
-                                this.userForumRegistrantService.serviceIsServingInForum(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, this.serviceGroup.get('serviceId').value)
+                                this.userForumRegistrantService.serviceIsServingInForumFromPromise(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, this.serviceGroup.get('serviceId').value)
                                   .then(isServing => {
                                     if (!isServing) {
                                       const newRegistrant: Registrant = {

@@ -53,6 +53,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   private _totalSubscription: Subscription;
   private _searchForumSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
+  private _serviceForumSubscription: Subscription;
   private _forumCount = new BehaviorSubject(0);
   private _tagCount = new BehaviorSubject(0);
   private _imageCount = new BehaviorSubject(0);
@@ -626,7 +627,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                         this.userForumUserBlockService.userIsBlocked(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.uid)
                           .then(forumUserBlock => {
                             if (!forumUserBlock) {
-                              this.userWhereServingService.serviceIsServingInForum(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, forum.forumId)
+                              this.userForumRegistrantService.serviceIsServingInForumFromPromise(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
                                 .then(isServing => {
                                   if (!isServing) {
                                     const newRegistrant: Registrant = {
@@ -1078,6 +1079,9 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (this._defaultServiceImageSubscription)
       this._defaultServiceImageSubscription.unsubscribe();
+
+    if (this._serviceForumSubscription)
+      this._serviceForumSubscription.unsubscribe();
   }
 
   trackServiceTags (index, tag) { return tag.tagId; }
@@ -1216,69 +1220,23 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               let forumId = JSON.parse(serviceForum).forumId;
         
               // check forum exists
-              that.userForumService.getForumFromPromise(userId, forumId)
-                .then(forum => {
+              that._serviceForumSubscription = that.userForumService.getForum(userId, forumId).pipe(
+                switchMap(forum =>{
                   if (forum && forum.title.length > 0){
                     // check if already serving in forum
-                    that.userForumRegistrantService.serviceIsServingInForum(userId, forumId, service.serviceId).then(exists => {
-                      if (!exists){
-                        that.serviceForum = that.userForumService.getForum(userId, forumId).pipe(
-                          switchMap(forum => {
-                            if (forum) {
-                              let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                                switchMap(forumImages => {
-                                  if (forumImages && forumImages.length > 0){
-                                    let getDownloadUrl$: Observable<any>;
-              
-                                    if (forumImages[0].tinyUrl)
-                                      getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-              
-                                    return combineLatest([getDownloadUrl$]).pipe(
-                                      switchMap(results => {
-                                        const [downloadUrl] = results;
-                                        
-                                        if (downloadUrl)
-                                          forumImages[0].url = downloadUrl;
-                                        else
-                                          forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                          
-                                        return of(forumImages[0]);
-                                      })
-                                    );
-                                  }
-                                  else return of(null);
-                                })
-                              );
-    
-                              return combineLatest([getDefaultForumImage$]).pipe(
-                                switchMap(results => {
-                                  const [defaultForumImage] = results;
-    
-                                  if (defaultForumImage)
-                                    forum.defaultForumImage = of(defaultForumImage);
-                                  else {
-                                    let tempImage = {
-                                      url: '../../../assets/defaultTiny.jpg'
-                                    };
-                                    forum.defaultForumImage = of(tempImage);
-                                  }    
-                                  return of(forum);
-                                })
-                              );
-                            }
-                            else return of(null);
-                          })
-                        );
-                      }
-                    })
-                    .catch(error => {
-                      console.log(error);
-                    });
+                    that.userForumRegistrantService.serviceIsServingInForum(userId, forumId, service.serviceId).pipe(
+                      switchMap(isServing => {
+                        if (!isServing)
+                          return of(forum);
+                        else
+                          return of(null);
+                      })
+                    );
                   }
-                }
-              )
-              .catch(error => {
-                console.error(error);
+                  else return of(null);
+                })
+              ).subscribe(forum => {
+                that.serviceForum = of(forum);
               });
             }
 
@@ -1308,14 +1266,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               })
             )
             .subscribe(serviceImage => {
-              if (serviceImage)
-                that.defaultServiceImage = of(serviceImage);
-              else {
-                let tempImage = {
-                  url: '../../../assets/defaultThumbnail.jpg'
-                };
-                that.defaultServiceImage = of(tempImage);
-              }
+              that.defaultServiceImage = of(serviceImage);
             });
 
             // service tags
@@ -2340,6 +2291,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
           if (window.localStorage.getItem('serviceForum')){
             let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
+            window.localStorage.removeItem('serviceForum');
             this.addForum(serviceForum);
           }
           else {

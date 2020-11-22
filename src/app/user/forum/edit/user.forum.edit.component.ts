@@ -1144,7 +1144,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                           this.userForumUserBlockService.userIsBlocked(service.uid, service.serviceId, this.forumGroup.get('uid').value)
                             .then(forumUserBlock => {
                               if (!forumUserBlock) {
-                                this.userForumRegistrantService.serviceIsServingInForum(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, service.serviceId)
+                                this.userForumRegistrantService.serviceIsServingInForumFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, service.serviceId)
                                   .then(isServing => {
                                     if (!isServing) {
                                       const newRegistrant: Registrant = {

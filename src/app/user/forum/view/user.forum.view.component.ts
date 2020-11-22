@@ -798,7 +798,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     if (this._talkingToServer == false){
       this._talkingToServer = true;
 
-      this.userForumRegistrantService.serviceIsServingInForum(this.userId, this.forumId, this.defaultSelectedRegistrant.serviceId)
+      this.userForumRegistrantService.serviceIsServingInForumFromPromise(this.userId, this.forumId, this.defaultSelectedRegistrant.serviceId)
         .then((isServing) => {
           if (isServing) {
             if (this.newMessageCtrl.value.length > 0){
