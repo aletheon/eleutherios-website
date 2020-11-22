@@ -35,7 +35,7 @@
 						<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 							<span>{{ tag.tag }}</span>
-							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove tag">close</i>
+							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</i>
 						</div>
 					</div>
 				</ng-container>
@@ -107,13 +107,13 @@
 										<mat-checkbox *ngIf="service.title.length == 0" matTooltip="Index" [checked]="service.indexed" disabled="true"></mat-checkbox>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+										<mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Add Forum">add_box</mat-icon>
+										<mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Add forum">add_box</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create Forum">add_circle</mat-icon>
+										<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>

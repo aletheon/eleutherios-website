@@ -112,7 +112,7 @@
 									<div [ngClass]="serviceItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
 										<span>{{ serviceTag.tag }}</span>
-										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</div>
 							</div>
@@ -170,7 +170,7 @@
                           </div>
                         </div>
                         <div style="flex:none">
-                          <mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+                          <mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add image">add</mat-icon>
                         </div>
                       </div>
                     </div>

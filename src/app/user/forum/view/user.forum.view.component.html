@@ -38,7 +38,7 @@
 					<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
-					<mat-icon [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+					<mat-icon [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
@@ -148,7 +148,7 @@
 									</ng-template>
 									<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == service.uid">
 										<div style="flex:none">
-											<mat-icon onclick="event.stopPropagation()" (click)="removePost(post)" style="cursor:pointer;color:#999" matTooltip="Remove message">close</mat-icon>
+											<mat-icon onclick="event.stopPropagation()" (click)="removePost(post)" style="cursor:pointer;color:#999" matTooltip="Remove">close</mat-icon>
 										</div>
 									</ng-container>
 								</div>
@@ -188,8 +188,8 @@
 							Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)
 						</mat-panel-title>
 						<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Create Service">add</mat-icon>
-							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Add Service">add_box</mat-icon>
+							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Create service">add</mat-icon>
+							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Add service">add_box</mat-icon>
 						</div>
 					</mat-expansion-panel-header>
 					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
@@ -257,7 +257,7 @@
 							Forums(<ng-container *ngIf="forumCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)
 						</mat-panel-title>
 						<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/forum/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Create Forum">add</mat-icon>
+							<mat-icon style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/forum/forum/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' matTooltip="Create forum">add</mat-icon>
 						</div>
 					</mat-expansion-panel-header>
 					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">

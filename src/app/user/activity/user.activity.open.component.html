@@ -53,7 +53,7 @@
             <div style="flex:none;padding:0px">
               <ng-container *ngIf="auth.uid == activity.uid; then showforumowner else showregistrantowner"></ng-container>
               <ng-template #showforumowner>
-                <mat-icon onclick="event.stopPropagation()" (click)="removeActivity(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove activity">close</mat-icon>
+                <mat-icon onclick="event.stopPropagation()" (click)="removeActivity(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
               </ng-template>
               <ng-template #showregistrantowner>
                 <mat-select #select="matSelect" (selectionChange)="blockForum($event, activity)">

@@ -65,7 +65,7 @@
 												<mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
 											</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+												<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 											</div>
 										</div>
 									</div>
@@ -112,8 +112,8 @@
 													<mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
 												</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
-												<mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+												<mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+												<mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 											</div>
 											<div style="flex:none">
 												<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add</mat-icon>

@@ -85,10 +85,10 @@
                     </ng-template>
                     <ng-container *ngIf="service.serviceRate | async; else noservicerate"></ng-container>
                     <ng-template #noservicerate>
-                      <mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/rate/create']" [queryParams]='{ parentServiceId: userServiceReviewItem.serviceReviewServiceId, userId: userServiceReviewItem.serviceUid, serviceId: userServiceReviewItem.serviceId }' matTooltip="Create Rate">add_box</mat-icon>
+                      <mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/rate/create']" [queryParams]='{ parentServiceId: userServiceReviewItem.serviceReviewServiceId, userId: userServiceReviewItem.serviceUid, serviceId: userServiceReviewItem.serviceId }' matTooltip="Create rate">add_box</mat-icon>
                     </ng-template>
                     <div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
-                      <mat-icon onclick="event.stopPropagation()" (click)="delete(userServiceReviewItem)" style="cursor:pointer" matTooltip="Delete Review">delete</mat-icon>
+                      <mat-icon onclick="event.stopPropagation()" (click)="delete(userServiceReviewItem)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
                     </div>
                   </div>
                 </div>

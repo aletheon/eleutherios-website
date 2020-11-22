@@ -49,7 +49,7 @@
 								<div style="flex:none;margin-right:5px" *ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
 									<div [ngClass]="notificationItem.type == 'Forum' ? 'forumTag' : 'serviceTag'" style="display:flex;flex-direction:row;align-items:center;padding:3px">
 										<p style="margin:0 3px 0 3px">{{ notificationTag.tag }}</p>
-										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</div>
 							</div>
@@ -112,15 +112,15 @@
 												<p style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ result.creationDate.toDate() | amTimeAgo }}</p>
 											</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: result.forumId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+												<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: result.forumId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
 											</div>
 											<ng-container *ngIf="result.defaultRegistrant | async; then showaddnewcontrols"></ng-container>
 											<ng-template #showaddnewcontrols>
 												<div style="flex:none;margin-right:5px">
-													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Add Service">add_box</mat-icon>
+													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Add service">add_box</mat-icon>
 												</div>
 												<div style="flex:none">
-													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Create Service">add_circle</mat-icon>
+													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Create service">add_circle</mat-icon>
 												</div>
 											</ng-template>
 										</div>
@@ -167,13 +167,13 @@
 												<p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ result.creationDate.toDate() | amTimeAgo }}</p>
 											</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="View Details">description</mat-icon>
+												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
 											</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="Add Forum">add_box</mat-icon>
+												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationUserId: notificationGroup.get('uid').value, notificationId: notificationGroup.get('notificationId').value }" style="cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
 											</div>
 											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="cursor:pointer" matTooltip="Create Forum">add_circle</mat-icon>
+												<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
 											</div>
 										</div>
 									</div>

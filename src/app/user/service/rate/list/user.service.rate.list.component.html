@@ -102,10 +102,10 @@
                     </div>
                     <ng-container *ngIf="service.serviceReview | async; else noservicereview"></ng-container>
                     <ng-template #noservicereview>
-                      <mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/service/review/create']" [queryParams]='{ parentServiceUserId: serviceRate.serviceRateServiceUid, parentServiceId: serviceRate.serviceRateServiceId, userId: serviceRate.serviceUid, serviceId: serviceRate.serviceId }' matTooltip="Create Review">add_box</mat-icon>
+                      <mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/user/service/review/create']" [queryParams]='{ parentServiceUserId: serviceRate.serviceRateServiceUid, parentServiceId: serviceRate.serviceRateServiceId, userId: serviceRate.serviceUid, serviceId: serviceRate.serviceId }' matTooltip="Create review">add_box</mat-icon>
                     </ng-template>
                     <div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
-                      <mat-icon onclick="event.stopPropagation()" (click)="delete(serviceRate)" style="cursor:pointer" matTooltip="Delete Rate">delete</mat-icon>
+                      <mat-icon onclick="event.stopPropagation()" (click)="delete(serviceRate)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
                     </div>
                   </div>
                 </div>

@@ -35,7 +35,7 @@
 						<div class="label label-default" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 							<span>{{ tag.tag }}</span>
-							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
 						</div>
 					</div>
 				</ng-container>
@@ -108,13 +108,13 @@
 										<mat-checkbox *ngIf="forum.title.length == 0" matTooltip="Index" [checked]="forum.indexed" disabled="true"></mat-checkbox>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View Details">description</mat-icon>
+										<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon style="cursor:pointer;color:#1B1B1B" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Add Service">add_box</mat-icon>
+										<mat-icon style="cursor:pointer;color:#1B1B1B" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' matTooltip="Add service">add_box</mat-icon>
 									</div>
 									<div style="flex:none">
-										<mat-icon onclick="event.stopPropagation()" (click)="createNewService(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Create Service">add_circle</mat-icon>
+										<mat-icon onclick="event.stopPropagation()" (click)="createNewService(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>

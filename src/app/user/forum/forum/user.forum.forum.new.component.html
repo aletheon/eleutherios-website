@@ -97,7 +97,7 @@
                   <div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
                     *ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
                     <span>{{ forumTag.tag }}</span>
-                    <i class="material-icons" (click)="removeForumTag(forumTag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+                    <i class="material-icons" (click)="removeForumTag(forumTag)" style="cursor:pointer" matTooltip="Remove">close</i>
                   </div>
                 </div>
               </ng-container>
@@ -154,7 +154,7 @@
                         </div>
                       </div>
                       <div style="flex:none">
-                        <mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add">add</mat-icon>
+                        <mat-icon onclick="event.stopPropagation()" (click)="addImage(image)" style="cursor:pointer" matTooltip="Add image">add</mat-icon>
                       </div>
                     </div>
                   </ng-template>
@@ -255,7 +255,7 @@
                   <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
                     *ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
                     <span>{{ tag.tag }}</span>
-                    <i class="material-icons" (click)="removeSearchServiceTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+                    <i class="material-icons" (click)="removeSearchServiceTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
                   </div>
                 </ng-container>
               </div>
@@ -280,7 +280,7 @@
                             <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
                           </p>
                           <div style="flex:none">
-                            <mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add">add</mat-icon>
+                            <mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add</mat-icon>
                           </div>
                         </div>
                       </div>

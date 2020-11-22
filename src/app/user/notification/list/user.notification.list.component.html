@@ -43,7 +43,7 @@
 						<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid rgb(109, 109, 109);align-items:center"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 							<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
-							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove tag">close</i>
+							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
 						</div>
 					</div>
 				</ng-container>
