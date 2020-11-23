@@ -143,7 +143,7 @@
 					<div style="margin-bottom:20px">
 						<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
-							<div *ngIf="serviceTagItems.length > 0; else noservicetags">
+							<div *ngIf="serviceTagItems.length > 0">
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 									<div [ngClass]="serviceGroup.get('paymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
 										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
@@ -152,11 +152,6 @@
 									</div>
 								</div>
 							</div>
-							<ng-template #noservicetags>
-								<p style="color:#999;font-size:90%">
-									<i>No Tags</i>
-								</p>
-							</ng-template>
 						</ng-container>
 						<div style="display:flex;flex-direction:row;align-items:center">
 							<div style="flex:1;margin-right:20px">

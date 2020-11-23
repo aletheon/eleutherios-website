@@ -92,7 +92,7 @@
               </div>
             </div>
             <ng-container *ngIf="forumTags | async;let forumTagItems">
-              <ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+              <ng-container *ngIf="forumTagItems.length > 0">
                 <div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
                   <div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
                     *ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
@@ -101,11 +101,6 @@
                   </div>
                 </div>
               </ng-container>
-              <ng-template #noforumtags>
-                <p style="color:#999;font-size:90%">
-                  <i>No Tags</i>
-                </p>
-              </ng-template>
             </ng-container>
           </div>
           <!-- START OF IMAGES SECTION -->

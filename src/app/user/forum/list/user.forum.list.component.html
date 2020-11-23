@@ -30,7 +30,7 @@
 					</mat-form-field>
 				</div>
 				<!-- show tags -->
-				<ng-container *ngIf="searchTags.length > 0; else nosearchtags">
+				<ng-container *ngIf="searchTags.length > 0">
 					<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 						<div class="label label-default" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
@@ -39,11 +39,6 @@
 						</div>
 					</div>
 				</ng-container>
-				<ng-template #nosearchtags>
-					<p style="color:#999;font-size:90%">
-						<i>No Tags</i>
-					</p>
-				</ng-template>
 			</div>
 		</div>
 		<!-- search results -->
