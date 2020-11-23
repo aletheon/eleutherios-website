@@ -51,6 +51,8 @@ import * as _ from "lodash";
 })
 export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
+  @ViewChild('startAmount', { static: false }) startAmountRef: ElementRef;
+  @ViewChild('endAmount', { static: false }) endAmountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
   private _notificationSubscription: Subscription;
@@ -71,6 +73,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
   public nextKey: any;
   public prevKeys: any[] = [];
   public types: string[] = ['Service', 'Forum'];
+  public paymentTypes: string[] = ['Free', 'Payment'];
   public notificationTags: Observable<any[]>;
   public matAutoCompleteSearch: Observable<any[]>;
   public matAutoCompleteSearchTags: Observable<any[]>;
@@ -255,6 +258,9 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       type:                           [''],
       title:                          ['', Validators.required ],
       active:                         [''],
+      paymentType:                    [''],
+      startAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+      endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
       creationDate:                   ['']
     });
@@ -571,8 +577,35 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
 
   saveChanges () {
     if (this.notificationGroup.status != 'VALID') {
-      console.log('service is not valid, cannot save to database');
-      return;
+      if (this.notificationGroup.get('title').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.notificationGroup.controls) {
+            this.notificationGroup.controls[i].markAsTouched();
+          }
+          this.titleRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.notificationGroup.get('paymentType').value == 'Payment'){
+        if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
+          setTimeout(() => {
+            for (let i in this.notificationGroup.controls) {
+              this.notificationGroup.controls[i].markAsTouched();
+            }
+            if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
+          }, 500);
+          return;
+        }
+        else if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
+          setTimeout(() => {
+            for (let i in this.notificationGroup.controls) {
+              this.notificationGroup.controls[i].markAsTouched();
+            }
+            if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
+          }, 500);
+          return;
+        }
+      }
     }
 
     let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
@@ -580,14 +613,17 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
     if (tempTitle.length <= 100){
       if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
         const notification: Notification = {
-          notificationId: this.notificationGroup.value.notificationId,
-          uid: this.notificationGroup.value.uid,
-          type: this.notificationGroup.value.type,
+          notificationId: this.notificationGroup.get('notificationId').value,
+          uid: this.notificationGroup.get('uid').value,
+          type: this.notificationGroup.get('type').value,
           title: tempTitle,
           title_lowercase: tempTitle.toLowerCase(),
-          active: this.notificationGroup.value.active != undefined ? this.notificationGroup.value.active : false,
-          lastUpdateDate: this.notificationGroup.value.lastUpdateDate,
-          creationDate: this.notificationGroup.value.creationDate
+          active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
+          paymentType: this.notificationGroup.get('paymentType').value,
+          startAmount: this.notificationGroup.get('startAmount').value,
+          endAmount: this.notificationGroup.get('endAmount').value,
+          lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
+          creationDate: this.notificationGroup.get('creationDate').value,
         };
         
         this.userNotificationService.update(this.auth.uid, notification.notificationId, notification).then(() => {
