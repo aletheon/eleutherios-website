@@ -37,8 +37,8 @@
 							</mat-form-field>
 						</div>
 					</div>
-					<div style="margin-bottom:10px;display:flex;flex-direction:row" *ngIf="notificationGroup.get('paymentType').value == 'Payment'">
-						<div style="flex:none">
+					<div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center" *ngIf="notificationGroup.get('paymentType').value == 'Payment'">
+						<div style="flex:none;margin-right:5px">
 							<mat-form-field>
 								<input
 									matInput
@@ -50,14 +50,14 @@
 									Amount required
 								</mat-error>
 								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('min')">
-									Must be greater than 0.49
+									Start amount must be greater than 0.49
 								</mat-error>
 								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('max')">
-									Must be less than 999999.99
+									Start amount must be less than 999999.99
 								</mat-error>
 							</mat-form-field>
 						</div>
-						<div style="flex:none">To</div>
+						<div style="flex:none;margin-right:5px">To</div>
 						<div style="flex:none">
 							<mat-form-field>
 								<input
@@ -66,14 +66,14 @@
 									placeholder="0.00"
 									formControlName="endAmount"
 									(change)="saveChanges()"/>
-								<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
 									Amount required
 								</mat-error>
-								<mat-error *ngIf="serviceGroup.get('endAmount').hasError('min')">
-									Must be greater than 0.49
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('min')">
+									End amount must be greater than 0.49
 								</mat-error>
-								<mat-error *ngIf="serviceGroup.get('endAmount').hasError('max')">
-									Must be less than 999999.99
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('max')">
+									End amount must be less than 999999.99
 								</mat-error>
 							</mat-form-field>
 						</div>

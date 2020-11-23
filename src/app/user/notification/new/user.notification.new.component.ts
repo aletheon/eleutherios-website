@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, ValidatorFn, Validators } from '@angular/forms';
 import {
   SiteTotalService,
   UserNotificationService,
@@ -27,6 +27,12 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, startWith } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+
+const rangeValidator: ValidatorFn = (fg: FormGroup) => {
+  const start = fg.get('startAmount').value;
+  const end = fg.get('endAmount').value;
+  return (start !== null && end !== null) && (start < end ? null : { range: true });
+};
 
 @Component({
   selector: 'user-notification-new',
@@ -226,7 +232,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
       creationDate:                   ['']
-    });
+    }, { validator: rangeValidator});
 
     //  ongoing subscription
     this._notificationSubscription = this.notification
@@ -543,90 +549,90 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   }
 
   saveChanges () {
-    if (this.notificationGroup.status != 'VALID') {
-      if (this.notificationGroup.get('title').hasError('required')) {
-        setTimeout(() => {
-          for (let i in this.notificationGroup.controls) {
-            this.notificationGroup.controls[i].markAsTouched();
-          }
-          this.titleRef.nativeElement.focus();
-        }, 500);
-        return;
-      }
-      else if (this.notificationGroup.get('type').value == 'Service'){
-        if (this.notificationGroup.get('paymentType').value == 'Payment'){
-          if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
-            setTimeout(() => {
-              for (let i in this.notificationGroup.controls) {
-                this.notificationGroup.controls[i].markAsTouched();
-              }
-              if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
-            }, 500);
-            return;
-          }
-          else if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
-            setTimeout(() => {
-              for (let i in this.notificationGroup.controls) {
-                this.notificationGroup.controls[i].markAsTouched();
-              }
-              if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
-            }, 500);
-            return;
-          }
-        }
-      }
-    }
+    // if (this.notificationGroup.status != 'VALID') {
+    //   if (this.notificationGroup.get('title').hasError('required')) {
+    //     setTimeout(() => {
+    //       for (let i in this.notificationGroup.controls) {
+    //         this.notificationGroup.controls[i].markAsTouched();
+    //       }
+    //       this.titleRef.nativeElement.focus();
+    //     }, 500);
+    //     return;
+    //   }
+    //   else if (this.notificationGroup.get('type').value == 'Service'){
+    //     if (this.notificationGroup.get('paymentType').value == 'Payment'){
+    //       if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
+    //         setTimeout(() => {
+    //           for (let i in this.notificationGroup.controls) {
+    //             this.notificationGroup.controls[i].markAsTouched();
+    //           }
+    //           if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
+    //         }, 500);
+    //         return;
+    //       }
+    //       else if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
+    //         setTimeout(() => {
+    //           for (let i in this.notificationGroup.controls) {
+    //             this.notificationGroup.controls[i].markAsTouched();
+    //           }
+    //           if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
+    //         }, 500);
+    //         return;
+    //       }
+    //     }
+    //   }
+    // }
 
-    let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
+    // let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
 
-    if (tempTitle.length <= 100){
-      if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
-        const notification: Notification = {
-          notificationId: this.notificationGroup.get('notificationId').value,
-          uid: this.notificationGroup.get('uid').value,
-          type: this.notificationGroup.get('type').value,
-          title: tempTitle,
-          title_lowercase: tempTitle.toLowerCase(),
-          active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
-          paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : '',
-          startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? this.notificationGroup.get('startAmount').value : '',
-          endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? this.notificationGroup.get('endAmount').value : '',
-          lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
-          creationDate: this.notificationGroup.get('creationDate').value
-        };
+    // if (tempTitle.length <= 100){
+    //   if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
+    //     const notification: Notification = {
+    //       notificationId: this.notificationGroup.get('notificationId').value,
+    //       uid: this.notificationGroup.get('uid').value,
+    //       type: this.notificationGroup.get('type').value,
+    //       title: tempTitle,
+    //       title_lowercase: tempTitle.toLowerCase(),
+    //       active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
+    //       paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : '',
+    //       startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? this.notificationGroup.get('startAmount').value : '',
+    //       endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? this.notificationGroup.get('endAmount').value : '',
+    //       lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
+    //       creationDate: this.notificationGroup.get('creationDate').value
+    //     };
         
-        this.userNotificationService.update(this.auth.uid, notification.notificationId, notification).then(() => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 5000,
-              data: 'Notification saved',
-              panelClass: ['green-snackbar']
-            }
-          );
-        });
-      }
-      else {
-        const snackBarRef =this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: `Invalid characters we're located in the title field, valid characters include [A-Za-z0-9]`,
-            panelClass: ['red-snackbar']
-          }
-        );
-      }
-    }
-    else {
-      const snackBarRef =this.snackbar.openFromComponent(
-        NotificationSnackBar,
-        {
-          duration: 8000,
-          data: 'This is the alpha version of eleutherios and is limited to only 100 characters per title',
-          panelClass: ['red-snackbar']
-        }
-      );
-    }
+    //     this.userNotificationService.update(this.auth.uid, notification.notificationId, notification).then(() => {
+    //       const snackBarRef = this.snackbar.openFromComponent(
+    //         NotificationSnackBar,
+    //         {
+    //           duration: 5000,
+    //           data: 'Notification saved',
+    //           panelClass: ['green-snackbar']
+    //         }
+    //       );
+    //     });
+    //   }
+    //   else {
+    //     const snackBarRef =this.snackbar.openFromComponent(
+    //       NotificationSnackBar,
+    //       {
+    //         duration: 8000,
+    //         data: `Invalid characters we're located in the title field, valid characters include [A-Za-z0-9]`,
+    //         panelClass: ['red-snackbar']
+    //       }
+    //     );
+    //   }
+    // }
+    // else {
+    //   const snackBarRef =this.snackbar.openFromComponent(
+    //     NotificationSnackBar,
+    //     {
+    //       duration: 8000,
+    //       data: 'This is the alpha version of eleutherios and is limited to only 100 characters per title',
+    //       panelClass: ['red-snackbar']
+    //     }
+    //   );
+    // }
   }
 
   onNext () {
