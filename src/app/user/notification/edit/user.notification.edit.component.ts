@@ -5,19 +5,19 @@
 // **************************************************
 // **************************************************
 // 1) Have to add paymentType to service notification
-// 2) Have to update service notification, service + forum create alerts
+// 2) Have to reflect service payment type in notifications list page
+// 3) Have to update service notification, service + forum create alerts
 // **************************************************
 // **************************************************
 // **************************************************
 // **************************************************
 // **************************************************
-
 
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, ValidatorFn, Validators, ValidationErrors } from '@angular/forms';
 import {
   SiteTotalService,
   UserNotificationService,
@@ -43,6 +43,14 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, startWith } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+
+// custom validator to ensure start amount is less than end amount
+// if end user wants to be notified about paid for services.
+const rangeValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+  const start = control.get('startAmount').value;
+  const end = control.get('endAmount').value;
+  return (start !== null && end !== null) && (start < end ? null : { range: true });
+};
 
 @Component({
   selector: 'user-notification-edit',
@@ -263,7 +271,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
       creationDate:                   ['']
-    });
+    }, { validators: rangeValidator });
 
     //  ongoing subscription
     this._notificationSubscription = this.notification
@@ -586,26 +594,60 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
         }, 500);
         return;
       }
-      else if (this.notificationGroup.get('paymentType').value == 'Payment'){
-        if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
-          setTimeout(() => {
-            for (let i in this.notificationGroup.controls) {
-              this.notificationGroup.controls[i].markAsTouched();
-            }
-            if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
-          }, 500);
-          return;
+  
+      if (this.notificationGroup.get('type').value == 'Service'){
+        if (this.notificationGroup.get('paymentType').value == 'Payment'){
+          if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
+            setTimeout(() => {
+              for (let i in this.notificationGroup.controls) {
+                this.notificationGroup.controls[i].markAsTouched();
+              }
+              if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
+            }, 500);
+            return;
+          }
+  
+          if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
+            setTimeout(() => {
+              for (let i in this.notificationGroup.controls) {
+                this.notificationGroup.controls[i].markAsTouched();
+              }
+              if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
+            }, 500);
+            return;
+          }
+  
+          if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
+            setTimeout(() => {
+              for (let i in this.notificationGroup.controls) {
+                this.notificationGroup.controls[i].markAsTouched();
+              }
+              if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
+            }, 500);
+            return;
+          }
+  
+          if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
+            setTimeout(() => {
+              for (let i in this.notificationGroup.controls) {
+                this.notificationGroup.controls[i].markAsTouched();
+              }
+              if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
+            }, 500);
+            return;
+          }
+  
+          if (this.notificationGroup.errors?.range){
+            setTimeout(() => {
+              for (let i in this.notificationGroup.controls) {
+                this.notificationGroup.controls[i].markAsTouched();
+              }
+              if (this.startAmountRef) this.startAmountRef.nativeElement.focus();
+            }, 500);
+            return;
+          }
         }
-        else if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
-          setTimeout(() => {
-            for (let i in this.notificationGroup.controls) {
-              this.notificationGroup.controls[i].markAsTouched();
-            }
-            if (this.endAmountRef) this.endAmountRef.nativeElement.focus();
-          }, 500);
-          return;
-        }
-      }
+      } 
     }
 
     let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
@@ -619,9 +661,9 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
           title: tempTitle,
           title_lowercase: tempTitle.toLowerCase(),
           active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
-          paymentType: this.notificationGroup.get('paymentType').value,
-          startAmount: this.notificationGroup.get('startAmount').value,
-          endAmount: this.notificationGroup.get('endAmount').value,
+          paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : 'Free',
+          startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('startAmount').value, 2) : 1.00,
+          endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('endAmount').value, 2) : 10.00,
           lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
           creationDate: this.notificationGroup.get('creationDate').value,
         };

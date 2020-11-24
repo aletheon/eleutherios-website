@@ -27,10 +27,11 @@ import { switchMap, startWith } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
+// custom validator to ensure start amount is less than end amount
+// if end user wants to be notified about paid for services.
 const rangeValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
   const start = control.get('startAmount').value;
   const end = control.get('endAmount').value;
-
   return (start !== null && end !== null) && (start < end ? null : { range: true });
 };
 
