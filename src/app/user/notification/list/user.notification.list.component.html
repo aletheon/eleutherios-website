@@ -40,9 +40,9 @@
 				<!-- show tags -->
 				<ng-container *ngIf="searchTags.length > 0; else nosearchtags">
 					<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-						<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;border:1px solid rgb(109, 109, 109);align-items:center"
+						<div class="label label-default" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
-							<p style="margin:0 3px 0 3px">{{ tag.tag }}</p>
+							<span>{{ tag.tag }}</span>
 							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
 						</div>
 					</div>
@@ -60,39 +60,80 @@
 			<ng-container *ngIf="notifications | async;let notificationItems">
 				<ng-container *ngIf="notificationItems.length > 0; then shownotifications else nonotifications"></ng-container>
 				<ng-template #shownotifications>
-					<div *ngFor="let notification of notificationItems; trackBy: trackNotifications" [ngClass]="notification.type == 'Forum' ? 'forum' : 'service'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
-						<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-							<div style="flex:1;margin-right:5px">
-								<p style="word-break: break-all">
-									<a [routerLink]="['/user/notification/edit']" [queryParams]="{ userId: notification.uid, notificationId: notification.notificationId }" style="color:#1B1B1B" matTooltip="{{ notification.title }}">{{ notification.title | noTitle | truncate: 35 }}</a>
-								</p>
-							</div>
-							<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-								<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:wrap">
-									<p style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ notification.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ notification.creationDate.toDate() | amTimeAgo }}</p>
-								</div>
-								<div style="flex:none;margin-right:5px">
-									<mat-icon onclick="event.stopPropagation()" (click)="edit(notification)" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
-								</div>
-								<div style="flex:none;margin-right:5px">
-									<mat-icon onclick="event.stopPropagation()" (click)="delete(notification)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
-								</div>
-								<div style="flex:none">
-									<mat-checkbox *ngIf="notification.title.length > 0" matTooltip="Activate" [checked]="notification.active" (change)="activateDeactivateNotification(notification)"></mat-checkbox>
-									<mat-checkbox *ngIf="notification.title.length == 0" matTooltip="Activate" [checked]="notification.active" disabled="true"></mat-checkbox>
-								</div>
-							</div>
-						</div>
-						<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems" style="flex:none">
-							<ng-container *ngIf="notificationTagItems.length > 0; then showtags"></ng-container>
-							<ng-template #showtags>
-								<div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
-									<ng-container *ngFor="let notificationTag of notificationTagItems">
-										<div [ngClass]="notification.type == 'Forum' ? 'forumTag' : 'serviceTag'" style="flex:none;padding:3px;margin-right:5px;font-size:0.85em">
-											<p style="margin:0 3px 0 3px">{{ notificationTag.tag }}</p>
+					<div style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+						<ng-container *ngFor="let notification of notificationItems; trackBy: trackNotifications">
+							<ng-container *ngIf="notification.type == 'Forum'; then showforumresult else showserviceresult"></ng-container>
+							<ng-template #showforumresult>
+								<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+									<div style="flex:1;margin-right:5px">
+										<p style="word-break: break-all">
+											<a [routerLink]="['/user/notification/edit']" [queryParams]="{ userId: notification.uid, notificationId: notification.notificationId }" style="color:#1B1B1B" matTooltip="{{ notification.title }}">{{ notification.title | noTitle | truncate: 35 }}</a>
+										</p>
+									</div>
+									<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+										<div class="label label-default" matTooltip="{{ notification.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+											{{ notification.creationDate.toDate() | amTimeAgo }}
 										</div>
-									</ng-container>
+										<div style="flex:none;margin-right:5px">
+											<mat-icon onclick="event.stopPropagation()" (click)="edit(notification)" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
+										</div>
+										<div style="flex:none;margin-right:5px">
+											<mat-icon onclick="event.stopPropagation()" (click)="delete(notification)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+										</div>
+										<div style="flex:none">
+											<mat-checkbox *ngIf="notification.title.length > 0" matTooltip="Activate" [checked]="notification.active" (change)="activateDeactivateNotification(notification)"></mat-checkbox>
+											<mat-checkbox *ngIf="notification.title.length == 0" matTooltip="Activate" [checked]="notification.active" disabled="true"></mat-checkbox>
+										</div>
+									</div>
 								</div>
+								<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
+									<ng-container *ngIf="notificationTagItems.length > 0; then showtags"></ng-container>
+									<ng-template #showtags>
+										<div style="flex:none;display:flex;flex-direction:row">
+											<ng-container *ngFor="let notificationTag of notificationTagItems">
+												<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
+													<span>{{ notificationTag.tag }}</span>
+												</div>
+											</ng-container>
+										</div>
+									</ng-template>
+								</ng-container>
+							</ng-template>
+							<ng-template #showserviceresult>
+								<div [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+									<div style="flex:1;margin-right:5px">
+										<p style="word-break: break-all">
+											<a [routerLink]="['/user/notification/edit']" [queryParams]="{ userId: notification.uid, notificationId: notification.notificationId }" style="color:#1B1B1B" matTooltip="{{ notification.title }}">{{ notification.title | noTitle | truncate: 35 }}</a>
+										</p>
+									</div>
+									<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+										<div class="label label-default" matTooltip="{{ notification.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+											{{ notification.creationDate.toDate() | amTimeAgo }}
+										</div>
+										<div style="flex:none;margin-right:5px">
+											<mat-icon onclick="event.stopPropagation()" (click)="edit(notification)" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
+										</div>
+										<div style="flex:none;margin-right:5px">
+											<mat-icon onclick="event.stopPropagation()" (click)="delete(notification)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+										</div>
+										<div style="flex:none">
+											<mat-checkbox *ngIf="notification.title.length > 0" matTooltip="Activate" [checked]="notification.active" (change)="activateDeactivateNotification(notification)"></mat-checkbox>
+											<mat-checkbox *ngIf="notification.title.length == 0" matTooltip="Activate" [checked]="notification.active" disabled="true"></mat-checkbox>
+										</div>
+									</div>
+								</div>
+								<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
+									<ng-container *ngIf="notificationTagItems.length > 0; then showtags"></ng-container>
+									<ng-template #showtags>
+										<div style="flex:none;display:flex;flex-direction:row">
+											<ng-container *ngFor="let notificationTag of notificationTagItems">
+												<div [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;font-size:0.85em">
+													<span>{{ notificationTag.tag }}</span>
+												</div>
+											</ng-container>
+										</div>
+									</ng-template>
+								</ng-container>
 							</ng-template>
 						</ng-container>
 					</div>
