@@ -102,14 +102,25 @@
 					<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 					<ng-container *ngIf="notificationTags | async;let notificationTagItems">
 						<div *ngIf="notificationTagItems.length > 0">
-							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;margin-right:5px" *ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
-									<div [ngClass]="notificationItem.type == 'Forum' ? 'forumTag' : 'serviceTag'" style="display:flex;flex-direction:row;align-items:center;padding:3px">
-										<p style="margin:0 3px 0 3px">{{ notificationTag.tag }}</p>
+							<ng-container *ngIf="notificationItem.type == 'Forum'; then showforumtags else showservicetags"></ng-container>
+							<ng-template #showforumtags>
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
+										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
+										<span>{{ notificationTag.tag }}</span>
 										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</div>
-							</div>
+							</ng-template>
+							<ng-template #showservicetags>
+								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
+									<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
+										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
+										<span>{{ notificationTag.tag }}</span>
+										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
+									</div>
+								</div>
+							</ng-template>
 						</div>
 					</ng-container>
 					<div style="display:flex;flex-direction:row;align-items:center">
@@ -160,17 +171,21 @@
 												</div>
 											</div>
 										</div>
-										<ng-container *ngIf="result.forumTags | async;let forumTagItems">
-											<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
-											<ng-template #showtags>
-												<div style="flex:none;display:flex;flex-direction:row">
-													<ng-container *ngFor="let forumTag of forumTagItems">
-														<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
-															<span>{{ forumTag.tag }}</span>
+										<ng-container *ngIf="result.forumTags | async">
+											<div style="flex:none">
+												<ng-container *ngIf="result.forumTags | async;let forumTagItems">
+													<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
+													<ng-template #showtags>
+														<div style="flex:none;display:flex;flex-direction:row">
+															<ng-container *ngFor="let forumTag of forumTagItems">
+																<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
+																	<span>{{ forumTag.tag }}</span>
+																</div>
+															</ng-container>
 														</div>
-													</ng-container>
-												</div>
-											</ng-template>
+													</ng-template>
+												</ng-container>
+											</div>
 										</ng-container>
 									</div>
 								</ng-template>
@@ -214,17 +229,21 @@
 												</div>
 											</div>
 										</div>
-										<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
-											<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-											<ng-template #showtags>
-												<div style="flex:none;display:flex;flex-direction:row">
-													<ng-container *ngFor="let forumTag of forumTagItems">
-														<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;font-size:0.85em">
-															<span>{{ serviceTag.tag }}</span>
+										<ng-container *ngIf="result.serviceTags | async">
+											<div style="flex:none">
+												<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
+													<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+													<ng-template #showtags>
+														<div style="display:flex;flex-direction:row">
+															<ng-container *ngFor="let serviceTag of serviceTagItems">
+																<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;font-size:0.85em">
+																	<span>{{ serviceTag.tag }}</span>
+																</div>
+															</ng-container>
 														</div>
-													</ng-container>
-												</div>
-											</ng-template>
+													</ng-template>
+												</ng-container>
+											</div>
 										</ng-container>
 									</div>
 								</ng-template>
