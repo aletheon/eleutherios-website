@@ -14,7 +14,6 @@
 					<div style="flex:1">
 						<mat-form-field style="width:150px">
 							<mat-select formControlName="type" #select="matSelect" (selectionChange)="changeType()">
-								<!-- <mat-select-trigger>{{ select.selected?.value }}</mat-select-trigger> -->
 								<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -27,15 +26,64 @@
 						</mat-slide-toggle>
 					</div>
 				</div>
-				<div style="display:flex;flex-direction:row;align-items:center">
-					<div style="flex:1">
-						<mat-form-field style="width:150px">
-							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
-								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
-							</mat-select>
-						</mat-form-field>
+				<ng-container *ngIf="notificationGroup.get('type').value == 'Service'">
+					<div style="display:flex;flex-direction:row;align-items:center">
+						<div style="flex:1">
+							<mat-form-field style="width:150px">
+								<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
+									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
 					</div>
-				</div>
+					<div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center" *ngIf="notificationGroup.get('paymentType').value == 'Payment'">
+						<div style="flex:none;margin-right:5px">
+							<mat-form-field>
+								<input
+									matInput
+									#startAmount
+									placeholder="Start amount"
+									formControlName="startAmount"
+									(change)="saveChanges()"/>
+								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('pattern')">
+									Amount required
+								</mat-error>
+								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('min')">
+									Start amount must be greater than 0.49
+								</mat-error>
+								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('max')">
+									Start amount must be less than 999999.99
+								</mat-error>
+								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('max')">
+									Start amount must be less than 999999.99
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div style="flex:none;margin-right:5px">To</div>
+						<div style="flex:none">
+							<mat-form-field>
+								<input
+									matInput
+									#endAmount
+									placeholder="End amount"
+									formControlName="endAmount"
+									(change)="saveChanges()"/>
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
+									Amount required
+								</mat-error>
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('min')">
+									End amount must be greater than 0.49
+								</mat-error>
+								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('max')">
+									End amount must be less than 999999.99
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<mat-error style="flex:none" *ngIf="notificationGroup.errors?.range">
+							End amount must be greater than start amount
+						</mat-error>
+					</div>
+				</ng-container>	
 				<div>
 					<mat-form-field style="width:100%">
 						<input
@@ -55,12 +103,21 @@
 					<ng-container *ngIf="notificationTags | async;let notificationTagItems">
 						<div *ngIf="notificationTagItems.length > 0">
 							<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;margin-right:5px" *ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
-									<div [ngClass]="notificationItem.type == 'Forum' ? 'forumTag' : 'serviceTag'" style="display:flex;flex-direction:row;align-items:center;padding:3px">
-										<p style="margin:0 3px 0 3px">{{ notificationTag.tag }}</p>
+								<ng-container *ngIf="notificationItem.type == 'Forum'; then showforumtag else showservicetag"></ng-container>
+								<ng-template #showforumtag>
+									<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
+										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
+										<span>{{ notificationTag.tag }}</span>
 										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
-								</div>
+								</ng-template>
+								<ng-template #showservicetag>
+									<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
+										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
+										<span>{{ notificationTag.tag }}</span>
+										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
+									</div>
+								</ng-template>
 							</div>
 						</div>
 					</ng-container>
@@ -85,116 +142,102 @@
 				<div *ngIf="!(searchLoading | async)" style="flex:1;display:flex;flex-direction:column">
 					<ng-container *ngIf="searchResults | async;let searchResultItems">
 						<ng-container *ngIf="searchResultItems.length > 0; then showsearchresults else nosearchresults"></ng-container>
-						<ng-template #showsearchresults>					
-							<div [ngClass]="notificationGroup.get('type').value == 'Forum' ? 'forum' : 'service'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px"
-								*ngFor="let result of searchResultItems; trackBy: trackResults">
-								<ng-container *ngIf="notificationGroup.get('type').value == 'Forum'; then showforumresult else showserviceresult"></ng-container>
+						<ng-template #showsearchresults>
+							<ng-container *ngFor="let result of searchResultItems; trackBy: trackResults">
+								<ng-container *ngIf="notificationItem.type == 'Forum'; then showforumresult else showserviceresult"></ng-container>
 								<ng-template #showforumresult>
-									<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-										<ng-container *ngIf="result.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-										<ng-template #showdefaultforumimage>
-											<ng-container *ngIf="result.defaultForumImage | async;let image">
-												<div style="flex:none;margin-right:10px">
-													<img [src]="image.url">
-												</div>
-											</ng-container>
-										</ng-template>
-										<div style="flex:1">
-											<ng-container *ngIf="result.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
-											<ng-template #showdefaultregistrant>
-												<p style="word-break: break-all">
-													<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: result.uid, forumId: result.forumId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="color:#1B1B1B" matTooltip="{{ result.title }}">{{ result.title | noTitle | truncate: 35 }} <i *ngIf="result.description.length > 0">- {{ result.description | truncate: 80 }}</i></a>
-												</p>
+									<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+										<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
+											<ng-container *ngIf="result.defaultForumImage | async; then showdefaultforumimage"></ng-container>
+											<ng-template #showdefaultforumimage>
+												<ng-container *ngIf="result.defaultForumImage | async;let image">
+													<div style="flex:none;margin-right:10px">
+														<img [src]="image.url">
+													</div>
+												</ng-container>
 											</ng-template>
-											<ng-template #nodefaultregistrant>
+											<div style="flex:1">
 												<a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: result.forumId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ result.title }}">{{ result.title | truncate: 35 }} <i *ngIf="result.description.length > 0">- {{ result.description | truncate: 80 }}</i></a>
-											</ng-template>
-										</div>
-										<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-											<!-- other button controls -->
-											<div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:wrap">							
-												<p style="flex:none;background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ result.creationDate.toDate() | amTimeAgo }}</p>
 											</div>
-											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: result.forumId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
-											</div>
-											<ng-container *ngIf="result.defaultRegistrant | async; then showaddnewcontrols"></ng-container>
-											<ng-template #showaddnewcontrols>
-												<div style="flex:none;margin-right:5px">
-													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Add service">add_box</mat-icon>
+											<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+												<!-- other button controls -->
+												<div class="label label-default" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+													{{ result.creationDate.toDate() | amTimeAgo }}
 												</div>
 												<div style="flex:none">
-													<mat-icon style="cursor:pointer" [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: result.uid, forumId: result.forumId }' matTooltip="Create service">add_circle</mat-icon>
+													<mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: result.forumId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+												</div>
+											</div>
+										</div>
+										<ng-container *ngIf="result.forumTags | async;let forumTagItems">
+											<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
+											<ng-template #showtags>
+												<div style="flex:none;display:flex;flex-direction:row">
+													<ng-container *ngFor="let forumTag of forumTagItems">
+														<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
+															<span>{{ forumTag.tag }}</span>
+														</div>
+													</ng-container>
 												</div>
 											</ng-template>
-										</div>
+										</ng-container>
 									</div>
-									<ng-container *ngIf="result.forumTags | async;let forumTagItems">
-										<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
-										<ng-template #showtags>
-											<div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
-												<ng-container *ngFor="let forumTag of forumTagItems">
-													<div style="flex:none;border:1px solid #ac2c2c;background-color:rgb(250, 155, 152);padding:3px;margin-right:5px;font-size:0.85em">
-														<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
-													</div>
-												</ng-container>
-											</div>
-										</ng-template>
-									</ng-container>
 								</ng-template>
 								<ng-template #showserviceresult>
-									<div style="flex:none;display:flex;flex-direction:row;padding:5px 5px 5px 10px;align-items:center;flex-wrap:wrap">
-										<ng-container *ngIf="result.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-										<ng-template #showdefaultserviceimage>
-											<ng-container *ngIf="result.defaultServiceImage | async;let image">
-												<div style="flex:none;margin-right:10px">
-													<img [src]="image.url">
-												</div>
-											</ng-container>
-										</ng-template>
-										<div style="flex:1;margin-right:5px">
-											<p style="word-break: break-all">
-												<a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="flex:none;color:#1B1B1B" matTooltip="{{ result.title }}">{{ result.title | truncate: 35 }} <i *ngIf="result.description.length > 0">- {{ result.description | truncate: 80 }}</i></a>
-											</p>
-										</div>
-										<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-											<!-- other button controls -->
-											<div style="flex:none;margin-right:5px">
-												<star-rating-control
-														[rating]="result.rate"
-														[showHalfStars]="true"
-														[starType]="'svg'"
-														[readOnly]="true">
-													</star-rating-control>
-											</div>
-											<div style="flex:none;margin-right:5px">
-												<p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ result.creationDate.toDate() | amTimeAgo }}</p>
-											</div>
-											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
-											</div>
-											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
-											</div>
-											<div style="flex:none;margin-right:5px">
-												<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
-											</div>
-										</div>
-									</div>
-									<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
-										<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-										<ng-template #showtags>
-											<div style="flex:none;display:flex;flex-direction:row;padding:0px 5px 5px 10px">
-												<ng-container *ngFor="let serviceTag of serviceTagItems">
-													<div style="flex:none;background-color:rgb(188, 194, 202);border:1px solid #007FFF;padding:3px;margin-right:5px;font-size:0.85em">
-														<p style="margin:0 3px 0 3px">{{ serviceTag.tag }}</p>
+									<div [ngClass]="notificationItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+										<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
+											<ng-container *ngIf="result.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+											<ng-template #showdefaultserviceimage>
+												<ng-container *ngIf="result.defaultServiceImage | async;let image">
+													<div style="flex:none;margin-right:10px">
+														<img [src]="image.url">
 													</div>
 												</ng-container>
+											</ng-template>
+											<div style="flex:1;margin-right:5px">
+												<p style="word-break: break-all">
+													<a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="flex:none;color:#1B1B1B" matTooltip="{{ result.title }}">{{ result.title | truncate: 35 }} <i *ngIf="result.description.length > 0">- {{ result.description | truncate: 80 }}</i></a>
+												</p>
 											</div>
-										</ng-template>
-									</ng-container>
+											<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+												<!-- other button controls -->
+												<div style="flex:none;margin-right:5px">
+													<star-rating-control
+															[rating]="result.rate"
+															[showHalfStars]="true"
+															[starType]="'svg'"
+															[readOnly]="true">
+														</star-rating-control>
+												</div>
+												<div class="label label-default" matTooltip="{{ result.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+													{{ result.creationDate.toDate() | amTimeAgo }}
+												</div>
+												<div style="flex:none;margin-right:5px">
+													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
+												</div>
+												<div style="flex:none;margin-right:5px">
+													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
+												</div>
+												<div style="flex:none;margin-right:5px">
+													<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
+												</div>
+											</div>
+										</div>
+										<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
+											<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+											<ng-template #showtags>
+												<div style="flex:none;display:flex;flex-direction:row">
+													<ng-container *ngFor="let forumTag of forumTagItems">
+														<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;font-size:0.85em">
+															<span>{{ serviceTag.tag }}</span>
+														</div>
+													</ng-container>
+												</div>
+											</ng-template>
+										</ng-container>
+									</div>
 								</ng-template>
-							</div>
+							</ng-container>
 						</ng-template>
 						<ng-template #nosearchresults>
 							<p style="flex:none;color:#999;font-size:90%">

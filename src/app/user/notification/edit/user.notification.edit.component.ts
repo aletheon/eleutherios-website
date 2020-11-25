@@ -357,14 +357,6 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
             let observables = forums.map(forum => {
               if (forum) {
                 let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
-                  switchMap(registrants => {
-                    if (registrants && registrants.length > 0)
-                      return of(registrants[0]);
-                    else
-                      return of(null);
-                  })
-                );
                 let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                   switchMap(forumImages => {
                     if (forumImages && forumImages.length > 0){
@@ -390,9 +382,9 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                   })
                 );
 
-                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
+                return combineLatest([getDefaultForumImage$, getForumTags$]).pipe(
                   switchMap(results => {
-                    const [defaultForumImage, forumTags, defaultRegistrant] = results;
+                    const [defaultForumImage, forumTags] = results;
 
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
@@ -408,17 +400,11 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                     else
                       forum.forumTags = of([]);
 
-                    if (defaultRegistrant)
-                      forum.defaultRegistrant = of(defaultRegistrant);
-                    else
-                      forum.defaultRegistrant = of(null);
-
                     return of(forum);
                   })
                 );
               }
-              else
-                return of(null);
+              else return of(null);
             });
 
             return zip(...observables, (...results) => {
