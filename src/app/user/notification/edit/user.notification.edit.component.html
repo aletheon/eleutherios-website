@@ -174,11 +174,11 @@
 										<ng-container *ngIf="result.forumTags | async">
 											<div style="flex:none">
 												<ng-container *ngIf="result.forumTags | async;let forumTagItems">
-													<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
-													<ng-template #showtags>
+													<ng-container *ngIf="forumTagItems.length > 0; then showforumtags"></ng-container>
+													<ng-template #showforumtags>
 														<div style="display:flex;flex-direction:row">
 															<ng-container *ngFor="let forumTag of forumTagItems">
-																<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
+																<div class="label label-danger" style="flex:none;margin-right:5px">
 																	<span>{{ forumTag.tag }}</span>
 																</div>
 															</ng-container>
@@ -219,10 +219,10 @@
 													{{ result.creationDate.toDate() | amTimeAgo }}
 												</div>
 												<div style="flex:none;margin-right:5px">
-													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="View details">description</mat-icon>
+													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 												</div>
 												<div style="flex:none;margin-right:5px">
-													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
+													<mat-icon [routerLink]="['/service/detail']" [queryParams]="{ serviceId: result.serviceId, notificationId: notificationGroup.get('notificationId').value, notificationUserId: notificationGroup.get('uid').value }" style="cursor:pointer;color:#1B1B1B" matTooltip="Add forum">add_box</mat-icon>
 												</div>
 												<div style="flex:none;margin-right:5px">
 													<mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add_circle</mat-icon>
@@ -232,11 +232,11 @@
 										<ng-container *ngIf="result.serviceTags | async">
 											<div style="flex:none">
 												<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
-													<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-													<ng-template #showtags>
+													<ng-container *ngIf="serviceTagItems.length > 0; then showservicetags"></ng-container>
+													<ng-template #showservicetags>
 														<div style="display:flex;flex-direction:row">
 															<ng-container *ngFor="let serviceTag of serviceTagItems">
-																<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;font-size:0.85em">
+																<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px">
 																	<span>{{ serviceTag.tag }}</span>
 																</div>
 															</ng-container>
