@@ -5423,13 +5423,14 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 // create alerts
                 var promises = notifications.map(notification => {
                   return new Promise((resolve, reject) => {
-                    // ensure alert doesn't exist in internal user delete alert collection
+                    // check if end user has already been notified about this alert
                     admin.firestore().collection(`users/${notification.uid}/deletedAlerts`)
                       .where('notificationId', '==', notification.notificationId)
                       .where('forumServiceId', '==', serviceId)
                       .get().then(deletedAlertSnapshot => {
-                        if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
-                          // ensure alert doesn't exist in internal service alert collection
+                        // continue creating alert
+                        if (deletedAlertSnapshot.size == 0){
+                          // check alert doesn't already exist in main (service/alert) collection
                           admin.firestore().collection(`services/${serviceId}/alerts`)
                             .where('notificationId', '==', notification.notificationId)
                             .where('forumServiceId', '==', serviceId)
@@ -5442,6 +5443,8 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                     notificationId: notification.notificationId,
                                     notificationUid: notification.uid,
                                     type: 'Service',
+                                    paymentType: '',
+                                    startAmount: 
                                     forumServiceId: serviceId,
                                     forumServiceUid: newValue.uid,
                                     viewed: false,

@@ -11,8 +11,7 @@ import {
   UserServiceImageService,
   UserForumRegistrantService,
   UserForumTagService,
-  UserServiceTagService,
-  Alert
+  UserServiceTagService
 } from '../../../shared';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
