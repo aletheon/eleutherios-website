@@ -108,7 +108,7 @@
 									<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
 										<span>{{ notificationTag.tag }}</span>
-										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</i>
+										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</div>
 							</ng-template>
@@ -176,7 +176,7 @@
 												<ng-container *ngIf="result.forumTags | async;let forumTagItems">
 													<ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
 													<ng-template #showtags>
-														<div style="flex:none;display:flex;flex-direction:row">
+														<div style="display:flex;flex-direction:row">
 															<ng-container *ngFor="let forumTag of forumTagItems">
 																<div class="label label-danger" style="flex:none;margin-right:5px;font-size:0.85em">
 																	<span>{{ forumTag.tag }}</span>

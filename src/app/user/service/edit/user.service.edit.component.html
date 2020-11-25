@@ -158,8 +158,8 @@
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 									<div [ngClass]="serviceGroup.get('paymentType').value == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
 										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
-										<span style="color:#1B1B1B">{{ serviceTag.tag }}</span>
-										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</i>
+										<span>{{ serviceTag.tag }}</span>
+										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</div>
 							</div>
@@ -340,7 +340,7 @@
 									<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 										<span>{{ tag.tag }}</span>
-										<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</i>
+										<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
 									</div>
 								</ng-container>
 							</div>
