@@ -1,5 +1,5 @@
 <header>
-  <div style="flex:none;display:flex;flex-direction:row;background-color:rgb(24, 24, 24);padding:10px;flex-wrap:wrap">
+  <div style="display:flex;flex-direction:row;background-color:#222222;padding:10px;flex-wrap:wrap">
     <div style="flex:none;display:flex;flex-direction:row;align-items:center">
       <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
       <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
