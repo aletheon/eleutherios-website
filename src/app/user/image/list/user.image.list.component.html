@@ -46,12 +46,12 @@
 						</div>
             <div style="flex:1;margin-right:5px" contenteditable="true" [textContent]="image.name" (blur)="changeImageName(image, $event.target.textContent)"></div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="cursor:default;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c" matTooltip="Forums">{{ image.forumCount }}</span>
+							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#f2dede" matTooltip="Forums">{{ image.forumCount }}</span>
 						</div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="cursor:default;background-color:#A9C4EB;border:1px solid #007FFF" matTooltip="Services">{{ image.serviceCount }}</span>
+							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#d9edf7" matTooltip="Services">{{ image.serviceCount }}</span>
 						</div>
-            <mat-icon onclick="event.stopPropagation()" (click)="delete(image)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
+            <mat-icon onclick="event.stopPropagation()" (click)="delete(image)" style="flex:none;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
 					</div>
 				</ng-container>
 			</ng-template>

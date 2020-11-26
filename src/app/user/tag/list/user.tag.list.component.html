@@ -14,13 +14,13 @@
 					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
 						<p style="flex:1">{{ tag.tag }}</p>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-danger btn-circle" style="cursor:default" matTooltip="Forums">{{ tag.forumCount }}</span>
+							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#f2dede" matTooltip="Forums">{{ tag.forumCount }}</span>
 						</div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-info btn-circle" style="cursor:default" matTooltip="Services">{{ tag.serviceCount }}</span>
+							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#d9edf7" matTooltip="Services">{{ tag.serviceCount }}</span>
 						</div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-primary btn-circle" style="cursor:default" matTooltip="Notifications">{{ tag.notificationCount }}</span>
+							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#f1f1f1" matTooltip="Notifications">{{ tag.notificationCount }}</span>
 						</div>
             <mat-icon onclick="event.stopPropagation()" (click)="delete(tag)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
           </div>

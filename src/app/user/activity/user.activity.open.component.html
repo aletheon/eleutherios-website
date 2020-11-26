@@ -77,7 +77,7 @@
                     <ng-container *ngIf="post.service | async as service">
                       <div style="display:flex;flex-direction:row;align-items:center">
                         <div style="flex:none;margin-right:8px">
-                          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:row;align-items:center;padding:5px">
+                          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:row;align-items:center;padding:5px;margin:0">
                             <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                             <ng-template #showdefaultserviceimage>
                               <ng-container *ngIf="service.defaultServiceImage | async;let image">
