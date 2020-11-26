@@ -12,7 +12,7 @@
       <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
         <div class="alert alert-danger" style="flex:none;width:100%;display:flex;flex-direction:column;margin-bottom:5px">
           <!-- title bar -->
-          <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+          <div style="flex:none;display:flex;flex-direction:row;justify-content:center">
             <ng-container *ngIf="activity.defaultForumImage | async; then showdefaultforumimage"></ng-container>
             <ng-template #showdefaultforumimage>
               <ng-container *ngIf="activity.defaultForumImage | async;let image">
@@ -77,7 +77,7 @@
                     <ng-container *ngIf="post.service | async as service">
                       <div style="display:flex;flex-direction:row;align-items:center">
                         <div style="flex:none;margin-right:8px">
-                          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:row;align-items:center;padding:5px;margin:0">
+                          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:row;align-items:center;padding:5px">
                             <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                             <ng-template #showdefaultserviceimage>
                               <ng-container *ngIf="service.defaultServiceImage | async;let image">

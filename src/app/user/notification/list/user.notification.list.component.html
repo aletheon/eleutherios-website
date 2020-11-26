@@ -64,7 +64,7 @@
 						<ng-container *ngIf="notification.type == 'Forum'; then showforumresult else showserviceresult"></ng-container>
 						<ng-template #showforumresult>
 							<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
-								<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+								<div style="flex:none;display:flex;flex-direction:row;justify-content:center;flex-wrap:wrap">
 									<div style="flex:1;margin-right:5px">
 										<p style="word-break: break-all">
 											<a [routerLink]="['/user/notification/edit']" [queryParams]="{ userId: notification.uid, notificationId: notification.notificationId }" style="color:#1B1B1B" matTooltip="{{ notification.title }}">{{ notification.title | noTitle | truncate: 35 }}</a>

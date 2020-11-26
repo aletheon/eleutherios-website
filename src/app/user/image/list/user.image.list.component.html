@@ -5,7 +5,7 @@
 			<h4 style="flex:1">Images(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
 			<back></back>
 		</div>
-		<div style="border:1px solid #a0a0a0;padding:10px;margin-bottom:10px;border-radius:2px">
+		<div class="panel panel-default" style="padding:10px;margin-bottom:10px">
 			<div *ngIf="currentUpload">
 				<div style="display:flex;flex-direction:row">
 					<div style="flex:1">
@@ -33,9 +33,8 @@
 		<ng-container *ngIf="images | async;let imageItems">
 			<ng-container *ngIf="imageItems.length > 0; then showimages else noimages"></ng-container>
 			<ng-template #showimages>
-				<div style="min-height:30px;border:1px solid rgb(153, 153, 153);margin-bottom:5px;padding-bottom:5px"
-					*ngFor="let image of imageItems; trackBy: trackImages">
-					<div style="display:flex;flex-direction:row;padding:5px 5px 3px 10px;align-items: center">
+				<ng-container *ngFor="let image of imageItems; trackBy: trackImages">
+					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
 						<div style="flex:none;margin-right:10px">
 							<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 								<ng-template #showimage>
@@ -53,8 +52,8 @@
 							<span class="btn btn-circle" style="cursor:default;background-color:#A9C4EB;border:1px solid #007FFF" matTooltip="Services">{{ image.serviceCount }}</span>
 						</div>
             <mat-icon onclick="event.stopPropagation()" (click)="delete(image)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
-          </div>
-				</div>
+					</div>
+				</ng-container>
 			</ng-template>
 			<ng-template #noimages>
 				<p style="color:#999;font-size:90%">
