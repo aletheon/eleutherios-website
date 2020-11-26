@@ -2004,6 +2004,7 @@ exports.createUserNotification = functions.firestore.document("users/{userId}/no
 // ********************************************************************************
 // updateUserNotification
 // ********************************************************************************
+
 exports.updateUserNotification = functions.firestore.document("users/{userId}/notifications/{notificationId}").onUpdate((change, context) => {
   var newValue = change.after.data();
   var previousValue = change.before.data();
@@ -5423,28 +5424,155 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 // create alerts
                 var promises = notifications.map(notification => {
                   return new Promise((resolve, reject) => {
-                    // check if end user has already been notified about this alert
-                    admin.firestore().collection(`users/${notification.uid}/deletedAlerts`)
-                      .where('notificationId', '==', notification.notificationId)
+                    var continueSendingAlert = function () {
+                      return new Promise((resolve, reject) => {
+                        // check if end user has already been notified about this alert
+                        admin.firestore().collection(`users/${notification.uid}/deletedAlerts`)
+                          .where('notificationId', '==', notification.notificationId)
+                          .where('forumServiceId', '==', serviceId)
+                          .get().then(deletedAlertSnapshot => {
+                            // continue creating alert
+                            if (deletedAlertSnapshot.size == 0){
+                              // check alert doesn't already exist in main (service/alert) collection
+                              admin.firestore().collection(`services/${serviceId}/alerts`)
+                                .where('notificationId', '==', notification.notificationId)
+                                .where('forumServiceId', '==', serviceId)
+                                .get().then(alertSnapshot => {
+                                  if (alertSnapshot.size == 0){ // alert doesn't exist so create it
+                                    if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the service
+                                      // create alert
+                                      var newAlert = {
+                                        alertId: uuidV4().replace(/-/g, ''),
+                                        notificationId: notification.notificationId,
+                                        notificationUid: notification.uid,
+                                        type: 'Service',
+                                        paymentType: notification.paymentType,
+                                        startAmount: notification.startAmount,
+                                        endAmount: notification.endAmount,
+                                        forumServiceId: serviceId,
+                                        forumServiceUid: newValue.uid,
+                                        viewed: false,
+                                        lastUpdateDate: FieldValue.serverTimestamp(),
+                                        creationDate: FieldValue.serverTimestamp()
+                                      };
+
+                                      async.parallel([
+                                        function (callback) {
+                                          // public alerts
+                                          var alertRef = admin.firestore().collection(`services/${serviceId}/alerts`).doc(newAlert.alertId);
+                                          alertRef.set(newAlert).then(() => {
+                                            console.log(`creating services/${serviceId}/alerts`);
+                                            callback(null, null);
+                                          })
+                                          .catch(error => {
+                                            callback(error);
+                                          });
+                                        }, 
+                                        function (callback){
+                                          // user or private alerts
+                                          var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
+                                          alertRef.set(newAlert).then(() => {
+                                            console.log(`creating users/${notification.uid}/alerts`);
+                                            callback(null, null);
+                                          })
+                                          .catch(error => {
+                                            callback(error);
+                                          });
+                                        }],
+                                        // optional callback
+                                        function (error, results) {
+                                          if (!error)
+                                            resolve()
+                                          else
+                                            reject(error);
+                                        }
+                                      );
+                                    }
+                                    else resolve();
+                                  }
+                                  else resolve();
+                                })
+                                .catch(error => {
+                                  reject(error);
+                                }
+                              );
+                            }
+                            else resolve();
+                          })
+                          .catch(error => {
+                            reject(error);
+                          }
+                        );
+                      });
+                    };
+
+                    if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
+                      if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
+                        continueSendingAlert().then(() => {
+                          resolve();
+                        })
+                        .catch(error => {
+                          reject(error);
+                        });
+                      }
+                      else resolve();
+                    }
+                    else if (newValue.paymentType == 'Free' && notification.paymentType == 'Free'){
+                      continueSendingAlert().then(() => {
+                        resolve();
+                      })
+                      .catch(error => {
+                        reject(error);
+                      });
+                    }
+                    else resolve();
+                  });
+                });
+
+                Promise.all(promises).then(() => {
+                  resolve();
+                })
+                .catch(error => {
+                  reject(error);
+                });
+              }
+              else resolve();
+            });
+          }
+          else resolve();
+        });
+      }
+      else {
+        admin.firestore().collection(`servicenotificationsnotags`)
+          .where('active', '==', true)
+          .get().then(snapshot => {
+          if (snapshot.size > 0){
+            var promises = snapshot.docs.map(doc => {
+              return new Promise((resolve, reject) => {
+                var continueSendingAlert = function () {
+                  return new Promise((resolve, reject) => {
+                    // ensure alert doesn't exist in internal user delete alert collection
+                    admin.firestore().collection(`users/${doc.data().uid}/deletedAlerts`)
+                      .where('notificationId', '==', doc.data().notificationId)
                       .where('forumServiceId', '==', serviceId)
                       .get().then(deletedAlertSnapshot => {
-                        // continue creating alert
-                        if (deletedAlertSnapshot.size == 0){
-                          // check alert doesn't already exist in main (service/alert) collection
+                        if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
+                          // ensure alert doesn't exist in internal service alert collection
                           admin.firestore().collection(`services/${serviceId}/alerts`)
-                            .where('notificationId', '==', notification.notificationId)
+                            .where('notificationId', '==', doc.data().notificationId)
                             .where('forumServiceId', '==', serviceId)
                             .get().then(alertSnapshot => {
                               if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                                if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the service
+                                if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the service
                                   // create alert
                                   var newAlert = {
                                     alertId: uuidV4().replace(/-/g, ''),
-                                    notificationId: notification.notificationId,
-                                    notificationUid: notification.uid,
+                                    notificationId: doc.data().notificationId,
+                                    notificationUid: doc.data().uid,
                                     type: 'Service',
-                                    paymentType: '',
-                                    startAmount: 
+                                    paymentType: notification.paymentType,
+                                    startAmount: notification.startAmount,
+                                    endAmount: notification.endAmount,
                                     forumServiceId: serviceId,
                                     forumServiceUid: newValue.uid,
                                     viewed: false,
@@ -5466,9 +5594,9 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                     }, 
                                     function (callback){
                                       // user or private alerts
-                                      var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
+                                      var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
                                       alertRef.set(newAlert).then(() => {
-                                        console.log(`creating users/${notification.uid}/alerts`);
+                                        console.log(`creating users/${doc.data().uid}/alerts`);
                                         callback(null, null);
                                       })
                                       .catch(error => {
@@ -5500,101 +5628,28 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                       }
                     );
                   });
-                });
+                };
 
-                Promise.all(promises).then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              }
-              else resolve();
-            });
-          }
-          else resolve();
-        });
-      }
-      else {
-        admin.firestore().collection(`servicenotificationsnotags`)
-          .where('active', '==', true)
-          .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                // ensure alert doesn't exist in internal user delete alert collection
-                admin.firestore().collection(`users/${doc.data().uid}/deletedAlerts`)
-                  .where('notificationId', '==', doc.data().notificationId)
-                  .where('forumServiceId', '==', serviceId)
-                  .get().then(deletedAlertSnapshot => {
-                    if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
-                      // ensure alert doesn't exist in internal service alert collection
-                      admin.firestore().collection(`services/${serviceId}/alerts`)
-                        .where('notificationId', '==', doc.data().notificationId)
-                        .where('forumServiceId', '==', serviceId)
-                        .get().then(alertSnapshot => {
-                          if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                            if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the service
-                              // create alert
-                              var newAlert = {
-                                alertId: uuidV4().replace(/-/g, ''),
-                                notificationId: doc.data().notificationId,
-                                notificationUid: doc.data().uid,
-                                type: 'Service',
-                                forumServiceId: serviceId,
-                                forumServiceUid: newValue.uid,
-                                viewed: false,
-                                lastUpdateDate: FieldValue.serverTimestamp(),
-                                creationDate: FieldValue.serverTimestamp()
-                              };
-
-                              async.parallel([
-                                function (callback) {
-                                  // public alerts
-                                  var alertRef = admin.firestore().collection(`services/${serviceId}/alerts`).doc(newAlert.alertId);
-                                  alertRef.set(newAlert).then(() => {
-                                    console.log(`creating services/${serviceId}/alerts`);
-                                    callback(null, null);
-                                  })
-                                  .catch(error => {
-                                    callback(error);
-                                  });
-                                }, 
-                                function (callback){
-                                  // user or private alerts
-                                  var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
-                                  alertRef.set(newAlert).then(() => {
-                                    console.log(`creating users/${doc.data().uid}/alerts`);
-                                    callback(null, null);
-                                  })
-                                  .catch(error => {
-                                    callback(error);
-                                  });
-                                }],
-                                // optional callback
-                                function (error, results) {
-                                  if (!error)
-                                    resolve()
-                                  else
-                                    reject(error);
-                                }
-                              );
-                            }
-                            else resolve();
-                          }
-                          else resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        }
-                      );
-                    }
-                    else resolve();
+                if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
+                  if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
+                    continueSendingAlert().then(() => {
+                      resolve();
+                    })
+                    .catch(error => {
+                      reject(error);
+                    });
+                  }
+                  else resolve();
+                }
+                else if (newValue.paymentType == 'Free' && notification.paymentType == 'Free'){
+                  continueSendingAlert().then(() => {
+                    resolve();
                   })
                   .catch(error => {
                     reject(error);
-                  }
-                );
+                  });
+                }
+                else resolve();
               });
             });
   
