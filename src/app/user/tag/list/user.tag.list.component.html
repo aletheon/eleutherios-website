@@ -10,22 +10,21 @@
 		<ng-container *ngIf="tags | async;let tagItems">
 			<ng-container *ngIf="tagItems.length > 0; then showtags else notags"></ng-container>
 			<ng-template #showtags>
-				<div style="min-height:30px;border:1px solid rgb(153, 153, 153);margin-bottom:5px;padding-bottom:5px"
-					*ngFor="let tag of tagItems; trackBy: trackTags">
-					<div style="display:flex;flex-direction:row;padding:5px 5px 3px 10px;align-items: center">
+				<ng-container *ngFor="let tag of tagItems; trackBy: trackTags">
+					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
 						<p style="flex:1">{{ tag.tag }}</p>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="cursor:default;background-color:rgb(250, 113, 108);border:1px solid #ac2c2c" matTooltip="Forums">{{ tag.forumCount }}</span>
+							<span class="btn btn-danger btn-circle" style="cursor:default" matTooltip="Forums">{{ tag.forumCount }}</span>
 						</div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="cursor:default;background-color:#A9C4EB;border:1px solid #007FFF" matTooltip="Services">{{ tag.serviceCount }}</span>
+							<span class="btn btn-info btn-circle" style="cursor:default" matTooltip="Services">{{ tag.serviceCount }}</span>
 						</div>
 						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="cursor:default;background-color:#99FF99;border:1px solid rgb(69, 221, 69)" matTooltip="Notifications">{{ tag.notificationCount }}</span>
+							<span class="btn btn-primary btn-circle" style="cursor:default" matTooltip="Notifications">{{ tag.notificationCount }}</span>
 						</div>
             <mat-icon onclick="event.stopPropagation()" (click)="delete(tag)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
           </div>
-				</div>
+				</ng-container>
 			</ng-template>
 			<ng-template #notags>
 				<p style="color:#999;font-size:90%">

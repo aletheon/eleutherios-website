@@ -156,7 +156,7 @@
 						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
 							<div *ngIf="serviceTagItems.length > 0">
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-									<div [ngClass]="serviceGroup.get('paymentType').value == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px"
+									<div [ngClass]="serviceGroup.get('paymentType').value == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let serviceTag of serviceTagItems; trackBy: trackServiceTags">
 										<span>{{ serviceTag.tag }}</span>
 										<i class="material-icons" (click)="removeServiceTag(serviceTag)" style="cursor:pointer" matTooltip="Remove">close</i>

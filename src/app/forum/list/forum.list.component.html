@@ -32,7 +32,7 @@
 				<!-- show tags -->
 				<ng-container *ngIf="searchTags.length > 0; else nosearchtags">
 					<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-						<div class="label label-default" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
+						<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
 							*ngFor="let tag of searchTags; trackBy: trackSearchTags">
 							<span>{{ tag.tag }}</span>
 							<i class="material-icons" (click)="removeSearchTag(tag)" style="cursor:pointer" matTooltip="Remove">close</i>
