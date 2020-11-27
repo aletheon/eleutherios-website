@@ -200,7 +200,7 @@
 									<ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
 									<ng-template #showservice>
 										<ng-container *ngIf="registrant.service | async;let service">
-											<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+											<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
 												<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 												<ng-template #showdefaultserviceimage>
 													<ng-container *ngIf="service.defaultServiceImage | async;let image">
@@ -265,7 +265,7 @@
 							<ng-container *ngIf="forumForumItems.length > 0; then showforumforums else noforumforums"></ng-container>
 							<ng-template #showforumforums>
 								<ng-container *ngFor="let forumForum of forumForumItems; trackBy: trackForumForums">
-									<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+									<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
 										<ng-container *ngIf="forumForum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 										<ng-template #showdefaultforumimage>
 											<ng-container *ngIf="forumForum.defaultForumImage | async;let image">

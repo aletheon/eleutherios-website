@@ -9,11 +9,11 @@ Forum (Food)
 ---- Service (Person or customer)
 ---- Service (Grocery store owner)
 ---- Forum (Pick up + drop off)
--------- Service (Grocery store owner or customer )
--------- Service (Fastpost couriers )
+-------- Service (Grocery store owner or customer)
+-------- Service (Fastpost couriers)
 -------- Forum (Healthcare worker to deliver food)
 ------------ Service (Fastpost couriers or customer)
------------- Service (Healthcare worker )
+------------ Service (Healthcare worker)
 ```
 
 In this example, Eleutherios is scaling or serializing the forum or conversation (Food/Pick up + drop off/Healthcare worker to deliver food), that people or businesses are having.  Not the service or work, that they are trying to provide or perform.  People or businesses, still provide the same product or service in the world, but within the same forum or conversation.
