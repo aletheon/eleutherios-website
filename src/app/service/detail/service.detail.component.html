@@ -117,7 +117,7 @@
 						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
 							<mat-icon [routerLink]="['/service/review/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create review">add_circle_outline</mat-icon>
 						</div>
-						<div style="flex:none">
+						<div style="flex:none;margin-right:5px;">
 							<ng-container *ngIf="reviewCount | async as reviewCount">
 								<ng-container [ngSwitch]="reviewCount">
 									<ng-container *ngSwitchCase="-1">

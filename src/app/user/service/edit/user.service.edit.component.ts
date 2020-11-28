@@ -62,7 +62,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   private _onboarding: boolean = false;
 
   public service: Observable<any>;
-  public user: Observable<any>;
   public serviceForum: Observable<any>;
   public defaultServiceImage: Observable<any>;
   public forumCount: Observable<number> = this._forumCount.asObservable();
@@ -1100,7 +1099,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       this.userServiceService.exists(this.auth.uid, params['serviceId']).then(exists => {
         if (exists){
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
-          this.user = this.userService.getUser(this.auth.uid);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;
           this.initForm();
