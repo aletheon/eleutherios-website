@@ -129,37 +129,64 @@ function decodeAuthToken(authToken) {
 exports.stripe = functions.https.onRequest(app);
 
 // listen to strip webhook events
-exports.stripeEvents = functions.https.onRequest((req, res) => {
+exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
 
   try {
     let event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     const intent = event.data.object;
-    const id = intent.id; // this looks like the paymentId that you can use to update 
-    const metadata = intent.metadata; // { userId: userId, serviceId: serviceId }
+    const paymentId = intent.id;
+    const metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
-    // 0) payment_intent
-    // 1) fetch payment from user created payment collection
-    // 2) fetch payment from user received payment collection
-    // 3) fetch all payments created/received update totals accordingly
-    // 3) update payments
+    // HERE ROB MOVE THIS SNAPSHOT OTHERWISE ERROR ON OTHER EVENT TYPES
 
-    // if (event.type is payment_intent)
-    //    update both payment and receipt
+    // const paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    // const paymentRef = paymentSnapshot.ref;
+    // const payment = paymentSnapshot.data();    
 
-    // switch(event.type) {
-    //   case 'payment_intent.created':
-    //     console.log('got payment_intent.created');
-    //     break;
-    //   case 'payment_intent.succeeded':
-    //     console.log('got payment_intent.succeeded');
-    //     break;
-    //   case 'payment_intent.payment_failed':
-    //     console.log('got payment_intent.payment_failed');
-    //     break;
-    //   default:
-    //     console.log('got type ' + event.type);
-    // }
+    switch (event.type) {
+      case 'payment_intent.created':
+        // update payment
+        const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+        const createPaymentRef = createPaymentSnapshot.ref;
+        const payment = createPaymentSnapshot.data();  
+        await createPaymentRef.update({ status: 'Pending' });
+
+        // HERE ROB
+
+        // create receipt
+        const receiptId = uuidV4().replace(/-/g, '');
+        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set(
+          {
+            receiptId: receiptId,
+            paymentId: payment.paymentId,
+            amount: payment.amount, // amount to pay
+            status: 'Pending', // [Pending, Success, Fail]
+            buyerUid: payment.buyerUid, // id of the user buying the goods the payment
+            buyerServiceId: payment.buyerServiceId, // id of the service buying the goods
+            sellerUid: payment.sellerUid, // id of the user selling the goods
+            sellerServiceId: payment.sellerServiceId, // id of the service selling the goods
+            paymentIntent: intent,
+            lastUpdateDate: FieldValue.serverTimestamp(),
+            creationDate: FieldValue.serverTimestamp()
+          }
+        );
+        break;
+      case 'payment_intent.succeeded':
+        await paymentRef.update({ status: 'Success' });
+        const successSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
+        const successRef = successSnapshot.ref;
+        await successRef.update({ status: 'Success' });
+        break;
+      case 'payment_intent.payment_failed':
+        await paymentRef.update({ status: 'Fail' });
+        const failSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
+        const failRef = failSnapshot.ref;
+        await failRef.update({ status: 'Fail' });
+        break;
+      default:
+        console.log('got type ' + event.type);
+    }
     
     return admin.database().ref("events").push(event) // Add the event to the database
       .then((snapshot) => {
