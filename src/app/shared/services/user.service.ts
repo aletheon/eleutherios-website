@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
 
 import * as firebase from 'firebase/app';
-import { Observable } from 'rxjs';
+import { Observable, defer } from 'rxjs';
 
 @Injectable()
 export class UserService {

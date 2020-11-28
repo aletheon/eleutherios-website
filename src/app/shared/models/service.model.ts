@@ -11,6 +11,7 @@ export interface Service {
   rate: number,  // average rating of the service for sorting purposes
   paymentType: string, // [Free|Payment|Donation|Subscription]
   amount: number, // amount to pay for this service { min: 0.50 USD, max: 999,999.99 }
+  currency: string, // [usd, nzd, aud etc]
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
   includeTagsInDetailPage: boolean,

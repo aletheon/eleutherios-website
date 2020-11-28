@@ -1,6 +1,6 @@
 <div style="display:flex;flex-direction:row">
   <ng-container *ngIf="userTotal | async as total">
-    <p style="flex:1;margin:0 5px 5px 5px;color:#818181;cursor:pointer" onclick="event.stopPropagation()" (click)="changeActivitySideBar()">
+    <p style="flex:1;margin:0 10px 5px 10px;color:#818181;cursor:pointer" onclick="event.stopPropagation()" (click)="changeActivitySideBar()">
       Activity({{ total.activityCount }})
     </p>
   </ng-container>
@@ -10,7 +10,7 @@
   <ng-template #showactivity>
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
-        <div class="alert alert-danger" style="flex:none;width:100%;display:flex;flex-direction:column;margin-bottom:5px">
+        <div class="alert alert-danger" style="flex:none;width:100%;display:flex;flex-direction:column">
           <!-- title bar -->
           <div style="flex:none;display:flex;flex-direction:row;justify-content:center">
             <ng-container *ngIf="activity.defaultForumImage | async; then showdefaultforumimage"></ng-container>

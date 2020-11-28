@@ -27,7 +27,8 @@ import {
   UserForumUserBlockService,
   ServiceService,
   Registrant,
-  NoTitlePipe,
+  User,
+  NoTitlePipe
 } from '../../shared';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -73,7 +74,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   public rateCount: Observable<number> = this._rateCount.asObservable();
   public reviewCount: Observable<number> = this._reviewCount.asObservable();
   public serviceGroup: FormGroup;
-  public stripeTest: FormGroup;
   public userForums: Observable<any[]>;
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
@@ -655,10 +655,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private initForm () {
     const that = this;
-
-    this.stripeTest = this.fb.group({
-      name: ['', [Validators.required]]
-    });
     
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
@@ -671,6 +667,9 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       default:                            [''],
       indexed:                            [''],
       rate:                               [''],
+      paymentType:                        [''],
+      amount:                             [''],
+      currency:                           [''],
       includeDescriptionInDetailPage:     [''],
       includeImagesInDetailPage:          [''],
       includeTagsInDetailPage:            [''],

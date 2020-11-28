@@ -130,7 +130,7 @@
 								</ng-container>
 								<ng-container *ngIf="service.paymentType == 'Payment'">
 									<div style="flex:none">
-										{{ service.amount}}
+										{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}
 									</div>
 								</ng-container>
 							</div>

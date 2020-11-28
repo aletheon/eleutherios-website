@@ -62,7 +62,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   private _addingTag = new BehaviorSubject(false);
 
   public service: Observable<any>;
-  public user: Observable<any>;
   public serviceForum: Observable<any>;
   public defaultServiceImage: Observable<any>;
   public forumCount: Observable<number> = this._forumCount.asObservable();
@@ -1122,29 +1121,31 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     this.searchPrivateForums = true;
     this.searchForumIncludeTagsInSearch = true;
 
-    const service: Service = {
-      serviceId: '',
-      uid: this.auth.uid,
-      type: 'Private',
-      title: '',
-      title_lowercase: '',
-      description: '',
-      website: '',
-      default: false,
-      indexed: false,
-      rate: 0,
-      paymentType: 'Free',
-      amount: 0,
-      includeDescriptionInDetailPage: false,
-      includeImagesInDetailPage: false,
-      includeTagsInDetailPage: false,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    this.service = this.userServiceService.create(this.auth.uid, service);
-    this.user = this.userService.getUser(this.auth.uid);
-    this.initForm();
+    this.auth.user.subscribe(user => {
+      const service: Service = {
+        serviceId: '',
+        uid: this.auth.uid,
+        type: 'Private',
+        title: '',
+        title_lowercase: '',
+        description: '',
+        website: '',
+        default: false,
+        indexed: false,
+        rate: 0,
+        paymentType: 'Free',
+        amount: 0,
+        currency: user.stripeCurrency,
+        includeDescriptionInDetailPage: false,
+        includeImagesInDetailPage: false,
+        includeTagsInDetailPage: false,
+        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+      };
+  
+      this.service = this.userServiceService.create(this.auth.uid, service);
+      this.initForm();
+    });
   }
 
   private initForm () {
@@ -1163,6 +1164,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       rate:                           [''],
       paymentType:                    [''],
       amount:                         ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+      currency:                       [''],
       includeDescriptionInDetailPage: [''],
       includeImagesInDetailPage:      [''],
       includeTagsInDetailPage:        [''],
@@ -2323,6 +2325,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
           rate: this.serviceGroup.get('rate').value,
           paymentType: this.serviceGroup.get('paymentType').value,
           amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : this.serviceGroup.get('amount').value,
+          currency: this.serviceGroup.get('currency').value,
           includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
           includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
           includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,

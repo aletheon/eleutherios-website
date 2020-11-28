@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import {
   SiteTotalService,
+  UserService,
   UserServiceService,
   UserServiceImageService,
   UserServiceTagService,
@@ -53,6 +54,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
+    private userService: UserService,
     private userServiceService: UserServiceService,
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
@@ -244,7 +246,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                            
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -275,14 +277,12 @@ export class ServiceListComponent implements OnInit, OnDestroy {
           else return of([]);
         })
       )
-        
-        .subscribe(services => {
-          this.servicesArray = _.slice(services, 0, this.numberItems);
-          this.services = of(this.servicesArray);
-          this.nextKey = _.get(services[this.numberItems], 'creationDate');
-          this._loading.next(false);
-        }
-      );
+      .subscribe(services => {
+        this.servicesArray = _.slice(services, 0, this.numberItems);
+        this.services = of(this.servicesArray);
+        this.nextKey = _.get(services[this.numberItems], 'creationDate');
+        this._loading.next(false);
+      });
     }
   }
 
