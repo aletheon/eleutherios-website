@@ -763,8 +763,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                               if (forumImages && forumImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
 
-                                if (forumImages[0].smallUrl)
-                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+                                if (forumImages[0].tinyUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
 
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
@@ -773,7 +773,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
-                                      forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+                                      forumImages[0].url = '../../assets/defaultTiny.jpg';
                       
                                     return of(forumImages[0]);
                                   })
@@ -796,7 +796,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                 forum.defaultForumImage = of(defaultForumImage);
                               else {
                                 let tempImage = {
-                                  url: '../../assets/defaultThumbnail.jpg'
+                                  url: '../../assets/defaultTiny.jpg'
                                 };
                                 forum.defaultForumImage = of(tempImage);
                               }
