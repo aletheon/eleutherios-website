@@ -138,21 +138,13 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     const paymentId = intent.id;
     const metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
-    // HERE ROB MOVE THIS SNAPSHOT OTHERWISE ERROR ON OTHER EVENT TYPES
-
-    // const paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
-    // const paymentRef = paymentSnapshot.ref;
-    // const payment = paymentSnapshot.data();    
-
     switch (event.type) {
       case 'payment_intent.created':
         // update payment
         const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const createPaymentRef = createPaymentSnapshot.ref;
-        const payment = createPaymentSnapshot.data();  
+        const payment = createPaymentSnapshot.data();
         await createPaymentRef.update({ status: 'Pending' });
-
-        // HERE ROB
 
         // create receipt
         const receiptId = uuidV4().replace(/-/g, '');
@@ -173,16 +165,26 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         );
         break;
       case 'payment_intent.succeeded':
-        await paymentRef.update({ status: 'Success' });
-        const successSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
-        const successRef = successSnapshot.ref;
-        await successRef.update({ status: 'Success' });
+        // update payment
+        const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+        const successPaymentRef = successPaymentSnapshot.ref;
+        await successPaymentRef.update({ status: 'Success' });
+
+        // update receipt
+        const successReceiptSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
+        const successReceiptRef = successReceiptSnapshot.ref;
+        await successReceiptRef.update({ status: 'Success' });
         break;
       case 'payment_intent.payment_failed':
-        await paymentRef.update({ status: 'Fail' });
-        const failSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
-        const failRef = failSnapshot.ref;
-        await failRef.update({ status: 'Fail' });
+        // update payment
+        const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+        const failPaymentRef = failPaymentSnapshot.ref;
+        await failPaymentRef.update({ status: 'Fail' });
+
+        // update receipt
+        const failReceiptSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
+        const failReceiptRef = failReceiptSnapshot.ref;
+        await failReceiptRef.update({ status: 'Fail' });
         break;
       default:
         console.log('got type ' + event.type);
