@@ -17,7 +17,6 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
-import { runInThisContext } from 'vm';
 
 @Component({
   selector: 'user-forum-service-block-list',
