@@ -117,9 +117,9 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
         if (alerts && alerts.length > 0){
           let observables = alerts.map(alert => {
             if (alert.type == 'Forum'){
-              return this.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
+              let getForum$ = this.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
                 switchMap(forum => {
-                  if (forum){
+                  if (forum) {
                     let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
                     let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
                       switchMap(registrants => {
@@ -184,11 +184,24 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
                   else return of(null);
                 })
               );
+
+              return combineLatest([getForum$]).pipe(
+                switchMap(results => {
+                  const [forum] = results;
+                  
+                  if (forum)
+                    alert.forum = of(forum);
+                  else {
+                    alert.forum = of(null);
+                  }
+                  return of(alert);
+                })
+              );
             }
             else {
-              return this.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
+              let getService$ = this.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
                 switchMap(service => {
-                  if (service){
+                  if (service) {
                     let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
                     let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                       switchMap(serviceImages => {
@@ -240,26 +253,22 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
                   else return of(null);
                 })
               );
+
+              return combineLatest([getService$]).pipe(
+                switchMap(results => {
+                  const [service] = results;
+                  
+                  if (service)
+                    alert.service = of(service);
+                  else {
+                    alert.service = of(null);
+                  }
+                  return of(alert);
+                })
+              );
             }
           });
-
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (alerts[i].type == 'Forum'){
-                if (result)
-                  alerts[i].forum = of(result);
-                else
-                  alerts[i].forum = of(null);
-              }
-              else {
-                if (result)
-                  alerts[i].service = of(result);
-                else
-                  alerts[i].service = of(null);
-              }                
-              return alerts[i];
-            });
-          });
+          return zip(...observables);
         }
         else return of([]);
       })

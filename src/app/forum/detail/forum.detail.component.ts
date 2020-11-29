@@ -625,8 +625,10 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             that.registrants = that.userForumRegistrantService.getRegistrants(forum.uid, forum.forumId).pipe(
               switchMap(registrants => {
                 if (registrants && registrants.length > 0) {
+                  console.log('registrants ' + JSON.stringify(registrants));
+
                   let observables = registrants.map(registrant => {
-                    return that.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
+                    let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
                       switchMap(service => {
                         if (service) {
                           let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
@@ -670,25 +672,26 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                             })
                           );
                         }
-                        else
-                          return of(null);
+                        else return of(null);
+                      })
+                    );
+
+                    return combineLatest([getService$]).pipe(
+                      switchMap(results => {
+                        const [service] = results;
+                        
+                        if (service)
+                          registrant.service = of(service);
+                        else {
+                          registrant.service = of(null);
+                        }
+                        return of(registrant);
                       })
                     );
                   });
-                  
-                  return zip(...observables, (...results) => {
-                    return results.map((result, i) => {
-                      if (result)
-                        registrants[i].service = of(result);
-                      else
-                        registrants[i].service = of(null);
-                        
-                      return registrants[i];
-                    });
-                  });
+                  return zip(...observables);
                 }
-                else
-                  return of([]);
+                else return of([]);
               })
             );
             

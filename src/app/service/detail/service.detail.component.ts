@@ -733,10 +733,20 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
             // which forums this service is serving in
             that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
+              map(whereServings => {
+                return whereServings.filter(whereServing => {
+                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
+                    return true;
+                  else
+                    return false;
+                }).map(whereServing => {
+                  return { ...whereServing };
+                });
+              }),
               switchMap(whereServings => {
                 if (whereServings && whereServings.length > 0) {
                   let observables = whereServings.map(whereServing => {
-                    return that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
+                    let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
                       switchMap(forum => {
                         if (forum) {
                           let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
@@ -747,13 +757,14 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                 return of(null);
                             })
                           );
+
                           let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                             switchMap(forumImages => {
                               if (forumImages && forumImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
 
-                                if (forumImages[0].tinyUrl)
-                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+                                if (forumImages[0].smallUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
 
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
@@ -762,7 +773,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
-                                      forumImages[0].url = '../../assets/defaultTiny.jpg';
+                                      forumImages[0].url = '../../assets/defaultThumbnail.jpg';
                       
                                     return of(forumImages[0]);
                                   })
@@ -772,57 +783,47 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                             })
                           );
 
-                          return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
+                          return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
                             switchMap(results => {
-                              const [defaultForumImage, defaultRegistrant] = results;
-                              
-                              if (defaultForumImage)
-                                forum.defaultForumImage = of(defaultForumImage);
-                              else {
-                                let tempImage = {
-                                  url: '../../assets/defaultTiny.jpg'
-                                };
-                                forum.defaultForumImage = of(tempImage);
-                              }
+                              const [defaultRegistrant, defaultForumImage] = results;
 
                               if (defaultRegistrant)
                                 forum.defaultRegistrant = of(defaultRegistrant);
                               else
                                 forum.defaultRegistrant = of(null);
-
+                              
+                              if (defaultForumImage)
+                                forum.defaultForumImage = of(defaultForumImage);
+                              else {
+                                let tempImage = {
+                                  url: '../../assets/defaultThumbnail.jpg'
+                                };
+                                forum.defaultForumImage = of(tempImage);
+                              }
                               return of(forum);
                             })
                           );
                         }
                         else return of(null);
                       })
-                    )
-                  });
-
-                  return zip(...observables, (...results: any[]) => {
-                    return results.map((result, i) => {
-                      whereServings[i].type = result.type;
-
-                      if (result)
-                        whereServings[i].forum = of(result);
-                      else
-                        whereServings[i].forum = of(null);
+                    );
+  
+                    return combineLatest([getForum$]).pipe(
+                      switchMap(results => {
+                        const [forum] = results;
                         
-                      return whereServings[i];
-                    });
+                        if (forum)
+                          whereServing.forum = of(forum);
+                        else {
+                          whereServing.forum = of(null);
+                        }
+                        return of(whereServing);
+                      })
+                    );
                   });
+                  return zip(...observables);
                 }
                 else return of([]);
-              }),
-              map(whereServings => {
-                return whereServings.filter(whereServing => {
-                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
-                    return true;
-                  else
-                    return false;
-                }).map(whereServing => {
-                  return { ...whereServing };
-                });
               })
             );
 

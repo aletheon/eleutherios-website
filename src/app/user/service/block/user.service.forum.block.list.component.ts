@@ -92,9 +92,34 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
       switchMap(forumBlocks => {
         if (forumBlocks && forumBlocks.length > 0){
           let observables = forumBlocks.map(forumBlock => {
-            return that.userServiceService.getService(forumBlock.serviceUid, forumBlock.serviceId).pipe(
+            let getService$ = this.userServiceService.getService(forumBlock.serviceUid, forumBlock.serviceId).pipe(
               switchMap(service => {
-                if (service){
+                if (service) {
+                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                    switchMap(serviceImages => {
+                      if (serviceImages && serviceImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+
+                        if (serviceImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+                
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              serviceImages[0].url = downloadUrl;
+                            else
+                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                
+                            return of(serviceImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
                   let getForum$ = this.userForumService.getForum(forumBlock.forumUid, forumBlock.forumId).pipe(
                     switchMap(forum => {
                       if (forum){
@@ -156,32 +181,7 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
-
-                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                    switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
-
-                        if (serviceImages[0].tinyUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-                            
-                            if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
-                            else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
-                            return of(serviceImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
+                  
                   return combineLatest([getDefaultServiceImage$, getForum$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, forum] = results;
@@ -194,12 +194,12 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
-        
+
                       if (forum)
                         service.forum = of(forum);
                       else
                         service.forum = of(null);
-        
+
                       return of(service);
                     })
                   );
@@ -207,18 +207,21 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-          });
 
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                forumBlocks[i].service = of(result);
-              else
-                forumBlocks[i].service = of(null);
-              
-              return forumBlocks[i];
-            });
+            return combineLatest([getService$]).pipe(
+              switchMap(results => {
+                const [service] = results;
+                
+                if (service)
+                  forumBlock.service = of(service);
+                else {
+                  forumBlock.service = of(null);
+                }
+                return of(forumBlock);
+              })
+            );
           });
+          return zip(...observables);
         }
         else return of([]);
       })

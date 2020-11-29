@@ -308,18 +308,18 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                 if (serviceReviews && serviceReviews.length > 0){
                   let observables = serviceReviews.map(serviceReview => {
                     if (serviceReview){
-                      return that.userServiceService.getService(serviceReview.serviceUid, serviceReview.serviceId).pipe(
+                      let getService$ = that.userServiceService.getService(serviceReview.serviceUid, serviceReview.serviceId).pipe(
                         switchMap(service => {
-                          if (service){
-                            let getServiceRate$ = that.userServiceRateService.getUserServiceRate(serviceReview.serviceReviewServiceUid, serviceReview.serviceReviewServiceId, service.uid, service.serviceId);
+                          if (service) {
+                            let getServiceRates$ = that.userServiceRateService.getUserServiceRate(serviceReview.serviceReviewServiceUid, serviceReview.serviceReviewServiceId, service.uid, service.serviceId);
                             let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                               switchMap(serviceImages => {
                                 if (serviceImages && serviceImages.length > 0){
                                   let getDownloadUrl$: Observable<any>;
-        
+    
                                   if (serviceImages[0].smallUrl)
                                     getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-        
+                          
                                   return combineLatest([getDownloadUrl$]).pipe(
                                     switchMap(results => {
                                       const [downloadUrl] = results;
@@ -328,7 +328,7 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                                         serviceImages[0].url = downloadUrl;
                                       else
                                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                        
+                          
                                       return of(serviceImages[0]);
                                     })
                                   );
@@ -336,11 +336,16 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                                 else return of(null);
                               })
                             );
-                  
-                            return combineLatest([getDefaultServiceImage$, getServiceRate$]).pipe(
+                            
+                            return combineLatest([getServiceRates$, getDefaultServiceImage$]).pipe(
                               switchMap(results => {
-                                const [defaultServiceImage, serviceRates] = results;
-                  
+                                const [serviceRates, defaultServiceImage] = results;
+
+                                if (serviceRates && serviceRates.length > 0)
+                                  service.serviceRate = of(serviceRates[0]);
+                                else
+                                  service.serviceRate = of(null);
+    
                                 if (defaultServiceImage)
                                   service.defaultServiceImage = of(defaultServiceImage);
                                 else {
@@ -349,12 +354,6 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
-
-                                if (serviceRates && serviceRates.length > 0)
-                                  service.serviceRate = of(serviceRates[0]);
-                                else
-                                  service.serviceRate = of(null);
-
                                 return of(service);
                               })
                             );
@@ -362,20 +361,23 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
                           else return of(null);
                         })
                       );
+    
+                      return combineLatest([getService$]).pipe(
+                        switchMap(results => {
+                          const [service] = results;
+                          
+                          if (service)
+                            serviceReview.service = of(service);
+                          else {
+                            serviceReview.service = of(null);
+                          }
+                          return of(serviceReview);
+                        })
+                      );
                     }
                     else return of(null);
                   });
-            
-                  return zip(...observables, (...results) => {
-                    return results.map((result, i) => {
-                      if (result)
-                        serviceReviews[i].service = of(result);
-                      else
-                        serviceReviews[i].service = of(null);
-
-                      return serviceReviews[i];
-                    });
-                  });
+                  return zip(...observables);
                 }
                 else return of([]);
               })

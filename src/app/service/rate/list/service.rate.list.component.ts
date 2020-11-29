@@ -292,10 +292,10 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
         if (serviceRates && serviceRates.length > 0){
           let observables = serviceRates.map(serviceRate => {
             if (serviceRate){
-              return this.userServiceService.getService(serviceRate.serviceUid, serviceRate.serviceId).pipe(
+              let getService$ = this.userServiceService.getService(serviceRate.serviceUid, serviceRate.serviceId).pipe(
                 switchMap(service => {
-                  if (service){
-                    let getServiceReview$ = this.userServiceReviewService.getUserServiceReview(serviceRate.serviceRateServiceUid, serviceRate.serviceRateServiceId, service.uid, service.serviceId);
+                  if (service) {
+                    let getServiceReviews$ = this.userServiceReviewService.getUserServiceReview(serviceRate.serviceRateServiceUid, serviceRate.serviceRateServiceId, service.uid, service.serviceId);
                     let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                       switchMap(serviceImages => {
                         if (serviceImages && serviceImages.length > 0){
@@ -303,7 +303,7 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
 
                           if (serviceImages[0].smallUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
+                  
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
@@ -312,7 +312,7 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                
+                  
                               return of(serviceImages[0]);
                             })
                           );
@@ -320,25 +320,24 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-          
-                    return combineLatest([getDefaultServiceImage$, getServiceReview$]).pipe(
+                    
+                    return combineLatest([getServiceReviews$, getDefaultServiceImage$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImage, serviceReviews] = results;
-          
-                        if (defaultServiceImage)
-                          service.defaultServiceImage = of(defaultServiceImage);
-                        else {
-                          let tempImage = {
-                            smallUrl: '../../../assets/defaultThumbnail.jpg'
-                          };
-                          service.defaultServiceImage = of(tempImage);
-                        }
+                        const [serviceReviews, defaultServiceImage] = results;
 
                         if (serviceReviews && serviceReviews.length > 0)
                           service.serviceReview = of(serviceReviews[0]);
                         else
                           service.serviceReview = of(null);
 
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
+                        else {
+                          let tempImage = {
+                            url: '../../../assets/defaultThumbnail.jpg'
+                          };
+                          service.defaultServiceImage = of(tempImage);
+                        }
                         return of(service);
                       })
                     );
@@ -346,20 +345,23 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
                   else return of(null);
                 })
               );
+
+              return combineLatest([getService$]).pipe(
+                switchMap(results => {
+                  const [service] = results;
+                  
+                  if (service)
+                    serviceRate.service = of(service);
+                  else {
+                    serviceRate.service = of(null);
+                  }
+                  return of(serviceRate);
+                })
+              );
             }
             else return of(null);
           });
-    
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                serviceRates[i].service = of(result);
-              else
-                serviceRates[i].service = of(null);
-
-              return serviceRates[i];
-            });
-          });
+          return zip(...observables);
         }
         else return of([]);
       })

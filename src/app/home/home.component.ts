@@ -444,18 +444,18 @@ export class HomeComponent implements OnDestroy, OnInit {
             if (alerts && alerts.length > 0){
               let observables = alerts.map(alert => {
                 if (alert.type == 'Forum'){
-                  return that.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
+                  let getForum$ = that.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
                     switchMap(forum => {
-                      if (forum){
-                        let getForumTags$ = that.userForumTagService.getTags(forum.uid, forum.forumId);
+                      if (forum) {
+                        let getForumTags$ = that.userServiceTagService.getTags(forum.uid, forum.forumId);
                         let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                           switchMap(forumImages => {
                             if (forumImages && forumImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
 
                               if (forumImages[0].smallUrl)
-                                getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
+                                getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+                      
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
@@ -464,7 +464,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                                     forumImages[0].url = downloadUrl;
                                   else
                                     forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-                    
+                      
                                   return of(forumImages[0]);
                                 })
                               );
@@ -472,7 +472,6 @@ export class HomeComponent implements OnDestroy, OnInit {
                             else return of(null);
                           })
                         );
-
                         let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
                           switchMap(registrants => {
                             if (registrants && registrants.length > 0)
@@ -481,11 +480,16 @@ export class HomeComponent implements OnDestroy, OnInit {
                               return of(null);
                           })
                         );
-
-                        return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
+                        
+                        return combineLatest([getForumTags$, getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
-                            const [defaultForumImage, forumTags, defaultRegistrant] = results;
-              
+                            const [forumTags, defaultForumImage, defaultRegistrant] = results;
+
+                            if (forumTags)
+                              forum.forumTags = of(forumTags);
+                            else
+                              forum.forumTags = of([]);
+                            
                             if (defaultForumImage)
                               forum.defaultForumImage = of(defaultForumImage);
                             else {
@@ -494,11 +498,6 @@ export class HomeComponent implements OnDestroy, OnInit {
                               };
                               forum.defaultForumImage = of(tempImage);
                             }
-
-                            if (forumTags)
-                              forum.forumTags = of(forumTags);
-                            else
-                              forum.forumTags = of([]);
 
                             if (defaultRegistrant)
                               forum.defaultRegistrant = of(defaultRegistrant);
@@ -512,11 +511,24 @@ export class HomeComponent implements OnDestroy, OnInit {
                       else return of(null);
                     })
                   );
+
+                  return combineLatest([getForum$]).pipe(
+                    switchMap(results => {
+                      const [forum] = results;
+                      
+                      if (forum)
+                        alert.forum = of(forum);
+                      else {
+                        alert.forum = of(null);
+                      }
+                      return of(alert);
+                    })
+                  );
                 }
                 else {
-                  return that.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
+                  let getService$ = that.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
                     switchMap(service => {
-                      if (service){
+                      if (service) {
                         let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
                         let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                           switchMap(serviceImages => {
@@ -525,7 +537,7 @@ export class HomeComponent implements OnDestroy, OnInit {
 
                               if (serviceImages[0].smallUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
+                      
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
@@ -534,7 +546,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                                     serviceImages[0].url = downloadUrl;
                                   else
                                     serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-                    
+                      
                                   return of(serviceImages[0]);
                                 })
                               );
@@ -542,11 +554,16 @@ export class HomeComponent implements OnDestroy, OnInit {
                             else return of(null);
                           })
                         );
-
-                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                        
+                        return combineLatest([getServiceTags$, getDefaultServiceImage$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImage, serviceTags] = results;
-              
+                            const [serviceTags, defaultServiceImage] = results;
+
+                            if (serviceTags)
+                              service.serviceTags = of(serviceTags);
+                            else
+                              service.serviceTags = of([]);
+                            
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
@@ -555,12 +572,6 @@ export class HomeComponent implements OnDestroy, OnInit {
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
-
-                            if (serviceTags)
-                              service.serviceTags = of(serviceTags);
-                            else
-                              service.serviceTags = of([]);
-
                             return of(service);
                           })
                         );
@@ -568,19 +579,22 @@ export class HomeComponent implements OnDestroy, OnInit {
                       else return of(null);
                     })
                   );
+
+                  return combineLatest([getService$]).pipe(
+                    switchMap(results => {
+                      const [service] = results;
+                      
+                      if (service)
+                        alert.service = of(service);
+                      else {
+                        alert.service = of(null);
+                      }
+                      return of(alert);
+                    })
+                  );
                 }
               });
-
-              return zip(...observables, (...results) => {
-                return results.map((result, i) => {
-                  if (alerts[i].type == 'Forum')
-                    alerts[i].forum = of(result);
-                  else
-                    alerts[i].service = of(result);
-                  
-                  return alerts[i];
-                });
-              });
+              return zip(...observables);
             }
             else return of([]);
           })

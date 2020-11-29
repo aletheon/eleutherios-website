@@ -146,6 +146,19 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         const payment = createPaymentSnapshot.data();
         await createPaymentRef.update({ status: 'Pending' });
 
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        // HERE ROB TEST THIS
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        /// *********************************
+        /// *********************************
+
         // create receipt
         const receiptId = uuidV4().replace(/-/g, '');
         await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set(

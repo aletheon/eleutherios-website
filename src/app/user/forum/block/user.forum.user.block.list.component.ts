@@ -88,9 +88,10 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
       switchMap(forumUserBlocks => {
         if (forumUserBlocks && forumUserBlocks.length > 0){
           let observables = forumUserBlocks.map(forumUserBlock => {
-            return that.userServiceService.getService(forumUserBlock.serviceUid, forumUserBlock.serviceId).pipe(
+            let getService$ = this.userServiceService.getService(forumUserBlock.serviceUid, forumUserBlock.serviceId).pipe(
               switchMap(service => {
-                if (service){
+                if (service) {
+                  let getUser$ = that.userService.getUser(forumUserBlock.userId);
                   let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                     switchMap(serviceImages => {
                       if (serviceImages && serviceImages.length > 0){
@@ -98,7 +99,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
 
                         if (serviceImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
+                
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
@@ -107,7 +108,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+                
                             return of(serviceImages[0]);
                           })
                         );
@@ -115,11 +116,15 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
-                  let getUser$ = that.userService.getUser(forumUserBlock.userId);
-
-                  return combineLatest([getDefaultServiceImage$, getUser$]).pipe(
+                  
+                  return combineLatest([getUser$, getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage, user] = results;
+                      const [user, defaultServiceImage] = results;
+
+                      if (user)
+                        service.user = of(user);
+                      else
+                        service.user = of(null);
 
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -129,12 +134,6 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
-                      
-                      if (user)
-                        service.user = of(user);
-                      else
-                        service.user = of(null);
-
                       return of(service);
                     })
                   );
@@ -142,18 +141,21 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-          });
 
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                forumUserBlocks[i].service = of(result);
-              else 
-                forumUserBlocks[i].service = of(null);
-              
-              return forumUserBlocks[i];
-            });
+            return combineLatest([getService$]).pipe(
+              switchMap(results => {
+                const [service] = results;
+                
+                if (service)
+                  forumUserBlock.service = of(service);
+                else {
+                  forumUserBlock.service = of(null);
+                }
+                return of(forumUserBlock);
+              })
+            );
           });
+          return zip(...observables);
         }
         else return of([]);
       })

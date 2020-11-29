@@ -1524,17 +1524,17 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       switchMap(registrants => { // get the service
         if (registrants && registrants.length > 0){
           let observables = registrants.map(registrant => {
-            return this.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
+            let getService$ = this.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
               switchMap(service => {
-                if (service){
+                if (service) {
                   let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                     switchMap(serviceImages => {
                       if (serviceImages && serviceImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
-  
+
                         if (serviceImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-  
+                
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
@@ -1543,7 +1543,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+                
                             return of(serviceImages[0]);
                           })
                         );
@@ -1551,11 +1551,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
-
+                  
                   return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -1571,18 +1571,21 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-          });
 
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                registrants[i].service = of(result);
-              else 
-                registrants[i].service = of(null);
-              
-              return registrants[i];
-            });
+            return combineLatest([getService$]).pipe(
+              switchMap(results => {
+                const [service] = results;
+                
+                if (service)
+                  registrant.service = of(service);
+                else {
+                  registrant.service = of(null);
+                }
+                return of(registrant);
+              })
+            );
           });
+          return zip(...observables);
         }
         else return of([]);
       })

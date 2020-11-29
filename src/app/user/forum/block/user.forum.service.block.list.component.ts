@@ -17,6 +17,7 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+import { runInThisContext } from 'vm';
 
 @Component({
   selector: 'user-forum-service-block-list',
@@ -90,6 +91,83 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
       switchMap(serviceBlocks => {
         if (serviceBlocks && serviceBlocks.length > 0){
           let observables = serviceBlocks.map(serviceBlock => {
+            let getForum$ = this.userForumService.getForum(serviceBlock.forumUid, serviceBlock.forumId).pipe(
+              switchMap(forum => {
+                if (forum) {
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                    switchMap(registrants => {
+                      if (registrants && registrants.length > 0)
+                        return of(registrants[0]);
+                      else
+                        return of(null);
+                    })
+                  );
+
+                  let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                    switchMap(forumImages => {
+                      if (forumImages && forumImages.length > 0){
+                        let getDownloadUrl$: Observable<any>;
+
+                        if (forumImages[0].smallUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+
+                        return combineLatest([getDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [downloadUrl] = results;
+                            
+                            if (downloadUrl)
+                              forumImages[0].url = downloadUrl;
+                            else
+                              forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+              
+                            return of(forumImages[0]);
+                          })
+                        );
+                      }
+                      else return of(null);
+                    })
+                  );
+
+                  return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
+                    switchMap(results => {
+                      const [defaultRegistrant, defaultForumImage] = results;
+
+                      if (defaultRegistrant)
+                        forum.defaultRegistrant = of(defaultRegistrant);
+                      else
+                        forum.defaultRegistrant = of(null);
+                      
+                      if (defaultForumImage)
+                        forum.defaultForumImage = of(defaultForumImage);
+                      else {
+                        let tempImage = {
+                          url: '../../assets/defaultThumbnail.jpg'
+                        };
+                        forum.defaultForumImage = of(tempImage);
+                      }
+                      return of(forum);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            );
+
+            return combineLatest([getForum$]).pipe(
+              switchMap(results => {
+                const [forum] = results;
+                
+                if (forum)
+                  whereServing.forum = of(forum);
+                else {
+                  whereServing.forum = of(null);
+                }
+                return of(whereServing);
+              })
+            );
+
+
+
             return that.userForumService.getForum(serviceBlock.forumUid, serviceBlock.forumId).pipe(
               switchMap(forum => {
                 if (forum){

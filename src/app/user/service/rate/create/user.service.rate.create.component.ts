@@ -408,10 +408,10 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
         if (serviceRates && serviceRates.length > 0){
           let observables = serviceRates.map(serviceRate => {
             if (serviceRate){
-              return this.userServiceService.getService(serviceRate.serviceUid, serviceRate.serviceId).pipe(
+              let getService$ = this.userServiceService.getService(serviceRate.serviceUid, serviceRate.serviceId).pipe(
                 switchMap(service => {
-                  if (service){
-                    let getServiceReview$ = this.userServiceReviewService.getUserServiceReview(serviceRate.serviceRateServiceUid, serviceRate.serviceRateServiceId, service.uid, service.serviceId);
+                  if (service) {
+                    let getServiceReviews$ = this.userServiceReviewService.getUserServiceReview(serviceRate.serviceRateServiceUid, serviceRate.serviceRateServiceId, service.uid, service.serviceId);
                     let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                       switchMap(serviceImages => {
                         if (serviceImages && serviceImages.length > 0){
@@ -437,7 +437,7 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
                       })
                     );
           
-                    return combineLatest([getDefaultServiceImage$, getServiceReview$]).pipe(
+                    return combineLatest([getDefaultServiceImage$, getServiceReviews$]).pipe(
                       switchMap(results => {
                         const [defaultServiceImage, serviceReviews] = results;
           
@@ -462,20 +462,23 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
                   else return of(null);
                 })
               );
+
+              return combineLatest([getService$]).pipe(
+                switchMap(results => {
+                  const [service] = results;
+                  
+                  if (service)
+                    serviceRate.service = of(service);
+                  else {
+                    serviceRate.service = of(null);
+                  }
+                  return of(serviceRate);
+                })
+              );
             }
             else return of(null);
           });
-    
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                serviceRates[i].service = of(result);
-              else
-                serviceRates[i].service = of(null);
-
-              return serviceRates[i];
-            });
-          });
+          return zip(...observables);
         }
         else return of([]);
       })
