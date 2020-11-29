@@ -88,9 +88,9 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
       switchMap(serviceUserBlocks => {
         if (serviceUserBlocks && serviceUserBlocks.length > 0){
           let observables = serviceUserBlocks.map(serviceUserBlock => {
-            return that.userForumService.getForum(serviceUserBlock.forumUid, serviceUserBlock.forumId).pipe(
+            let getForum$ = that.userForumService.getForum(serviceUserBlock.forumUid, serviceUserBlock.forumId).pipe(
               switchMap(forum => {
-                if (forum){
+                if (forum) {
                   let getUser$ = that.userService.getUser(serviceUserBlock.userId);
                   let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                     switchMap(forumImages => {
@@ -142,18 +142,21 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-          });
 
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                serviceUserBlocks[i].forum = of(result);
-              else 
-                serviceUserBlocks[i].forum = of(null);
-              
-              return serviceUserBlocks[i];
-            });
+            return combineLatest([getForum$]).pipe(
+              switchMap(results => {
+                const [forum] = results;
+                
+                if (forum)
+                  serviceUserBlock.forum = of(forum);
+                else {
+                  serviceUserBlock.forum = of(null);
+                }
+                return of(serviceUserBlock);
+              })
+            );
           });
+          return zip(...observables);
         }
         else return of([]);
       })

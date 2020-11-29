@@ -1414,7 +1414,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               switchMap(whereServings => {
                 if (whereServings && whereServings.length > 0) {
                   let observables = whereServings.map(whereServing => {
-                    return that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
+                    let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
                       switchMap(forum => {
                         if (forum) {
                           let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
@@ -1449,10 +1449,15 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                               else return of(null);
                             })
                           );
-                          
-                          return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
+
+                          return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
                             switchMap(results => {
-                              const [defaultForumImage, defaultRegistrant] = results;
+                              const [defaultRegistrant, defaultForumImage] = results;
+
+                              if (defaultRegistrant)
+                                forum.defaultRegistrant = of(defaultRegistrant);
+                              else
+                                forum.defaultRegistrant = of(null);
 
                               if (defaultForumImage)
                                 forum.defaultForumImage = of(defaultForumImage);
@@ -1462,31 +1467,28 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                                 };
                                 forum.defaultForumImage = of(tempImage);
                               }
-
-                              if (defaultRegistrant)
-                                forum.defaultRegistrant = of(defaultRegistrant);
-                              else
-                                forum.defaultRegistrant = of(null);
-
                               return of(forum);
                             })
                           );
                         }
-                        else
-                          return of(null);
+                        else return of(null);
+                      })
+                    );
+  
+                    return combineLatest([getForum$]).pipe(
+                      switchMap(results => {
+                        const [forum] = results;
+                        
+                        if (forum)
+                          whereServing.forum = of(forum);
+                        else {
+                          whereServing.forum = of(null);
+                        }
+                        return of(whereServing);
                       })
                     );
                   });
-                  
-                  return zip(...observables, (...results) => {
-                    return results.map((result, i) => {
-                      if (result)
-                        whereServings[i].forum = of(result);
-                      else
-                        whereServings[i].forum = of(null);
-                      return whereServings[i];
-                    });
-                  });
+                  return zip(...observables);
                 }
                 else return of([]);
               })

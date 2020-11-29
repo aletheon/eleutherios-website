@@ -94,83 +94,6 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
             let getForum$ = this.userForumService.getForum(serviceBlock.forumUid, serviceBlock.forumId).pipe(
               switchMap(forum => {
                 if (forum) {
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
-                    switchMap(registrants => {
-                      if (registrants && registrants.length > 0)
-                        return of(registrants[0]);
-                      else
-                        return of(null);
-                    })
-                  );
-
-                  let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                    switchMap(forumImages => {
-                      if (forumImages && forumImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
-
-                        if (forumImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-                            
-                            if (downloadUrl)
-                              forumImages[0].url = downloadUrl;
-                            else
-                              forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-              
-                            return of(forumImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
-                  return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
-                    switchMap(results => {
-                      const [defaultRegistrant, defaultForumImage] = results;
-
-                      if (defaultRegistrant)
-                        forum.defaultRegistrant = of(defaultRegistrant);
-                      else
-                        forum.defaultRegistrant = of(null);
-                      
-                      if (defaultForumImage)
-                        forum.defaultForumImage = of(defaultForumImage);
-                      else {
-                        let tempImage = {
-                          url: '../../assets/defaultThumbnail.jpg'
-                        };
-                        forum.defaultForumImage = of(tempImage);
-                      }
-                      return of(forum);
-                    })
-                  );
-                }
-                else return of(null);
-              })
-            );
-
-            return combineLatest([getForum$]).pipe(
-              switchMap(results => {
-                const [forum] = results;
-                
-                if (forum)
-                  whereServing.forum = of(forum);
-                else {
-                  whereServing.forum = of(null);
-                }
-                return of(whereServing);
-              })
-            );
-
-
-
-            return that.userForumService.getForum(serviceBlock.forumUid, serviceBlock.forumId).pipe(
-              switchMap(forum => {
-                if (forum){
                   let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
@@ -283,18 +206,21 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-          });
 
-          return zip(...observables, (...results) => {
-            return results.map((result, i) => {
-              if (result)
-                serviceBlocks[i].forum = of(result);
-              else
-                serviceBlocks[i].forum = of(null);
-              
-              return serviceBlocks[i];
-            });
+            return combineLatest([getForum$]).pipe(
+              switchMap(results => {
+                const [forum] = results;
+                
+                if (forum)
+                  serviceBlock.forum = of(forum);
+                else {
+                  serviceBlock.forum = of(null);
+                }
+                return of(serviceBlock);
+              })
+            );
           });
+          return zip(...observables);
         }
         else return of([]);
       })

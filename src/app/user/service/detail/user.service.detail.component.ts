@@ -685,7 +685,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
               switchMap(whereServings => {
                 if (whereServings && whereServings.length > 0) {
                   let observables = whereServings.map(whereServing => {
-                    return that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
+                    let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
                       switchMap(forum => {
                         if (forum) {
                           let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
@@ -732,20 +732,21 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                         else return of(null);
                       })
                     );
+  
+                    return combineLatest([getForum$]).pipe(
+                      switchMap(results => {
+                        const [forum] = results;
+                        
+                        if (forum)
+                          whereServing.forum = of(forum);
+                        else {
+                          whereServing.forum = of(null);
+                        }
+                        return of(whereServing);
+                      })
+                    );
                   });
-
-                  return zip(...observables, (...results) => {
-                    return results.map((result, i) => {
-                      whereServings[i].type = result.type;
-
-                      if (result)
-                        whereServings[i].forum = of(result);
-                      else 
-                        whereServings[i].forum = of(null);
-
-                      return whereServings[i];
-                    });
-                  });
+                  return zip(...observables);
                 }
                 else return of([]);
               }),
