@@ -146,19 +146,6 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         const payment = createPaymentSnapshot.data();
         await createPaymentRef.update({ status: 'Pending' });
 
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        // HERE ROB TEST THIS
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        /// *********************************
-        /// *********************************
-
         // create receipt
         const receiptId = uuidV4().replace(/-/g, '');
         await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set(
@@ -427,7 +414,7 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 
 	var createUserTotals = function () {
 		return new Promise((resolve, reject) => {
-			admin.database().ref('totals').child(userId).set({ 
+			admin.database().ref('totals').child(userId).set({
 				activityCount: 0, // number of activities this user is serving in
 				forumCount: 0, // number of forums this user has created
 				serviceCount: 0, // number of services this user has created

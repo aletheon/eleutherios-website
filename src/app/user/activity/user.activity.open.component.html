@@ -8,7 +8,7 @@
 <ng-container *ngIf="activities | async;let activityItems">
   <ng-container *ngIf="activityItems.length > 0; then showactivity"></ng-container>
   <ng-template #showactivity>
-    <div style="display:flex;flex-direction:column;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;padding:0 3px 0 10px">
       <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
         <div class="alert alert-danger" style="flex:none;width:100%;display:flex;flex-direction:column;margin-bottom:6px">
           <!-- title bar -->

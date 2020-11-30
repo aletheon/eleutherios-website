@@ -8,7 +8,7 @@
 <ng-container *ngIf="activities | async;let activityItems">
   <ng-container *ngIf="activityItems.length > 0; then showactivity else noactivity"></ng-container>
   <ng-template #showactivity>
-    <div style="display:flex;flex-direction:column;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;padding:0 3px 0 3px">
       <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
         <div [ngClass]="activity.highlight == true ? 'alert alert-danger highlight' : 'alert alert-danger'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:6px">
           <!-- forum image -->

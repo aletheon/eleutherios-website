@@ -1,5 +1,5 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="user | async;let userItem">
+<ng-container *ngIf="auth.user | async;let userItem">
 	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
 		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 			<h4 style="flex:none">Settings</h4>
@@ -10,9 +10,14 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="userGroup" novalidate>
-				<p *ngIf="userItem.receivePushNotifications == false" style="margin-bottom:10px;padding:6px;background-color:rgb(188, 194, 202);border:1px solid #007FFF">
+				<div *ngIf="userItem.receivePushNotifications == false" class="panel-group">
+					<div class="panel panel-default">
+						<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
+					</div>
+				</div>
+				<!-- <p *ngIf="userItem.receivePushNotifications == false" class="panel panel-default" style="margin-bottom:10px;padding:6px">
 					<b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).
-				</p>
+				</p> -->
 				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;padding:5px">
 					<div style="flex:1">
 						<p>Push Notifications</p>
@@ -45,7 +50,7 @@
 						<mat-checkbox formControlName="receiveForumPostNotifications" (change)="saveChanges()"></mat-checkbox>
 					</div>
 				</div>
-				<div style="display:flex;flex-direction:row;justify-content:flex-start">
+				<div style="display:flex;flex-direction:row;justify-content:flex-end">
 					<button (click)="delete()" type="button" class="btn btn-danger">Remove Account</button>
 				</div>
 			</form>
