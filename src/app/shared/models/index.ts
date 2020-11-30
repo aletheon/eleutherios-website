@@ -28,3 +28,4 @@ export * from './service.created.review.model';
 export * from './service.rate.model';
 export * from './service.review.comment.model';
 export * from './service.review.model';
+export * from './payment.model';

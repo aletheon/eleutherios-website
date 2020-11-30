@@ -65,6 +65,7 @@ import { UserNotificationListComponent } from './user/notification/list/user.not
 import { UserTagListComponent } from './user/tag/list/user.tag.list.component';
 import { UserAlertListComponent } from './user/alert/list/user.alert.list.component';
 import { UserSettingEditComponent } from './user/setting/edit/user.setting.edit.component';
+import { UserPaymentNewComponent } from './user/payment/new/user.payment.new.component';
 
 const routes: Routes = [
   // **********************************************
@@ -230,6 +231,11 @@ const routes: Routes = [
   {
     path: 'user/service/detail',
     component: UserServiceDetailComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'user/payment/new',
+    component: UserPaymentNewComponent,
     canActivate: [AuthGuard]
   },
   {
