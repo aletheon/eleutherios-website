@@ -44,7 +44,6 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
   public sellerService: Observable<any>;
   public payment: Observable<any>;
   public serviceGroup: FormGroup;
-  public paymentGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
   public userServices: Observable<any[]>;
   public userServicesCtrl: FormControl;
