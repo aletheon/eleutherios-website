@@ -7,9 +7,10 @@ import {
   UserPaymentService,
   UserServiceService,
   UserServiceImageService,
-  Payment
+  Payment,
+  NoTitlePipe,
+  TruncatePipe
 } from '../../../shared';
-import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -77,6 +78,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
     private stripeService: StripeService,
     private router: Router,
     private snackbar: MatSnackBar) {
+      this.userServicesCtrl = new FormControl();
   }
 
   trackUserServices (index, service) { return service.serviceId; }
@@ -152,7 +154,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      this._sellerUid = params['uid']
+      this._sellerUid = params['userId']
       this._sellerServiceId = params['serviceId']
 
       this.userServiceService.getServiceFromPromise(this._sellerUid, this._sellerServiceId)
@@ -234,8 +236,27 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
     this._serviceSubscription = this.sellerService
       .subscribe(service => {
         if (service){
-          this.serviceGroup.patchValue(service);
-          this.serviceGroup.setValue({ name: service.title }); // transponse --> stripe requires this naming
+          this.serviceGroup.setValue({ 
+            serviceId: service.serviceId,
+            uid: service.uid,
+            type: service.type,
+            title: service.title,
+            name: service.title,
+            title_lowercase: service.title_lowercase,
+            description: service.description,
+            website: service.website,
+            default: service.default,
+            indexed: service.indexed,
+            rate: service.rate,
+            paymentType: service.paymentType,
+            amount: service.amount,
+            currency: service.currency,
+            includeDescriptionInDetailPage: service.includeDescriptionInDetailPage,
+            includeImagesInDetailPage: service.includeImagesInDetailPage,
+            includeTagsInDetailPage: service.includeTagsInDetailPage,
+            lastUpdateDate: service.lastUpdateDate,
+            creationDate: service.creationDate
+          });
         }
         else {
           const snackBarRef = this.snackbar.openFromComponent(

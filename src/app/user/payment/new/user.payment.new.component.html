@@ -19,11 +19,16 @@
         </div>
         <div style="flex:none;display:flex;flex-direction:row">
           <div style="flex:1">
-            <mat-form-field>
-              <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service">
-                <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <ng-container *ngIf="userServices | async;let userServiceItems">
+              <ng-container *ngIf="userServiceItems.length > 0; then showuserservices"></ng-container>
+              <ng-template #showuserservices>
+                <mat-form-field>
+                  <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service">
+                    <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
+            </ng-container>
           </div>
           <div style="flex:none">
             <button [disabled]="showPaymentButton" class="pay" (click)="pay()" >PAY</button>

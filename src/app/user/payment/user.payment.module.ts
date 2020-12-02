@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { UserPaymentNewComponent } from './new/user.payment.new.component';
 
+import { StripeService } from 'ngx-stripe';
 import {
   SiteTotalService,
   UserPaymentService,
@@ -34,6 +35,7 @@ import {
     UserPaymentNewComponent
   ],
   providers: [
+    StripeService,
     SiteTotalService,
     UserPaymentService,
     UserServiceService,
