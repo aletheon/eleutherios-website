@@ -6,10 +6,30 @@
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
 				<back></back>
 			</div>
-		</div>
-		<div style="flex:1">
-      <!-- 1) select list for end user to choose service to pay with -->
-      
-		</div>
+    </div>
+    <form [formGroup]="serviceGroup" novalidate>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div style="flex:none">
+          <input formControlName="name" />
+          <input formControlName="amount" />
+          <ngx-stripe-card
+            [options]="cardOptions"
+            [elementsOptions]="elementsOptions">
+          </ngx-stripe-card>
+        </div>
+        <div style="flex:none;display:flex;flex-direction:row">
+          <div style="flex:1">
+            <mat-form-field>
+              <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service">
+                <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div style="flex:none">
+            <button [disabled]="showPaymentButton" class="pay" (click)="pay()" >PAY</button>
+          </div>
+        </div>
+      </div>
+    </form>
 	</div>
 </ng-container>

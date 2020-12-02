@@ -1,18 +1,25 @@
-// https://stackoverflow.com/questions/56041334/stripe-paymentintent-card-how-to-implement
-
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { Router } from '@angular/router';
 import {
   UserPaymentService,
   UserServiceService,
   UserServiceImageService,
   Payment
 } from '../../../shared';
+import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
+import { StripeService, StripeCardComponent } from 'ngx-stripe';
+import {
+  StripeCardElementOptions,
+  StripeElementsOptions,
+  PaymentIntent,
+} from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -24,23 +31,56 @@ import * as firebase from 'firebase/app';
   styleUrls: ['./user.payment.new.component.css']
 })
 export class UserPaymentNewComponent implements OnInit, OnDestroy {
+  @ViewChild(StripeCardComponent) card: StripeCardComponent;
   private _loading = new BehaviorSubject(false);
   private _sellerServiceSubscription: Subscription;
   private _buyerServiceSubscription: Subscription;
   private _paymentSubscription: Subscription;
+  private _serviceSubscription: Subscription;
+  private _defaultServiceImageSubscription: Subscription;
   private _sellerUid: string;
   private _sellerServiceId: string;
   
   public sellerService: Observable<any>;
+  public payment: Observable<any>;
+  public serviceGroup: FormGroup;
+  public paymentGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public userServices: Observable<any[]>;
+  public userServicesCtrl: FormControl;
+  public defaultServiceImage: Observable<any>;
+  public numberItems: number = 100;
+  public showPaymentButton: boolean = false;
+  public cardOptions: StripeCardElementOptions = {
+    style: {
+      base: {
+        iconColor: '#666EE8',
+        color: '#31325F',
+        fontWeight: '300',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSize: '18px',
+        '::placeholder': {
+          color: '#CFD7E0',
+        },
+      },
+    },
+  };
+  public elementsOptions: StripeElementsOptions = {
+    locale: 'en',
+  };
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
+    private fb: FormBuilder,
     private userServiceService: UserServiceService,
     private userServiceImageService: UserServiceImageService,
     private userPaymentService: UserPaymentService,
+    private stripeService: StripeService,
+    private router: Router,
     private snackbar: MatSnackBar) {
   }
+
+  trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
     if (this._sellerServiceSubscription)
@@ -51,28 +91,61 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
 
     if (this._paymentSubscription)
       this._paymentSubscription.unsubscribe();
+
+    if (this._serviceSubscription)
+      this._serviceSubscription.unsubscribe();
+
+    if (this._defaultServiceImageSubscription)
+      this._defaultServiceImageSubscription.unsubscribe();
   }
 
-  private createPayment (buyerService, sellerService){
-    const newPayment: Payment = {
-      paymentId: '',
-      receiptId: '',
-      amount: sellerService.amount,
-      description: sellerService.description,
-      status: '',
-      buyerUid: buyerService.uid,
-      buyerServiceId: buyerService.serviceId,
-      sellerUid: sellerService.uid,
-      sellerServiceId: sellerService.serviceId,
-      paymentIntent: null,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
+  selectService(){
+    if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0){
+      if (this.auth.uid != this.userServicesCtrl.value.uid)
+        this.showPaymentButton = true;
+    }
+  }
 
-    this._paymentSubscription = this.userPaymentService.create(this.auth.uid, newPayment).subscribe(payment => {
-      if (payment){
+  pay(){
+    this.sellerService.subscribe(sellerService => {
+      const newPayment: Payment = {
+        paymentId: '',
+        receiptId: '',
+        amount: sellerService.amount,
+        description: sellerService.description,
+        status: '',
+        buyerUid: this.userServicesCtrl.value.uid,
+        buyerServiceId: this.userServicesCtrl.value.serviceId,
+        sellerUid: sellerService.uid,
+        sellerServiceId: sellerService.serviceId,
+        paymentIntent: null,
+        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-      }
+      this._paymentSubscription = this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
+        if (payment){
+          this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+            payment_method: {
+              card: this.card.element,
+              billing_details: {
+                name: sellerService.title
+              },
+            },
+          })
+          .subscribe((result) => {
+            if (result.error) {
+              // Show error to your customer (e.g., insufficient funds)
+              console.log(result.error.message);
+            } else {
+              // The payment has been processed!
+              if (result.paymentIntent.status === 'succeeded') {
+                // Show a success message to your customer
+              }
+            }
+          });
+        }
+      });
     });
   }
 
@@ -83,17 +156,116 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
       this._sellerUid = params['uid']
       this._sellerServiceId = params['serviceId']
 
-      this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId).pipe(
-        switchMap(service => {
+      this.userServiceService.getServiceFromPromise(this._sellerUid, this._sellerServiceId)
+        .then(service => {
           if (service){
-            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+            if (service.paymentType == 'Payment'){
+              this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
+              this.initForm();
+            }
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: `Status of service was changed to free`,
+                  panelClass: ['red-snackbar']
+                }
+              );
+
+              if (service.type == 'Public')
+                this.router.navigate(['/']);
+              else
+                this.router.navigate(['/']);
+            }
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Service does not exist or was recently removed',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
+        }
+      )
+      .catch(error => {
+        const snackBarRef = this.snackbar.openFromComponent(
+          NotificationSnackBar,
+          {
+            duration: 8000,
+            data: error.message,
+            panelClass: ['red-snackbar']
+          }
+        );
+        this.router.navigate(['/']);
+      });
+    });
+  }
+
+  private initForm () {
+    const that = this;
+
+    this.serviceGroup = this.fb.group({
+      serviceId:                          [''],
+      uid:                                [''],
+      type:                               [''],
+      title:                              [''],
+      name:                               [''],
+      title_lowercase:                    [''],
+      description:                        [''],
+      website:                            [''],
+      default:                            [''],
+      indexed:                            [''],
+      rate:                               [''],
+      paymentType:                        [''],
+      amount:                             [''],
+      currency:                           [''],
+      includeDescriptionInDetailPage:     [''],
+      includeImagesInDetailPage:          [''],
+      includeTagsInDetailPage:            [''],
+      lastUpdateDate:                     [''],
+      creationDate:                       ['']
+    });
+
+    //  ongoing subscription
+    this._serviceSubscription = this.sellerService
+      .subscribe(service => {
+        if (service){
+          this.serviceGroup.patchValue(service);
+          this.serviceGroup.setValue({ name: service.title }); // transponse --> stripe requires this naming
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'Service does not exist or was recently removed',
+              panelClass: ['red-snackbar']
+            }
+          );
+          this.router.navigate(['/']);
+        }
+      }
+    );
+
+    // run once subscription
+    const runOnceSubscription = this.sellerService.subscribe(service => {
+      if (service){
+        let load = async function(){
+          try {
+            // get seller service image
+            that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
-
+        
                   if (serviceImages[0].smallUrl)
                     getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-          
+        
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
@@ -102,63 +274,42 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-          
+        
                       return of(serviceImages[0]);
                     })
                   );
                 }
                 else return of(null);
               })
-            );
-            
-            return combineLatest([getDefaultServiceImage$]).pipe(
-              switchMap(results => {
-                const [defaultServiceImage] = results;
+            )
+            .subscribe(serviceImage => {
+              if (serviceImage)
+                that.defaultServiceImage = of(serviceImage);
+              else {
+                let tempImage = {
+                  url: '../../../assets/defaultThumbnail.jpg'
+                };
+                that.defaultServiceImage = of(tempImage);
+              }
+            });
 
-                if (defaultServiceImage)
-                  service.defaultServiceImage = of(defaultServiceImage);
-                else {
-                  let tempImage = {
-                    url: '../../../assets/defaultThumbnail.jpg'
-                  };
-                  service.defaultServiceImage = of(tempImage);
-                }
-                return of(service);
-              })
-            );
+            // get end user services
+            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
           }
-          else return of(null);
+          catch (error) {
+            throw error;
+          }
+        }
+    
+        // call load
+        load().then(() => {
+          this._loading.next(false);
+          runOnceSubscription.unsubscribe();
         })
-      )
+        .catch((error) =>{
+          console.log('initForm ' + error);
+        });
+      }
     });
-
-    // const newPayment: Payment = {
-    //   paymentId: '',
-    //   receiptId: '',
-    //   amount: 0,
-    //   description: '',
-    //   status: '',
-    //   buyerUid: '',
-    //   buyerServiceId: '',
-    //   sellerUid: '',
-    //   sellerServiceId: '',
-    //   paymentIntent: null,
-    //   creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-    //   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-    // };
-
-    // this.userPaymentService.create(this.auth.uid, newPayment).then(() => {
-    //   // do something
-    // })
-    // .catch(error => {
-    //   const snackBarRef = this.snackbar.openFromComponent(
-    //     NotificationSnackBar,
-    //     {
-    //       duration: 8000,
-    //       data: error.message,
-    //       panelClass: ['red-snackbar']
-    //     }
-    //   );
-    // });
   }
 }

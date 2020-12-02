@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { environment } from '../../../environments/environment';
 import {
   ClickEvent
 } from 'angular-star-rating';
@@ -33,20 +32,11 @@ import {
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
-import { StripeService } from 'ngx-stripe';
-import {
-  StripeElementsOptions,
-  PaymentRequestPaymentMethodEvent,
-  PaymentIntent,
-  PaymentRequestShippingAddressEvent,
-} from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
-
-declare var Stripe: any;
 
 @Component({
   selector: 'service-detail',
@@ -85,109 +75,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
   public defaultReview: Observable<any>;
-
-  @Input() amount: number;
-  @Input() lablel: string;
-
-  elements: any;
-  paymentRequest: any;
-  prButton: any;
-
-  // @ViewChild('payElement') payElement;
-
-  // public paymentRequestOptions = {
-  //   country: 'ES',
-  //   currency: 'eur',
-  //   total: {
-  //     label: 'Demo Total',
-  //     amount: 1099,
-  //   },
-  //   requestPayerName: true,
-  //   requestPayerEmail: true,
-  // };
-
-  // public elementsOptions: StripeElementsOptions = {
-  //   locale: 'es',
-  // };
-
-  // public onPaymentMethod(ev: PaymentRequestPaymentMethodEvent) {
-  //   this.createPaymentIntent()
-  //     .pipe(
-  //       switchMap((pi) => {
-  //         return this.stripeService
-  //           .confirmCardPayment(
-  //             pi.client_secret,
-  //             { payment_method: ev.paymentMethod.id },
-  //             { handleActions: false }
-  //           )
-  //           .pipe(
-  //             switchMap((confirmResult) => {
-  //               if (confirmResult.error) {
-  //                 // Report to the browser that the payment failed, 
-  //                 // prompting it to re-show the payment interface, 
-  //                 // or show an error message and close the payment.
-  //                 ev.complete('fail');
-  //                 return of({
-  //                   error: new Error('Error Confirming the payment'),
-  //                 });
-  //               } else {
-  //                 // Report to the browser that the confirmation was 
-  //                 // successful, prompting it to close the browser 
-  //                 // payment method collection interface.
-  //                 ev.complete('success');
-  //                 // Let Stripe.js handle the rest of the payment flow.
-  //                 return this.stripeService.confirmCardPayment(
-  //                   pi.client_secret
-  //                 );
-  //               }
-  //             })
-  //           );
-  //       })
-  //     )
-  //     .subscribe((result) => {
-  //       if (result.error) {
-  //         // The payment failed -- ask your customer for a new payment method.
-  //       } else {
-  //         // The payment has succeeded.
-  //       }
-  //     });
-  // }
-
-  // public onShippingAddressChange(ev: PaymentRequestShippingAddressEvent) {
-  //   if (ev.shippingAddress.country !== 'US') {
-  //     ev.updateWith({ status: 'invalid_shipping_address' });
-  //   } else {
-  //     // Replace this with your own custom implementation if needed
-  //     fetch('/calculateShipping', {
-  //       data: JSON.stringify({
-  //         shippingAddress: ev.shippingAddress,
-  //       }),
-  //     } as any)
-  //       .then((response) => response.json())
-  //       .then((result) =>
-  //         ev.updateWith({
-  //           status: 'success',
-  //           shippingOptions: result.supportedShippingOptions,
-  //         })
-  //       );
-  //   }
-  // }
-
-  // public onNotAvailable() {
-  //   // Subscribe to this event in case you want to act
-  //   // base on availability
-  //   console.log('Payment Request is not Available');
-  // }
-
-  // createPaymentIntent(): Observable<PaymentIntent> {
-  //   // Replace this with your own custom implementation 
-  //   // to perform a Payment Intent Creation
-  //   // You will need your own Server to do that
-  //   return this.http.post<PaymentIntent>(
-  //     '/create-payment-intent',
-  //     { amount: this.paymentRequestOptions.total.amount }
-  //   );
-  // }
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -209,7 +96,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private route: ActivatedRoute,
     private snackbar: MatSnackBar,
     private location: Location,
-    private stripeService: StripeService,
     private http: HttpClient,
     private changeDetector : ChangeDetectorRef) {
       this.userForumsCtrl = new FormControl();
@@ -582,9 +468,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit () {
-    // Stripe public key
-    const stripe = Stripe(environment.stripeTestKey);
-
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
