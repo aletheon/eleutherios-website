@@ -9,30 +9,51 @@
     </div>
     <form [formGroup]="serviceGroup" novalidate>
       <div style="flex:1;display:flex;flex-direction:column">
-        <div style="flex:none">
-          <input formControlName="name" />
-          <input formControlName="amount" />
-          <ngx-stripe-card
-            [options]="cardOptions"
-            [elementsOptions]="elementsOptions">
-          </ngx-stripe-card>
-        </div>
-        <div style="flex:none;display:flex;flex-direction:row">
-          <div style="flex:1">
+        <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-flow:wrap;">
+          <div style="flex:none;margin-right:10px">
+            <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+            <ng-template #showdefaultserviceimage>
+              <ng-container *ngIf="defaultServiceImage | async;let image">
+                <div>
+                  <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                  <ng-template #showimage>
+                    <img [src]="image.url" (click)="showImageList()" style="cursor:pointer">
+                    <!-- <img [src]="image.url" *ngIf="serviceGroup.get('type').value == 'Public'" [routerLink]="['/service/image/list']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer"> -->
+                  </ng-template>
+                  <ng-template #noimage>
+                    <img [src]="image.url">
+                  </ng-template>
+                </div>
+              </ng-container>
+            </ng-template>
+          </div>
+          <div style="flex:none;margin-right:10px">
+            <input formControlName="name" />
+          </div>
+          <div style="flex:none;">
+            <input formControlName="amount" />
+          </div>
+          <div style="flex:1;text-align:right">
             <ng-container *ngIf="userServices | async;let userServiceItems">
               <ng-container *ngIf="userServiceItems.length > 0; then showuserservices"></ng-container>
               <ng-template #showuserservices>
                 <mat-form-field>
-                  <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service">
+                  <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service to pay with">
                     <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </ng-template>
             </ng-container>
           </div>
-          <div style="flex:none">
-            <button [disabled]="showPaymentButton" class="pay" (click)="pay()" >PAY</button>
-          </div>
+          <!-- <div style="flex:none">
+            <ngx-stripe-card
+              [options]="cardOptions"
+              [elementsOptions]="elementsOptions">
+            </ngx-stripe-card>
+          </div> -->
+        </div>
+        <div style="flex:none;text-align:right">
+          <button [disabled]="showPaymentButton" class="pay" (click)="pay()">PAY</button>
         </div>
       </div>
     </form>

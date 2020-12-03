@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackModule } from '../../shared';
+import { PipeModule } from '../../shared';
 import { LoadingSpinnerModule } from '../../shared';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,7 +30,8 @@ import {
     MatSnackBarModule,
     MatIconModule,
     LoadingSpinnerModule,
-    BackModule
+    BackModule,
+    PipeModule
   ],
   declarations: [
     UserPaymentNewComponent

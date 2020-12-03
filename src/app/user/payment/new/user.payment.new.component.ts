@@ -12,6 +12,22 @@ import {
   TruncatePipe
 } from '../../../shared';
 
+// import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+// import { Location } from '@angular/common';
+// import { AngularFireDatabase } from '@angular/fire/database';
+// import { ActivatedRoute, Params } from '@angular/router';
+// import { AuthService } from '../../../core/auth.service';
+// import { Router } from '@angular/router';
+// import { FormGroup, FormControl, FormBuilder} from '@angular/forms';
+// import {
+//   UserPaymentService,
+//   UserServiceService,
+//   UserServiceImageService,
+//   Payment,
+//   NoTitlePipe,
+//   TruncatePipe
+// } from '../../../shared';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
@@ -50,7 +66,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
   public userServicesCtrl: FormControl;
   public defaultServiceImage: Observable<any>;
   public numberItems: number = 100;
-  public showPaymentButton: boolean = false;
+  public showPaymentButton: boolean = true;
   public cardOptions: StripeCardElementOptions = {
     style: {
       base: {
@@ -100,10 +116,23 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
       this._defaultServiceImageSubscription.unsubscribe();
   }
 
+  showImageList(){
+    // console.log('service ' + this.serviceGroup.get('serviceId').value);
+
+    if (this.serviceGroup.get('type').value == 'Private')
+      this.router.navigate(['/user/service/image/list'], { queryParams: { userId: this.serviceGroup.get('uid').value, serviceId: this.serviceGroup.get('serviceId').value } });
+    else
+      this.router.navigate(['/service/image/list'], { queryParams: { serviceId: this.serviceGroup.get('serviceId').value } });
+  }
+
   selectService(){
     if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0){
-      if (this.auth.uid != this.userServicesCtrl.value.uid)
-        this.showPaymentButton = true;
+      this.sellerService.subscribe(sellerService => {
+        if (sellerService.serviceId != this.userServicesCtrl.value.serviceId)
+          this.showPaymentButton = false;
+        else
+          this.showPaymentButton = true;
+      });
     }
   }
 
