@@ -48,12 +48,25 @@ export class UserPaymentService {
     return this.afs.collection(`users/${parentUserId}/payments`).doc(paymentId).valueChanges();
   }
 
-  public create (parentUserId: string, data: any): Observable<any> {
-    const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(this.afs.createId());
-    data.paymentId = paymentRef.ref.id;
-    paymentRef.set(data);
-    return paymentRef.valueChanges();
+  public create(parentUserId: string, data: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(this.afs.createId());
+      data.paymentId = paymentRef.ref.id;
+      paymentRef.set(data).then(() => {
+        resolve(data.paymentId);
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
   }
+
+  // public create (parentUserId: string, data: any): Observable<any> {
+  //   const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(this.afs.createId());
+  //   data.paymentId = paymentRef.ref.id;
+  //   paymentRef.set(data);
+  //   return paymentRef.valueChanges();
+  // }
 
   public update (parentUserId: string, paymentId: string, data: any) {
     const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(paymentId);

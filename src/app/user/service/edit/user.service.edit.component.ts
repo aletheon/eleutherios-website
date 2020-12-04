@@ -200,17 +200,17 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         }, 500);
         return;
       }
-      else if (this.serviceGroup.get('paymentType').value == 'Payment'){
-        if (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max')){
-          setTimeout(() => {
-            for (let i in this.serviceGroup.controls) {
-              this.serviceGroup.controls[i].markAsTouched();
-            }
-            if (this.amountRef) this.amountRef.nativeElement.focus();
-          }, 500);
-          return;
-        }
-      }
+      // else if (this.serviceGroup.get('paymentType').value == 'Payment'){
+      //   if (this.serviceGroup.get('amount').hasError('pattern') || this.serviceGroup.get('amount').hasError('min') || this.serviceGroup.get('amount').hasError('max')){
+      //     setTimeout(() => {
+      //       for (let i in this.serviceGroup.controls) {
+      //         this.serviceGroup.controls[i].markAsTouched();
+      //       }
+      //       if (this.amountRef) this.amountRef.nativeElement.focus();
+      //     }, 500);
+      //     return;
+      //   }
+      // }
     }
 
     this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {

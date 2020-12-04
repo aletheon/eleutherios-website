@@ -611,26 +611,66 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
     const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
     const buyer = buyerSnapshot.data();
 
+    console.log('buyer ' + JSON.stringify(buyer));
+
     // get seller
     const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
     const seller = sellerSnapshot.data();
 
-    // Create a charge using the paymentId as the idempotency key and stripeAccountId as the seller
-    const idempotencyKey = paymentId;
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: payment.amount,
-        currency: seller.currency,
+    console.log('seller ' + JSON.stringify(seller));
+
+    // get customer
+    const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
+    const customer = customerSnapshot.data();
+
+    if (customer){
+      console.log('customer exists ' + JSON.stringify(customer));
+
+      return Promise.resolve();
+      // const existingCustomerPaymentIntent = await stripe.paymentIntents.create({
+      //   amount: payment.amount,
+      //   currency: seller.stripeCurrency,
+      //   customer: buyer.stripeCustomerId,
+      //   application_fee_amount: 0,
+      //   metadata: { userId: userId, paymentId: paymentId }
+      // }, {
+      //   stripeAccount: seller.stripeAccountId,
+      // });
+      // return await snap.ref.set({ paymentIntent: existingCustomerPaymentIntent });
+    }
+    else {
+      // customer doesn't exist in connected account customer list
+      // add them to that list
+      console.log('customer does not exist');
+
+      const token = await stripe.tokens.create({
         customer: buyer.stripeCustomerId,
-        application_fee_amount: 0,
-        metadata: { userId: userId, paymentId: paymentId }
       }, {
         stripeAccount: seller.stripeAccountId,
-      },
-      { idempotencyKey }
-    );
-    
-    // If the result is successful, write it back to the database.
-    return await snap.ref.set({ paymentIntent: paymentIntent });
+      });
+
+      console.log('token ' + JSON.stringify(token));
+  
+      const customer = await stripe.customers.create({
+        source: token.id,
+      }, {
+        stripeAccount: seller.stripeAccountId,
+      });
+
+      console.log('created customer ' + JSON.stringify(customer));
+      return Promise.resolve();
+
+      // const newCustomerPaymentIntent = await stripe.paymentIntents.create({
+      //   amount: payment.amount,
+      //   currency: seller.stripeCurrency,
+      //   customer: customer.id,
+      //   application_fee_amount: 0,
+      //   metadata: { userId: userId, paymentId: paymentId }
+      // }, {
+      //   stripeAccount: seller.stripeAccountId,
+      // });
+      // return await snap.ref.set({ paymentIntent: newCustomerPaymentIntent });
+    }
   }
   catch (error) {
     return Promise.reject(error);

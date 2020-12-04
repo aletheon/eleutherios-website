@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
@@ -12,30 +12,21 @@ import {
   TruncatePipe
 } from '../../../shared';
 
-// import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-// import { Location } from '@angular/common';
-// import { AngularFireDatabase } from '@angular/fire/database';
-// import { ActivatedRoute, Params } from '@angular/router';
-// import { AuthService } from '../../../core/auth.service';
-// import { Router } from '@angular/router';
-// import { FormGroup, FormControl, FormBuilder} from '@angular/forms';
-// import {
-//   UserPaymentService,
-//   UserServiceService,
-//   UserServiceImageService,
-//   Payment,
-//   NoTitlePipe,
-//   TruncatePipe
-// } from '../../../shared';
-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
-import { StripeService, StripeCardComponent } from 'ngx-stripe';
+// import { StripeService, StripeCardComponent } from 'ngx-stripe';
+// import {
+//   StripeCardElementOptions,
+//   StripeElementsOptions,
+//   PaymentIntent,
+// } from '@stripe/stripe-js';
+import { StripeService } from "ngx-stripe";
 import {
+  StripeElements,
+  StripeCardElement,
   StripeCardElementOptions,
-  StripeElementsOptions,
-  PaymentIntent,
+  StripeElementsOptions
 } from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
@@ -47,8 +38,7 @@ import * as firebase from 'firebase/app';
   templateUrl: './user.payment.new.component.html',
   styleUrls: ['./user.payment.new.component.css']
 })
-export class UserPaymentNewComponent implements OnInit, OnDestroy {
-  @ViewChild(StripeCardComponent) card: StripeCardComponent;
+export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit {
   private _loading = new BehaviorSubject(false);
   private _sellerServiceSubscription: Subscription;
   private _buyerServiceSubscription: Subscription;
@@ -67,6 +57,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
   public defaultServiceImage: Observable<any>;
   public numberItems: number = 100;
   public showPaymentButton: boolean = true;
+  public elements: StripeElements;
+  public card: StripeCardElement;
   public cardOptions: StripeCardElementOptions = {
     style: {
       base: {
@@ -98,6 +90,25 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
   }
 
   trackUserServices (index, service) { return service.serviceId; }
+
+  ngAfterViewInit () {
+    let intervalId = setInterval(() => {
+      if(this._loading.getValue() == false) {
+        clearInterval(intervalId);
+
+        this.stripeService.elements(this.elementsOptions)
+          .subscribe(elements => {
+            this.elements = elements;
+            // Only mount the element the first time
+            if (!this.card) {
+              this.card = this.elements.create('card', this.cardOptions);
+              this.card.mount('#card-element');
+            }
+          }
+        );
+      }
+    }, 500);
+  }
 
   ngOnDestroy () {
     if (this._sellerServiceSubscription)
@@ -141,7 +152,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
       const newPayment: Payment = {
         paymentId: '',
         receiptId: '',
-        amount: sellerService.amount,
+        amount: 5,
         description: sellerService.description,
         status: '',
         buyerUid: this.userServicesCtrl.value.uid,
@@ -153,29 +164,65 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      this._paymentSubscription = this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
-        if (payment){
-          this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
-            payment_method: {
-              card: this.card.element,
-              billing_details: {
-                name: sellerService.title
-              },
-            },
-          })
-          .subscribe((result) => {
-            if (result.error) {
-              // Show error to your customer (e.g., insufficient funds)
-              console.log(result.error.message);
-            } else {
-              // The payment has been processed!
-              if (result.paymentIntent.status === 'succeeded') {
-                // Show a success message to your customer
-              }
-            }
-          });
-        }
+      this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).then(paymentId => {
+        console.log('paymentId ' + JSON.stringify(paymentId));
+
+        this._paymentSubscription = this.userPaymentService.getPayment(this.userServicesCtrl.value.uid, paymentId).subscribe(payment => {
+          if (payment){
+            console.log('payment ' + JSON.stringify(payment));
+  
+            // this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+            //   payment_method: {
+            //     card: this.card.element,
+            //     billing_details: {
+            //       name: sellerService.title
+            //     },
+            //   },
+            // })
+            // .subscribe((result) => {
+            //   if (result.error) {
+            //     // Show error to your customer (e.g., insufficient funds)
+            //     console.log(result.error.message);
+            //   } else {
+            //     // The payment has been processed!
+            //     if (result.paymentIntent.status === 'succeeded') {
+            //       // Show a success message to your customer
+            //     }
+            //   }
+            // });
+          }
+        })
+      })
+      .catch(error => {
+        console.log(error);
       });
+
+      // this._paymentSubscription = this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
+      //   if (payment){
+      //     console.log('payment ' + JSON.stringify(payment));
+
+
+      //     this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+      //       payment_method: {
+      //         card: this.card.element,
+      //         billing_details: {
+      //           name: sellerService.title
+      //         },
+      //       },
+      //     })
+      //     .subscribe((result) => {
+      //       if (result.error) {
+      //         // Show error to your customer (e.g., insufficient funds)
+      //         console.log(result.error.message);
+      //       } else {
+      //         // The payment has been processed!
+      //         if (result.paymentIntent.status === 'succeeded') {
+      //           // Show a success message to your customer
+      //         }
+      //       }
+      //     });
+      //   }
+      // });
     });
   }
 
@@ -260,6 +307,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
+    this.serviceGroup.get('name').disable();
+    this.serviceGroup.get('amount').disable();
 
     //  ongoing subscription
     this._serviceSubscription = this.sellerService
@@ -278,7 +327,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy {
             indexed: service.indexed,
             rate: service.rate,
             paymentType: service.paymentType,
-            amount: service.amount,
+            amount: 5,
             currency: service.currency,
             includeDescriptionInDetailPage: service.includeDescriptionInDetailPage,
             includeImagesInDetailPage: service.includeImagesInDetailPage,
