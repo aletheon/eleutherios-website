@@ -2,15 +2,15 @@
 <ng-container *ngIf="auth.user | async;let userItem">
   <div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
     
-    <form novalidate (ngSubmit)="createToken()" [formGroup]="serviceGroup">
+    <!-- <form novalidate (ngSubmit)="createToken()" [formGroup]="serviceGroup">
       <input type="text" formControlName="title">
       <div id="card-element" class="field"></div>
       <button type="submit">
         CREATE TOKEN
       </button>
-    </form>
+    </form> -->
 
-		<!-- <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 			<h4 style="flex:none">New Payment</h4>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
 				<back></back>
@@ -18,8 +18,55 @@
     </div>
     <form [formGroup]="serviceGroup" novalidate>
       <div style="flex:1;display:flex;flex-direction:column">
-        <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-flow:wrap;">
-          <div class="alert alert-info" style="flex:1;display:flex;flex-direction:row;align-items:flex-end;flex-flow:wrap">
+        <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-flow:wrap">
+          <div class="alert alert-info" style="flex:none;display:flex;flex-direction:column">
+            <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+              <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+              <ng-template #showdefaultserviceimage>
+                <ng-container *ngIf="defaultServiceImage | async;let image">
+                  <div style="flex:none;margin-right:10px">
+                    <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                    <ng-template #showimage>
+                      <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
+                    </ng-template>
+                    <ng-template #noimage>
+                      <img [src]="image.url">
+                    </ng-template>
+                  </div>
+                </ng-container>
+              </ng-template>
+              <div style="flex:1;margin-right:5px">
+                <p style="word-break: break-all">
+                  <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ serviceGroup.get('title').value }}">{{ serviceGroup.get('title').value | noTitle | truncate: 35 }} <i *ngIf="serviceGroup.get('description').value.length > 0">- {{ serviceGroup.get('description').value | truncate: 80 }}</i></a>
+                </p>
+              </div>
+            </div>
+            <ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+              <div style="flex:none">
+                {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
+              </div>
+            </ng-container>
+            <!-- <div style="flex:none;display:flex;flex-direction:row">
+              <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
+                <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+                <ng-template #showtags>
+                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+                    <ng-container *ngFor="let serviceTag of serviceTagItems">
+                      <span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+                    </ng-container>
+                  </div>
+                </ng-template>
+              </ng-container>
+              <ng-container *ngIf="service.paymentType == 'Payment'">
+                <div style="flex:none">
+                  {{ service.currency.toUpperCase() }}({{ service.amount.toFixed(2) }})
+                </div>
+              </ng-container>
+            </div> -->
+          </div>
+
+
+          <!-- <div class="alert alert-info" style="flex:1;display:flex;flex-direction:row;align-items:flex-end;flex-flow:wrap">
             <div style="flex:none;margin-right:10px">
               <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>
@@ -42,8 +89,13 @@
             <div style="flex:1;text-align:right;margin-right:5px">
               <input formControlName="amount" />
             </div>
+          </div> -->
+        </div>
+        <div style="display:flex;flex-direction:row;align-items:center;">
+          <div style="flex:1">
+            <div id="card-element" class="field"></div>
           </div>
-          <div style="flex:none;margin-left:10px">
+          <div style="flex:none;margin-right:10px">
             <ng-container *ngIf="userServices | async;let userServiceItems">
               <ng-container *ngIf="userServiceItems.length > 0; then showuserservices"></ng-container>
               <ng-template #showuserservices>
@@ -55,17 +107,11 @@
               </ng-template>
             </ng-container>
           </div>
-        </div>
-        <div style="flex:none;text-align:right">
-          <ngx-stripe-card
-            [options]="cardOptions"
-            [elementsOptions]="elementsOptions">
-          </ngx-stripe-card>
-        </div>
-        <div style="flex:none;text-align:right">
-          <button [disabled]="showPaymentButton" class="pay" (click)="pay()">PAY</button>
+          <div style="flex:none">
+            <button [disabled]="showPaymentButton" class="pay" (click)="pay()">PAY</button>
+          </div>
         </div>
       </div>
-    </form> -->
+    </form>
 	</div>
 </ng-container>
