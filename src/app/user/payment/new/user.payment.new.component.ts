@@ -7,6 +7,7 @@ import {
   UserPaymentService,
   UserServiceService,
   UserServiceImageService,
+  UserServiceTagService,
   Payment,
   NoTitlePipe,
   TruncatePipe
@@ -53,6 +54,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   public serviceGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
   public userServices: Observable<any[]>;
+  public serviceTags: Observable<any[]>;
   public userServicesCtrl: FormControl;
   public defaultServiceImage: Observable<any>;
   public numberItems: number = 100;
@@ -82,6 +84,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     private fb: FormBuilder,
     private userServiceService: UserServiceService,
     private userServiceImageService: UserServiceImageService,
+    private userServiceTagService: UserServiceTagService,
     private userPaymentService: UserPaymentService,
     private stripeService: StripeService,
     private router: Router,
@@ -399,6 +402,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 that.defaultServiceImage = of(tempImage);
               }
             });
+
+            // get service tags
+            that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
             // get end user services
             that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);

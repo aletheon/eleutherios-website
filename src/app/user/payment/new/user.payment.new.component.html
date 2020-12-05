@@ -39,6 +39,18 @@
                 </div>
               </ng-container>
             </div>
+            <div style="flex:none;display:flex;flex-direction:row">
+              <ng-container *ngIf="serviceTags | async;let serviceTagItems">
+                <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+                <ng-template #showtags>
+                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+                    <ng-container *ngFor="let serviceTag of serviceTagItems">
+                      <span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+                    </ng-container>
+                  </div>
+                </ng-template>
+              </ng-container>
+            </div>
           </div>
         </div>
         <div style="flex:none;display:flex;flex-direction:row;align-items:center">
