@@ -139,7 +139,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   selectService(){
     if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0){
       this.sellerService.subscribe(sellerService => {
-        if (sellerService.serviceId != this.userServicesCtrl.value.serviceId)
+        if (sellerService.uid != this.userServicesCtrl.value.uid)
           this.showPaymentButton = false;
         else
           this.showPaymentButton = true;
