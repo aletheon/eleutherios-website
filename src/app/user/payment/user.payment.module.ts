@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackModule } from '../../shared';
 import { PipeModule } from '../../shared';
+import { AppRoutingModule } from '../../app-routing.module';
 import { LoadingSpinnerModule } from '../../shared';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -31,7 +32,8 @@ import {
     MatIconModule,
     LoadingSpinnerModule,
     BackModule,
-    PipeModule
+    PipeModule,
+    AppRoutingModule
   ],
   declarations: [
     UserPaymentNewComponent

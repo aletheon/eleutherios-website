@@ -148,54 +148,63 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   pay(){
-    this.sellerService.subscribe(sellerService => {
-      const newPayment: Payment = {
-        paymentId: '',
-        receiptId: '',
-        amount: 5,
-        description: sellerService.description,
-        status: '',
-        buyerUid: this.userServicesCtrl.value.uid,
-        buyerServiceId: this.userServicesCtrl.value.serviceId,
-        sellerUid: sellerService.uid,
-        sellerServiceId: sellerService.serviceId,
-        paymentIntent: null,
-        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-      };
+    const snackBarRef = this.snackbar.openFromComponent(
+      NotificationSnackBar,
+      {
+        duration: 8000,
+        data: `The Stripe payment gateway has not been implemented yet.  Eleutherios will try and get it up and running before 25 Dec 2020.  Thankyou!`,
+        panelClass: ['red-snackbar']
+      }
+    );
 
-      this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).then(paymentId => {
-        console.log('paymentId ' + JSON.stringify(paymentId));
+    // this.sellerService.subscribe(sellerService => {
+    //   const newPayment: Payment = {
+    //     paymentId: '',
+    //     receiptId: '',
+    //     amount: sellerService.amount,
+    //     description: sellerService.description,
+    //     status: '',
+    //     buyerUid: this.userServicesCtrl.value.uid,
+    //     buyerServiceId: this.userServicesCtrl.value.serviceId,
+    //     sellerUid: sellerService.uid,
+    //     sellerServiceId: sellerService.serviceId,
+    //     paymentIntent: null,
+    //     creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+    //     lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+    //   };
 
-        this._paymentSubscription = this.userPaymentService.getPayment(this.userServicesCtrl.value.uid, paymentId).subscribe(payment => {
-          if (payment){
-            console.log('payment ' + JSON.stringify(payment));
+    //   this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).then(paymentId => {
+    //     console.log('paymentId ' + JSON.stringify(paymentId));
+
+    //     this._paymentSubscription = this.userPaymentService.getPayment(this.userServicesCtrl.value.uid, paymentId).subscribe(payment => {
+    //       if (payment){
+    //         console.log('payment ' + JSON.stringify(payment));
   
-            // this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
-            //   payment_method: {
-            //     card: this.card.element,
-            //     billing_details: {
-            //       name: sellerService.title
-            //     },
-            //   },
-            // })
-            // .subscribe((result) => {
-            //   if (result.error) {
-            //     // Show error to your customer (e.g., insufficient funds)
-            //     console.log(result.error.message);
-            //   } else {
-            //     // The payment has been processed!
-            //     if (result.paymentIntent.status === 'succeeded') {
-            //       // Show a success message to your customer
-            //     }
-            //   }
-            // });
-          }
-        })
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    //         // this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+    //         //   payment_method: {
+    //         //     card: this.card.element,
+    //         //     billing_details: {
+    //         //       name: sellerService.title
+    //         //     },
+    //         //   },
+    //         // })
+    //         // .subscribe((result) => {
+    //         //   if (result.error) {
+    //         //     // Show error to your customer (e.g., insufficient funds)
+    //         //     console.log(result.error.message);
+    //         //   } else {
+    //         //     // The payment has been processed!
+    //         //     if (result.paymentIntent.status === 'succeeded') {
+    //         //       // Show a success message to your customer
+    //         //     }
+    //         //   }
+    //         // });
+    //       }
+    //     })
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
 
       // this._paymentSubscription = this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
       //   if (payment){
@@ -223,7 +232,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       //     });
       //   }
       // });
-    });
+    //});
   }
 
   ngOnInit () {
