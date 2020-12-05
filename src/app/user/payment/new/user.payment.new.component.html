@@ -10,7 +10,7 @@
     <form [formGroup]="serviceGroup" novalidate>
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-flow:wrap">
-          <div class="alert alert-info" style="flex:none;display:flex;flex-direction:column">
+          <div class="alert alert-info" style="flex:none;width:100%;display:flex;flex-direction:column">
             <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>
@@ -31,18 +31,15 @@
                   <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ serviceGroup.get('title').value }}">{{ serviceGroup.get('title').value | noTitle | truncate: 35 }} <i *ngIf="serviceGroup.get('description').value.length > 0">- {{ serviceGroup.get('description').value | truncate: 80 }}</i></a>
                 </p>
               </div>
+              <ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+                <div style="flex:none">
+                  {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
+                </div>
+              </ng-container>
             </div>
-            <ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-              <div style="flex:none">
-                {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
-              </div>
-            </ng-container>
           </div>
         </div>
-        <div style="display:flex;flex-direction:row;align-items:center;">
-          <div style="flex:1">
-            <div id="card-element" class="field"></div>
-          </div>
+        <div style="flex:none;display:flex;flex-direction:row;align-items:center">
           <div style="flex:none;margin-right:10px">
             <ng-container *ngIf="userServices | async;let userServiceItems">
               <ng-container *ngIf="userServiceItems.length > 0; then showuserservices"></ng-container>
@@ -54,6 +51,9 @@
                 </mat-form-field>
               </ng-template>
             </ng-container>
+          </div>
+          <div style="flex:1;margin-right:10px">
+            <div id="card-element" class="field"></div>
           </div>
           <div style="flex:none">
             <button [disabled]="showPaymentButton" class="pay" (click)="pay()">PAY</button>

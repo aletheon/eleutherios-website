@@ -327,7 +327,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             indexed: service.indexed,
             rate: service.rate,
             paymentType: service.paymentType,
-            amount: 5,
+            amount: service.amount,
             currency: service.currency,
             includeDescriptionInDetailPage: service.includeDescriptionInDetailPage,
             includeImagesInDetailPage: service.includeImagesInDetailPage,
