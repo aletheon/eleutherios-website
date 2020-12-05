@@ -152,7 +152,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       NotificationSnackBar,
       {
         duration: 8000,
-        data: `The Stripe payment gateway has not been implemented yet.  Eleutherios will try and get it up and running before 25 Dec 2020.  Thankyou!`,
+        data: `The Stripe payment gateway has not been implemented yet.  Eleutherios will try and get the payment gateway up and running, before 25 December 2020.`,
         panelClass: ['red-snackbar']
       }
     );
