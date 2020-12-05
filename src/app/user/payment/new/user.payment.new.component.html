@@ -46,8 +46,8 @@
             <ng-container *ngIf="userServices | async;let userServiceItems">
               <ng-container *ngIf="userServiceItems.length > 0; then showuserservices"></ng-container>
               <ng-template #showuserservices>
-                <mat-form-field>
-                  <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Choose service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service to pay with">
+                <mat-form-field style="width:200px">
+                  <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Select service to pay with" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Select service to pay with">
                     <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
                   </mat-select>
                 </mat-form-field>

@@ -538,7 +538,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
         NotificationSnackBar,
         {
           duration: 8000,
-          data: 'You did not choose a service',
+          data: 'You did not select a service',
           panelClass: ['red-snackbar']
         }
       );
@@ -563,7 +563,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
         NotificationSnackBar,
         {
           duration: 8000,
-          data: 'You did not choose a service',
+          data: 'You did not select a service',
           panelClass: ['red-snackbar']
         }
       );

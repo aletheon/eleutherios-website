@@ -46,7 +46,7 @@
 						<div style="display:flex;flex-direction:row;justify-content:flex-start">
 							<div style="flex:none">
 								<mat-form-field>
-									<mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Select service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Choose service">
+									<mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Select service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Select service">
 										<mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service" matTooltip="{{ service.title }}">{{ service.title | truncate: 35 }}</mat-option>
 									</mat-select>
 								</mat-form-field>
