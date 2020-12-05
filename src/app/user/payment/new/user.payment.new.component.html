@@ -37,50 +37,7 @@
                 {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
               </div>
             </ng-container>
-            <!-- <div style="flex:none;display:flex;flex-direction:row">
-              <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
-                <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-                <ng-template #showtags>
-                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
-                    <ng-container *ngFor="let serviceTag of serviceTagItems">
-                      <span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
-                    </ng-container>
-                  </div>
-                </ng-template>
-              </ng-container>
-              <ng-container *ngIf="service.paymentType == 'Payment'">
-                <div style="flex:none">
-                  {{ service.currency.toUpperCase() }}({{ service.amount.toFixed(2) }})
-                </div>
-              </ng-container>
-            </div> -->
           </div>
-
-
-          <!-- <div class="alert alert-info" style="flex:1;display:flex;flex-direction:row;align-items:flex-end;flex-flow:wrap">
-            <div style="flex:none;margin-right:10px">
-              <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-              <ng-template #showdefaultserviceimage>
-                <ng-container *ngIf="defaultServiceImage | async;let image">
-                  <div>
-                    <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-                    <ng-template #showimage>
-                      <img [src]="image.url" (click)="showImageList()" style="cursor:pointer">
-                    </ng-template>
-                    <ng-template #noimage>
-                      <img [src]="image.url">
-                    </ng-template>
-                  </div>
-                </ng-container>
-              </ng-template>
-            </div>
-            <div style="flex:none">
-              <input formControlName="name" />
-            </div>
-            <div style="flex:1;text-align:right;margin-right:5px">
-              <input formControlName="amount" />
-            </div>
-          </div> -->
         </div>
         <div style="display:flex;flex-direction:row;align-items:center;">
           <div style="flex:1">
