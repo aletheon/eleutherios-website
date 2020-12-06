@@ -186,8 +186,7 @@
 						<!-- service images -->
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 							<ng-container *ngIf="serviceImages | async;let serviceImageItems">
-								<ng-container *ngIf="serviceImageItems.length > 0; then showserviceimages else noserviceimages"></ng-container>
-								<ng-template #showserviceimages>
+								<ng-container *ngIf="serviceImageItems.length > 0">
 									<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap"
 										*ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
 										<div style="flex:none;display:flex;flex-direction:row;align-items:center">
@@ -204,12 +203,7 @@
 											</div>
 										</div>
 									</div>
-								</ng-template>
-								<ng-template #noserviceimages>
-									<p style="flex:none;color:#999;font-size:90%">
-										<i>No Images</i>
-									</p>
-								</ng-template>
+								</ng-container>
 							</ng-container>
 						</div>
 						<!-- images -->
@@ -249,8 +243,7 @@
 						<!-- whereServings -->
 						<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 							<ng-container *ngIf="whereServings | async;let whereServingItems">
-								<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
-								<ng-template #showwhereservings>
+								<ng-container *ngIf="whereServingItems.length > 0">
 									<ng-container *ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
 										<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 											<ng-container *ngIf="whereServing.forum | async;let forum">
@@ -293,12 +286,7 @@
 											</ng-container>
 										</div>
 									</ng-container>
-								</ng-template>
-								<ng-template #nowhereservings>
-									<p style="flex:none;color:#999;font-size:90%">
-										<i>No Forums</i>
-									</p>
-								</ng-template>
+								</ng-container>
 							</ng-container>
 						</div>
 						<!-- search -->

@@ -133,8 +133,7 @@
 					<!-- forum images -->
 					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 						<ng-container *ngIf="forumImages | async;let forumImageItems">
-							<ng-container *ngIf="forumImageItems.length > 0; then showforumimages else noforumimages"></ng-container>
-							<ng-template #showforumimages>
+							<ng-container *ngIf="forumImageItems.length > 0">
 								<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap"
 									*ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
 									<div style="flex:none;display:flex;flex-direction:row;align-items:center">
@@ -151,12 +150,7 @@
 										</div>
 									</div>
 								</div>
-							</ng-template>
-							<ng-template #noforumimages>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Images</i>
-								</p>
-							</ng-template>
+							</ng-container>
 						</ng-container>
 					</div>
 					<!-- images -->
@@ -196,8 +190,7 @@
 					<!-- registrants -->
 					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 						<ng-container *ngIf="registrants | async;let registrantItems">
-							<ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
-							<ng-template #showregistrants>
+							<ng-container *ngIf="registrantItems.length > 0">
 								<ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
 									<ng-container *ngIf="registrant.service | async;let service">
 										<ng-container *ngIf="service; then showservice"></ng-container>
@@ -232,12 +225,7 @@
 										</ng-template>
 									</ng-container>
 								</ng-container>
-							</ng-template>
-							<ng-template #noregistrants>
-								<p style="flex:none;color:#999;font-size:90%">
-									<i>No Services</i>
-								</p>
-							</ng-template>
+							</ng-container>
 						</ng-container>
 					</div>
 					<!-- search -->
