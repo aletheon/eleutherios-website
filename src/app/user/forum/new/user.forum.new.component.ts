@@ -1701,7 +1701,7 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: `Invalid characters we're located in the tag field, valid characters include [A-Za-z0-9]`,
+                data: `Invalid characters we're found in the tag field, valid characters include [A-Za-z0-9]`,
                 panelClass: ['red-snackbar']
               }
             );
@@ -1771,7 +1771,7 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: `Invalid characters we're located in the tag field, valid characters include [A-Za-z0-9]`,
+                data: `Invalid characters we're found in the tag field, valid characters include [A-Za-z0-9]`,
                 panelClass: ['red-snackbar']
               }
             );

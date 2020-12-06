@@ -1879,7 +1879,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: `Invalid characters we're located in the tag field, valid characters include [A-Za-z0-9]`,
+                data: `Invalid characters we're found in the tag field, valid characters include [A-Za-z0-9]`,
                 panelClass: ['red-snackbar']
               }
             );
@@ -1949,7 +1949,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: `Invalid characters we're located in the tag field, valid characters include [A-Za-z0-9]`,
+                data: `Invalid characters we're found in the tag field, valid characters include [A-Za-z0-9]`,
                 panelClass: ['red-snackbar']
               }
             );
