@@ -33,11 +33,9 @@
                   <a *ngIf="serviceGroup.get('type').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ serviceGroup.get('title').value }}">{{ serviceGroup.get('title').value | noTitle | truncate: 35 }} <i *ngIf="serviceGroup.get('description').value.length > 0">- {{ serviceGroup.get('description').value | truncate: 80 }}</i></a>
                 </p>
               </div>
-              <ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-                <div style="flex:none">
-                  {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
-                </div>
-              </ng-container>
+              <div style="flex:none">
+                {{ serviceGroup.get('currency').value.toUpperCase() }}({{ serviceGroup.get('amount').value.toFixed(2) }})
+              </div>
             </div>
             <div style="flex:none;display:flex;flex-direction:row">
               <ng-container *ngIf="serviceTags | async;let serviceTagItems">
