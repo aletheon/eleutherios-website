@@ -908,6 +908,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 };
       
                 const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
+                  // add tag to search list
+                  this.tagService.search(newTag.tag).subscribe(tags => {
+                    this.searchServiceTagsSelectionChange(tags[0]);
+                  });
+                  
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {

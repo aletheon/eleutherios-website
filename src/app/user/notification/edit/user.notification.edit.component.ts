@@ -517,6 +517,11 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                 };
       
                 const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
+                  // add tag to search list
+                  this.tagService.search(newTag.tag).subscribe(tags => {
+                    this.tagSearchSelectionChange(tags[0]);
+                  });
+
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
@@ -525,11 +530,6 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                       panelClass: ['green-snackbar']
                     }
                   );
-                });
-
-                // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tags => {
-                  this.tagSearchSelectionChange(tags[0]);
                 });
               }
               else {
