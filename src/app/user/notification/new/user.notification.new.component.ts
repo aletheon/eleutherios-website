@@ -495,8 +495,8 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.tagSearchSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.tagSearchSelectionChange(tags[0]);
                 });
               }
               else {

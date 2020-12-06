@@ -1858,8 +1858,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.searchForumTagsSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.searchForumTagsSelectionChange(tags[0]);
                 });
               }
               else {
@@ -1928,8 +1928,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.serviceTagsSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.serviceTagsSelectionChange(tags[0]);
                 });
               }
               else {

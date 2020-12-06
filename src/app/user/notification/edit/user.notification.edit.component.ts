@@ -528,8 +528,8 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.tagSearchSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.tagSearchSelectionChange(tags[0]);
                 });
               }
               else {

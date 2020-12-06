@@ -1680,8 +1680,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.searchServiceTagsSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.searchServiceTagsSelectionChange(tags[0]);
                 });
               }
               else {
@@ -1750,8 +1750,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
                 });
 
                 // add tag to search list
-                this.tagService.search(newTag.tag).subscribe(tag => {
-                  this.forumTagsSelectionChange(tag);
+                this.tagService.search(newTag.tag).subscribe(tags => {
+                  this.forumTagsSelectionChange(tags[0]);
                 });
               }
               else {
