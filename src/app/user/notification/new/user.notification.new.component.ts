@@ -493,6 +493,11 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                     }
                   );
                 });
+
+                // add tag to search list
+                this.tagService.search(newTag.tag).subscribe(tag => {
+                  this.tagSearchSelectionChange(tag);
+                });
               }
               else {
                 const snackBarRef = this.snackbar.openFromComponent(

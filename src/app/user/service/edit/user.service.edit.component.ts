@@ -1856,6 +1856,11 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     }
                   );
                 });
+
+                // add tag to search list
+                this.tagService.search(newTag.tag).subscribe(tag => {
+                  this.searchForumTagsSelectionChange(tag);
+                });
               }
               else {
                 const snackBarRef = this.snackbar.openFromComponent(
@@ -1920,6 +1925,11 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       panelClass: ['green-snackbar']
                     }
                   );
+                });
+
+                // add tag to search list
+                this.tagService.search(newTag.tag).subscribe(tag => {
+                  this.serviceTagsSelectionChange(tag);
                 });
               }
               else {

@@ -576,7 +576,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       if (forum){
         let load = async function(){
           try {
-            // listen when description panel is ready, then open            
+            // listen when description panel is ready, then open
             that._totalSubscription = that.siteTotalService.getTotal(forum.forumId)
               .subscribe(total => {
                 if (total) {

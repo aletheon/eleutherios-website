@@ -1545,6 +1545,11 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                       panelClass: ['green-snackbar']
                     }
                   );
+
+                  // add tag to search list
+                  this.tagService.search(newTag.tag).subscribe(tag => {
+                    this.searchServiceTagsSelectionChange(tag);
+                  });
                 });
               }
               else {
@@ -1610,6 +1615,11 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                       panelClass: ['green-snackbar']
                     }
                   );
+                  
+                  // add tag to search list
+                  this.tagService.search(newTag.tag).subscribe(tag => {
+                    this.forumTagsSelectionChange(tag);
+                  });
                 });
               }
               else {
