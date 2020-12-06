@@ -625,8 +625,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             that.registrants = that.userForumRegistrantService.getRegistrants(forum.uid, forum.forumId).pipe(
               switchMap(registrants => {
                 if (registrants && registrants.length > 0) {
-                  console.log('registrants ' + JSON.stringify(registrants));
-
                   let observables = registrants.map(registrant => {
                     let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
                       switchMap(service => {
