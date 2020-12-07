@@ -229,22 +229,23 @@
 												</div>
 											</div>
 										</div>
-										<ng-container *ngIf="result.serviceTags | async">
-											<div style="flex:none">
-												<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
-													<ng-container *ngIf="serviceTagItems.length > 0; then showservicetags"></ng-container>
-													<ng-template #showservicetags>
-														<div style="display:flex;flex-direction:row">
-															<ng-container *ngFor="let serviceTag of serviceTagItems">
-																<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px">
-																	<span>{{ serviceTag.tag }}</span>
-																</div>
-															</ng-container>
-														</div>
-													</ng-template>
-												</ng-container>
-											</div>
-										</ng-container>
+										<div style="flex:none;display:flex;flex-direction:row">
+											<ng-container *ngIf="result.serviceTags | async;let serviceTagItems">
+												<ng-container *ngIf="serviceTagItems.length > 0; then showservicetags"></ng-container>
+												<ng-template #showservicetags>
+													<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+														<ng-container *ngFor="let serviceTag of serviceTagItems">
+															<span [ngClass]="result.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+														</ng-container>
+													</div>
+												</ng-template>
+											</ng-container>
+											<ng-container *ngIf="result.paymentType == 'Payment'">
+												<div style="flex:none">
+													<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: result.uid, serviceId: result.serviceId }" style="color:#1B1B1B">{{ result.currency.toUpperCase() }} {{ result.amount.toFixed(2) }}</a>
+												</div>
+											</ng-container>
+										</div>
 									</div>
 								</ng-template>
 							</ng-container>

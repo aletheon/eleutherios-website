@@ -44,6 +44,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef; 
 
   private _loading = new BehaviorSubject(false);
+  private _initialforumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
@@ -159,6 +160,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                                         }
                                       )
                                       .catch(error => {
+                                        console.log('here 2');
                                         console.error(error);
                                       });
                                     }
@@ -269,6 +271,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         this.userActivityService.removeRegistrant(registrant.uid, this.forumGroup.get('forumId').value, registrant);
       })
       .catch(error => {
+        console.log('here 3');
         console.error(error);
       });
     }
@@ -303,6 +306,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
       this.userActivityService.removeRegistrant(registrant.uid, this.forumGroup.get('forumId').value, registrant);
     })
     .catch(error => {
+      console.log('here 4');
       console.error(error);
     });
   }
@@ -442,6 +446,9 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
+    if (this._initialforumSubscription)
+      this._initialforumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -507,61 +514,57 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         }
       }
   
-      this.userForumService.getForumFromPromise(forumUserId, forumId)
-        .then(forum => {
-          if (forum){
-            if (forum.uid == this.auth.uid){
-              this._canViewDetail.next(true);
-              this.forum = this.userForumService.getForum(forumUserId, forumId);
-              this.initForm();
-            }
-            else {
-              if (forum.indexed == true){
-                // check permissions
-                this.checkPermissions(forum)
-                  .then(() => {
-                    this.forum = this.userForumService.getForum(forumUserId, forumId);
-                    this.initForm();
-                  }
-                ).catch(error => {
-                  const snackBarRef = this.snackbar.openFromComponent(
-                    NotificationSnackBar,
-                    {
-                      duration: 8000,
-                      data: error.message,
-                      panelClass: ['red-snackbar']
-                    }
-                  );
-                  this.router.navigate(['/']);
-                });
-              }
-              else {
+      this._initialforumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
+        if (forum){
+          if (forum.uid == this.auth.uid){
+            this._canViewDetail.next(true);
+            this.forum = this.userForumService.getForum(forumUserId, forumId);
+            this.initForm();
+          }
+          else {
+            if (forum.indexed == true){
+              // check permissions
+              this.checkPermissions(forum)
+                .then(() => {
+                  this.forum = this.userForumService.getForum(forumUserId, forumId);
+                  this.initForm();
+                }
+              ).catch(error => {
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: 'Forum does not exist',
+                    data: error.message,
                     panelClass: ['red-snackbar']
                   }
                 );
                 this.router.navigate(['/']);
-              }
+              });
+            }
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Forum does not exist',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
             }
           }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Forum does not exist or was recently removed',
-                panelClass: ['red-snackbar']
-              }
-            );
-            this.router.navigate(['/']);
-          }
         }
-      ).catch(error => {
-        console.error(error);
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'Forum does not exist or was recently removed',
+              panelClass: ['red-snackbar']
+            }
+          );
+          this.router.navigate(['/']);
+        }
       });
     });
   }
@@ -761,6 +764,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
             that.getDefaultForumImage();
           }
           catch (error) {
+            console.log('here');
             throw error;
           }
         }

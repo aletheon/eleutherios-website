@@ -41,6 +41,7 @@ import * as firebase from 'firebase/app';
 })
 export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit {
   private _loading = new BehaviorSubject(false);
+  private _userServiceSubscription: Subscription;
   private _sellerServiceSubscription: Subscription;
   private _buyerServiceSubscription: Subscription;
   private _paymentSubscription: Subscription;
@@ -114,6 +115,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnDestroy () {
+    if (this._userServiceSubscription)
+      this._userServiceSubscription.unsubscribe();
+
     if (this._sellerServiceSubscription)
       this._sellerServiceSubscription.unsubscribe();
 
@@ -245,8 +249,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       this._sellerUid = params['userId']
       this._sellerServiceId = params['serviceId']
 
-      this.userServiceService.getServiceFromPromise(this._sellerUid, this._sellerServiceId)
-        .then(service => {
+      this._userServiceSubscription = this.userServiceService.getService(this._sellerUid, this._sellerServiceId)
+        .subscribe(service => {
           if (service){
             if (service.paymentType == 'Payment'){
               this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
@@ -280,18 +284,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             this.router.navigate(['/']);
           }
         }
-      )
-      .catch(error => {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
-      });
+      );
     });
   }
 
