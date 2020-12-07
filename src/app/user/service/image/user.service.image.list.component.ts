@@ -31,6 +31,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _service: any;
   private _total = new BehaviorSubject(0);
+  private _initialServiceSubscription: Subscription;
   private _subscription: Subscription;
   private _serviceImagesSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -65,6 +66,9 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -94,11 +98,10 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
       this.serviceGroup.get('serviceId').setValue(params['serviceId']);
       this.serviceGroup.get('uid').setValue(params['userId']);
 
-      if ((this.serviceGroup.get('serviceId').value && this.serviceGroup.get('serviceId').value.length > 0) &&
-        (this.serviceGroup.get('uid').value && this.serviceGroup.get('uid').value.length > 0)){
+      if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('uid').value){
         // ensure service exists
-        this.userServiceService.getServiceFromPromise(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
-          .then(service => {
+        this._initialServiceSubscription = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
+          .subscribe(service => {
             if (service){
               // authenticate
               let canViewDetail: boolean = false;
@@ -152,10 +155,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          console.error(error);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

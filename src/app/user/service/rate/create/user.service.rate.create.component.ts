@@ -36,6 +36,7 @@ import * as _ from "lodash";
 export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceRateSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -83,6 +84,9 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
   trackUserServiceRates (index, userServiceRate) { return userServiceRate.serviceRateId; }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+    
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 

@@ -45,6 +45,7 @@ import * as _ from "lodash";
 export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _routeSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -880,6 +881,9 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._totalSubscription)
       this._totalSubscription.unsubscribe();
 
@@ -953,8 +957,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
         this._requestServiceId.next(requestServiceId);
         this._requestServiceUserId = requestServiceUserId;
 
-        this.userServiceService.getServiceFromPromise(requestServiceUserId, requestServiceId)
-          .then(requestService => {
+        this._initialServiceSubscription = this.userServiceService.getService(requestServiceUserId, requestServiceId)
+          .subscribe(requestService => {
             if (requestService){
               if (requestService.title.length == 0){
                 const snackBarRef = this.snackbar.openFromComponent(
@@ -999,18 +1003,7 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         this.forum = this.userForumService.create(this.auth.uid, forum);

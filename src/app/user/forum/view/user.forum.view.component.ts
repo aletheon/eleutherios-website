@@ -50,6 +50,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _initialforumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -121,6 +122,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   ngOnDestroy () {
     this.messageSharingService.changeViewForumId(''); // dis-inform listeners that the view forum page is viewing this forum
 
+    if (this._initialforumSubscription)
+      this._initialforumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -184,7 +188,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
       this.messageSharingService.changeViewForumId('');
 
-      this.userForumService.getForumFromPromise(this.userId, this.forumId).then(forum => {
+      this._initialforumSubscription = this.userForumService.getForum(this.userId, this.forumId).subscribe(forum => {
         if (forum){
           this._tempForum = forum;
 
@@ -235,17 +239,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
           );
           that.router.navigate(['/']);
         }
-      })
-      .catch(error => {
-        const snackBarRef = that.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        that.router.navigate(['/']);
       });
     });
   }

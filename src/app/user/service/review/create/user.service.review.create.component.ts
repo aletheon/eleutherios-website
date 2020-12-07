@@ -38,6 +38,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
   @ViewChild('main', { static: false }) reviewRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceReviewSubscription: Subscription;
   private _userServiceSubscription: Subscription;
@@ -86,6 +87,9 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
   trackUserServiceReviews (index, userServiceReview) { return userServiceReview.serviceReviewId; }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -134,8 +138,8 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceUserId && parentServiceId){
-        this.userServiceService.getServiceFromPromise(parentServiceUserId, parentServiceId)
-          .then(service => {
+        this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
+          .subscribe(service => {
             if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
@@ -193,18 +197,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

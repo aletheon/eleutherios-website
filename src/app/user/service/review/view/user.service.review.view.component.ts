@@ -37,6 +37,7 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
   @ViewChild('main', { static: false }) reviewRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceReviewSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -73,6 +74,9 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -117,8 +121,8 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
       this._serviceId = params['serviceId'];
 
       if (parentServiceUserId && parentServiceId){
-        this.userServiceService.getServiceFromPromise(parentServiceUserId, parentServiceId)
-          .then(service => {
+        this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
+          .subscribe(service => {
             if (service){
               if (service.uid == this.auth.uid){
                 this._canViewService.next(true);
@@ -170,18 +174,7 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(
