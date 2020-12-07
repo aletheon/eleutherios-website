@@ -190,7 +190,7 @@
 								</ng-container>
 								<ng-container *ngIf="service.paymentType == 'Payment'">
 									<div style="flex:none">
-										<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+										<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
 									</div>
 								</ng-container>
 							</div>
