@@ -48,6 +48,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   @ViewChild('amount', { static: false }) amountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _searchForumSubscription: Subscription;
@@ -1044,6 +1045,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -1096,8 +1100,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       if (onboarding)
         this._onboarding = true;
 
-      this.userServiceService.exists(this.auth.uid, params['serviceId']).then(exists => {
-        if (exists){
+      this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
+        if (service){
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;
@@ -1114,17 +1118,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           );
           this.router.navigate(['/service/list', 'private']);
         }
-      })
-      .catch(error => {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
       });
     });
   }

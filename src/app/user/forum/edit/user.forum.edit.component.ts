@@ -46,6 +46,7 @@ import * as _ from "lodash";
 export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _searchServiceCtrlSubscription: Subscription;
@@ -132,6 +133,9 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngOnDestroy () {
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -177,8 +181,8 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      this.userForumService.exists(this.auth.uid, params['forumId']).then(exists => {
-        if (exists){
+      this._initialForumSubscription = this.userForumService.getForum(this.auth.uid, params['forumId']).subscribe(forum => {
+        if (forum){
           this.forum = this.userForumService.getForum(this.auth.uid, params['forumId']);
           this.searchPrivateServices = true;
           this.searchServiceIncludeTagsInSearch = true;
@@ -195,17 +199,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
           );
           this.router.navigate(['/user/forum/list']);
         }
-      })
-      .catch(error => {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
       });
     });
   }
