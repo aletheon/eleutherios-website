@@ -45,6 +45,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
@@ -446,6 +447,9 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -493,26 +497,22 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       }
 
       if (forumId){
-        this.forumService.getForumFromPromise(forumId)
-          .then(forum => {
-            if (forum){
-              this.forum = this.forumService.getForum(forumId);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
+        this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
+          if (forum){
+            this.forum = this.forumService.getForum(forumId);
+            this.initForm();
           }
-        ).catch(error => {
-          console.error(error);
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Forum does not exist or was recently removed',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
         });
       }
       else {

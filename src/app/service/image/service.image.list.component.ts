@@ -29,6 +29,7 @@ import * as _ from "lodash";
 export class ServiceImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _initialServiceSubscription: Subscription;
   private _subscription: Subscription;
   private _serviceImagesSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -61,6 +62,9 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -90,8 +94,8 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
       this.serviceGroup.get('serviceId').setValue(params['serviceId']);
 
       if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('serviceId').value.length > 0){
-        this.serviceService.getServiceFromPromise(this.serviceGroup.get('serviceId').value)
-          .then(service => {
+        this._initialServiceSubscription = this.serviceService.getService(this.serviceGroup.get('serviceId').value)
+          .subscribe(service => {
             if (service){
               // authenticate
               let canViewDetail: boolean = false;
@@ -145,10 +149,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          console.error(error);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

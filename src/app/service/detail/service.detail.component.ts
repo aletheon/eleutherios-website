@@ -49,6 +49,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private _loading = new BehaviorSubject(false);
   private _routeSubscription: any;
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -424,6 +425,9 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -491,8 +495,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       }
   
       if (serviceId){
-        this.serviceService.getServiceFromPromise(serviceId)
-          .then(service => {
+        this._initialServiceSubscription = this.serviceService.getService(serviceId)
+          .subscribe(service => {
             if (service){
               this.service = this.serviceService.getService(serviceId);
               this.initForm();
@@ -509,18 +513,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

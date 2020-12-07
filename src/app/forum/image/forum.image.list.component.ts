@@ -29,6 +29,7 @@ import * as _ from "lodash";
 export class ForumImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _initialForumSubscription: Subscription;
   private _subscription: Subscription;
   private _forumImagesSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
@@ -63,6 +64,9 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+      
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -95,8 +99,8 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
       this.forumGroup.get('forumId').setValue(params['forumId']);
 
       // ensure forum exists
-      this.forumSerivce.getForumFromPromise(this.forumGroup.get('forumId').value)
-        .then(forum => {
+      this._initialForumSubscription = this.forumSerivce.getForum(this.forumGroup.get('forumId').value)
+        .subscribe(forum => {
           if (forum){
             this.forum = this.forumSerivce.getForum(this.forumGroup.get('forumId').value);
             this.initForm();
@@ -113,17 +117,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
             this.router.navigate(['/']);
           }
         }
-      ).catch(error => {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
-      });
+      );
     });
   }
 

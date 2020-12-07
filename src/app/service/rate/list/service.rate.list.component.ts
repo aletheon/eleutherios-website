@@ -34,6 +34,7 @@ import * as _ from "lodash";
 export class ServiceRateListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _serviceRateSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -73,6 +74,9 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -100,8 +104,8 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceId){
-        this.serviceService.getServiceFromPromise(parentServiceId)
-          .then(service => {
+        this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
+          .subscribe(service => {
             if (service){
               this.service = this.serviceService.getService(parentServiceId);
               this.initForm();
@@ -118,18 +122,7 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

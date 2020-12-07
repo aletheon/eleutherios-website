@@ -35,6 +35,7 @@ import * as _ from "lodash";
 export class ServiceRateCreateComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceRateSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -80,6 +81,9 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
   trackUserServiceRates (index, userServiceRate) { return userServiceRate.serviceRateId; }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -105,8 +109,8 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceId){
-        this.serviceService.getServiceFromPromise(parentServiceId)
-          .then(service => {
+        this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
+          .subscribe(service => {
             if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
@@ -149,18 +153,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(
