@@ -16,12 +16,6 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
-// import { StripeService, StripeCardComponent } from 'ngx-stripe';
-// import {
-//   StripeCardElementOptions,
-//   StripeElementsOptions,
-//   PaymentIntent,
-// } from '@stripe/stripe-js';
 import { StripeService } from "ngx-stripe";
 import {
   StripeElements,
@@ -163,6 +157,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         panelClass: ['red-snackbar']
       }
     );
+
+    // 1) create payment
+    // 2) 
+
 
     // this.sellerService.subscribe(sellerService => {
     //   const newPayment: Payment = {

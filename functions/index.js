@@ -206,6 +206,98 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// create stripe payment intent
+exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
+  const userId = req.userId;
+  const paymentId = req.paymentId;
+
+  try {
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).doc(paymentId).get();
+    const paymentRef = paymentSnapshot.ref;
+    const payment = paymentSnapshot.data();
+
+    if (payment){
+      // get buyer
+      const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
+      const buyer = buyerSnapshot.data();
+
+      console.log('buyer ' + JSON.stringify(buyer));
+
+      // get seller
+      const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
+      const seller = sellerSnapshot.data();
+
+      console.log('seller ' + JSON.stringify(seller));
+
+      // get customer
+      const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
+      const customer = customerSnapshot.data();
+
+      if (buyer && seller){ 
+        if (customer){
+          console.log('customer exists');
+
+          const existingCustomerPaymentIntent = await stripe.paymentIntents.create({
+            amount: payment.amount,
+            currency: seller.stripeCurrency,
+            customer: buyer.stripeCustomerId,
+            application_fee_amount: 0,
+            metadata: { userId: userId, paymentId: paymentId }
+          }, {
+            stripeAccount: seller.stripeAccountId,
+          });
+          return await paymentRef.update({ paymentIntent: existingCustomerPaymentIntent });
+        }
+        else {
+          // customer doesn't exist in connected account customer list
+          // add them to that list
+          console.log('customer does not exist');
+
+          const token = await stripe.tokens.create({
+            customer: buyer.stripeCustomerId,
+          }, {
+            stripeAccount: seller.stripeAccountId,
+          });
+
+          console.log('token ' + JSON.stringify(token));
+
+          const customer = await stripe.customers.create({
+            source: token.id,
+          }, {
+            stripeAccount: seller.stripeAccountId,
+          });
+
+          // create customer
+          const newCustomerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(customer.id).get();
+          const newCustomerRef = newCustomerSnapshot.ref;
+
+          const newCustomer = await newCustomerRef.set({
+            customerId: customer.id,
+            lastUpdateDate: FieldValue.serverTimestamp(),
+            creationDate: FieldValue.serverTimestamp()
+          });
+
+          const newPaymentIntent = await stripe.paymentIntents.create({
+            amount: payment.amount,
+            currency: seller.stripeCurrency,
+            customer: customer.id,
+            application_fee_amount: 0,
+            metadata: { userId: userId, paymentId: paymentId }
+          }, {
+            stripeAccount: seller.stripeAccountId,
+          });
+          return await paymentRef.update({ paymentIntent: newPaymentIntent });
+        }
+      }
+      else Promise.reject('No buyer or seller provided');
+    }
+    else return Promise.reject(`Payment with paymentId ${paymentId} was not found`);
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
+});
+
 // IMAGE UPLOAD
 
 // ********************************************************************************
@@ -588,93 +680,105 @@ exports.createUserPayment = functions.firestore.document("users/{userId}/payment
   const userId = context.params.userId;
   const paymentId = context.params.paymentId;
 
-  let updatePaymentCount = async function() {
-    try {
-      const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).select().get();
-      const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
-
-      if (totalSnapshot.exists())
-        return await admin.database().ref("totals").child(userId).update({ paymentCount: paymentSnapshot.size });
-      else
-        return;
-    }
-    catch (error) {
-      throw new Error(error);
-    }
-  };
-
   try {
-    // update payment count
-    const updatePayment = await updatePaymentCount();
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
 
-    // get buyer
-    const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
-    const buyer = buyerSnapshot.data();
-
-    console.log('buyer ' + JSON.stringify(buyer));
-
-    // get seller
-    const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
-    const seller = sellerSnapshot.data();
-
-    console.log('seller ' + JSON.stringify(seller));
-
-    // get customer
-    const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
-    const customer = customerSnapshot.data();
-
-    if (customer){
-      console.log('customer exists ' + JSON.stringify(customer));
-
-      return Promise.resolve();
-      // const existingCustomerPaymentIntent = await stripe.paymentIntents.create({
-      //   amount: payment.amount,
-      //   currency: seller.stripeCurrency,
-      //   customer: buyer.stripeCustomerId,
-      //   application_fee_amount: 0,
-      //   metadata: { userId: userId, paymentId: paymentId }
-      // }, {
-      //   stripeAccount: seller.stripeAccountId,
-      // });
-      // return await snap.ref.set({ paymentIntent: existingCustomerPaymentIntent });
-    }
-    else {
-      // customer doesn't exist in connected account customer list
-      // add them to that list
-      console.log('customer does not exist');
-
-      const token = await stripe.tokens.create({
-        customer: buyer.stripeCustomerId,
-      }, {
-        stripeAccount: seller.stripeAccountId,
-      });
-
-      console.log('token ' + JSON.stringify(token));
-  
-      const customer = await stripe.customers.create({
-        source: token.id,
-      }, {
-        stripeAccount: seller.stripeAccountId,
-      });
-
-      console.log('created customer ' + JSON.stringify(customer));
-      return Promise.resolve();
-
-      // const newCustomerPaymentIntent = await stripe.paymentIntents.create({
-      //   amount: payment.amount,
-      //   currency: seller.stripeCurrency,
-      //   customer: customer.id,
-      //   application_fee_amount: 0,
-      //   metadata: { userId: userId, paymentId: paymentId }
-      // }, {
-      //   stripeAccount: seller.stripeAccountId,
-      // });
-      // return await snap.ref.set({ paymentIntent: newCustomerPaymentIntent });
-    }
+    if (totalSnapshot.exists())
+      return await admin.database().ref("totals").child(userId).update({ paymentCount: paymentSnapshot.size });
+    else
+      return;
   }
   catch (error) {
     return Promise.reject(error);
   }
+
+  // let updatePaymentCount = async function() {
+  //   try {
+  //     const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).select().get();
+  //     const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
+
+  //     if (totalSnapshot.exists())
+  //       return await admin.database().ref("totals").child(userId).update({ paymentCount: paymentSnapshot.size });
+  //     else
+  //       return;
+  //   }
+  //   catch (error) {
+  //     throw new Error(error);
+  //   }
+  // };
+
+  // try {
+  //   return await updatePaymentCount();
+
+  //   // // get buyer
+  //   // const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
+  //   // const buyer = buyerSnapshot.data();
+
+  //   // console.log('buyer ' + JSON.stringify(buyer));
+
+  //   // // get seller
+  //   // const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
+  //   // const seller = sellerSnapshot.data();
+
+  //   // console.log('seller ' + JSON.stringify(seller));
+
+  //   // // get customer
+  //   // const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
+  //   // const customer = customerSnapshot.data();
+
+  //   // if (customer){
+  //   //   console.log('customer exists ' + JSON.stringify(customer));
+
+  //   //   return Promise.resolve();
+  //   //   // const existingCustomerPaymentIntent = await stripe.paymentIntents.create({
+  //   //   //   amount: payment.amount,
+  //   //   //   currency: seller.stripeCurrency,
+  //   //   //   customer: buyer.stripeCustomerId,
+  //   //   //   application_fee_amount: 0,
+  //   //   //   metadata: { userId: userId, paymentId: paymentId }
+  //   //   // }, {
+  //   //   //   stripeAccount: seller.stripeAccountId,
+  //   //   // });
+  //   //   // return await snap.ref.set({ paymentIntent: existingCustomerPaymentIntent });
+  //   // }
+  //   // else {
+  //   //   // customer doesn't exist in connected account customer list
+  //   //   // add them to that list
+  //   //   console.log('customer does not exist');
+
+  //   //   const token = await stripe.tokens.create({
+  //   //     customer: buyer.stripeCustomerId,
+  //   //   }, {
+  //   //     stripeAccount: seller.stripeAccountId,
+  //   //   });
+
+  //   //   console.log('token ' + JSON.stringify(token));
+  
+  //   //   const customer = await stripe.customers.create({
+  //   //     source: token.id,
+  //   //   }, {
+  //   //     stripeAccount: seller.stripeAccountId,
+  //   //   });
+
+  //   //   console.log('created customer ' + JSON.stringify(customer));
+  //   //   return Promise.resolve();
+
+  //   //   // const newCustomerPaymentIntent = await stripe.paymentIntents.create({
+  //   //   //   amount: payment.amount,
+  //   //   //   currency: seller.stripeCurrency,
+  //   //   //   customer: customer.id,
+  //   //   //   application_fee_amount: 0,
+  //   //   //   metadata: { userId: userId, paymentId: paymentId }
+  //   //   // }, {
+  //   //   //   stripeAccount: seller.stripeAccountId,
+  //   //   // });
+  //   //   // return await snap.ref.set({ paymentIntent: newCustomerPaymentIntent });
+  //   // }
+  // }
+  // catch (error) {
+  //   return Promise.reject(error);
+  // }
 });
 
 // ********************************************************************************
