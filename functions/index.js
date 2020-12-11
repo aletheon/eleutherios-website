@@ -220,44 +220,46 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
   // See https://stripe.com/docs/webhooks/signatures for more information.
   try {
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
-  } catch (err) {
-    return response.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    const connectedEvent = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
-  const connectedEvent = await admin.database().ref("connectedevents").push(event); // Add the event to the database
+    console.log('account before ' + JSON.stringify(event.data.object));
 
-  consol.log('account before ' + JSON.stringify(event.data.object));
+    const account = await stripe.accounts.retrieve(event.data.object.account);
 
-  const account = await stripe.accounts.retrieve(event.data.object.account);
+    console.log('account after ' + JSON.stringify(account));
 
-  consol.log('account after ' + JSON.stringify(account));
+    var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', account.id).limit(1).get();
 
-  var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', account.id).limit(1).get();
+    if (snapshot.size > 0)
+      userRef = snapshot.docs[0].ref;
 
-  if (snapshot.size > 0)
-    userRef = snapshot.docs[0].ref;
-
-  // stripeOnboardingStatus: '',
-  // stripeCurrency: account.default_currency ? account.default_currency : 'usd',
-
-  if (event.type == 'account.application.deauthorized'){
-    if (userRef)
-      await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
-    
-    return res.json({ received: true, ref: snapshot.ref.toString() });
-  }
-  else if (event.type == 'account.updated'){
-    if (userRef){
-      if (account.charges_enabled)
+    if (event.type == 'account.application.authorized'){
+      if (userRef)
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
-      else
-        await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+      
+      return res.json({ received: true, ref: snapshot.ref.toString() });
     }
-    return res.json({ received: true, ref: snapshot.ref.toString() });
-  }
-  else {
-    console.log('Undefined type ' + event.type);
-    return res.json({ received: true, ref: snapshot.ref.toString() });
+    else if (event.type == 'account.application.deauthorized'){
+      if (userRef)
+        await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
+      
+      return res.json({ received: true, ref: snapshot.ref.toString() });
+    }
+    else if (event.type == 'account.updated'){
+      if (userRef){
+        if (account.charges_enabled)
+          await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+        else
+          await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
+      return res.json({ received: true, ref: snapshot.ref.toString() });
+    }
+    else {
+      console.log('Unknown type ' + event.type);
+      return res.json({ received: true, ref: snapshot.ref.toString() });
+    }
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
 
@@ -352,6 +354,33 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       else return Promise.reject('No buyer or seller provided');
     }
     else return Promise.reject(`Payment with paymentId ${paymentId} was not found`);
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
+});
+
+// create stripe payment intents
+exports.updateAccount = functions.https.onCall(async (data, context) => {
+  const userId = context.auth.uid;
+
+  try {
+    const userSnapshot = await admin.firestore().collection('users').doc(userId).get();
+    const userRef = userSnapshot.ref;
+    const user = userSnapshot.data();
+
+    if (user.stripeAccountId){
+      // get account
+      const account = await stripe.accounts.retrieve(user.stripeAccountId);
+
+      console.log('account ' + JSON.stringify(account));
+
+      if (account.charges_enabled)
+        await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+      else
+        await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+    }
+    return Promise.resolve();
   }
   catch (error) {
     return Promise.reject(error);

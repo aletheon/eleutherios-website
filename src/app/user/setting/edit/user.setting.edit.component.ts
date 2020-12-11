@@ -12,6 +12,7 @@ import { NotificationSnackBar } from '../../../shared/components/notification.sn
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import * as async from 'async'
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'user-setting-edit',
@@ -47,6 +48,31 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         }, 1000);
       }
     ]);
+  }
+
+  updateAccount(){
+    // Use the function name from Firebase
+    var updateAccount = firebase.functions().httpsCallable('updateAccount');
+    updateAccount().then((result) => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 5000,
+          data: 'Settings saved',
+          panelClass: ['green-snackbar']
+        }
+      );
+    })
+    .catch(error => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 12000,
+          data: error.message,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   checkPushNotificationPermission () {

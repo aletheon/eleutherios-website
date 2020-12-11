@@ -149,66 +149,76 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   pay(){
-    this.sellerService.subscribe(sellerService => {
-      const newPayment: Payment = {
-        paymentId: '',
-        receiptId: '',
-        amount: sellerService.amount,
-        currency: sellerService.currency,
-        description: sellerService.description,
-        status: '',
-        buyerUid: this.userServicesCtrl.value.uid,
-        buyerServiceId: this.userServicesCtrl.value.serviceId,
-        sellerUid: sellerService.uid,
-        sellerServiceId: sellerService.serviceId,
-        paymentIntent: null,
-        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-      };
+    const snackBarRef = this.snackbar.openFromComponent(
+      NotificationSnackBar,
+      {
+        duration: 8000,
+        data: 'The payment system is still being implemented',
+        panelClass: ['red-snackbar']
+      }
+    );
 
-      this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
-        if (payment){
-          // var createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-          // createPaymentIntent({ 
-          //   userId: this.userServicesCtrl.value.uid, 
-          //   paymentId: payment.paymentId
-          // })
-          // .then((result) => {
-          //   console.log('result.data ' + JSON.stringify(result.data));
 
-          //   var client_secret = result.data.client_secret;
+    // this.sellerService.subscribe(sellerService => {
+    //   const newPayment: Payment = {
+    //     paymentId: '',
+    //     receiptId: '',
+    //     amount: sellerService.amount,
+    //     currency: sellerService.currency,
+    //     description: sellerService.description,
+    //     status: '',
+    //     buyerUid: this.userServicesCtrl.value.uid,
+    //     buyerServiceId: this.userServicesCtrl.value.serviceId,
+    //     sellerUid: sellerService.uid,
+    //     sellerServiceId: sellerService.serviceId,
+    //     paymentIntent: null,
+    //     creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+    //     lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+    //   };
 
-          //   console.log('client_secret ' + JSON.stringify(client_secret));
-          //   console.log('this.card ' + JSON.stringify(this.card));
+    //   this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
+    //     if (payment){
+    //       // var createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+    //       // createPaymentIntent({ 
+    //       //   userId: this.userServicesCtrl.value.uid, 
+    //       //   paymentId: payment.sna
+    //       // })
+    //       // .then((result) => {
+    //       //   console.log('result.data ' + JSON.stringify(result.data));
 
-          //   // if (client_secret){
-          //   //   this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
-          //   //     payment_method: {
-          //   //       card: this.card,
-          //   //       billing_details: {
-          //   //         name: sellerService.title
-          //   //       },
-          //   //     },
-          //   //   })
-          //   //   .subscribe((result) => {
-          //   //     if (result.error) {
-          //   //       // Show error to your customer (e.g., insufficient funds)
-          //   //       console.log(result.error.message);
-          //   //     } else {
-          //   //       // The payment has been processed!
-          //   //       if (result.paymentIntent.status === 'succeeded') {
-          //   //         // Show a success message to your customer
-          //   //       }
-          //   //     }
-          //   //   });
-          //   // }
-          // })
-          // .catch(error => {
-          //   console.log('createPaymentIntent error ' + error);
-          // });
-        }
-      });
-    });
+    //       //   var client_secret = result.data.client_secret;
+
+    //       //   console.log('client_secret ' + JSON.stringify(client_secret));
+    //       //   console.log('this.card ' + JSON.stringify(this.card));
+
+    //       //   // if (client_secret){
+    //       //   //   this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+    //       //   //     payment_method: {
+    //       //   //       card: this.card,
+    //       //   //       billing_details: {
+    //       //   //         name: sellerService.title
+    //       //   //       },
+    //       //   //     },
+    //       //   //   })
+    //       //   //   .subscribe((result) => {
+    //       //   //     if (result.error) {
+    //       //   //       // Show error to your customer (e.g., insufficient funds)
+    //       //   //       console.log(result.error.message);
+    //       //   //     } else {
+    //       //   //       // The payment has been processed!
+    //       //   //       if (result.paymentIntent.status === 'succeeded') {
+    //       //   //         // Show a success message to your customer
+    //       //   //       }
+    //       //   //     }
+    //       //   //   });
+    //       //   // }
+    //       // })
+    //       // .catch(error => {
+    //       //   console.log('createPaymentIntent error ' + error);
+    //       // });
+    //     }
+    //   });
+    // });
 
     // this.sellerService.subscribe(sellerService => {
     //   const newPayment: Payment = {
