@@ -44,10 +44,16 @@ app.use(
 // onboard-user
 app.post("/onboard-user", async (req, res) => {
   try {
-    console.log('in onboarding user');
-    const account = await stripe.accounts.create({type: "standard"});
+    const account = await stripe.accounts.create({ type: "standard" });
+
+    console.log('in onboarding user account before ' + JSON.stringify(account));
+
     req.session.accountId = account.id;
     req.session.returnUrl = req.body.returnUrl;
+
+    const accountAfter = await stripe.accounts.retrieve(account.id);
+
+    console.log('in onboarding user account after ' + JSON.stringify(accountAfter));
 
     let requestedUid = req.body.uid;     // resource the user is requsting to modify
     let authToken = validateHeader(req); // current user encrypted
@@ -59,11 +65,9 @@ app.post("/onboard-user", async (req, res) => {
     const uid = await decodeAuthToken(authToken);
     if (uid === requestedUid) {
       const origin = `${req.headers.origin}`;
-      const accountLinkURL = await generateAccountLink(account.id, origin, req.session.returnUrl);
+      const accountLinkURL = await generateAccountLink(accountAfter.id, origin, req.session.returnUrl);
       const updateUser = await admin.firestore().collection('users').doc(uid).update({
-        stripeAccountId: account.id,
-        stripeOnboardingStatus: '',
-        stripeCurrency: account.default_currency ? account.default_currency : 'usd',
+        stripeAccountId: accountAfter.id,
         lastUpdateDate: FieldValue.serverTimestamp()
       });
       res.send({ url: accountLinkURL });
@@ -128,6 +132,57 @@ function decodeAuthToken(authToken) {
 // export app as stripe API
 exports.stripe = functions.https.onRequest(app);
 
+// https://dashboard.stripe.com/test/webhooks
+// https://stripe.com/docs/connect/authentication
+exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
+  let sig = req.headers["stripe-signature"];
+  let event, userRef;
+
+  // Verify webhook signature and extract the event.
+  // See https://stripe.com/docs/webhooks/signatures for more information.
+  try {
+    event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    return response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  const connectedEvent = await admin.database().ref("connectedevents").push(event); // Add the event to the database
+
+  consol.log('account before ' + JSON.stringify(event.data.object));
+
+  const account = await stripe.accounts.retrieve(event.data.object.account);
+
+  consol.log('account after ' + JSON.stringify(account));
+
+  var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', account.id).limit(1).get();
+
+  if (snapshot.size > 0)
+    userRef = snapshot.docs[0].ref;
+
+  // stripeOnboardingStatus: '',
+  // stripeCurrency: account.default_currency ? account.default_currency : 'usd',
+
+  if (event.type == 'account.application.deauthorized'){
+    if (userRef)
+      await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
+    
+    return res.json({ received: true, ref: snapshot.ref.toString() });
+  }
+  else if (event.type == 'account.updated'){
+    if (userRef){
+      if (account.charges_enabled)
+        await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+      else
+        await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+    }
+    return res.json({ received: true, ref: snapshot.ref.toString() });
+  }
+  else {
+    console.log('Undefined type ' + event.type);
+    return res.json({ received: true, ref: snapshot.ref.toString() });
+  }
+});
+
 // listen to strip webhook events
 exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
@@ -148,43 +203,43 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
 
         // create receipt
         const receiptId = uuidV4().replace(/-/g, '');
-        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set(
-          {
-            receiptId: receiptId,
-            paymentId: payment.paymentId,
-            amount: payment.amount, // amount to pay
-            status: 'Pending', // [Pending, Success, Fail]
-            buyerUid: payment.buyerUid, // id of the user buying the goods the payment
-            buyerServiceId: payment.buyerServiceId, // id of the service buying the goods
-            sellerUid: payment.sellerUid, // id of the user selling the goods
-            sellerServiceId: payment.sellerServiceId, // id of the service selling the goods
-            paymentIntent: intent,
-            lastUpdateDate: FieldValue.serverTimestamp(),
-            creationDate: FieldValue.serverTimestamp()
-          }
-        );
+        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
+          receiptId: receiptId,
+          paymentId: payment.paymentId,
+          amount: payment.amount, // amount to pay
+          currency: payment.currency, // [usd, nzd, aud etc]
+          description: string, // description of product/service
+          status: 'Pending', // [Pending, Success, Fail]
+          buyerUid: payment.buyerUid, // id of the user buying the goods the payment
+          buyerServiceId: payment.buyerServiceId, // id of the service buying the goods
+          sellerUid: payment.sellerUid, // id of the user selling the goods
+          sellerServiceId: payment.sellerServiceId, // id of the service selling the goods
+          paymentIntent: intent,
+          lastUpdateDate: FieldValue.serverTimestamp(),
+          creationDate: FieldValue.serverTimestamp()
+        });
         break;
       case 'payment_intent.succeeded':
         // update payment
         const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const successPaymentRef = successPaymentSnapshot.ref;
-        await successPaymentRef.update({ status: 'Success' });
+        await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
 
         // update receipt
         const successReceiptSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
         const successReceiptRef = successReceiptSnapshot.ref;
-        await successReceiptRef.update({ status: 'Success' });
+        await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
         break;
       case 'payment_intent.payment_failed':
         // update payment
         const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const failPaymentRef = failPaymentSnapshot.ref;
-        await failPaymentRef.update({ status: 'Fail' });
+        await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
 
         // update receipt
         const failReceiptSnapshot = await admin.firestore().collection(`users/${metadata.sellerUid}/receipts`).doc(payment.receiptId).get();
         const failReceiptRef = failReceiptSnapshot.ref;
-        await failReceiptRef.update({ status: 'Fail' });
+        await failReceiptRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
         break;
       default:
         console.log('got type ' + event.type);
@@ -206,10 +261,9 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   }
 });
 
-// create stripe payment intent
-exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
-  const userId = req.userId;
-  const paymentId = req.paymentId;
+exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
+  const userId = data.userId;
+  const paymentId = data.paymentId;
 
   try {
     const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).doc(paymentId).get();
@@ -233,7 +287,8 @@ exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
       const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
       const customer = customerSnapshot.data();
 
-      if (buyer && seller){ 
+      if (buyer && seller){
+        // check if existing customer
         if (customer){
           console.log('customer exists');
 
@@ -246,13 +301,14 @@ exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
           }, {
             stripeAccount: seller.stripeAccountId,
           });
-          return await paymentRef.update({ paymentIntent: existingCustomerPaymentIntent });
+          await paymentRef.update({ paymentIntent: existingCustomerPaymentIntent });
+          return Promise.resolve(existingCustomerPaymentIntent);
         }
         else {
-          // customer doesn't exist in connected account customer list
-          // add them to that list
+          // customer doesn't exist so add them to the connected accounts customer list
           console.log('customer does not exist');
 
+          // get a token to connect with
           const token = await stripe.tokens.create({
             customer: buyer.stripeCustomerId,
           }, {
@@ -261,13 +317,14 @@ exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
 
           console.log('token ' + JSON.stringify(token));
 
+          // connect them together
           const customer = await stripe.customers.create({
             source: token.id,
           }, {
             stripeAccount: seller.stripeAccountId,
           });
 
-          // create customer
+          // remember customer
           const newCustomerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(customer.id).get();
           const newCustomerRef = newCustomerSnapshot.ref;
 
@@ -277,6 +334,7 @@ exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
             creationDate: FieldValue.serverTimestamp()
           });
 
+          // create intent
           const newPaymentIntent = await stripe.paymentIntents.create({
             amount: payment.amount,
             currency: seller.stripeCurrency,
@@ -286,10 +344,11 @@ exports.createPaymentIntent = functions.https.onCall(async (req, res) => {
           }, {
             stripeAccount: seller.stripeAccountId,
           });
-          return await paymentRef.update({ paymentIntent: newPaymentIntent });
+          await paymentRef.update({ paymentIntent: newPaymentIntent });
+          return Promise.resolve(newPaymentIntent);
         }
       }
-      else Promise.reject('No buyer or seller provided');
+      else return Promise.reject('No buyer or seller provided');
     }
     else return Promise.reject(`Payment with paymentId ${paymentId} was not found`);
   }

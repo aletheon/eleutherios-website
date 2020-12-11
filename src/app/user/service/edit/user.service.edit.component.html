@@ -85,7 +85,7 @@
 						</div>
 					</div>
 					<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
+						<ng-container *ngIf="userItem.stripeOnboardingStatus == 'Authorized'; else onboarduser">
 							<div style="display:flex;flex-direction:row;align-items:center">
 								<mat-form-field style="flex:none">
 									<input
@@ -114,6 +114,12 @@
 								<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
 									<img src="../../../../assets/blue-on-dark.png" />
 								</button>
+								<div class="label label-warning" *ngIf="userItem.stripeOnboardingStatus == 'Pending'" style="flex:none">
+									Pending
+								</div>
+								<div class="label label-alert" *ngIf="userItem.stripeOnboardingStatus == 'Deauthorized'" style="flex:none">
+									Deauthorized
+								</div>
 								<mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
 							</div>
 						</ng-template>

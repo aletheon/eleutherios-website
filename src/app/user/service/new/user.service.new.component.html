@@ -79,30 +79,41 @@
 						</div>
 					</div>
 					<div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-						<ng-container *ngIf="userItem.stripeAccountId && userItem.stripeOnboardingStatus == 'Complete'; else onboarduser">
-							<mat-form-field style="width:10.7%">
-								<input
-									matInput
-									#amount
-									placeholder="#.##"
-									formControlName="amount"
-									(change)="saveChanges()"/>
-								<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
-									Amount required
-								</mat-error>
-								<mat-error *ngIf="serviceGroup.get('amount').hasError('min')">
-									Must be greater than 0.49
-								</mat-error>
-								<mat-error *ngIf="serviceGroup.get('amount').hasError('max')">
-									Must be less than 999999.99
-								</mat-error>
-							</mat-form-field>
+						<ng-container *ngIf="userItem.stripeOnboardingStatus == 'Authorized'; else onboarduser">
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<mat-form-field style="flex:none">
+									<input
+										matInput
+										#amount
+										placeholder="#.##"
+										formControlName="amount"
+										(change)="saveChanges()"/>
+									<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
+										Amount required
+									</mat-error>
+									<mat-error *ngIf="serviceGroup.get('amount').hasError('min')">
+										Must be greater than 0.49
+									</mat-error>
+									<mat-error *ngIf="serviceGroup.get('amount').hasError('max')">
+										Must be less than 999999.99
+									</mat-error>
+								</mat-form-field>
+								<div style="flex:1;align-items:flex-start">
+									{{ userItem.stripeCurrency }}
+								</div>
+							</div>
 						</ng-container>
 						<ng-template #onboarduser>
 							<div style="display:flex;flex-direction:row;align-items:center">
 								<button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
 									<img src="../../../../assets/blue-on-dark.png" />
 								</button>
+								<div class="label label-warning" *ngIf="userItem.stripeOnboardingStatus == 'Pending'" style="flex:none">
+									Pending
+								</div>
+								<div class="label label-alert" *ngIf="userItem.stripeOnboardingStatus == 'Deauthorized'" style="flex:none">
+									Deauthorized
+								</div>
 								<mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
 							</div>
 						</ng-template>

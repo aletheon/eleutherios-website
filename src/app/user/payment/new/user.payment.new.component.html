@@ -33,7 +33,7 @@
                   <a *ngIf="serviceGroup.get('type').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ serviceGroup.get('title').value }}">{{ serviceGroup.get('title').value | noTitle | truncate: 35 }} <i *ngIf="serviceGroup.get('description').value.length > 0">- {{ serviceGroup.get('description').value | truncate: 80 }}</i></a>
                 </p>
               </div>
-              <div style="flex:none">
+              <div style="flex:none;color:#1B1B1B">
                 {{ serviceGroup.get('currency').value.toUpperCase() }} {{ serviceGroup.get('amount').value.toFixed(2) }} 
               </div>
             </div>

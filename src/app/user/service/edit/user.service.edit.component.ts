@@ -1100,6 +1100,10 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       if (onboarding)
         this._onboarding = true;
 
+      
+
+
+
       this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
         if (service){
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);

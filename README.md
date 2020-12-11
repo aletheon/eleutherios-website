@@ -9,10 +9,10 @@ Forum (Food)
 ---- Service (Person or customer)
 ---- Service (Grocery store owner)
 ---- Forum (Pick up + drop off)
--------- Service (Grocery store owner or customer)
+-------- Service (Grocery store owner)
 -------- Service (Fastpost couriers)
 -------- Forum (Healthcare worker to deliver food)
------------- Service (Fastpost couriers or customer)
+------------ Service (Fastpost couriers)
 ------------ Service (Healthcare worker)
 ```
 
