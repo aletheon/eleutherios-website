@@ -16,7 +16,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling the forum or sociopolitical or economic aspects of the conversation for food.  Services are paid by the appropriate customer at the time the forum or request is created.  For example, when the courier wants to hire a healthcare worker to deliver the food to the quarantined person.
+In this example, Eleutherios is scaling the forum or sociopolitical or economic aspects of the conversation for food.  Services are paid for by the appropriate customer at the time the forum or request is created.  For example, when the courier wants to hire a healthcare worker to deliver the food to the quarantined person.
 
 #### Features:
 
