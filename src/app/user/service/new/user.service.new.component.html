@@ -85,7 +85,7 @@
 									<input
 										matInput
 										#amount
-										placeholder="#.##"
+										placeholder="9.99"
 										formControlName="amount"
 										(change)="saveChanges()"/>
 									<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
@@ -99,7 +99,7 @@
 									</mat-error>
 								</mat-form-field>
 								<div style="flex:1;align-items:flex-start">
-									{{ userItem.stripeCurrency }}
+									{{ userItem.stripeCurrency.toUpperCase() }}
 								</div>
 							</div>
 						</ng-container>

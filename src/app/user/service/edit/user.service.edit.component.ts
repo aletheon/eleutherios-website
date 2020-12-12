@@ -2251,7 +2251,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
           rate: this.serviceGroup.get('rate').value,
           paymentType: this.serviceGroup.get('paymentType').value,
-          amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : this.serviceGroup.get('amount').value,
+          amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
           currency: this.serviceGroup.get('currency').value,
           includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
           includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,

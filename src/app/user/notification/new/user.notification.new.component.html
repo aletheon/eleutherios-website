@@ -42,7 +42,7 @@
 								<input
 									matInput
 									#startAmount
-									placeholder="Start amount"
+									placeholder="Start amount 9.99"
 									formControlName="startAmount"
 									(change)="saveChanges()"/>
 								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('pattern')">
@@ -65,7 +65,7 @@
 								<input
 									matInput
 									#endAmount
-									placeholder="End amount"
+									placeholder="End amount 9.99"
 									formControlName="endAmount"
 									(change)="saveChanges()"/>
 								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
