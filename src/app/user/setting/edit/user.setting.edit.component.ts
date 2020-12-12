@@ -38,6 +38,16 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
     async.series([
       function(callback) {
+        if (that.userGroup.get('receivePushNotifications').value == true){
+          that.userGroup.get('receiveForumAlertNotifications').setValue(true);
+          that.userGroup.get('receiveServiceAlertNotifications').setValue(true);
+          that.userGroup.get('receiveForumPostNotifications').setValue(true);
+        }
+        else {
+          that.userGroup.get('receiveForumAlertNotifications').setValue(false);
+          that.userGroup.get('receiveServiceAlertNotifications').setValue(false);
+          that.userGroup.get('receiveForumPostNotifications').setValue(false);
+        }
         that.saveChanges();
         callback(null, null);
       },
@@ -154,6 +164,9 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         this.userGroup.patchValue(user);
 
         if (user.receivePushNotifications == false){
+
+
+
           this.userGroup.get('receiveForumAlertNotifications').disable();
           this.userGroup.get('receiveServiceAlertNotifications').disable();
           this.userGroup.get('receiveForumPostNotifications').disable();
