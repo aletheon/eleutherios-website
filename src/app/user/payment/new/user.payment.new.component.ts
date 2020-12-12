@@ -157,86 +157,88 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         panelClass: ['red-snackbar']
       }
     );
-    
-    // this.sellerService.subscribe(sellerService => {
-    //   const newPayment: Payment = {
-    //     paymentId: '',
-    //     receiptId: '',
-    //     amount: sellerService.amount,
-    //     currency: sellerService.currency,
-    //     description: sellerService.description,
-    //     status: '',
-    //     buyerUid: this.userServicesCtrl.value.uid,
-    //     buyerServiceId: this.userServicesCtrl.value.serviceId,
-    //     sellerUid: sellerService.uid,
-    //     sellerServiceId: sellerService.serviceId,
-    //     paymentIntent: null,
-    //     creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-    //     lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-    //   };
 
-    //   this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
-    //     if (payment){
-    //       console.log('payment ' + JSON.stringify(payment));
+    this.sellerService.subscribe(sellerService => {
+      const newPayment: Payment = {
+        paymentId: '',
+        receiptId: '',
+        amount: sellerService.amount,
+        currency: sellerService.currency,
+        title: sellerService.title,
+        description: sellerService.description,
+        quantity: 1,
+        status: '',
+        buyerUid: this.userServicesCtrl.value.uid,
+        buyerServiceId: this.userServicesCtrl.value.serviceId,
+        sellerUid: sellerService.uid,
+        sellerServiceId: sellerService.serviceId,
+        paymentIntent: null,
+        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-    //       var createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-    //       createPaymentIntent({ 
-    //         userId: this.userServicesCtrl.value.uid, 
-    //         paymentId: payment.paymentId
-    //       })
-    //       .then((result) => {
-    //         console.log('payment intent result.data ' + JSON.stringify(result.data));
+      this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
+        if (payment){
+          console.log('payment ' + JSON.stringify(payment));
 
-    //         var client_secret = result.data.client_secret;
+          var createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+          createPaymentIntent({ 
+            userId: this.userServicesCtrl.value.uid, 
+            paymentId: payment.paymentId
+          })
+          .then((result) => {
+            console.log('payment intent result.data ' + JSON.stringify(result.data));
 
-    //         console.log('client_secret ' + JSON.stringify(client_secret));
-    //         console.log('this.card ' + JSON.stringify(this.card));
+            var client_secret = result.data.client_secret;
 
-    //         // if (client_secret){
-    //         //   this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
-    //         //     payment_method: {
-    //         //       card: this.card,
-    //         //       billing_details: {
-    //         //         name: sellerService.title
-    //         //       },
-    //         //     },
-    //         //   })
-    //         //   .subscribe((result) => {
-    //         //     if (result.error) {
-    //         //       // Show error to your customer (e.g., insufficient funds)
-    //         //       console.log(result.error.message);
-    //         //     } else {
-    //         //       // The payment has been processed!
-    //         //       if (result.paymentIntent.status === 'succeeded') {
-    //         //         // Show a success message to your customer
-    //         //       }
-    //         //     }
-    //         //   });
-    //         // }
-    //       })
-    //       .catch(error => {
-    //         const snackBarRef = this.snackbar.openFromComponent(
-    //           NotificationSnackBar,
-    //           {
-    //             duration: 8000,
-    //             data: error.message,
-    //             panelClass: ['red-snackbar']
-    //           }
-    //         );
-    //       });
-    //     }
-    //     else {
-    //       const snackBarRef = this.snackbar.openFromComponent(
-    //         NotificationSnackBar,
-    //         {
-    //           duration: 8000,
-    //           data: 'There was a problem creating a payment',
-    //           panelClass: ['red-snackbar']
-    //         }
-    //       );
-    //     }
-    //   });
-    // });
+            console.log('client_secret ' + JSON.stringify(client_secret));
+            console.log('this.card ' + JSON.stringify(this.card));
+
+            // if (client_secret){
+            //   this.stripeService.confirmCardPayment(payment.paymentIntent.client_secret, {
+            //     payment_method: {
+            //       card: this.card,
+            //       billing_details: {
+            //         name: sellerService.title
+            //       },
+            //     },
+            //   })
+            //   .subscribe((result) => {
+            //     if (result.error) {
+            //       // Show error to your customer (e.g., insufficient funds)
+            //       console.log(result.error.message);
+            //     } else {
+            //       // The payment has been processed!
+            //       if (result.paymentIntent.status === 'succeeded') {
+            //         // Show a success message to your customer
+            //       }
+            //     }
+            //   });
+            // }
+          })
+          .catch(error => {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: error.message,
+                panelClass: ['red-snackbar']
+              }
+            );
+          });
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'There was a problem creating a payment',
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+      });
+    });
   }
 
   ngOnInit () {

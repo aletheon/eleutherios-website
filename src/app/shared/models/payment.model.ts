@@ -3,7 +3,9 @@ export interface Payment {
   receiptId: string,
   amount: number, // amount to pay
   currency: string, // [usd, nzd, aud etc]
+  title: string, // title of product/service
   description: string, // description of product/service
+  quantity: number, // number of units ordered
   status: string, // [Pending, Success, Fail]
   buyerUid: string, // id of the user creating the payment
   buyerServiceId: string, // id of the service creating the payment
