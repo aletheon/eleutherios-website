@@ -26,7 +26,7 @@ In this example, Eleutherios is scaling the forum or sociopolitical or economic 
 * Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
 * Service ratings/reviews (trust)
 * Payments (resilience)
-* Shared process or manifest (B2B/redundancy)
+* Shared process or manifest (redundancy)
 * AI (automation)
 
 Eleutherios, is built with an HTML/javascript (Angular) frontend and node.js (nosql/firebase) backend.
