@@ -77,11 +77,12 @@
               </ng-container>
             </ng-template>
           </div>
-          <div style="flex:1;margin-right:10px">
-            <div id="card-element" class="field"></div>
+          <div style="flex:1;display:flex;flex-direction:column;margin-right:10px">
+            <div id="card-element" class="field" style="flex:none"></div>
+            <mat-error id="card-errors" style="flex:none"></mat-error>
           </div>
           <div style="flex:none;display:flex;flex-direction:row;align-items:center">
-            <button [disabled]="showPaymentButton" class="pay" (click)="pay()" style="flex:none">PAY</button>
+            <button [disabled]="hidePaymentButton" class="pay" (click)="pay()" style="flex:none">PAY</button>
             <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none"></mat-spinner>
           </div>
         </div>
