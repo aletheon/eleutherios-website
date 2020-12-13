@@ -7,12 +7,12 @@ import { Observable } from 'rxjs';
 export class UserActivityService {
   constructor(private afs: AngularFirestore) { }
 
-  public removeRegistrants (forumUid: string, forumId: string, userId: string){
+  public removeRegistrants (forumUid: string, forumId: string, userId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${userId}/activities/${forumId}/registrants`).get().then(querySnapshot => {
         if (querySnapshot.size > 0){
           var promises = querySnapshot.docs.map(docActivityRegistrant => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               var registrant = docActivityRegistrant.data();
 
               // remove from forum registrants
@@ -64,20 +64,20 @@ export class UserActivityService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public getActivity (parentUserId: string, forumId: string){
-    return new Promise<any>((resolve, reject) => {
+  public getActivity (parentUserId: string, forumId: string): Promise<any>{
+    return new Promise((resolve, reject) => {
       const activityRef = this.afs.collection(`users/${parentUserId}/activities`).doc(forumId);
       activityRef.ref.get().then(doc => {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Activity with activityId ${forumId} was not found`);
       });
     });
   }
 
-  public create (parentUserId: string, forumId: string, data: any){
-    return new Promise<any>((resolve, reject) => {
+  public create (parentUserId: string, forumId: string, data: any): Promise<void>{
+    return new Promise((resolve, reject) => {
       const activityRef = this.afs.collection(`users/${parentUserId}/activities`).doc(forumId);
       activityRef.set(data).then(() => {
         resolve();
@@ -94,8 +94,8 @@ export class UserActivityService {
     return activityRef.update(data);
   }
 
-  public delete (parentUserId: string, forumId: string) {
-    return new Promise<any>((resolve, reject) => {
+  public delete (parentUserId: string, forumId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
       const activityRef = this.afs.collection(`users/${parentUserId}/activities`).doc(forumId);
       activityRef.ref.get().then(doc => {
         if (doc.exists){
@@ -118,7 +118,7 @@ export class UserActivityService {
     });
   }
 
-  public removeRegistrant (parentUserId: string, forumId: string, data: any){
+  public removeRegistrant (parentUserId: string, forumId: string, data: any): Promise<void>{
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/activities/${forumId}/registrants`).doc(data.registrantId).get().then(doc => {
         if (doc.exists){

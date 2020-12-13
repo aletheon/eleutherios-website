@@ -15,7 +15,7 @@ export class UserWhereServingService {
     return this.afs.collection<any>(`users/${parentUserId}/services/${serviceId}/whereservings`, ref => ref.orderBy('creationDate', 'desc')).valueChanges();
   }
 
-  public create (parentUserId: string, serviceId: string, forumId: string): Promise<any> {
+  public create (parentUserId: string, serviceId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       let whereServing = {
         forumId: forumId,
@@ -31,7 +31,7 @@ export class UserWhereServingService {
     });
   }
 
-  public delete (parentUserId: string, serviceId: string, forumId: string): Promise<any> {
+  public delete (parentUserId: string, serviceId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/whereservings`).doc(forumId).delete().then(() => {
         resolve();

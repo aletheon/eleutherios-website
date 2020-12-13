@@ -80,12 +80,12 @@ export class UserForumImageService {
       return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').startAt(key).limit(numberOfItems+1)).valueChanges();
   }
 
-  public removeForumImages (parentUserId: string, forumId: string) {
+  public removeForumImages (parentUserId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/forums/${forumId}/images`).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               doc.ref.delete().then(()=>{
                 resolve();
               })

@@ -299,6 +299,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
             amount: payment.amount,
             currency: seller.stripeCurrency,
             customer: buyer.stripeCustomerId,
+            payment_method_types: ["card"],
             application_fee_amount: 0,
             metadata: { userId: userId, paymentId: paymentId }
           }, {
@@ -342,6 +343,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
             amount: payment.amount,
             currency: seller.stripeCurrency,
             customer: customer.id,
+            payment_method_types: ["card"],
             application_fee_amount: 0,
             metadata: { userId: userId, paymentId: paymentId }
           }, {

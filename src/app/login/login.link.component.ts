@@ -102,7 +102,7 @@ export class LoginLinkComponent implements OnInit {
   }
 
   confirmSignIn(url) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.afAuth.isSignInWithEmailLink(url)) {
         let email = window.localStorage.getItem('email');
   

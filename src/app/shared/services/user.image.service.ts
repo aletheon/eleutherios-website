@@ -27,7 +27,7 @@ export class UserImageService {
   constructor(public afs: AngularFirestore,
     private db: AngularFireDatabase) { }
 
-  private createUserImage (parentUserId: string, image: any) {
+  private createUserImage (parentUserId: string, image: any): Promise<void> {
     return new Promise((resolve, reject) => {
       let userImageRef = this.afs.firestore.collection(`users/${parentUserId}/images`).doc(image.imageId);
       userImageRef.set(image).then(() => {
@@ -61,7 +61,7 @@ export class UserImageService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Image with imageId ${imageId} was not found`);
       })
       .catch(error => {
         reject(error);
@@ -121,8 +121,8 @@ export class UserImageService {
     return imageRef.update(data);
   }
 
-  public delete (parentUserId: string, imageId: string) {
-    return new Promise<any>((resolve, reject) => {
+  public delete (parentUserId: string, imageId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
       const imageRef = this.afs.collection(`users/${parentUserId}/images`).doc(imageId);
       
       imageRef.delete().then(() => {

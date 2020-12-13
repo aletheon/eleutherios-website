@@ -29,7 +29,7 @@ export class TagService {
     return this.afs.collection('tags').doc(tagId).valueChanges();
   }
 
-  public create(tagId: string, data: any) {
+  public create(tagId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const tagRef = this.afs.collection('tags').doc(tagId);
 
@@ -42,7 +42,7 @@ export class TagService {
     });
   }
 
-  public delete(tagId: string) {
+  public delete(tagId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const tagRef = this.afs.collection('tags').doc(tagId);
 

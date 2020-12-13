@@ -23,7 +23,7 @@ export class UserServiceBlockService {
     });
   }
 
-  public create(parentUserId: string, forumId: string, serviceId: string, data: any) {
+  public create(parentUserId: string, forumId: string, serviceId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const serviceBlockExistRef = this.afs.collection(`users/${parentUserId}/serviceblocks`).ref.where('serviceId', '==', serviceId).where('forumId', '==', forumId);
       serviceBlockExistRef.get().then(querySnapshot => {
@@ -48,7 +48,7 @@ export class UserServiceBlockService {
     return serviceBlockRef.update(data);
   }
 
-  public delete(parentUserId: string, forumId: string, serviceId: string){
+  public delete(parentUserId: string, forumId: string, serviceId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const serviceBlockExistRef = this.afs.collection(`users/${parentUserId}/serviceblocks`).ref.where('serviceId', '==', serviceId).where('forumId', '==', forumId);
       serviceBlockExistRef.get().then(snapshot => {

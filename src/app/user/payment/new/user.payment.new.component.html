@@ -80,8 +80,9 @@
           <div style="flex:1;margin-right:10px">
             <div id="card-element" class="field"></div>
           </div>
-          <div style="flex:none">
-            <button [disabled]="showPaymentButton" class="pay" (click)="pay()">PAY</button>
+          <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+            <button [disabled]="showPaymentButton" class="pay" (click)="pay()" style="flex:none">PAY</button>
+            <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none"></mat-spinner>
           </div>
         </div>
       </div>

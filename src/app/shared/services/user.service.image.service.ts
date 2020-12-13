@@ -80,12 +80,12 @@ export class UserServiceImageService {
       return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').startAt(key).limit(numberOfItems+1)).valueChanges();
   }
 
-  public removeServiceImages (parentUserId: string, serviceId: string) {
+  public removeServiceImages (parentUserId: string, serviceId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/images`).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               doc.ref.delete().then(()=>{
                 resolve();
               })

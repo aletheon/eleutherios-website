@@ -56,12 +56,12 @@ export class UserForumTagService {
     return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/tags`, ref => ref.orderBy('tag')).valueChanges();
   }
 
-  public removeForumTags(parentUserId: string, forumId: string) {
+  public removeForumTags(parentUserId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/forums/${forumId}/tags`).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               if (doc.exists){
                 doc.ref.delete().then(() => {
                   resolve();

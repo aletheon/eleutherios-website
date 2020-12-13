@@ -88,7 +88,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public searchPrivateForums: boolean;
   public loading: Observable<boolean> = this._loading.asObservable();
   public stripeButtonDisabled: boolean = false;
-  public tempCurrency: string = 'nzd';
 
   constructor(public auth: AuthService, 
     private route: ActivatedRoute,

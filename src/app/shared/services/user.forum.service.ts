@@ -32,7 +32,7 @@ export class UserForumService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Forum with forumId ${forumId} was not found`);
       });
     });
   }
@@ -70,11 +70,11 @@ export class UserForumService {
 
           // iterate forums and store/remember forums in which the service is serving in
           let promises = querySnapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               let forum = doc.data();
 
               let serviceIsServingInForum = function () {
-                return new Promise((resolve, reject) => {
+                return new Promise<void>((resolve, reject) => {
                   const registrantRef = that.afs.collection(`users/${forum.uid}/forums/${forum.forumId}/registrants`).ref.where('serviceId', '==', serviceId);
 
                   registrantRef.get().then(querySnapshot => {

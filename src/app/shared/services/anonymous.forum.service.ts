@@ -27,7 +27,7 @@ export class AnonymousForumService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Forum with forumId ${forumId} was not found`);
       })
       .catch(error => {
         reject(error);

@@ -17,7 +17,7 @@ export class UserAlertService {
     return alertRef.update(data);
   }
 
-  public delete (parentUserId: string, alertId: string) {
+  public delete (parentUserId: string, alertId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       // const alertRef = this.afs.collection('alerts').doc(alertId); // redundant public container so clients can access alerts with alertId without having to know the userId
       const userAlertRef = this.afs.collection(`users/${parentUserId}/alerts`).doc(alertId); // private user container

@@ -27,7 +27,7 @@ export class AnonymousServiceService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Service with serviceId ${serviceId} was not found`);
       })
       .catch(error => {
         reject(error);

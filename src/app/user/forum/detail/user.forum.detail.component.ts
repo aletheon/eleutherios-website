@@ -466,7 +466,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   }
 
   checkPermissions (forum) {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.auth.uid)
         .then(defaultRegistrant => {
           if (defaultRegistrant)

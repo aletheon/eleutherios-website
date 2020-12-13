@@ -35,7 +35,7 @@ export class UserNotificationService {
           if (doc.exists)
             resolve(doc.data());
           else
-            resolve();
+            reject(`Notification with notificationId ${notificationId} was not found`);
         })
         .catch(error => {
           reject(error);

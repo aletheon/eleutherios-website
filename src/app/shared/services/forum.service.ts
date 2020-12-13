@@ -31,7 +31,7 @@ export class ForumService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`Forum with forumId ${forumId} was not found`);
       });
     });
   }

@@ -56,12 +56,12 @@ export class UserNotificationTagService {
     return this.afs.collection<any>(`users/${parentUserId}/notifications/${notificationId}/tags`, ref => ref.orderBy('tag', 'asc')).valueChanges();
   }
   
-  public removeNotificationTags(parentUserId: string, notificationId: string) {
+  public removeNotificationTags(parentUserId: string, notificationId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/notifications/${notificationId}/tags`).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               if (doc.exists){
                 doc.ref.delete().then(() => {
                   resolve();

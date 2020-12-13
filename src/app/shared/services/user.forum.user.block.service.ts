@@ -23,7 +23,7 @@ export class UserForumUserBlockService {
     });
   }
 
-  public create(parentUserId: string, serviceId: string, userId: string, data: any) {
+  public create(parentUserId: string, serviceId: string, userId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       console.log('here');
 
@@ -50,7 +50,7 @@ export class UserForumUserBlockService {
     });
   }
 
-  public update(parentUserId: string, serviceId: string, userId: string, data: any){
+  public update(parentUserId: string, serviceId: string, userId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const forumUserBlockRef = this.afs.firestore.collection(`users/${parentUserId}/forumuserblocks`).where("serviceId", "==", serviceId).where("userId", "==", userId);
       data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
@@ -70,7 +70,7 @@ export class UserForumUserBlockService {
     });
   }
 
-  public delete(parentUserId: string, serviceId: string, userId: string){
+  public delete(parentUserId: string, serviceId: string, userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const forumUserBlockRef = this.afs.firestore.collection(`users/${parentUserId}/forumuserblocks`).where("serviceId", "==", serviceId).where("userId", "==", userId);
       forumUserBlockRef.get().then(querySnapshot => {

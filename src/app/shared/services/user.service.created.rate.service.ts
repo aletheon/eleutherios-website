@@ -23,7 +23,7 @@ export class UserServiceCreatedRateService {
     return serviceCreatedRateRef.valueChanges();
   }
 
-  public delete (parentUserId: string, serviceId: string, serviceCreatedRateId: string): Promise<any> {
+  public delete (parentUserId: string, serviceId: string, serviceCreatedRateId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/servicecreatedrates`).doc(serviceCreatedRateId).delete().then(() => {
         resolve();

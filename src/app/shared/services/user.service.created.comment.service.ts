@@ -23,7 +23,7 @@ export class UserServiceCreatedCommentService {
     return serviceCreatedCommentRef.valueChanges();
   }
 
-  public delete (parentUserId: string, serviceId: string, serviceCreatedCommentId: string): Promise<any> {
+  public delete (parentUserId: string, serviceId: string, serviceCreatedCommentId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/servicecreatedcomments`).doc(serviceCreatedCommentId).delete().then(() => {
         resolve();

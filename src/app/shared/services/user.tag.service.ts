@@ -31,7 +31,7 @@ export class UserTagService {
   }
 
   public create (parentUserId: string, data: any) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(this.afs.createId());
       data.tagId = tagRef.ref.id;
       tagRef.set(data).then(() => {
@@ -54,8 +54,8 @@ export class UserTagService {
     return tagRef.update(data);
   }
 
-  public delete (parentUserId: string, tagId: string) {
-    return new Promise<any>((resolve, reject) => {
+  public delete (parentUserId: string, tagId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
       const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(tagId);
       tagRef.delete().then(() => {
         this.tagService.delete(tagId).then(() => {

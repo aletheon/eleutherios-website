@@ -27,7 +27,7 @@ export class UserService {
     });
   }
 
-  public create (parentUserId: string, data: any) {
+  public create (parentUserId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const userRef = this.afs.doc(`users/${parentUserId}`);
 
@@ -42,7 +42,7 @@ export class UserService {
     });
   }
 
-  public update (parentUserId: string, data: any) {
+  public update (parentUserId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.collection('users').doc(parentUserId).ref.get().then(doc => {
         if (doc.exists){
@@ -54,7 +54,7 @@ export class UserService {
             reject(error);
           });
         }
-        else reject('User with userId ' + parentUserId + ' not found');
+        else reject(`User with userId ${parentUserId} was not found`);
       })
       .catch(error => {
         reject(error);
@@ -62,7 +62,7 @@ export class UserService {
     });
   }
 
-  public delete (parentUserId: string) {
+  public delete(parentUserId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const userRef = this.afs.doc(`users/${parentUserId}`);
       userRef.delete().then(() => {
@@ -98,7 +98,7 @@ export class UserService {
         if (doc.exists)
           resolve(doc.data());
         else
-          resolve();
+          reject(`User with userId ${parentUserId} was not found`);
       })
       .catch(error => {
         reject(error);

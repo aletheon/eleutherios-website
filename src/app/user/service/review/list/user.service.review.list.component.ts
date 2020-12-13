@@ -96,7 +96,7 @@ export class UserServiceReviewListComponent implements OnInit, OnDestroy {
   trackServiceReviews (index, serviceReview) { return serviceReview.serviceReviewId; }
 
   checkPermissions (parentUserId: string, service: Service) {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.userForumService.serviceIsServingInUserForumFromPromise(parentUserId, service.serviceId)
         .then(isServing => {
           if (service.type == 'Public')

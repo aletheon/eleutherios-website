@@ -58,7 +58,7 @@ export class UserForumBlockService {
     });
   }
 
-  public create (parentUserId: string, serviceId: string, forumId: string, data: any) {
+  public create (parentUserId: string, serviceId: string, forumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const forumBlockExistRef = this.afs.collection(`users/${parentUserId}/forumblocks`).ref.where('forumId', '==', forumId).where('serviceId', '==', serviceId);
       forumBlockExistRef.get().then(querySnapshot => {
@@ -83,7 +83,7 @@ export class UserForumBlockService {
     return forumBlockRef.update(data);
   }
 
-  public delete (parentUserId: string, serviceId: string, forumId: string){
+  public delete (parentUserId: string, serviceId: string, forumId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       const forumBlockExistRef = this.afs.collection(`users/${parentUserId}/forumblocks`).ref.where('forumId', '==', forumId).where('serviceId', '==', serviceId);
       forumBlockExistRef.get().then(snapshot => {

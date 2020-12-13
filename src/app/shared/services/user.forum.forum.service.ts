@@ -22,7 +22,7 @@ export class UserForumForumService {
     });
   }
 
-  public create (parentUserId: string, parentForumId: string, data: any): Promise<any> {
+  public create (parentUserId: string, parentForumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const forumForumRef = this.afs.collection(`users/${parentUserId}/forums/${parentForumId}/forums`).doc(data.forumId);
       forumForumRef.set(data).then(() => {
@@ -34,12 +34,12 @@ export class UserForumForumService {
     });
   }
 
-  public delete (parentUserId: string, parentForumId: string, forumId: string){
+  public delete (parentUserId: string, parentForumId: string, forumId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.afs.collection(`users/${parentUserId}/forums/${parentForumId}/forums`).ref.where('forumId', '==', forumId).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               if (doc.exists){
                 doc.ref.delete().then(() => {
                   resolve();
@@ -68,13 +68,13 @@ export class UserForumForumService {
     return this.afs.collection<any>(`users/${parentUserId}/forums/${parentForumId}/forums`, ref => ref.where('indexed', '==', true).orderBy('creationDate')).valueChanges();
   }
 
-  public removeForumForums (parentUserId: string, parentForumId: string){
+  public removeForumForums (parentUserId: string, parentForumId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/forums/${parentForumId}/forums`)
         .get().then(querySnapshot => {
           if (querySnapshot.size > 0){
             let promises = querySnapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
+              return new Promise<void>((resolve, reject) => {
                 doc.ref.delete().then(() => {
                   resolve();
                 }).catch(error => {
@@ -96,7 +96,7 @@ export class UserForumForumService {
     });
   }
 
-  public removeForumFromParent (parentUserId: string, parentForumId: string, forumId: string){
+  public removeForumFromParent (parentUserId: string, parentForumId: string, forumId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.delete(parentUserId, parentForumId, forumId).then(() => {
         resolve();

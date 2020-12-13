@@ -33,7 +33,7 @@ export class AuthService {
     );
   }
 
-  resetUserActivityHighlightPost(userId: string){
+  resetUserActivityHighlightPost(userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       // reset highlight post flags on all users activities
       let query = this.afs.collection(`users/${userId}/activities`).ref;
@@ -58,7 +58,7 @@ export class AuthService {
   }
 
   facebookLogin(accessToken){
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.afAuth.signInWithCredential(firebase.auth.FacebookAuthProvider.credential(accessToken))
         .then((credential) => {
           this.updateUserData(credential.user);

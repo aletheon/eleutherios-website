@@ -35,7 +35,7 @@ export class UserReceiptService {
           if (doc.exists)
             resolve(doc.data());
           else
-            resolve();
+            reject(`Receipt with receiptId ${receiptId} was not found`);
         })
         .catch(error => {
           reject(error);

@@ -13,7 +13,7 @@ export class UserServiceReviewService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public create(parentUserId: string, parentServiceId: string, data: any): Promise<any> {
+  public create(parentUserId: string, parentServiceId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const userServiceReviewRef = this.afs.collection(`users/${parentUserId}/services/${parentServiceId}/servicereviews`).doc(this.afs.createId());
       data.serviceReviewId = userServiceReviewRef.ref.id;
@@ -32,7 +32,7 @@ export class UserServiceReviewService {
     return userServiceReviewRef.update(data);
   }
 
-  public delete (parentUserId: string, parentServiceId: string, serviceReviewId: string): Promise<any> {
+  public delete (parentUserId: string, parentServiceId: string, serviceReviewId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${parentServiceId}/servicereviews`).doc(serviceReviewId).delete().then(() => {
         resolve();
@@ -72,7 +72,7 @@ export class UserServiceReviewService {
           if (doc.exists)
             resolve(doc.data());
           else
-            resolve();
+            reject(`ServiceReview with serviceReviewId ${serviceReviewId} was not found`);
         })
         .catch(error => {
           reject(error);
@@ -96,7 +96,7 @@ export class UserServiceReviewService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            resolve(); 
+            reject(`ServiceReview with serviceId ${serviceId} was not found`);
         })
         .catch(error => {
           reject(error);

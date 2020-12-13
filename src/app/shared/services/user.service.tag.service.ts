@@ -56,12 +56,12 @@ export class UserServiceTagService {
     return this.afs.collection<any>(`users/${parentUserId}/services/${serviceId}/tags`, ref => ref.orderBy('tag', 'asc')).valueChanges();
   }
   
-  public removeServiceTags(parentUserId: string, serviceId: string) {
+  public removeServiceTags(parentUserId: string, serviceId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/tags`).get().then(snapshot => {
         if (snapshot.size > 0){
           let promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               if (doc.exists){
                 doc.ref.delete().then(() => {
                   resolve();

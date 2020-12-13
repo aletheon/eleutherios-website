@@ -20,7 +20,7 @@ export class UserForumPostService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public create(parentUserId: string, forumId: string, data: any) {
+  public create(parentUserId: string, forumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       let posts = this.db.list(`users/${parentUserId}/forums/${forumId}/posts`);
 
@@ -38,7 +38,7 @@ export class UserForumPostService {
     return postRef.update(data);
   }
 
-  public delete(parentUserId: string, forumId: string, postId: string){
+  public delete(parentUserId: string, forumId: string, postId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.db.database.ref(`users/${parentUserId}/forums/${forumId}/posts/${postId}`).once('value').then(snapshot => {
         if (snapshot.exists){

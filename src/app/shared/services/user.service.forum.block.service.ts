@@ -24,7 +24,7 @@ export class UserServiceForumBlockService {
     });
   }
 
-  public create(parentUserId: string, serviceId: string, forumId: string, data: any) {
+  public create(parentUserId: string, serviceId: string, forumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/forumblocks`).where("forumId", "==", forumId)
         .get().then(querySnapshot => {
@@ -50,7 +50,7 @@ export class UserServiceForumBlockService {
     return serviceForumBlockRef.update(data);
   }
 
-  public delete(parentUserId: string, serviceId: string, forumId: string){
+  public delete(parentUserId: string, serviceId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const serviceForumBlockRef = this.afs.collection(`users/${parentUserId}/services/${serviceId}/forumblocks`).ref.where('forumId', '==', forumId);
       serviceForumBlockRef.get().then(snapshot => {

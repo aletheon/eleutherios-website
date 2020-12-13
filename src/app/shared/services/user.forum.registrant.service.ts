@@ -24,7 +24,7 @@ export class UserForumRegistrantService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            resolve();
+            reject(`Registrant with serviceId ${serviceId} was not found`);
         })
         .catch(error => {
           reject(error);
@@ -44,7 +44,7 @@ export class UserForumRegistrantService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            resolve();
+            reject(`Registrant with userId ${userId} was not found`);
         })
         .catch(error => {
           reject(error);
@@ -96,7 +96,7 @@ export class UserForumRegistrantService {
     });
   }
 
-  public create(parentUserId: string, forumId: string, data: any): Promise<any> {
+  public create(parentUserId: string, forumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const registrantRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`).doc(this.afs.createId());
       data.registrantId = registrantRef.ref.id;
@@ -115,7 +115,7 @@ export class UserForumRegistrantService {
     return registrantRef.update(data);
   }
 
-  public delete(parentUserId: string, forumId: string, serviceId: string){
+  public delete(parentUserId: string, forumId: string, serviceId: string): Promise<void>{
     return new Promise((resolve, reject) => {
       this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`).ref.where('serviceId', '==', serviceId).get().then(registrantSnapshot => {
         if (registrantSnapshot.size > 0){
