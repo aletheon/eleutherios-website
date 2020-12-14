@@ -3,7 +3,6 @@ const admin = require('firebase-admin'); // The Firebase Admin SDK to access the
 const firebase = admin.initializeApp(functions.config().firebase);
 const async = require('async');
 const _ = require('lodash');
-const uuidV4 = require('uuidv4');
 const uuid = require('uuid');
 const tagUtil = require('./tagUtil');
 const FieldValue = require("firebase-admin").firestore.FieldValue;
@@ -158,7 +157,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         await createPaymentRef.update({ status: 'Pending' });
 
         // create receipt
-        const receiptId = uuidV4().replace(/-/g, '');
+        const receiptId = uuid.v4().replace(/-/g, '');
         await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
           receiptId: receiptId,
           paymentId: payment.paymentId,
@@ -223,11 +222,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
     const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
-    console.log('account before ' + JSON.stringify(event.data.object));
+    console.log('event.data.object ' + JSON.stringify(event.data.object));
 
-    const account = await stripe.accounts.retrieve(event.data.object.account);
-
-    console.log('account after ' + JSON.stringify(account));
+    // const account = await stripe.accounts.retrieve(event.data.object.account);
+    // console.log('account after ' + JSON.stringify(account));
 
     var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', account.id).limit(1).get();
 
@@ -235,28 +233,55 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       userRef = snapshot.docs[0].ref;
 
     if (event.type == 'account.application.authorized'){
+      console.log('account.application.authorized');
+
       if (userRef)
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
       
-      return res.json({ received: true, ref: snapshot.ref.toString() });
+      return res.json({ received: true });
     }
     else if (event.type == 'account.application.deauthorized'){
+      console.log('account.application.deauthorized');
+
       if (userRef)
         await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
       
-      return res.json({ received: true, ref: snapshot.ref.toString() });
+      return res.json({ received: true });
     }
     else if (event.type == 'account.updated'){
+      console.log('account.updated');
+
       if (userRef){
         if (account.charges_enabled)
           await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
         else
           await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
       }
-      return res.json({ received: true, ref: snapshot.ref.toString() });
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.created'){
+      const paymentIntent = event.data.object;
+      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      console.log('payment_intent.created');
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.succeeded'){
+      const paymentIntent = event.data.object;
+      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      console.log('payment_intent.succeeded');
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.payment_failed'){
+      const paymentIntent = event.data.object;
+      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      console.log('payment_intent.payment_failed');
+      return res.json({ received: true });
     }
     else {
-      console.log('Unknown type ' + event.type);
+      console.log('Unknown event.type ' + event.type);
       return res.json({ received: true, ref: snapshot.ref.toString() });
     }
   } catch (error) {
@@ -277,13 +302,19 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const sellerSnapshot = await admin.firestore().collection('users').doc(sellerUid).get();
     const seller = sellerSnapshot.data();
 
+    console.log('seller ' + JSON.stringify(seller));
+
     // get buyer service
     const buyerServiceSnapshot = await admin.firestore().collection(`users/${buyerUid}/services`).doc(buyerServiceId).get();
     const buyerService = buyerServiceSnapshot.data();
 
+    console.log('buyerService ' + JSON.stringify(buyerService));
+
     // get seller service
     const sellerServiceSnapshot = await admin.firestore().collection(`users/${sellerUid}/services`).doc(sellerServiceId).get();
     const sellerService = sellerServiceSnapshot.data();
+
+    console.log('sellerService ' + JSON.stringify(sellerService));
     
     const newPayment = {
       paymentId: uuid.v4().replace(/-/g, ''),
@@ -304,18 +335,24 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       lastUpdateDate: FieldValue.serverTimestamp()
     };
 
-    const paymentRef = (await admin.firestore().collection(`users/${userId}/payments`).doc(newPayment.paymentId).get()).ref;
+    console.log('newPayment ' + JSON.stringify(newPayment));
+
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).doc(newPayment.paymentId).get();
+    const paymentRef = paymentSnapshot.ref;
     await paymentRef.set(newPayment);
-    
+
+    console.log('amount to charge ' + JSON.stringify(newPayment.amount*100));
+   
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: newPayment.amount.toFixed(2),
+      amount: newPayment.amount*100,
       currency: newPayment.currency,
       payment_method_types: ["card"],
-      application_fee_amount: 0,
       metadata: { userId: newPayment.uid, paymentId: newPayment.paymentId }
     }, {
       stripeAccount: seller.stripeAccountId,
     });
+
+    console.log('paymentIntent ' + JSON.stringify(paymentIntent));
 
     await paymentRef.update({ paymentIntent: paymentIntent });
     return Promise.resolve(paymentIntent);
@@ -326,25 +363,15 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 });
 
 // create stripe payment intents
-exports.updateAccount = functions.https.onCall(async (data, context) => {
-  const userId = context.auth.uid;
+exports.updatePaymentIntent = functions.https.onCall(async (data, context) => {
+  const paymentIntentId = data.paymentIntentId;
+  const customerId = data.customerId;
 
   try {
-    const userSnapshot = await admin.firestore().collection('users').doc(userId).get();
-    const userRef = userSnapshot.ref;
-    const user = userSnapshot.data();
-
-    if (user.stripeAccountId){
-      // get account
-      const account = await stripe.accounts.retrieve(user.stripeAccountId);
-
-      console.log('account ' + JSON.stringify(account));
-
-      if (account.charges_enabled)
-        await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
-      else
-        await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
-    }
+    const paymentIntent = await stripe.paymentIntents.update(
+      paymentIntentId,
+      {customer: customerId}
+    );
     return Promise.resolve();
   }
   catch (error) {
@@ -5582,7 +5609,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                     if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the service
                                       // create alert
                                       var newAlert = {
-                                        alertId: uuidV4().replace(/-/g, ''),
+                                        alertId: uuid.v4().replace(/-/g, ''),
                                         notificationId: notification.notificationId,
                                         notificationUid: notification.uid,
                                         type: 'Service',
@@ -5706,7 +5733,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                 if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the service
                                   // create alert
                                   var newAlert = {
-                                    alertId: uuidV4().replace(/-/g, ''),
+                                    alertId: uuid.v4().replace(/-/g, ''),
                                     notificationId: doc.data().notificationId,
                                     notificationUid: doc.data().uid,
                                     type: 'Service',
@@ -8103,7 +8130,7 @@ exports.createUserServiceReview = functions.firestore.document("users/{userId}/s
   var createUserServiceCreatedReview = function () {
     return new Promise((resolve, reject) => {
       var newServiceCreatedReview = {
-        serviceCreatedReviewId: uuidV4().replace(/-/g, ''),
+        serviceCreatedReviewId: uuid.v4().replace(/-/g, ''),
         serviceReviewId: serviceReviewId,
         serviceReviewServiceId: serviceId,
         serviceReviewServiceUid: userId,
@@ -8330,7 +8357,7 @@ exports.createUserServiceReviewComment = functions.firestore.document("users/{us
   var createUserServiceCreatedComment = function () {
     return new Promise((resolve, reject) => {
       var newServiceCreatedComment = {
-        serviceCreatedCommentId: uuidV4().replace(/-/g, ''),
+        serviceCreatedCommentId: uuid.v4().replace(/-/g, ''),
         serviceReviewCommentId: serviceReviewCommentId,
         serviceReviewId: serviceReviewId,
         serviceReviewServiceId: serviceId,
@@ -8514,7 +8541,7 @@ exports.createUserServiceRate = functions.firestore.document("users/{userId}/ser
   var createUserServiceCreatedRate = function () {
     return new Promise((resolve, reject) => {
       var newServiceCreatedRate = {
-        serviceCreatedRateId: uuidV4().replace(/-/g, ''),
+        serviceCreatedRateId: uuid.v4().replace(/-/g, ''),
         serviceRateId: serviceRateId,
         serviceRateServiceId: serviceId,
         serviceRateServiceUid: userId,
@@ -9945,7 +9972,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                                 if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the forum
                                   // create alert
                                   var newAlert = {
-                                    alertId: uuidV4().replace(/-/g, ''),
+                                    alertId: uuid.v4().replace(/-/g, ''),
                                     notificationId: notification.notificationId,
                                     notificationUid: notification.uid,
                                     type: 'Forum',
@@ -10041,7 +10068,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                             if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the forum
                               // create alert
                               var newAlert = {
-                                alertId: uuidV4().replace(/-/g, ''),
+                                alertId: uuid.v4().replace(/-/g, ''),
                                 notificationId: doc.data().notificationId,
                                 notificationUid: doc.data().uid,
                                 type: 'Forum',

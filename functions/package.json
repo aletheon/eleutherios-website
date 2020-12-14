@@ -27,8 +27,7 @@
     "sanitizer": "^0.1.3",
     "sharp": "^0.26.1",
     "stripe": "^8.110.0",
-    "uuid": "^8.3.2",
-    "uuidv4": "^6.2.4"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"

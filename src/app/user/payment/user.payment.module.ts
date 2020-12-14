@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UserPaymentNewComponent } from './new/user.payment.new.component';
 
@@ -30,6 +31,7 @@ import {
     MatTooltipModule,
     MatSnackBarModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     LoadingSpinnerModule,
     BackModule,
     PipeModule,
