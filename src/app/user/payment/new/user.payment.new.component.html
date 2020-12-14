@@ -1,8 +1,16 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <ng-container *ngIf="auth.user | async;let userItem">
   <div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
-		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-			<h4 style="flex:none">You are about to buy</h4>
+    <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+      <ng-container *ngIf="serviceGroup.get('uid').value == userItem.uid; then showownerheader else noownerheader"></ng-container>
+      <ng-template #showownerheader>
+        <div class="label label-danger" style="padding:5px">
+          You cannot buy your own service
+        </div>
+      </ng-template>
+      <ng-template #noownerheader>
+        <h4 style="flex:none">You are about to buy</h4>
+      </ng-template>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
 				<back></back>
 			</div>
@@ -51,20 +59,14 @@
             </div>
           </div>
         </div>
-        <div style="flex:none;display:flex;flex-direction:row;align-items:center">
-          <div style="flex:none;margin-right:10px">
-            <ng-container *ngIf="serviceGroup.get('uid').value == userItem.uid; then showownerservice else noownerservice"></ng-container>
-            <ng-template #showownerservice>
-              <div class="label label-danger" style="padding:5px">
-                You cannot buy your own service
-              </div>
-            </ng-template>
-            <ng-template #noownerservice>
+        <ng-container *ngIf="serviceGroup.get('uid').value != userItem.uid">
+          <div style="flex:none;display:flex;flex-direction:column">
+            <div style="flex:none;text-align:right">
               <ng-container *ngIf="userServices | async;let userServiceItems">
                 <ng-container *ngIf="userServiceItems.length > 0; then showuserservices else nouserservices"></ng-container>
                 <ng-template #showuserservices>
                   <mat-form-field style="width:200px">
-                    <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Select service to pay with" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Select service to pay with">
+                    <mat-select #select="matSelect" (selectionChange)="selectService()" placeholder="Select service to pay with" [formControl]="userServicesCtrl" matTooltip="Select service to pay with">
                       <mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service">{{ service.title | truncate: 35 }}</mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -75,17 +77,21 @@
                   </div>
                 </ng-template>
               </ng-container>
-            </ng-template>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+              <div style="flex:1;margin-right:10px">
+                <div id="card-element" class="field" style="flex:none"></div>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+                <button [disabled]="hidePaymentButton" class="pay" (click)="pay()" style="flex:none">PAY</button>
+                <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none"></mat-spinner>
+              </div>
+            </div>
+            <div style="flex:none">
+              <mat-error id="card-errors"></mat-error>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;margin-right:10px">
-            <div id="card-element" class="field" style="flex:none"></div>
-            <mat-error id="card-errors" style="flex:none"></mat-error>
-          </div>
-          <div style="flex:none;display:flex;flex-direction:row;align-items:center">
-            <button [disabled]="hidePaymentButton" class="pay" (click)="pay()" style="flex:none">PAY</button>
-            <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none"></mat-spinner>
-          </div>
-        </div>
+        </ng-container>
       </div>
     </form>
 	</div>

@@ -4,6 +4,7 @@ const firebase = admin.initializeApp(functions.config().firebase);
 const async = require('async');
 const _ = require('lodash');
 const uuidV4 = require('uuidv4');
+const uuid = require('uuid');
 const tagUtil = require('./tagUtil');
 const FieldValue = require("firebase-admin").firestore.FieldValue;
 const { Storage } = require('@google-cloud/storage');
@@ -265,97 +266,59 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
 // create stripe payment intents
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
-  const userId = data.userId;
-  const paymentId = data.paymentId;
+  const userId = context.auth.uid;
+  const sellerUid = data.sellerUid;
+  const sellerServiceId = data.sellerServiceId;
+  const buyerUid = data.buyerUid;
+  const buyerServiceId = data.buyerServiceId;
 
   try {
-    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).doc(paymentId).get();
-    const paymentRef = paymentSnapshot.ref;
-    const payment = paymentSnapshot.data();
+    // get seller
+    const sellerSnapshot = await admin.firestore().collection('users').doc(sellerUid).get();
+    const seller = sellerSnapshot.data();
 
-    if (payment){
-      // get buyer
-      const buyerSnapshot = await admin.firestore().collection('users').doc(payment.buyerUid).get();
-      const buyer = buyerSnapshot.data();
+    // get buyer service
+    const buyerServiceSnapshot = await admin.firestore().collection(`users/${buyerUid}/services`).doc(buyerServiceId).get();
+    const buyerService = buyerServiceSnapshot.data();
 
-      console.log('buyer ' + JSON.stringify(buyer));
+    // get seller service
+    const sellerServiceSnapshot = await admin.firestore().collection(`users/${sellerUid}/services`).doc(sellerServiceId).get();
+    const sellerService = sellerServiceSnapshot.data();
+    
+    const newPayment = {
+      paymentId: uuid.v4().replace(/-/g, ''),
+      uid: userId,
+      receiptId: '',
+      amount: sellerService.amount,
+      currency: sellerService.currency,
+      title: sellerService.title,
+      description: sellerService.description,
+      quantity: 1,
+      status: '',
+      buyerUid: buyerUid,
+      buyerServiceId: buyerServiceId,
+      sellerUid: sellerUid,
+      sellerServiceId: sellerServiceId,
+      paymentIntent: null,
+      creationDate: FieldValue.serverTimestamp(),
+      lastUpdateDate: FieldValue.serverTimestamp()
+    };
 
-      // get seller
-      const sellerSnapshot = await admin.firestore().collection('users').doc(payment.sellerUid).get();
-      const seller = sellerSnapshot.data();
+    const paymentRef = (await admin.firestore().collection(`users/${userId}/payments`).doc(newPayment.paymentId).get()).ref;
+    await paymentRef.set(newPayment);
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: newPayment.amount.toFixed(2),
+      currency: newPayment.currency,
+      payment_method_types: ["card"],
+      application_fee_amount: 0,
+      metadata: { userId: newPayment.uid, paymentId: newPayment.paymentId }
+    }, {
+      stripeAccount: seller.stripeAccountId,
+    });
 
-      console.log('seller ' + JSON.stringify(seller));
-
-      // get customer
-      const customerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(buyer.stripeCustomerId).get();
-      const customer = customerSnapshot.data();
-
-      if (buyer && seller){
-        // check if existing customer
-        if (customer){
-          console.log('customer exists');
-
-          const existingCustomerPaymentIntent = await stripe.paymentIntents.create({
-            amount: payment.amount,
-            currency: seller.stripeCurrency,
-            customer: buyer.stripeCustomerId,
-            payment_method_types: ["card"],
-            application_fee_amount: 0,
-            metadata: { userId: userId, paymentId: paymentId }
-          }, {
-            stripeAccount: seller.stripeAccountId,
-          });
-          await paymentRef.update({ paymentIntent: existingCustomerPaymentIntent });
-          return Promise.resolve(existingCustomerPaymentIntent);
-        }
-        else {
-          // customer doesn't exist so add them to the connected accounts customer list
-          console.log('customer does not exist');
-
-          // get a token to connect with
-          const token = await stripe.tokens.create({
-            customer: buyer.stripeCustomerId,
-          }, {
-            stripeAccount: seller.stripeAccountId,
-          });
-
-          console.log('token ' + JSON.stringify(token));
-
-          // connect them together
-          const customer = await stripe.customers.create({
-            source: token.id,
-          }, {
-            stripeAccount: seller.stripeAccountId,
-          });
-
-          // remember customer
-          const newCustomerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/customers`).doc(customer.id).get();
-          const newCustomerRef = newCustomerSnapshot.ref;
-
-          const newCustomer = await newCustomerRef.set({
-            customerId: customer.id,
-            lastUpdateDate: FieldValue.serverTimestamp(),
-            creationDate: FieldValue.serverTimestamp()
-          });
-
-          // create intent
-          const newPaymentIntent = await stripe.paymentIntents.create({
-            amount: payment.amount,
-            currency: seller.stripeCurrency,
-            customer: customer.id,
-            payment_method_types: ["card"],
-            application_fee_amount: 0,
-            metadata: { userId: userId, paymentId: paymentId }
-          }, {
-            stripeAccount: seller.stripeAccountId,
-          });
-          await paymentRef.update({ paymentIntent: newPaymentIntent });
-          return Promise.resolve(newPaymentIntent);
-        }
-      }
-      else return Promise.reject('No buyer or seller provided');
-    }
-    else return Promise.reject(`Payment with paymentId ${paymentId} was not found`);
+    await paymentRef.update({ paymentIntent: paymentIntent });
+    return Promise.resolve(paymentIntent);
   }
   catch (error) {
     return Promise.reject(error);

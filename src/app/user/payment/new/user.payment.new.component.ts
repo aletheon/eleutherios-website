@@ -9,7 +9,6 @@ import {
   UserServiceService,
   UserServiceImageService,
   UserServiceTagService,
-  Payment,
   NoTitlePipe,
   TruncatePipe
 } from '../../../shared';
@@ -100,18 +99,23 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         this.stripeService.elements(this.elementsOptions)
           .subscribe(elements => {
             this.elements = elements;
+
             // Only mount the element the first time
             if (!this.card) {
               this.card = this.elements.create('card', this.cardOptions);
-              this.card.mount('#card-element');
-              this.card.on('change', function (event) {
-                var displayError = document.getElementById('card-errors');
-                if (event.error) {
-                  displayError.textContent = event.error.message;
-                } else {
-                  displayError.textContent = '';
-                }
-              });
+              let cardElement = document.getElementById("card-element");
+
+              if (cardElement){
+                this.card.mount('#card-element');
+                this.card.on('change', function (event) {
+                  var displayError = document.getElementById('card-errors');
+                  if (event.error) {
+                    displayError.textContent = event.error.message;
+                  } else {
+                    displayError.textContent = '';
+                  }
+                });
+              }
             }
           }
         );
@@ -155,70 +159,66 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       this.hidePaymentButton = true;
   }
 
-  async pay(){
-    const snackBarRef = this.snackbar.openFromComponent(
-      NotificationSnackBar,
-      {
-        duration: 8000,
-        data: 'The payment gateway system is still being implemented',
-        panelClass: ['red-snackbar']
-      }
-    );
+  pay(){
+    // const snackBarRef = this.snackbar.openFromComponent(
+    //   NotificationSnackBar,
+    //   {
+    //     duration: 8000,
+    //     data: 'The payment gateway system is still being implemented',
+    //     panelClass: ['red-snackbar']
+    //   }
+    // );
 
     // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5 
-    // this.showSpinner = true;
-    // this.hidePaymentButton = true;
+    this.showSpinner = true;
+    this.hidePaymentButton = true;
 
-    // try {
-    //   const buyer = await this.userService.getUserFromPromise(this.serviceGroup.get('uid').value);
-    //   const name = buyer.displayName;
-    //   const newPayment: Payment = {
-    //     paymentId: '',
-    //     receiptId: '',
-    //     amount: this.serviceGroup.get('amount').value,
-    //     currency: this.serviceGroup.get('currency').value,
-    //     title: this.serviceGroup.get('title').value,
-    //     description: this.serviceGroup.get('description').value,
-    //     quantity: 1,
-    //     status: '',
-    //     buyerUid: this.userServicesCtrl.value.uid,
-    //     buyerServiceId: this.userServicesCtrl.value.serviceId,
-    //     sellerUid: this.serviceGroup.get('uid').value,
-    //     sellerServiceId: this.serviceGroup.get('serviceId').value,
-    //     paymentIntent: null,
-    //     creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-    //     lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-    //   };
-    //   this.userPaymentService.create(this.userServicesCtrl.value.uid, newPayment).subscribe(payment => {
-    //     this.stripeService
-    //       .createToken(this.card, { name })
-    //       .subscribe((result) => {
-    //         if (result.token) {
-    //           // Use the token
-    //           console.log(result.token.id);
-    //         } else if (result.error) {
-    //           // Error creating the token
-    //           console.log(result.error.message);
-    //         }
+    const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+    createPaymentIntent({
+      sellerUid: this.serviceGroup.get('uid').value,
+      sellerServiceId: this.serviceGroup.get('serviceId').value,
+      buyerUid: this.userServicesCtrl.value.uid,
+      buyerServiceId: this.userServicesCtrl.value.serviceId
+    }).then(result => {
+      console.log('result ' + JSON.stringify(result.data));
 
-    //         this.showSpinner = false;
-    //         if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0)
-    //           this.hidePaymentButton = false;
-    //         else
-    //           this.hidePaymentButton = true;
-    //       }
-    //     );
-    //   });
-    // }
-    // catch (error) {
-    //   console.error(error);
-              
-    //   this.showSpinner = false;
-    //   if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0)
-    //     this.hidePaymentButton = false;
-    //   else
-    //     this.hidePaymentButton = true;
-    // }
+      this.showSpinner = false;
+      if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0)
+        this.hidePaymentButton = false;
+      else
+        this.hidePaymentButton = true;
+
+      // if (result){
+      //   this.stripeService.confirmCardPayment(result.data.client_secret, {
+      //     payment_method: {
+      //       card: this.card,
+      //       billing_details: {
+      //         name: sellerService.title
+      //       },
+      //     },
+      //   })
+      //   .subscribe((result) => {
+      //     if (result.error) {
+      //       // Show error to your customer (e.g., insufficient funds)
+      //       console.log(result.error.message);
+      //     } else {
+      //       // The payment has been processed!
+      //       if (result.paymentIntent.status === 'succeeded') {
+      //         // Show a success message to your customer
+      //       }
+      //     }
+      //   });
+      // }
+    })
+    .catch(error => {
+      console.error(error);
+
+      this.showSpinner = false;
+      if (this.userServicesCtrl.value && this.userServicesCtrl.value.title.length > 0)
+        this.hidePaymentButton = false;
+      else
+        this.hidePaymentButton = true;
+    });
   }
 
   ngOnInit () {
