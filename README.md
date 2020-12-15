@@ -2,21 +2,23 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or marketplace, where people or businesses can serve one another, through the same customer request, forum or conversation.
 
-For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food. A grocery store owner could register as a service and subscribe to the forum and ask the person, what food they wanted? After listening to their request the grocery store owner could, gather the food from their store.  They could scale the forum by creating a sub-forum for a delivery service to deliver the food. The delivery service could scale the forum again and create another sub-forum for a healthcare worker, to be the person that delivers the food to the person.
+For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request the grocery store owner could, gather the food from their store.  The person could, scale their forum by creating a sub-forum, for a delivery service to have the groceries delivered to them.  The delivery service could, scale the forum again and create another sub-forum, for a healthcare worker to be the person that delivers the food to the person.
 
 ```bash
 Forum (Food)
 ---- Service (Person or customer)
 ---- Service (Grocery store owner)
----- Forum (Pick up + drop off)
--------- Service (Grocery store owner or customer)
+---- Forum (Delivery service)
+-------- Service (Person or customer)
 -------- Service (Fastpost couriers)
 -------- Forum (Healthcare worker to deliver food)
 ------------ Service (Fastpost couriers or customer)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling the forum or sociopolitical or economic aspects of the conversation for food.  Services get paid by the appropriate customer at the time they join the conversation.  For example, when the delivery service wants to hire a healthcare worker to deliver the food to the quarantined person.
+In this example, Eleutherios is scaling or serializing the customer request, forum or conversation, that's taking place, i.e. food.  Services (people or business) subscribe or come into the conversation, where they feel their energy can be utilized.
+
+
 
 #### Features:
 
