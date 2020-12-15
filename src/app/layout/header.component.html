@@ -36,12 +36,12 @@
             <a [routerLink]="['/user/alert/list']" style="color:#faebd7;text-decoration:none">{{ total.serviceAlertCount }}</a>
           </div>
           <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:rgb(250, 113, 108)" *ngIf="total.forumAlertCount > 0" matTooltip="Forum Alert" matTooltipPosition="below">
-            <a [routerLink]="['/user/alert/list']" style="color:#faebd7;text-decoration:none">{{ total.forumAlertCount }}</a>
+            <a [routerLink]="['/user/alert/list']" style="color:#83796d;text-decoration:none">{{ total.forumAlertCount }}</a>
           </div>
         </div>
 
         <!-- user control -->
-        <button style="flex:none;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
+        <button class="btn btn-default" style="flex:none;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
         <mat-menu #mainMenu="matMenu">
           <ng-container *ngIf="userTotal | async as total">
             <button mat-menu-item [matMenuTriggerFor]="forums">Forums({{ total.forumCount }})</button>

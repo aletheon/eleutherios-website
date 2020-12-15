@@ -146,8 +146,8 @@
 		</div>
 		<!-- paging -->
 		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
-			<button style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
-			<button style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+			<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+			<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 		</div>
 	</form>
 </div>
