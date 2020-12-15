@@ -136,6 +136,7 @@ exports.stripe = functions.https.onRequest(app);
 // listen to stripe webhook events
 exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
+  let intent, metadata;
 
   try {
     // Verify webhook signature and extract the event.
@@ -147,8 +148,8 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
 
     switch (event.type) {
       case 'payment_intent.created':
-        let intent = event.data.object;
-        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+        intent = event.data.object;
+        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
         console.log('payment_intent.created');
 
@@ -179,8 +180,8 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         });
         break;
       case 'payment_intent.succeeded':
-        let intent = event.data.object;
-        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+        intent = event.data.object;
+        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
         console.log('payment_intent.succeeded');
 
@@ -196,8 +197,8 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
         break;
       case 'payment_intent.payment_failed':
-        let intent = event.data.object;
-        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+        intent = event.data.object;
+        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
         
         console.log('payment_intent.payment_failed');
 
