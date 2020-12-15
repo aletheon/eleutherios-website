@@ -143,13 +143,15 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     let event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     const eventDB = await admin.database().ref("events").push(event); // Add the event to the database
 
-    const intent = event.data.object;
-    const metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
-
-    console.log('event.type ' + event.type);
+    console.log('event.data.object ' + JSON.stringify(event.data.object));
 
     switch (event.type) {
       case 'payment_intent.created':
+        let intent = event.data.object;
+        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+
+        console.log('payment_intent.created');
+
         // update payment
         const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const createPaymentRef = createPaymentSnapshot.ref;
@@ -177,6 +179,11 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         });
         break;
       case 'payment_intent.succeeded':
+        let intent = event.data.object;
+        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+
+        console.log('payment_intent.succeeded');
+
         // update payment
         const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const successPaymentRef = successPaymentSnapshot.ref;
@@ -189,6 +196,11 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
         break;
       case 'payment_intent.payment_failed':
+        let intent = event.data.object;
+        let metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+        
+        console.log('payment_intent.payment_failed');
+
         // update payment
         const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const failPaymentRef = failPaymentSnapshot.ref;
@@ -214,7 +226,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
 // listen to stripe connected webhook events
 exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
-  let event, userRef;
+  let event;
 
   try {
     // Verify webhook signature and extract the event.
@@ -224,34 +236,34 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
     console.log('event.data.object ' + JSON.stringify(event.data.object));
 
-    // const account = await stripe.accounts.retrieve(event.data.object.account);
-    // console.log('account after ' + JSON.stringify(account));
-
-    var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', account.id).limit(1).get();
-
-    if (snapshot.size > 0)
-      userRef = snapshot.docs[0].ref;
-
     if (event.type == 'account.application.authorized'){
       console.log('account.application.authorized');
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
 
-      if (userRef)
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
-      
+      }
       return res.json({ received: true });
     }
     else if (event.type == 'account.application.deauthorized'){
       console.log('account.application.deauthorized');
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
 
-      if (userRef)
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
         await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
-      
+      }
       return res.json({ received: true });
     }
     else if (event.type == 'account.updated'){
       console.log('account.updated');
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
+      const account = await stripe.accounts.retrieve(event.data.object.account);
 
-      if (userRef){
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
+
         if (account.charges_enabled)
           await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
         else
@@ -274,15 +286,15 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
+      console.log('payment_intent.payment_failed');
+
       const paymentIntent = event.data.object;
       const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-
-      console.log('payment_intent.payment_failed');
       return res.json({ received: true });
     }
     else {
       console.log('Unknown event.type ' + event.type);
-      return res.json({ received: true, ref: snapshot.ref.toString() });
+      return res.json({ received: true });
     }
   } catch (error) {
     return res.status(400).send(`Webhook Error: ${error.message}`);
@@ -341,8 +353,8 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const paymentRef = paymentSnapshot.ref;
     await paymentRef.set(newPayment);
 
-    console.log('amount to charge ' + JSON.stringify(newPayment.amount*100));
-   
+    console.log('seller.stripeAccountId ' + seller.stripeAccountId);
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: newPayment.amount*100,
       currency: newPayment.currency,
