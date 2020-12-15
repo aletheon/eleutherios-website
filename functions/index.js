@@ -235,11 +235,11 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
     const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
-    console.log('event.data.object ' + JSON.stringify(event.data.object));
+    console.log('event ' + JSON.stringify(event));
 
     if (event.type == 'account.application.authorized'){
       console.log('account.application.authorized');
-      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
@@ -249,7 +249,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     }
     else if (event.type == 'account.application.deauthorized'){
       console.log('account.application.deauthorized');
-      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
@@ -259,8 +259,8 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     }
     else if (event.type == 'account.updated'){
       console.log('account.updated');
-      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.data.object.account).limit(1).get();
-      const account = await stripe.accounts.retrieve(event.data.object.account);
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
+      const account = await stripe.accounts.retrieve(event.account);
 
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
