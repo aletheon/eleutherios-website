@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
         })
         .catch(error => {
           // cannot register with an existing or the same email address
-          if (_.includes(error.message, 'An account already exists with the same email addr')){
+          if (_.includes(error.message, 'An account already exists with the same email address')){
             const snackBarRef = this.snackbar.openFromComponent(
               NotificationSnackBar,
               {
