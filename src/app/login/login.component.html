@@ -5,12 +5,12 @@
   <div style="flex:1">
     <div style="display:flex;flex-direction:column;align-items:center;margin-top:20px">
       <div style="flex:none;margin-bottom:10px">
-        <button (click)='loginWithGoogle()'>Login with Google</button>
+        <input type="image" (click)='loginWithGoogle()' src="../../assets/btn_google_signin_dark_normal_web.png" style="width:225px;margin:0px" matTooltip="Login with Google" />
       </div>
       <div style="flex:none;margin-bottom:10px">
-        <button (click)='loginWithFacebook()'>Login with Facebook</button>
+        <input type="image" (click)='loginWithFacebook()' src="../../assets/fbLogin.jpg" style="width:225px;margin:0px" matTooltip="Login with Facebook" />
       </div>
-      <div style="flex:none;text-align:center;padding-top:10px">
+      <div style="flex:none;text-align:center">
         <p style="margin-bottom:5px">Register or login with your email address</p>
         <button [routerLink]="['/login/link']" type="button">Login with E-mail Link</button>
       </div>

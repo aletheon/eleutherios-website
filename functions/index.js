@@ -244,6 +244,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
+
+        console.log('account ' + JSON.stringify(account));
+
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
@@ -255,6 +259,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
+
+        console.log('account ' + JSON.stringify(account));
+
         await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
@@ -263,15 +271,14 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       console.log('account.updated');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
-      const account = await stripe.accounts.retrieve(event.account);
-
+      
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
 
-        if (account.charges_enabled)
-          await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
-        else
-          await userRef.update({ stripeOnboardingStatus: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+        console.log('account ' + JSON.stringify(account));
+
+        await userRef.update({ stripeOnboardingStatus: account.charges_enabled ? 'Authorized' : 'Pending', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
     }
@@ -280,7 +287,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-      
+      var account = await stripe.accounts.retrieve(event.account);
+
+      console.log('account ' + JSON.stringify(account));
+
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.succeeded'){
@@ -288,7 +298,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-      
+      var account = await stripe.accounts.retrieve(event.account);
+
+      console.log('account ' + JSON.stringify(account));
+
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
@@ -296,7 +309,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      var account = await stripe.accounts.retrieve(event.account);
       
+      console.log('account ' + JSON.stringify(account));
+
       return res.json({ received: true });
     }
     else {
