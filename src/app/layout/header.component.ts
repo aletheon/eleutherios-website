@@ -32,7 +32,10 @@ export class HeaderComponent implements OnInit {
   }
 
   home () {
-    this.router.navigate(['/']);
+    if (this.auth.uid)
+      this.router.navigate(['/']);
+    else
+      this.router.navigate(['/anonymous/home']);
   }
 
   logout() {

@@ -6,13 +6,13 @@
 		</div>
 		<loading-spinner *ngIf="loading | async"></loading-spinner>
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center">
-			<div style="flex:none;width:100%" *ngIf="emailSent" style="flex:none;width:100%;margin-bottom:10px;padding:6px;background-color:rgb(188, 194, 202);border:1px solid #007FFF">
-				We sent a login link to your email address {{ tempEmail }}.  Don't forget to check your junk mail as it may have ended up there.
+			<div *ngIf="emailSent" class="alert alert-success">
+				<strong>Success!</strong> We sent a login link to your email address {{ tempEmail }}.  Don't forget to check your junk mail as it may have ended up there.
 			</div>
-			<div *ngIf="errorMessage" style="flex:none;width:100%;margin-bottom:10px;padding:6px;border:1px solid red; background-color:rgb(250, 155, 152)">
+			<div *ngIf="errorMessage" class="alert alert-danger">
 				{{ errorMessage }}
 			</div>
-			<div style="flex:none;width:250px">
+			<div style="flex:none;width:350px">
 				<div style="display:flex;flex-direction:row">
 					<input id="emailAddress" type="email" placeholder="Your email address" [(ngModel)]="email" [ngModelOptions]="{standalone: true}" style="flex:none;margin-right:5px">
 					<button id="submitButton"

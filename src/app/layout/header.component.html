@@ -1,6 +1,6 @@
 <header>
-  <div style="display:flex;flex-direction:row;background-color:#222222;padding:10px;flex-wrap:wrap">
-    <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+  <div class="navbar navbar-inverse" style="margin:0px;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+    <div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-left:10px">
       <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
       <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
       <ng-template #showloggedinlogo>
@@ -25,11 +25,11 @@
         </div>
       </div>
     </div>
-    <div style="flex:none" *ngIf="auth.user | async; then authenticated else guest"></div>
+    <ng-container *ngIf="auth.user | async; then authenticated else guest"></ng-container>
 
     <!-- user logged in -->
     <ng-template #authenticated>
-      <div *ngIf="auth.user | async as user" style="display:flex;flex-direction:row">
+      <div *ngIf="auth.user | async as user" style="flex:none;display:flex;flex-direction:row;margin-right:10px">
         <!-- alert control -->
         <div style="flex:none;display:flex;flex-direction:row" *ngIf="userTotal | async as total">
           <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:#A9C4EB" *ngIf="total.serviceAlertCount > 0" matTooltip="Service Alert" matTooltipPosition="below">
@@ -78,7 +78,7 @@
 
     <!-- user not logged in -->
     <ng-template #guest>
-      <div style="flex:none;display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-end">
+      <div style="flex:none;margin-right:10px">
         <a [routerLink]="['/login']" style="color:#faebd7">Login</a>
       </div>
     </ng-template>

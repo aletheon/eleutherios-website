@@ -31,7 +31,7 @@
                   {{ forum.creationDate.toDate() | amTimeAgo }}
                 </div>
                 <div style="flex:none">
-                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
                 </div>
               </div>
             </div>
@@ -88,7 +88,7 @@
                   {{ service.creationDate.toDate() | amTimeAgo }}
                 </div>
                 <div style="flex:none">
-                  <mat-icon [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+                  <mat-icon [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
                 </div>
               </div>
             </div>
