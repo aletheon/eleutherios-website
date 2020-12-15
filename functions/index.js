@@ -136,22 +136,22 @@ exports.stripe = functions.https.onRequest(app);
 // listen to stripe webhook events
 exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
-  let intent, metadata;
+  let event, intent, metadata;
 
   try {
     // Verify webhook signature and extract the event.
     // See https://stripe.com/docs/webhooks/signatures for more information.
-    let event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
+    event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     const eventDB = await admin.database().ref("events").push(event); // Add the event to the database
 
-    console.log('event.data.object ' + JSON.stringify(event.data.object));
+    console.log('event ' + JSON.stringify(event));
 
     switch (event.type) {
       case 'payment_intent.created':
+        console.log('payment_intent.created');
+
         intent = event.data.object;
         metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
-
-        console.log('payment_intent.created');
 
         // update payment
         const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
@@ -180,10 +180,10 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         });
         break;
       case 'payment_intent.succeeded':
+        console.log('payment_intent.succeeded');
+
         intent = event.data.object;
         metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
-
-        console.log('payment_intent.succeeded');
 
         // update payment
         const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
@@ -197,11 +197,11 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
         break;
       case 'payment_intent.payment_failed':
+        console.log('payment_intent.payment_failed');
+
         intent = event.data.object;
         metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
         
-        console.log('payment_intent.payment_failed');
-
         // update payment
         const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
         const failPaymentRef = failPaymentSnapshot.ref;
@@ -212,7 +212,6 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
         const failReceiptSnapshot = await admin.firestore().collection(`users/${failPayment.sellerUid}/receipts`).doc(failPayment.receiptId).get();
         const failReceiptRef = failReceiptSnapshot.ref;
         await failReceiptRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
-
         break;
       default:
         console.log('got unknown type ' + event.type);
@@ -233,12 +232,14 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     // Verify webhook signature and extract the event.
     // See https://stripe.com/docs/webhooks/signatures for more information.
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
-    const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
     console.log('event ' + JSON.stringify(event));
 
+    const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
+
     if (event.type == 'account.application.authorized'){
       console.log('account.application.authorized');
+
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
       if (snapshot.size > 0){
@@ -249,6 +250,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     }
     else if (event.type == 'account.application.deauthorized'){
       console.log('account.application.deauthorized');
+
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
       if (snapshot.size > 0){
@@ -259,6 +261,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     }
     else if (event.type == 'account.updated'){
       console.log('account.updated');
+
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
       const account = await stripe.accounts.retrieve(event.account);
 
@@ -273,24 +276,27 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.created'){
-      const paymentIntent = event.data.object;
-      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-
       console.log('payment_intent.created');
+
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.succeeded'){
-      const paymentIntent = event.data.object;
-      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-
       console.log('payment_intent.succeeded');
+
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
       console.log('payment_intent.payment_failed');
 
-      const paymentIntent = event.data.object;
-      const metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      
       return res.json({ received: true });
     }
     else {
@@ -364,7 +370,6 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     }, {
       stripeAccount: seller.stripeAccountId,
     });
-
     console.log('paymentIntent ' + JSON.stringify(paymentIntent));
 
     await paymentRef.update({ paymentIntent: paymentIntent });
@@ -377,13 +382,14 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
 // create stripe payment intents
 exports.updatePaymentIntent = functions.https.onCall(async (data, context) => {
+  const userId = context.auth.uid;
   const paymentIntentId = data.paymentIntentId;
   const customerId = data.customerId;
 
   try {
     const paymentIntent = await stripe.paymentIntents.update(
       paymentIntentId,
-      {customer: customerId}
+      { customer: customerId }
     );
     return Promise.resolve();
   }
