@@ -87,20 +87,18 @@
 									</div>
 								</div>
 								<ng-container *ngIf="notification.notificationTags | async">
-									<div style="flex:none">
-										<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
-											<ng-container *ngIf="notificationTagItems.length > 0; then showforumtags"></ng-container>
-											<ng-template #showforumtags>
-												<div style="flex:none;display:flex;flex-direction:row">
-													<ng-container *ngFor="let notificationTag of notificationTagItems">
-														<div class="label label-danger" style="flex:none;margin-right:5px">
-															<span>{{ notificationTag.tag }}</span>
-														</div>
-													</ng-container>
-												</div>
-											</ng-template>
-										</ng-container>
-									</div>
+									<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
+										<ng-container *ngIf="notificationTagItems.length > 0; then showforumtags"></ng-container>
+										<ng-template #showforumtags>
+											<div style="flex:none;display:flex;flex-direction:row">
+												<ng-container *ngFor="let notificationTag of notificationTagItems">
+													<div class="label label-danger" style="flex:none;margin-right:5px">
+														<span>{{ notificationTag.tag }}</span>
+													</div>
+												</ng-container>
+											</div>
+										</ng-template>
+									</ng-container>
 								</ng-container>
 							</div>
 						</ng-template>
@@ -129,20 +127,18 @@
 									</div>
 								</div>
 								<ng-container *ngIf="notification.notificationTags | async">
-									<div style="flex:none">
-										<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
-											<ng-container *ngIf="notificationTagItems.length > 0; then showservicetags"></ng-container>
-											<ng-template #showservicetags>
-												<div style="display:flex;flex-direction:row">
-													<ng-container *ngFor="let notificationTag of notificationTagItems">
-														<div [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px">
-															<span>{{ notificationTag.tag }}</span>
-														</div>
-													</ng-container>
-												</div>
-											</ng-template>
-										</ng-container>
-									</div>
+									<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
+										<ng-container *ngIf="notificationTagItems.length > 0; then showservicetags"></ng-container>
+										<ng-template #showservicetags>
+											<div style="display:flex;flex-direction:row">
+												<ng-container *ngFor="let notificationTag of notificationTagItems">
+													<div [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px">
+														<span>{{ notificationTag.tag }}</span>
+													</div>
+												</ng-container>
+											</div>
+										</ng-template>
+									</ng-container>
 								</ng-container>
 							</div>
 						</ng-template>
