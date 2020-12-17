@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or marketplace, where people or businesses can serve one another, through the same customer request, forum or conversation.
 
-For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner could gather the food from their store.  The person could have the groceries delivered by scaling the forum and creating a sub-forum for a delivery service.  The delivery service could scale the forum again and create another sub-forum, for a healthcare worker to be the person, that delivers the food to the quarantined person.
+For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner could gather the food from their store and charge the customer directly or wait until the goods are delivered.  The person could then, have the groceries delivered by scaling the forum and creating a sub-forum for a delivery service.  The delivery service could scale the forum again and create another sub-forum, for a healthcare worker to be the person, that delivers the food to the quarantined person.
 
 ```bash
 Forum (Food)
@@ -16,9 +16,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or serializing the customer request, forum or conversation, that's taking place, i.e. food.  Services (people or business) subscribe or come into the conversation, where they feel their energy can be utilized.
-
-
+In this example, Eleutherios is scaling or serializing the customer request, forum or conversation, that is taking place, i.e. food.  Services (people or business) subscribe or come into the conversation, where they feel their energy can be utilized.
 
 #### Features:
 
