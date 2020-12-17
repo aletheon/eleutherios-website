@@ -16,7 +16,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or serializing the customer request, forum or conversation about food.  Services (people or business) participate or subscribe to the conversation, where they feel their energy can be used.
+In this example, Eleutherios is scaling or serializing the customer request, forum or conversation, that services (people or business) are having about food, not the service or work, that they provide.  People or businesses, still provide the same service or work in the world, but within the relevant forum or conversation.
 
 #### Features:
 
