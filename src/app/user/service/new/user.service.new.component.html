@@ -102,6 +102,15 @@
 									{{ userItem.stripeCurrency.toUpperCase() }}
 								</div>
 							</div>
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<div style="flex:1">
+									<mat-form-field style="width:150px">
+										<mat-select formControlName="typeOfPayment" (selectionChange)="saveChanges()">
+											<mat-option *ngFor="let t of typesOfPayments" [value]="t">{{ t }}</mat-option>
+										</mat-select>
+									</mat-form-field>
+								</div>
+							</div>
 						</ng-container>
 						<ng-template #onboarduser>
 							<div style="display:flex;flex-direction:row;align-items:center">
