@@ -42,7 +42,7 @@
 								<input
 									matInput
 									#startAmount
-									placeholder="Start amount 9.99"
+									placeholder="Start amount e.g. 1.95"
 									formControlName="startAmount"
 									(change)="saveChanges()"/>
 								<mat-error *ngIf="notificationGroup.get('startAmount').hasError('pattern')">
@@ -65,7 +65,7 @@
 								<input
 									matInput
 									#endAmount
-									placeholder="End amount 9.99"
+									placeholder="End amount e.g. 9.95"
 									formControlName="endAmount"
 									(change)="saveChanges()"/>
 								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
@@ -102,7 +102,7 @@
 					<h5 style="padding:0px">Tags(<ng-container *ngIf="tagCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 					<ng-container *ngIf="notificationTags | async;let notificationTagItems">
 						<div *ngIf="notificationTagItems.length > 0">
-							<ng-container *ngIf="notificationItem.type == 'Forum'; then showforumtags else showservicetags"></ng-container>
+							<ng-container *ngIf="notificationGroup.get('type').value == 'Forum'; then showforumtags else showservicetags"></ng-container>
 							<ng-template #showforumtags>
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
 									<div class="label label-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
@@ -114,7 +114,7 @@
 							</ng-template>
 							<ng-template #showservicetags>
 								<div style="display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-									<div [ngClass]="notificationItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
+									<div [ngClass]="notificationGroup.get('paymentType').value == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 										*ngFor="let notificationTag of notificationTagItems; trackBy: trackNotificationTags">
 										<span>{{ notificationTag.tag }}</span>
 										<i class="material-icons" (click)="removeTag(notificationTag)" style="cursor:pointer" matTooltip="Remove">close</i>
@@ -146,7 +146,7 @@
 						<ng-container *ngIf="searchResultItems.length > 0; then showsearchresults else nosearchresults"></ng-container>
 						<ng-template #showsearchresults>
 							<ng-container *ngFor="let result of searchResultItems; trackBy: trackResults">
-								<ng-container *ngIf="notificationItem.type == 'Forum'; then showforumresult else showserviceresult"></ng-container>
+								<ng-container *ngIf="notificationGroup.get('type').value == 'Forum'; then showforumresult else showserviceresult"></ng-container>
 								<ng-template #showforumresult>
 									<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
 										<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
@@ -190,7 +190,7 @@
 									</div>
 								</ng-template>
 								<ng-template #showserviceresult>
-									<div [ngClass]="notificationItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+									<div [ngClass]="result.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
 										<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
 											<ng-container *ngIf="result.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 											<ng-template #showdefaultserviceimage>
