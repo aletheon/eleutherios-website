@@ -392,6 +392,11 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       });
     }
     else {
+
+      
+      // HERE ROB FIX THIS SO IT CONSIDERS PAYMENT TYPE
+
+
       this._searchSubscription = this.serviceService.getServices(this.numberOfItems, key, this._tempNotificationTags, this._tempNotificationTags.length > 0 ? true : false, true).pipe(
         switchMap(services => {
           if (services && services.length > 0) {
