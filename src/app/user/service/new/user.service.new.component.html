@@ -85,7 +85,7 @@
 									<input
 										matInput
 										#amount
-										placeholder="9.99"
+										placeholder="e.g. 1.95"
 										formControlName="amount"
 										(change)="saveChanges()"/>
 									<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">

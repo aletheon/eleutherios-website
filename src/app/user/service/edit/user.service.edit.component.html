@@ -69,7 +69,7 @@
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1">
 							<mat-form-field style="width:150px">
-								<mat-select formControlName="type" #select="matSelect" (selectionChange)="saveChanges()">
+								<mat-select formControlName="type" (selectionChange)="saveChanges()">
 									<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
 								</mat-select>
 							</mat-form-field>
@@ -78,7 +78,7 @@
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1">
 							<mat-form-field style="width:150px">
-								<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
+								<mat-select formControlName="paymentType" (selectionChange)="saveChanges()">
 									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
 								</mat-select>
 							</mat-form-field>
@@ -91,7 +91,7 @@
 									<input
 										matInput
 										#amount
-										placeholder="9.99"
+										placeholder="e.g. 1.95"
 										formControlName="amount"
 										(change)="saveChanges()"/>
 									<mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
@@ -106,6 +106,15 @@
 								</mat-form-field>
 								<div style="flex:1;align-items:flex-start">
 									{{ userItem.stripeCurrency.toUpperCase() }}
+								</div>
+							</div>
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<div style="flex:1">
+									<mat-form-field style="width:150px">
+										<mat-select formControlName="typeOfPayment" (selectionChange)="saveChanges()">
+											<mat-option *ngFor="let t of typesOfPayments" [value]="t">{{ t }}</mat-option>
+										</mat-select>
+									</mat-form-field>
 								</div>
 							</div>
 						</ng-container>
@@ -279,7 +288,7 @@
 														<div style="flex:none">
 															<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
 															<ng-template #showblockcontrol>
-																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockForum($event, forum)">
+																<mat-select placeholder="" (selectionChange)="blockForum($event, forum)">
 																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
 																</mat-select>
 															</ng-template>

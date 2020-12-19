@@ -72,6 +72,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public types: string[] = ['Public', 'Private'];
   public blockTypes: string[] = ['Remove', 'Block Forum', 'Block User'];
   public paymentTypes: string[] = ['Free', 'Payment'];
+  public typesOfPayments: string[] = ['One-off', 'On-going'];
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public matAutoCompleteSearchForums: Observable<any[]>;
@@ -1137,7 +1138,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       rate:                           [''],
       paymentType:                    [''],
       amount:                         ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
-      currency:                           [''],
+      typeOfPayment:                  [''],
+      currency:                       [''],
       includeDescriptionInDetailPage: [''],
       includeImagesInDetailPage:      [''],
       includeTagsInDetailPage:        [''],
@@ -1153,12 +1155,28 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     //  ongoing subscription
     this._serviceSubscription = this.service.subscribe(service => {
       if (service){
-        this.serviceGroup.patchValue(service);
-
         // use pipe to display currency
         this.serviceGroup.patchValue({
-          amount: this.currencyPipe.transform(service.amount, '', '', '1.2-2').replace(/,/g, '')
-        }, { emitEvent: false });
+          serviceId: service.serviceId,
+          uid: service.uid,
+          type: service.type,
+          title: service.title,
+          title_lowercase: service.title_lowercase,
+          description: service.description,
+          website: service.website,
+          default: service.default,
+          indexed: service.indexed,
+          rate: service.rate,
+          paymentType: service.paymentType,
+          amount: this.currencyPipe.transform(service.amount, '', '', '1.2-2').replace(/,/g, ''),
+          typeOfPayment: service.typeOfPayment,
+          currency: service.currency,
+          includeDescriptionInDetailPage: service.includeDescriptionInDetailPage,
+          includeImagesInDetailPage: service.includeImagesInDetailPage,
+          includeTagsInDetailPage: service.includeDescriptionInDetailPage,
+          lastUpdateDate: service.lastUpdateDate,
+          creationDate: service.creationDate
+        });
 
         if (service.title.length == 0)
           that.serviceGroup.get('indexed').disable();
@@ -2251,6 +2269,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           rate: this.serviceGroup.get('rate').value,
           paymentType: this.serviceGroup.get('paymentType').value,
           amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
+          typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
           currency: this.serviceGroup.get('currency').value,
           includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
           includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,

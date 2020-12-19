@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
@@ -12,6 +12,7 @@ import {
   NoTitlePipe,
   TruncatePipe
 } from '../../../shared';
+import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -34,8 +35,11 @@ import * as firebase from 'firebase/app';
   styleUrls: ['./user.payment.new.component.css']
 })
 export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit {
+  // @ViewChild('card-element', { static: false }) _cardElement: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _loadCard = new BehaviorSubject(false);
   private _userSubscription: Subscription;
+  private _connectedUserSubscription: Subscription;
   private _userServiceSubscription: Subscription;
   private _sellerServiceSubscription: Subscription;
   private _buyerServiceSubscription: Subscription;
@@ -46,7 +50,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   private _sellerServiceId: string;
   private _paymentIntent: any;
   private _user: any;
-  
+  private _connectedUser: any;
+  private _loadCardListener: Observable<boolean> = this._loadCard.asObservable();
+
   public sellerService: Observable<any>;
   public payment: Observable<any>;
   public serviceGroup: FormGroup;
@@ -99,36 +105,49 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       if(this._loading.getValue() == false) {
         clearInterval(intervalId);
 
-        this.stripeService.elements(this.elementsOptions)
-          .subscribe(elements => {
-            this.elements = elements;
+        this._loadCardListener.subscribe(result => {
+          if (result == true){
+            console.log('this._connectedUser.stripeAccountId ' + this._connectedUser.stripeAccountId);
 
-            // Only mount the element the first time
-            if (!this.card) {
-              this.card = this.elements.create('card', this.cardOptions);
-              let cardElement = document.getElementById("card-element");
+            this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+            this.stripeService.elements(this.elementsOptions)
+              .subscribe(elements => {
+                this.elements = elements;
 
-              if (cardElement){
-                this.card.mount('#card-element');
-                this.card.on('change', function (event) {
-                  var displayError = document.getElementById('card-errors');
-                  if (event.error) {
-                    displayError.textContent = event.error.message;
-                  } else {
-                    displayError.textContent = '';
+                // Only mount the element the first time
+                if (!this.card) {
+                  this.card = this.elements.create('card', this.cardOptions);
+                  let cardElement = document.getElementById("card-element");
+
+                  if (cardElement){
+                    this.card.mount('#card-element');
+                    this.card.on('change', function (event) {
+                      var displayError = document.getElementById('card-errors');
+                      if (event.error) {
+                        displayError.textContent = event.error.message;
+                      } else {
+                        displayError.textContent = '';
+                      }
+                    });
                   }
-                });
+                }
               }
-            }
+            );  
           }
-        );
+        });
       }
     }, 2500);
   }
 
   ngOnDestroy () {
+    // change the key back before leaving
+    this.stripeService.changeKey(environment.stripeTestKey);
+
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
+
+    if (this._connectedUserSubscription)
+      this._connectedUserSubscription.unsubscribe();
 
     if (this._userServiceSubscription)
       this._userServiceSubscription.unsubscribe();
@@ -175,6 +194,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     //   }
     // );
 
+    // var stripe = Stripe(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+    // this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+
     // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5 
     this.showSpinner = true;
     this.hidePaymentButton = true;
@@ -186,9 +208,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         payment_method: {
           card: this.card,
           billing_details: {
-            name: this._user.displayName
+            name: this._user.displayName,
+            email: this._user.email
           },
-        },
+        }
       })
       .subscribe((result) => {
         console.log('confirmCardPayment result ' + JSON.stringify(result));
@@ -213,7 +236,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         sellerUid: this.serviceGroup.get('uid').value,
         sellerServiceId: this.serviceGroup.get('serviceId').value,
         buyerUid: this.userServicesCtrl.value.uid,
-        buyerServiceId: this. userServicesCtrl.value.serviceId
+        buyerServiceId: this.userServicesCtrl.value.serviceId
       }).then(result => {
         console.log('created paymentIntent result ' + JSON.stringify(result));
 
@@ -224,7 +247,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             payment_method: {
               card: this.card,
               billing_details: {
-                name: this._user.displayName
+                name: this._user.displayName,
+                email: this._user.email
               },
             },
           })
@@ -236,10 +260,28 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
               console.log(result.error.message);
             } else {
               // The payment has been processed!
-              // if (result.paymentIntent.status === 'succeeded') {
-              //   // Show a success message to your customer
-              // }
               console.log('status ' + result.paymentIntent.status);
+
+              if (result.paymentIntent.status === 'succeeded') {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Success!',
+                    panelClass: ['green-snackbar']
+                  }
+                );
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'An unknown problem occurred status ' + result.paymentIntent.status,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }  
             }
             this.showSpinner = false;
             this.hidePaymentButton = false;
@@ -424,6 +466,14 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
 
             // get end user services
             that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
+
+            // get connected user
+            that._connectedUserSubscription = that.userService.getUser(service.uid).subscribe(user => {
+              if (user){
+                that._connectedUser = user;
+                that._loadCard.next(true);
+              }
+            });
           }
           catch (error) {
             throw error;
