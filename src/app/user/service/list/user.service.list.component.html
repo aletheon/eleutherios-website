@@ -117,8 +117,8 @@
 									</div>
 								</div>
 							</div>
-							<div style="flex:none;display:flex;flex-direction:row">
-								<ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
+							<ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
+								<div style="flex:none;display:flex;flex-direction:row">
 									<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
 									<ng-template #showtags>
 										<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
@@ -127,13 +127,21 @@
 											</ng-container>
 										</div>
 									</ng-template>
-								</ng-container>
-								<ng-container *ngIf="service.paymentType == 'Payment'">
-									<div style="flex:none">
-										<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-									</div>
-								</ng-container>
-							</div>
+									<ng-container *ngIf="service.paymentType == 'Payment'">
+										<ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+										<ng-template #showtagswithpayment>
+											<div style="flex:none">
+												<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+											</div>
+										</ng-template>
+										<ng-template #showtagswithoutpayment>
+											<div style="flex:1;text-align:right">
+												<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+											</div>
+										</ng-template>
+									</ng-container>
+								</div>
+							</ng-container>
 						</div>
 					</ng-container>
 				</ng-template>

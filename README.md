@@ -16,13 +16,13 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or serializing the forum, customer request or conversation, that services (people or business) are having about food, not the service or work, that they are providing.  People or businesses, still provide the same service or work in the world, but within the relevant forum or conversation.
+In this example, Eleutherios is scaling or serializing the forum, customer request or conversation, that services (people or business) are having about food, not the service or work, that they are trying to provide or perform. People or businesses, still provide or perform the same service or work in the world, but within the relevant forum or conversation.
 
 #### Features:
 
 * Forum in forum (scalability)
 * Tags for filtering forums or services (search)
-* Alerts to keep end users informed when new forums or services are created in the system (notifications)
+* Alerts to keep end users informed, when new forums or services are created in the system (notifications)
 * Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
 * Service ratings/reviews (trust)
 * Payments (resilience)

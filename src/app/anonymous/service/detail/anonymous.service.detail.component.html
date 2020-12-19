@@ -53,23 +53,31 @@
 						<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 					</div>
 					<!-- tags -->
-					<div style="flex:none;flex:none;display:flex;flex-direction:row;margin-bottom:10px">
-						<ng-container *ngIf="serviceTags | async;let serviceTagItems">
-							<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
+					<ng-container *ngIf="serviceItem.serviceTags | async;let serviceTagItems">
+						<div style="flex:none;display:flex;flex-direction:row;;margin-bottom:10px">
+							<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+							<ng-template #showtags>
 								<div style="flex:1;display:flex;flex-direction:row">
 									<ng-container *ngFor="let serviceTag of serviceTagItems">
 										<span [ngClass]="serviceItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
 									</ng-container>
 								</div>
-								<ng-container *ngIf="serviceItem.paymentType == 'Payment'">
+							</ng-template>
+							<ng-container *ngIf="serviceItem.paymentType == 'Payment'">
+								<ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+								<ng-template #showtagswithpayment>
 									<div style="flex:none">
 										<a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="color:#1B1B1B" matTooltip="Buy">{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}</a>
 									</div>
-								</ng-container>
+								</ng-template>
+								<ng-template #showtagswithoutpayment>
+									<div style="flex:1;text-align:right">
+										<a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="color:#1B1B1B" matTooltip="Buy">{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}</a>
+									</div>
+								</ng-template>
 							</ng-container>
-							<ng-template #noservicetags></ng-template>
-						</ng-container>
-					</div>
+						</div>
+					</ng-container>
           <div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create forum">Create forum</a>
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left" matTooltip="Create forum">keyboard_arrow_right</a>
