@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackModule } from '../shared';
 import { LoadingSpinnerModule } from '../shared';
+import { AppRoutingModule } from '../app-routing.module';
 
 import { TermsOfServiceComponent } from './terms.of.service.component';
 
@@ -9,6 +10,7 @@ import { TermsOfServiceComponent } from './terms.of.service.component';
   imports: [
     CommonModule,
     LoadingSpinnerModule,
+    AppRoutingModule,
     BackModule
   ],
   declarations: [
