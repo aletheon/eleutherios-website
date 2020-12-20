@@ -10,44 +10,46 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="userGroup" novalidate>
-				<div *ngIf="userItem.receivePushNotifications == false" class="panel-group">
-					<div class="panel panel-default">
-						<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
-					</div>
+				<div *ngIf="userItem.receivePushNotifications == false" class="panel panel-default" style="margin-bottom:10px">
+					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
 				</div>
 				<!-- <p *ngIf="userItem.receivePushNotifications == false" class="panel panel-default" style="margin-bottom:10px;padding:6px">
 					<b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).
 				</p> -->
-				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;padding:5px">
-					<div style="flex:1">
-						<p>Push Notifications</p>
+				<div class="panel panel-default">
+					<div class="panel-heading" style="display:flex;flex-direction:row">
+						<div style="flex:1">
+							Push Notifications
+						</div>
+						<div style="flex:none">
+							<mat-checkbox formControlName="receivePushNotifications" (change)="pushNotificationSave()"></mat-checkbox>
+						</div>
 					</div>
-					<div style="flex:none">
-						<mat-checkbox formControlName="receivePushNotifications" (change)="pushNotificationSave()"></mat-checkbox>
-					</div>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;background-color:#D0D0D0;padding:5px">
-					<div style="flex:1;padding-left:20px">
-						<p>Forum Alerts</p>
-					</div>
-					<div style="flex:none">
-						<mat-checkbox formControlName="receiveForumAlertNotifications" (change)="saveChanges()"></mat-checkbox>
-					</div>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;background-color:#D0D0D0;padding:5px">
-					<div style="flex:1;padding-left:20px">
-						<p>Service Alerts</p>
-					</div>
-					<div style="flex:none">
-						<mat-checkbox formControlName="receiveServiceAlertNotifications" (change)="saveChanges()"></mat-checkbox>
-					</div>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px;background-color:#D0D0D0;padding:5px">
-					<div style="flex:1;padding-left:20px">
-						<p>Forum Posts</p>
-					</div>
-					<div style="flex:none">
-						<mat-checkbox formControlName="receiveForumPostNotifications" (change)="saveChanges()"></mat-checkbox>
+					<div class="panel-body">
+						<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px">
+							<div style="flex:1">
+								<p>Forum Alerts</p>
+							</div>
+							<div style="flex:none">
+								<mat-checkbox formControlName="receiveForumAlertNotifications" (change)="saveChanges()"></mat-checkbox>
+							</div>
+						</div>
+						<div style="display:flex;flex-direction:row;align-items:center;margin-bottom:10px">
+							<div style="flex:1">
+								<p>Service Alerts</p>
+							</div>
+							<div style="flex:none">
+								<mat-checkbox formControlName="receiveServiceAlertNotifications" (change)="saveChanges()"></mat-checkbox>
+							</div>
+						</div>
+						<div style="display:flex;flex-direction:row;align-items:center">
+							<div style="flex:1">
+								<p>Forum Posts</p>
+							</div>
+							<div style="flex:none">
+								<mat-checkbox formControlName="receiveForumPostNotifications" (change)="saveChanges()"></mat-checkbox>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div style="display:flex;flex-direction:row;justify-content:flex-end">
