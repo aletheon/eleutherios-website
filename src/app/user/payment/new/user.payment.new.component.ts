@@ -105,10 +105,11 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       if(this._loading.getValue() == false) {
         clearInterval(intervalId);
 
+        // delay the loading of the card element to allow
+        // for the seller service to load, and provide us with the
+        // connected (merchant) account
         this._loadCardListener.subscribe(result => {
           if (result == true){
-            console.log('this._connectedUser.stripeAccountId ' + this._connectedUser.stripeAccountId);
-
             this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
             this.stripeService.elements(this.elementsOptions)
               .subscribe(elements => {
@@ -136,7 +137,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
           }
         });
       }
-    }, 2500);
+    }, 2000);
   }
 
   ngOnDestroy () {
