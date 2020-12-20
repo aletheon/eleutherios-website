@@ -424,7 +424,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       });
     }
     else {
-      this._searchSubscription = this.serviceService.getServices(this.numberOfItems, key, this._tempNotificationTags, this._tempNotificationTags.length > 0 ? true : false, true).pipe(
+      this._searchSubscription = this.serviceService.getServices(this.numberOfItems, key, this._tempNotificationTags, this._tempNotificationTags.length > 0 ? true : false, true, this.notificationGroup.get('paymentType').value).pipe(
         switchMap(services => {
           if (services && services.length > 0) {
             let observables = services.map(service => {

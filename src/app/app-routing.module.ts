@@ -10,6 +10,8 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LoginLinkComponent } from './login/login.link.component';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { AcceptableUsePolicyComponent } from './aup/acceptable.use.policy.component';
+import { TermsOfServiceComponent } from './tos/terms.of.service.component';
 
 // anonymous
 
@@ -79,6 +81,14 @@ const routes: Routes = [
   {
     path: 'privacy',
     component: PrivacyComponent
+  },
+  {
+    path: 'tos',
+    component: TermsOfServiceComponent
+  },
+  {
+    path: 'aup',
+    component: AcceptableUsePolicyComponent
   },
   {
     path: 'about',

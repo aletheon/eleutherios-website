@@ -38,6 +38,8 @@ import { AnonymousModule } from './anonymous/anonymous.module';
 import { HomeModule } from './home/home.module';
 import { LoginModule } from './login/login.module';
 import { PrivacyModule } from './privacy/privacy.module';
+import { AcceptableUsePolicyModule } from './aup/acceptable.use.policy.module';
+import { TermsOfServiceModule } from './tos/terms.of.service.module';
 
 // public
 
@@ -104,6 +106,8 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     HomeModule,
     LoginModule,
     PrivacyModule,
+    AcceptableUsePolicyModule,
+    TermsOfServiceModule,
     ServiceModule,
     UserActivityModule,
     UserAlertModule,

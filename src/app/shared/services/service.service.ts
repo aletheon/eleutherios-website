@@ -92,7 +92,7 @@ export class ServiceService {
     }
   }
 
-  public getServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public getServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string): Observable<any[]>{
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
@@ -107,42 +107,84 @@ export class ServiceService {
     }
 
     if (!key){
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
+      if (paymentType){
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', paymentType).limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
     }
     else {
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
+      if (paymentType){
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).where('paymentType', '==', paymentType).limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
     }
   }
 
