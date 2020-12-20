@@ -1,7 +1,7 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
   <!-- public forums -->
-  <div style="flex:none;flex-grow:0;border:1px solid #a0a0a0;overflow-x:auto;display:flex;flex-direction:row;margin:15px 15px 10px 15px;padding:10px">
+  <div class="panel panel-default" style="flex:none;flex-grow:0;overflow-x:auto;display:flex;flex-direction:row;margin:15px 15px 10px 15px;padding:10px">
     <ng-container *ngIf="publicForums | async;let publicForumItems">
       <ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
       <ng-template #showpublicforums>
@@ -39,7 +39,7 @@
     </ng-container>
   </div>
   <!-- public services -->
-  <div style="flex:none;flex-grow:0;border:1px solid #a0a0a0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 10px 15px;padding:10px">
+  <div class="panel panel-default" style="flex:none;flex-grow:0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 10px 15px;padding:10px">
     <ng-container *ngIf="publicServices | async;let publicServiceItems">
       <ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else nopublicservices"></ng-container>
       <ng-template #showpublicservices>
@@ -71,7 +71,7 @@
     </ng-container>
   </div>
   <!-- alerts -->
-  <div style="flex:1;flex-grow:1;border:1px solid #a0a0a0;overflow-x:hidden;display:flex;flex-direction:column;margin:0px 15px 10px 15px;padding:10px;overflow-y:scroll">
+  <div class="panel panel-default" style="flex:1;flex-grow:1;overflow-x:hidden;display:flex;flex-direction:column;margin:0px 15px 10px 15px;padding:10px;overflow-y:scroll">
     <ng-container *ngIf="alerts | async;let alertItems">
       <ng-container *ngIf="alertItems.length > 0; then showalerts else noalerts"></ng-container>
       <ng-template #showalerts>
@@ -214,7 +214,7 @@
     </ng-container>
   </div>
   <!-- private forums -->
-  <div style="flex:none;flex-grow:0;border:1px solid #a0a0a0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 10px 15px;padding:10px">
+  <div class="panel panel-default" style="flex:none;flex-grow:0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 10px 15px;padding:10px">
     <ng-container *ngIf="privateForums | async;let privateForumItems">
       <ng-container *ngIf="privateForumItems.length > 0; then showprivateforums else noprivateforums"></ng-container>
       <ng-template #showprivateforums>
@@ -259,7 +259,7 @@
     </ng-container>
   </div>
   <!-- private services -->
-  <div style="flex:none;flex-grow:0;border:1px solid #a0a0a0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 20px 15px;padding:10px">
+  <div class="panel panel-default" style="flex:none;flex-grow:0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 20px 15px;padding:10px">
     <ng-container *ngIf="privateServices | async;let privateServiceItems">
       <ng-container *ngIf="privateServiceItems.length > 0; then showprivateservices else noprivateservices"></ng-container>
       <ng-template #showprivateservices>
