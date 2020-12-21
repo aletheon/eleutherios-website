@@ -93,7 +93,7 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${activity.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${activity.forumId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );

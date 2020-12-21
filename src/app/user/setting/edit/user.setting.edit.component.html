@@ -1,15 +1,15 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="auth.user | async;let userItem">
-	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
-		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-			<h4 style="flex:none">Settings</h4>
-			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-				<back></back>
-			</div>
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+	<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+		<h4 style="flex:none">Settings</h4>
+		<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+			<back></back>
 		</div>
-		<div style="flex:1">
-			<!-- START OF USER DETAILS SECTION -->
-			<form [formGroup]="userGroup" novalidate>
+	</div>
+	<div style="flex:1">
+		<!-- START OF USER DETAILS SECTION -->
+		<form [formGroup]="userGroup" novalidate>
+			<ng-container *ngIf="auth.user | async;let userItem">
 				<div *ngIf="userItem.receivePushNotifications == false" class="panel panel-default" style="margin-bottom:10px">
 					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
 				</div>
@@ -56,7 +56,7 @@
 					<!-- <button (click)="updateAccount()" type="button" class="btn btn-success" style="margin-right:5px">Update Account</button> -->
 					<button (click)="delete()" type="button" class="btn btn-danger">Remove Account</button>
 				</div>
-			</form>
-		</div>
+			</ng-container>
+		</form>
 	</div>
-</ng-container>
+</div>

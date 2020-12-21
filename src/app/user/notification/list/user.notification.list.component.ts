@@ -283,7 +283,7 @@ export class UserNotificationListComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Notification with notificationId ${notification.notificationId} was removed or does not exist`,
+              data: `Notification with notificationId ${notification.notificationId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );

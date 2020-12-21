@@ -1,6 +1,6 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="service | async;let serviceItem">
-	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+	<ng-container *ngIf="service | async;let serviceItem">
 		<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:5px">
 			<div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
 				<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
@@ -37,7 +37,7 @@
 				<div style="flex:none;margin-right:5px">
 					<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 					<ng-template #showpublicenabledtype>
-						<mat-icon onclick="event.stopPropagation()" (click)="changeType(serviceItem)" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+						<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
 					<ng-template #showpublicdisabledtype>
 						<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
@@ -47,10 +47,10 @@
 					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
 				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
-					<mat-icon onclick="event.stopPropagation()" (click)="delete(serviceItem)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
+					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
 				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
-					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService(serviceItem)"></mat-checkbox>
+					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService()"></mat-checkbox>
 					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
 				</div>
 				<ng-container *ngIf="id | async; then fromeditpage else backtohistorypage"></ng-container>
@@ -73,7 +73,6 @@
 				</ng-template>
 				<ng-template #backtohistorypage>
 					<back></back>
-					<!-- <mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon> -->
 				</ng-template>
 			</div>
 		</div>
@@ -239,5 +238,5 @@
 				</div>
 			</form>
 		</div>
-	</div>
-</ng-container>
+	</ng-container>
+</div>

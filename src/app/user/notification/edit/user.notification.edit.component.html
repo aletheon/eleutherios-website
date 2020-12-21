@@ -1,6 +1,6 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="notification | async;let notificationItem">
-	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+	<ng-container *ngIf="notification | async;let notificationItem">
 		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 			<h4 style="flex:none">Edit Notification</h4>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
@@ -272,5 +272,5 @@
 				</div>
 			</form>
 		</div>
-	</div>
-</ng-container>
+	</ng-container>
+</div>

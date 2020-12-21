@@ -1,6 +1,6 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="forum | async;let forumItem">
-	<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+	<ng-container *ngIf="forum | async;let forumItem">
 		<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;margin-bottom:10px">
 			<div style="flex:none;display:flex;flex-direction:column;align-items:center;margin-right:10px">
 				<ng-container *ngIf="defaultForumImage | async; then showdefaultforumimage"></ng-container>
@@ -354,8 +354,8 @@
 				<button class="send-message" (click)="sendMessage()" >SEND</button>
 			</div>
 		</div>
-	</div>
-</ng-container>
+	</ng-container>
+</div>
 <audio #audioSound>
 	<source src='../../../../assets/intricate.mp3' type="audio/mp3">
 </audio>

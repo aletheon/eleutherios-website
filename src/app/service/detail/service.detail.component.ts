@@ -109,8 +109,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
-  changeType (service) {
-    this.userServiceService.getServiceFromPromise(service.uid, service.serviceId)
+  changeType () {
+    this.userServiceService.getServiceFromPromise(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
       .then(fetchedService => {
         if (fetchedService){
           if (fetchedService.type == 'Public')
@@ -125,7 +125,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Service with serviceId ${service.serviceId} was removed or does not exist`,
+              data: `Service with serviceId ${this.serviceGroup.get('serviceId').value} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -144,8 +144,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  indexDeindexService (service){
-    this.userServiceService.getServiceFromPromise(service.uid, service.serviceId)
+  indexDeindexService (){
+    this.userServiceService.getServiceFromPromise(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
       .then(fetchedService => {
         if (fetchedService){
           fetchedService.indexed = !fetchedService.indexed;
@@ -156,7 +156,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Service with serviceId ${service.serviceId} was removed or does not exist`,
+              data: `Service with serviceId ${this.serviceGroup.get('serviceId').value} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -175,8 +175,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  delete (service) {
-    this.userServiceService.delete(service.uid, service.serviceId).then(() => {
+  delete () {
+    this.userServiceService.delete(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).then(() => {
       const snackBarRef = this.snackbar.openFromComponent(
         NotificationSnackBar,
         {

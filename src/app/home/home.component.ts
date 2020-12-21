@@ -86,7 +86,7 @@ export class HomeComponent implements OnDestroy, OnInit {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${forum.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${forum.forumId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -121,7 +121,7 @@ export class HomeComponent implements OnDestroy, OnInit {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Service with serviceId ${service.serviceId} was removed or does not exist`,
+              data: `Service with serviceId ${service.serviceId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );

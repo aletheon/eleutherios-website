@@ -1,7 +1,7 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="forum | async; let forumItem">
-  <div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
-    <form [formGroup]="forumGroup" novalidate>
+<div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
+  <form [formGroup]="forumGroup" novalidate>
+    <ng-container *ngIf="forum | async; let forumItem">
       <!-- header -->
       <div style="flex:none">
         <div style="display:flex;flex-direction:row;justify-content:center;margin-bottom:5px">
@@ -158,6 +158,6 @@
           </div>
         </div>
       </div>
-    </form>
-  </div>
-</ng-container>
+    </ng-container>
+  </form>
+</div>

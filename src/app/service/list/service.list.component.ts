@@ -339,7 +339,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Service with serviceId ${service.serviceId} was removed or does not exist`,
+              data: `Service with serviceId ${service.serviceId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -370,7 +370,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Service with serviceId ${service.serviceId} was removed or does not exist`,
+              data: `Service with serviceId ${service.serviceId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );

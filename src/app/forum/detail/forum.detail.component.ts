@@ -107,8 +107,8 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
-  changeType (forum) {
-    this.userForumService.getForumFromPromise(forum.uid, forum.forumId)
+  changeType () {
+    this.userForumService.getForumFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value)
       .then(fetchedForum => {
         if (fetchedForum){
           if (fetchedForum.type == 'Public')
@@ -123,7 +123,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${forum.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${this.forumGroup.get('forumId').value} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -142,8 +142,8 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  indexDeindexForum (forum){
-    this.userForumService.getForumFromPromise(forum.uid, forum.forumId)
+  indexDeindexForum (){
+    this.userForumService.getForumFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value)
       .then(fetchedForum => {
         if (fetchedForum){
           fetchedForum.indexed = !fetchedForum.indexed;
@@ -154,7 +154,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${forum.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${this.forumGroup.get('forumId').value} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -173,8 +173,8 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  delete (forum) {
-    this.userForumService.delete(forum.uid, forum.forumId).then(() => {
+  delete () {
+    this.userForumService.delete(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).then(() => {
       const snackBarRef = this.snackbar.openFromComponent(
         NotificationSnackBar,
         {

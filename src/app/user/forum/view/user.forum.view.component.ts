@@ -706,7 +706,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${forum.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${forum.forumId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );
@@ -858,7 +858,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: `Forum with forumId ${forum.forumId} was removed or does not exist`,
+              data: `Forum with forumId ${forum.forumId} does not exist or was removed`,
               panelClass: ['red-snackbar']
             }
           );

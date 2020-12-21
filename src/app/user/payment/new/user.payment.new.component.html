@@ -1,6 +1,6 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<ng-container *ngIf="auth.user | async;let userItem">
-  <div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+  <ng-container *ngIf="auth.user | async;let userItem">
     <div style="flex:none;display:flex;flex-direction:row;align-items:center">
       <ng-container *ngIf="serviceGroup.get('uid').value == userItem.uid; then showownerheader else noownerheader"></ng-container>
       <ng-template #showownerheader>
@@ -11,9 +11,9 @@
       <ng-template #noownerheader>
         <h4 style="flex:none">You are about to buy</h4>
       </ng-template>
-			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-				<back></back>
-			</div>
+      <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+        <back></back>
+      </div>
     </div>
     <form [formGroup]="serviceGroup" novalidate>
       <div style="flex:1;display:flex;flex-direction:column">
@@ -94,5 +94,5 @@
         </ng-container>
       </div>
     </form>
-	</div>
-</ng-container>
+  </ng-container>
+</div>
