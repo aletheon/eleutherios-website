@@ -170,9 +170,6 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   }
 
   ngOnDestroy () {
-    if (this._notificationSubscription)
-      this._notificationSubscription.unsubscribe();
-
     if (this._totalSubscription)
       this._totalSubscription.unsubscribe();
 
@@ -239,6 +236,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
     this._notificationSubscription = this.notification
       .subscribe(notification => {
         if (notification){
+          this._notificationSubscription.unsubscribe();
           this.notificationGroup.patchValue(notification);
   
           if (notification.title.length == 0)

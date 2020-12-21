@@ -77,9 +77,6 @@ export class UserServiceReviewListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -130,6 +127,8 @@ export class UserServiceReviewListComponent implements OnInit, OnDestroy {
         this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
           .subscribe(service => {
             if (service){
+              this._initialServiceSubscription.unsubscribe();
+
               if (service.uid == this.auth.uid){
                 this._canViewService.next(true);
                 this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);

@@ -133,9 +133,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngOnDestroy () {
-    if (this._initialForumSubscription)
-      this._initialForumSubscription.unsubscribe();
-
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -183,6 +180,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     this.route.queryParams.subscribe((params: Params) => {
       this._initialForumSubscription = this.userForumService.getForum(this.auth.uid, params['forumId']).subscribe(forum => {
         if (forum){
+          this._initialForumSubscription.unsubscribe();
           this.forum = this.userForumService.getForum(this.auth.uid, params['forumId']);
           this.searchPrivateServices = true;
           this.searchServiceIncludeTagsInSearch = true;

@@ -447,9 +447,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
-    if (this._initialForumSubscription)
-      this._initialForumSubscription.unsubscribe();
-
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -499,6 +496,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       if (forumId){
         this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
           if (forum){
+            this._initialForumSubscription.unsubscribe();
             this.forum = this.forumService.getForum(forumId);
             this.initForm();
           }

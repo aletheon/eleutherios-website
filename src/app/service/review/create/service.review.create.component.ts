@@ -83,9 +83,6 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   trackUserServiceReviews (index, userServiceReview) { return userServiceReview.serviceReviewId; }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -119,6 +116,8 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
         this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
           .subscribe(service => {
             if (service){
+              this._initialServiceSubscription.unsubscribe();
+
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
                   this.service = this.serviceService.getService(parentServiceId);

@@ -83,10 +83,7 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
   trackUserServiceRates (index, userServiceRate) { return userServiceRate.serviceRateId; }
 
-  ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-    
+  ngOnDestroy () {    
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -132,9 +129,11 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceUserId && parentServiceId){
-        this.userServiceService.getServiceFromPromise(parentServiceUserId, parentServiceId)
-          .then(service => {
+        this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
+          .subscribe(service => {
             if (service){
+              this._initialServiceSubscription.unsubscribe();
+
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
                   // check permissions
@@ -191,18 +190,7 @@ export class UserServiceRateCreateComponent implements OnInit, OnDestroy {
               this.router.navigate(['/']);
             }
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(

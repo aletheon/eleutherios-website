@@ -881,9 +881,6 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._totalSubscription)
       this._totalSubscription.unsubscribe();
 
@@ -960,6 +957,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
         this._initialServiceSubscription = this.userServiceService.getService(requestServiceUserId, requestServiceId)
           .subscribe(requestService => {
             if (requestService){
+              this._initialServiceSubscription.unsubscribe();
+
               if (requestService.title.length == 0){
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,

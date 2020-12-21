@@ -63,10 +63,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     private snackbar: MatSnackBar) {
     }
 
-  ngOnDestroy () {
-    if (this._initialForumSubscription)
-      this._initialForumSubscription.unsubscribe();
-      
+  ngOnDestroy () {      
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -102,6 +99,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
       this._initialForumSubscription = this.forumSerivce.getForum(this.forumGroup.get('forumId').value)
         .subscribe(forum => {
           if (forum){
+            this._initialForumSubscription.unsubscribe();
             this.forum = this.forumSerivce.getForum(this.forumGroup.get('forumId').value);
             this.initForm();
           }

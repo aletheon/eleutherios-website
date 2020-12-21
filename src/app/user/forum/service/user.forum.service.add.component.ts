@@ -43,7 +43,7 @@ import * as _ from "lodash";
 })
 export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
-  private _initialforumSubscription: Subscription;
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _searchServiceCtrlSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
@@ -445,9 +445,6 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
-    if (this._initialforumSubscription)
-      this._initialforumSubscription.unsubscribe();
-
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -481,9 +478,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       this.forumId = params['forumId'];
       this.userId = params['userId'];
 
-      this._initialforumSubscription = this.userForumService.getForum(this.userId, this.forumId)
+      this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId)
         .subscribe(forum => {
           if (forum){
+            this._initialForumSubscription.unsubscribe();
+
             if (forum.title.length > 0){
               this.forum = this.userForumService.getForum(this.userId, this.forumId);
               this.initForm();

@@ -48,7 +48,7 @@ import * as _ from "lodash";
 export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
-  private _initialforumSubscription: Subscription;
+  private _initialForumSubscription: Subscription;
   private _parentForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
@@ -138,9 +138,6 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngOnDestroy () {
-    if (this._initialforumSubscription)
-      this._initialforumSubscription.unsubscribe();
-
     if (this._parentForumSubscription)
       this._parentForumSubscription.unsubscribe();
 
@@ -209,9 +206,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         creationDate: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      this._initialforumSubscription = this.userForumService.getForum(this.parentForumUserId, this.parentForumId)
+      this._initialForumSubscription = this.userForumService.getForum(this.parentForumUserId, this.parentForumId)
         .subscribe(forum => {
           if (forum){
+            this._initialForumSubscription.unsubscribe();
+            
             if (forum.title.length > 0){
               this._tempForum = forum;
 

@@ -50,7 +50,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
-  private _initialforumSubscription: Subscription;
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -122,9 +122,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   ngOnDestroy () {
     this.messageSharingService.changeViewForumId(''); // dis-inform listeners that the view forum page is viewing this forum
 
-    if (this._initialforumSubscription)
-      this._initialforumSubscription.unsubscribe();
-
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -188,8 +185,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
       this.messageSharingService.changeViewForumId('');
 
-      this._initialforumSubscription = this.userForumService.getForum(this.userId, this.forumId).subscribe(forum => {
+      this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).subscribe(forum => {
         if (forum){
+          this._initialForumSubscription.unsubscribe();
           this._tempForum = forum;
 
           // ensure user is serving in the forum before viewing it

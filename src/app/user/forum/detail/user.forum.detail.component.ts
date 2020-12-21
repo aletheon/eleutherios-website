@@ -44,7 +44,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef; 
 
   private _loading = new BehaviorSubject(false);
-  private _initialforumSubscription: Subscription;
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
@@ -446,9 +446,6 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
-    if (this._initialforumSubscription)
-      this._initialforumSubscription.unsubscribe();
-
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -514,8 +511,9 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         }
       }
   
-      this._initialforumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
+      this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
         if (forum){
+          this._initialForumSubscription.unsubscribe();
           if (forum.uid == this.auth.uid){
             this._canViewDetail.next(true);
             this.forum = this.userForumService.getForum(forumUserId, forumId);

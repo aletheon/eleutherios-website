@@ -66,9 +66,6 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -103,6 +100,8 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
         this._initialServiceSubscription = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
           .subscribe(service => {
             if (service){
+              this._initialServiceSubscription.unsubscribe();
+
               // authenticate
               let canViewDetail: boolean = false;
 

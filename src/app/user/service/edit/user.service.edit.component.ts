@@ -1045,9 +1045,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -1102,6 +1099,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
       this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
         if (service){
+          this._initialServiceSubscription.unsubscribe();   /// HERE ROB FIX ALL THESE!
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;
@@ -1124,6 +1122,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   private initForm () {
     const that = this;
+    console.log('initForm');
 
     this.serviceGroup = this.fb.group({
       serviceId:                      [''],
@@ -1207,7 +1206,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   else
                     that._imageCount.next(total.imageCount);
                 }
-              });
+              }
+            );
 
             // check if service is being created for a new forum
             let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));

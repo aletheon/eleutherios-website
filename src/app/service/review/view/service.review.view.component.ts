@@ -72,9 +72,6 @@ export class ServiceReviewViewComponent implements OnInit, OnDestroy  {
   }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -101,6 +98,7 @@ export class ServiceReviewViewComponent implements OnInit, OnDestroy  {
         this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
           .subscribe(service => {
             if (service){
+              this._initialServiceSubscription.unsubscribe();
               this.service = this.serviceService.getService(parentServiceId);
               this.initForm();
             }
