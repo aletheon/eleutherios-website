@@ -12,6 +12,7 @@ import { LoginLinkComponent } from './login/login.link.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptableUsePolicyComponent } from './aup/acceptable.use.policy.component';
 import { TermsOfServiceComponent } from './tos/terms.of.service.component';
+import { HelpComponent } from './help/help.component';
 
 // anonymous
 
@@ -77,6 +78,10 @@ const routes: Routes = [
     path: '',
     component: HomeComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'help',
+    component: HelpComponent
   },
   {
     path: 'privacy',

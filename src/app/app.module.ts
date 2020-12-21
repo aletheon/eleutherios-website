@@ -40,6 +40,7 @@ import { LoginModule } from './login/login.module';
 import { PrivacyModule } from './privacy/privacy.module';
 import { AcceptableUsePolicyModule } from './aup/acceptable.use.policy.module';
 import { TermsOfServiceModule } from './tos/terms.of.service.module';
+import { HelpModule } from './help/help.module';
 
 // public
 
@@ -108,6 +109,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     PrivacyModule,
     AcceptableUsePolicyModule,
     TermsOfServiceModule,
+    HelpModule,
     ServiceModule,
     UserActivityModule,
     UserAlertModule,
