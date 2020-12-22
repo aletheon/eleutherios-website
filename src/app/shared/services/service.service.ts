@@ -92,7 +92,7 @@ export class ServiceService {
     }
   }
 
-  public getServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, startAmount?: number, endAmount?: number): Observable<any[]>{
+  public getServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]>{
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
@@ -118,12 +118,18 @@ export class ServiceService {
                   if (service.title.length > 0){
                     // check service amount is within range
                     if (startAmount && endAmount){
-                      if (service.amount >= startAmount && service.amount <= endAmount)
-                        return true;
-                      else
-                        return false;
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
                     }
-                    return true;
+                    else return true;
                   }
                   else return false;
                 }
@@ -187,12 +193,18 @@ export class ServiceService {
                   if (service.title.length > 0){
                     // check service amount is within range
                     if (startAmount && endAmount){
-                      if (service.amount >= startAmount && service.amount <= endAmount)
-                        return true;
-                      else
-                        return false;
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
                     }
-                    return true;
+                    else return true;
                   }
                   else return false;
                 }
