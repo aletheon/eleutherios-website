@@ -390,7 +390,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       });
     }
     else {
-      this._searchSubscription = this.serviceService.getServices(this.numberOfItems, key, this._tempNotificationTags, this._tempNotificationTags.length > 0 ? true : false, true, this.notificationGroup.get('paymentType').value).pipe(
+      this._searchSubscription = this.serviceService.getServices(this.numberOfItems, key, this._tempNotificationTags, this._tempNotificationTags.length > 0 ? true : false, true, this.notificationGroup.get('paymentType').value, this.notificationGroup.get('startAmount').value, this.notificationGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0) {
             let observables = services.map(service => {
