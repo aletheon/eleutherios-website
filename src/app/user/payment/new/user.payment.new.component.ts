@@ -312,6 +312,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       this._userServiceSubscription = this.userServiceService.getService(this._sellerUid, this._sellerServiceId)
         .subscribe(service => {
           if (service){
+            this._userServiceSubscription.unsubscribe();
+            
             if (service.paymentType == 'Payment'){
               this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
               this.initForm();
@@ -321,7 +323,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: `Status of service was changed to free`,
+                  data: `Service was changed to free`,
                   panelClass: ['red-snackbar']
                 }
               );

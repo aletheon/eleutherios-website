@@ -30,15 +30,20 @@
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1">
 							<mat-form-field style="width:150px">
-								<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
+								<mat-select formControlName="paymentType" (selectionChange)="saveChanges()">
 									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
 								</mat-select>
 							</mat-form-field>
 						</div>
 					</div>
 					<div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center" *ngIf="notificationGroup.get('paymentType').value == 'Payment'">
-						<div style="flex:none;margin-right:5px">
-							<mat-form-field>
+						<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+							<mat-form-field style="width:150px;margin-right:10px">
+								<mat-select formControlName="currency" (selectionChange)="saveChanges()">
+									<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<mat-form-field style="flex:none">
 								<input
 									matInput
 									#startAmount

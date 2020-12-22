@@ -63,6 +63,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
   @ViewChild('endAmount', { static: false }) endAmountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _initialNotificationSubscription: Subscription;
   private _notificationSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _notificationTagSubscription: Subscription;
@@ -72,7 +73,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
   private _tagCount = new BehaviorSubject(0);
   private _alertCount = new BehaviorSubject(0);
   private _addingTag = new BehaviorSubject(false);
-
+  
   public notification: Observable<any>;
   public tagCount: Observable<number> = this._tagCount.asObservable();
   public alertCount: Observable<number> = this._alertCount.asObservable();
@@ -82,6 +83,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
   public prevKeys: any[] = [];
   public types: string[] = ['Service', 'Forum'];
   public paymentTypes: string[] = ['Free', 'Payment'];
+  public currencies: string[] = ['AUD', 'BRL', 'GBP', 'BGN', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'RON', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD'];
   public notificationTags: Observable<any[]>;
   public matAutoCompleteSearch: Observable<any[]>;
   public matAutoCompleteSearchTags: Observable<any[]>;
@@ -220,12 +222,12 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
   }
   
   ngOnInit () {
-    const that = this;
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      this.userNotificationService.exists(this.auth.uid, params['notificationId']).then(exists => {
-        if (exists){
+      this._initialNotificationSubscription = this.userNotificationService.getNotification(this.auth.uid, params['notificationId']).subscribe(notification => {
+        if (notification){
+          this._initialNotificationSubscription.unsubscribe();
           this.notification = this.userNotificationService.getNotification(this.auth.uid, params['notificationId']);
           this.initForm();
         }
@@ -240,17 +242,6 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
           );
           this.router.navigate(['/user/notification/list']);
         }
-      })
-      .catch(error => {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: error.message,
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
       });
     });
   }
@@ -264,6 +255,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       title:                          ['', Validators.required ],
       active:                         [''],
       paymentType:                    [''],
+      currency:                       [''],
       startAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
@@ -274,7 +266,6 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
     this._notificationSubscription = this.notification
       .subscribe(notification => {
         if (notification){
-          this._notificationSubscription.unsubscribe();
           this.notificationGroup.patchValue(notification);
   
           if (notification.title.length == 0)
@@ -639,6 +630,8 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       } 
     }
 
+    // refresh search list
+    this.getSearchList();
     let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
@@ -651,6 +644,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
           title_lowercase: tempTitle.toLowerCase(),
           active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
           paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : 'Free',
+          currency: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('currency').value : '',
           startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('startAmount').value, 2) : 1.00,
           endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('endAmount').value, 2) : 10.00,
           lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,

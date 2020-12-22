@@ -66,6 +66,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   public prevKeys: any[] = [];
   public types: string[] = ['Service', 'Forum'];
   public paymentTypes: string[] = ['Free', 'Payment'];
+  public currencies: string[] = ['AUD', 'BRL', 'GBP', 'BGN', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'RON', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD'];
   public notificationTags: Observable<any[]>;
   public matAutoCompleteSearch: Observable<any[]>;
   public matAutoCompleteSearchTags: Observable<any[]>;
@@ -208,6 +209,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       title_lowercase: '',
       active: false,
       paymentType: 'Free',
+      currency: 'NZD',
       startAmount: 1.00,
       endAmount: 10.00,
       lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
@@ -226,6 +228,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       title:                          ['', Validators.required ],
       active:                         [''],
       paymentType:                    [''],
+      currency:                       [''],
       startAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
@@ -606,6 +609,8 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       } 
     }
 
+    // refresh search list
+    this.getSearchList();
     let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
@@ -618,6 +623,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
           title_lowercase: tempTitle.toLowerCase(),
           active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
           paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : 'Free',
+          currency: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('currency').value : '',
           startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('startAmount').value, 2) : 1.00,
           endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('endAmount').value, 2) : 10.00,
           lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,

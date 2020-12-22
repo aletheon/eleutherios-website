@@ -6,6 +6,7 @@ export interface Notification {
   title_lowercase: string, // for case insensitive searching
   active: boolean, // [true or false] - indicates whether this notification is active or not
   paymentType: string, // [Free|Payment|Donation|Subscription]
+  currency: string, // [usd, nzd, aud etc]
   startAmount: number,
   endAmount: number,
   lastUpdateDate: object, 
