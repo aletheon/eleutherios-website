@@ -5710,12 +5710,25 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
 
                     if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
                       if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
-                        continueSendingAlert().then(() => {
-                          resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        });
+                        if (notification.currency && notification.currency.length > 0){
+                          if (newValue.currency = notification.currency){
+                            continueSendingAlert().then(() => {
+                              resolve();
+                            })
+                            .catch(error => {
+                              reject(error);
+                            });
+                          }
+                          else resolve();
+                        }
+                        else {
+                          continueSendingAlert().then(() => {
+                            resolve();
+                          })
+                          .catch(error => {
+                            reject(error);
+                          });
+                        }
                       }
                       else resolve();
                     }
@@ -5831,15 +5844,28 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                     );
                   });
                 };
-
+                
                 if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
                   if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
-                    continueSendingAlert().then(() => {
-                      resolve();
-                    })
-                    .catch(error => {
-                      reject(error);
-                    });
+                    if (notification.currency && notification.currency.length > 0){
+                      if (newValue.currency = notification.currency){
+                        continueSendingAlert().then(() => {
+                          resolve();
+                        })
+                        .catch(error => {
+                          reject(error);
+                        });
+                      }
+                      else resolve();
+                    }
+                    else {
+                      continueSendingAlert().then(() => {
+                        resolve();
+                      })
+                      .catch(error => {
+                        reject(error);
+                      });
+                    }
                   }
                   else resolve();
                 }

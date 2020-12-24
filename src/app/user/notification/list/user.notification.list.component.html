@@ -104,7 +104,7 @@
 						</ng-template>
 						<ng-template #showserviceresult>
 							<div [ngClass]="notification.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
-								<div style="flex:none;display:flex;flex-direction:row;flex-wrap:wrap">
+								<div style="flex:none;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center">
 									<div style="flex:1;margin-right:5px">
 										<p style="word-break: break-all">
 											<a [routerLink]="['/user/notification/edit']" [queryParams]="{ userId: notification.uid, notificationId: notification.notificationId }" style="color:#1B1B1B" matTooltip="{{ notification.title }}">{{ notification.title | noTitle | truncate: 35 }}</a>
@@ -126,19 +126,30 @@
 										</div>
 									</div>
 								</div>
-								<ng-container *ngIf="notification.notificationTags | async">
-									<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
-										<ng-container *ngIf="notificationTagItems.length > 0; then showservicetags"></ng-container>
-										<ng-template #showservicetags>
-											<div style="display:flex;flex-direction:row">
+								<ng-container *ngIf="notification.notificationTags | async;let notificationTagItems">
+									<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+										<ng-container *ngIf="notificationTagItems.length > 0; then showtags"></ng-container>
+										<ng-template #showtags>
+											<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
 												<ng-container *ngFor="let notificationTag of notificationTagItems">
-													<div [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px">
-														<span>{{ notificationTag.tag }}</span>
-													</div>
+													<span [ngClass]="notification.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ notificationTag.tag }}</span>
 												</ng-container>
 											</div>
 										</ng-template>
-									</ng-container>
+										<ng-container *ngIf="notification.paymentType == 'Payment'">
+											<ng-container *ngIf="notificationTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+											<ng-template #showtagswithpayment>
+												<div style="flex:none;color:#1B1B1B">
+													{{ notification.currency.toUpperCase() }} {{ notification.startAmount }} To {{ notification.endAmount }}
+												</div>
+											</ng-template>
+											<ng-template #showtagswithoutpayment>
+												<div style="flex:1;text-align:right;color:#1B1B1B">
+													{{ notification.currency.toUpperCase() }} {{ notification.startAmount }} To {{ notification.endAmount }}
+												</div>
+											</ng-template>
+										</ng-container>
+									</div>
 								</ng-container>
 							</div>
 						</ng-template>
