@@ -5,6 +5,14 @@
 			<div style="display:flex;flex-direction:row;align-items:center">
 				<h4 style="flex:none">Services(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
 				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+					<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+						<mat-form-field style="flex:none;width:150px">
+							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="changePaymentType()">
+								<!-- <mat-select-trigger>{{ select.selected?.value }}</mat-select-trigger> -->
+								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
 					<div style="flex:none;margin-right:5px">
 						<mat-checkbox formControlName="includeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="includeTagsInSearchClick()"></mat-checkbox>
 					</div>

@@ -195,6 +195,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       }
     );
 
+
+    // HERE ROB BEFORE CONTINUING WITH PAYMENTS DO SERVICE SEARCH PAYMENT AMOUNT - START -> END
+
+
     // var stripe = Stripe(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
     // this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
 
