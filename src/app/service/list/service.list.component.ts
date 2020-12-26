@@ -36,6 +36,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   private _siteTotalSubscription: Subscription;
   private _serviceSearchSubscription: Subscription;
   private _tempSearchTags: string[] = [];
+  private _serviceSearchFirstTimeThrough: boolean = true;
 
   public serviceGroup: FormGroup;
   public searchServiceCtrl: FormControl;
@@ -43,6 +44,8 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   public numberItems: number = 12;
   public nextKey: any;
   public prevKeys: any[] = [];
+  public paymentTypes: string[] = ['Any', 'Free', 'Payment'];
+  public currencies: string[] = ['AUD', 'BRL', 'GBP', 'BGN', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'RON', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD'];
   public loading: Observable<boolean> = this._loading.asObservable();
   public matAutoCompleteSearchTags: Observable<any[]>;
   public services: Observable<any[]> = of([]);
@@ -78,7 +81,10 @@ export class ServiceListComponent implements OnInit, OnDestroy {
         startWith('')
       )
       .subscribe(searchTerm => {
-        this.getServicesList(searchTerm);
+        if (this._serviceSearchFirstTimeThrough == false)
+          this.getServicesList(searchTerm);
+        else 
+          this._serviceSearchFirstTimeThrough = false;
       });
     }
 
@@ -108,9 +114,17 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       this.includeTagsInSearch = true;
 
       this.serviceGroup = this.fb.group({
-        includeTagsInSearch: ['']
+        includeTagsInSearch:  [''],
+        paymentType:          [''],
+        currency:             [''],
+        startAmount:          [''],
+        endAmount:            ['']
       });
       this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
+      this.serviceGroup.get('paymentType').setValue('Any');
+      this.serviceGroup.get('currency').setValue('NZD');
+      this.serviceGroup.get('startAmount').setValue(1);
+      this.serviceGroup.get('endAmount').setValue(10);
 
       this._totalSubscription = this.siteTotalService.getTotal('service')
         .subscribe(total => {
@@ -137,7 +151,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       if (!key)
         key = this.searchServiceCtrl.value;
 
-      this._subscription = this.serviceService.getServicesSearchTerm(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+      this._subscription = this.serviceService.getServicesSearchTerm(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -211,7 +225,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       });
     }
     else {
-      this._subscription = this.serviceService.getAllServices(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+      this._subscription = this.serviceService.getAllServices(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {

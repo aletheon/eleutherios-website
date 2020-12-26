@@ -34,6 +34,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
   private _siteTotalSubscription: Subscription;
   private _serviceSearchSubscription: Subscription;
   private _tempSearchTags: string[] = [];
+  private _serviceSearchFirstTimeThrough: boolean = true;
 
   public serviceGroup: FormGroup;
   public searchServiceCtrl: FormControl;
@@ -76,7 +77,10 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
         startWith('')
       )
       .subscribe(searchTerm => {
-        this.getServicesList(searchTerm);
+        if (this._serviceSearchFirstTimeThrough == false)
+          this.getServicesList(searchTerm);
+        else 
+          this._serviceSearchFirstTimeThrough = false;
       });
     }
 
