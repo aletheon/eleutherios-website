@@ -38,61 +38,7 @@ export class ServiceService {
     return this.afs.collection('services').doc(serviceId).valueChanges();
   }
 
-  public getServicesSearchTerm(numberOfItems: number, key?: string, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
-    let collectionName: string = 'services';
-    let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
-
-    if (includeTagsInSearch !== undefined){
-      if (includeTagsInSearch == true){
-        if (tags && tags.length > 0){
-          tags.sort();
-          collectionName = `servicescollection/${tags.toString().replace(/,/gi,'')}/services`;
-        }
-      }
-      else collectionName = 'servicesnotags';
-    }
-
-    if (!key){
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
-    }
-    else {
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
-    }
-  }
-
-  public getServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]>{
+  public getServicesSearchTerm (numberOfItems: number, key?: string, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
@@ -133,7 +79,215 @@ export class ServiceService {
                   }
                   else return false;
                 }
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
                 else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
+    }
+    else {
+      if (paymentType){
+        if (paymentType == 'Payment'){
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").where('paymentType', '==', 'Payment').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  // check service has a title
+                  if (service.title.length > 0){
+                    // check service amount is within range
+                    if (startAmount && endAmount){
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
+                    }
+                    else return true;
+                  }
+                  else return false;
+                }
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
+    }
+  }
+
+  public getServices (numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
+    let collectionName: string = 'services';
+    let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    if (includeTagsInSearch !== undefined){
+      if (includeTagsInSearch == true){
+        if (tags && tags.length > 0){
+          tags.sort();
+          collectionName = `servicescollection/${tags.toString().replace(/,/gi,'')}/services`;
+        }
+      }
+      else collectionName = 'servicesnotags';
+    }
+
+    if (!key){
+      if (paymentType){
+        if (paymentType == 'Payment'){
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Payment').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  // check service has a title
+                  if (service.title.length > 0){
+                    // check service amount is within range
+                    if (startAmount && endAmount){
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
+                    }
+                    else return true;
+                  }
+                  else return false;
+                }
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
               }).map(service => {
                 return { ...service };
               });
@@ -208,7 +362,21 @@ export class ServiceService {
                   }
                   else return false;
                 }
-                else return true;
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
               }).map(service => {
                 return { ...service };
               });
@@ -258,7 +426,7 @@ export class ServiceService {
     }
   }
 
-  public getAllServices(numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public getAllServices (numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
@@ -273,42 +441,182 @@ export class ServiceService {
     }
 
     if (!key){
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
+      if (paymentType){
+        if (paymentType == 'Payment'){
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Payment').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  // check service has a title
+                  if (service.title.length > 0){
+                    // check service amount is within range
+                    if (startAmount && endAmount){
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
+                    }
+                    else return true;
+                  }
+                  else return false;
+                }
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
     }
     else {
-      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
-      let tempObservable = tempCollection.valueChanges().pipe(
-        map(arr => {
-          return arr.filter(service => {
-            if (tempFilterTitle == true){
-              if (service.title.length > 0)
-                return true;
-              else
-                return false;
-            }
-            else return true;
-          }).map(service => {
-            return { ...service };
-          });
-        })
-      );
-      return tempObservable;
+      if (paymentType){
+        if (paymentType == 'Payment'){
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).where('paymentType', '==', 'Payment').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  // check service has a title
+                  if (service.title.length > 0){
+                    // check service amount is within range
+                    if (startAmount && endAmount){
+                      if (service.amount >= startAmount && service.amount <= endAmount){
+                        if (currency){
+                          if (service.currency == currency.toLowerCase())
+                            return true;
+                          else
+                            return false;
+                        }
+                        else return true;
+                      }
+                      else return false;
+                    }
+                    else return true;
+                  }
+                  else return false;
+                }
+                else {
+                  if (startAmount && endAmount){
+                    if (service.amount >= startAmount && service.amount <= endAmount){
+                      if (currency){
+                        if (service.currency == currency.toLowerCase())
+                          return true;
+                        else
+                          return false;
+                      }
+                      else return true;
+                    }
+                    else return false;
+                  }
+                  else return true;
+                }
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+      }
+      else {
+        let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
+        let tempObservable = tempCollection.valueChanges().pipe(
+          map(arr => {
+            return arr.filter(service => {
+              if (tempFilterTitle == true){
+                if (service.title.length > 0)
+                  return true;
+                else
+                  return false;
+              }
+              else return true;
+            }).map(service => {
+              return { ...service };
+            });
+          })
+        );
+        return tempObservable;
+      }
     }
   }
 

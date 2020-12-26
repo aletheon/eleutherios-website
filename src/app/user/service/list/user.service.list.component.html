@@ -12,6 +12,11 @@
 								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
 							</mat-select>
 						</mat-form-field>
+						<ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+							<!-- show currency -->
+							<!-- show startAmount -->
+							<!-- show endAmount -->
+						</ng-container>
 					</div>
 					<div style="flex:none;margin-right:5px">
 						<mat-checkbox formControlName="includeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="includeTagsInSearchClick()"></mat-checkbox>
