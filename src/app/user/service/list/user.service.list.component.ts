@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, OnDestroy } fr
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, ValidatorFn, Validators, ValidationErrors } from '@angular/forms';
 import {
   SiteTotalService,
   UserServiceService,
@@ -20,6 +20,14 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, startWith } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+
+// custom validator to ensure start amount is less than end amount
+// if end user wants to be notified about paid for services.
+const rangeValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+  const start = control.get('startAmount').value;
+  const end = control.get('endAmount').value;
+  return (start !== null && end !== null) && (start < end ? null : { range: true });
+};
 
 @Component({
   selector: 'user-service-list',
@@ -109,8 +117,8 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
       includeTagsInSearch:  [''],
       paymentType:          [''],
       currency:             [''],
-      startAmount:          [''],
-      endAmount:            ['']
+      startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+      endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
     });
     this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
     this.serviceGroup.get('paymentType').setValue('Any');

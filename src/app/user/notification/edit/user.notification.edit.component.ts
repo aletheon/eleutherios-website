@@ -1,18 +1,3 @@
-
-// **************************************************
-// **************************************************
-// **************************************************
-// **************************************************
-// **************************************************
-// 1) Have to add paymentType to service notification
-// 2) Have to reflect service payment type in notifications list page
-// 3) Have to update service notification, service + forum create alerts
-// **************************************************
-// **************************************************
-// **************************************************
-// **************************************************
-// **************************************************
-
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
