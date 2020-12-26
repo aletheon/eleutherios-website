@@ -139,7 +139,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
     this.getServicesList();
   }
 
-  getServicesList (key?: any) {
+  public getServicesList (key?: any) {
     if (this._subscription)
       this._subscription.unsubscribe();
     
@@ -334,10 +334,6 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
 
   delete (service) {
     this.userServiceService.delete(service.uid, service.serviceId);
-  }
-
-  changePaymentType(){
-    console.log(this.serviceGroup.get('paymentType').value);
   }
 
   changeType (service) {

@@ -47,70 +47,70 @@
 			</div>
 		</div>
 		<!-- search results -->
+		<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+			<mat-form-field style="flex:none;width:150px">
+				<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="getServicesList()">
+					<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+				<div style="display:flex;flex-direction:row;align-items:center;margin-left:10px">
+					<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+						<mat-form-field style="width:100px;margin-right:10px">
+							<mat-select formControlName="currency" (selectionChange)="getServicesList()">
+								<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<mat-form-field style="flex:none;width:100px">
+							<input
+								matInput
+								#startAmount
+								placeholder="Start amount e.g. 1.00"
+								formControlName="startAmount"
+								(change)="getServicesList()"/>
+							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('pattern')">
+								Amount required
+							</mat-error>
+							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('min')">
+								Start amount must be greater than 0.50
+							</mat-error>
+							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
+								Start amount must be less than 999999.99
+							</mat-error>
+							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
+								Start amount must be less than 999999.99
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div style="flex:none;margin-right:5px">To</div>
+					<mat-form-field style="flex:none;width:100px">
+						<input
+							matInput
+							#endAmount
+							placeholder="End amount e.g. 10.00"
+							formControlName="endAmount"
+							(change)="getServicesList()"/>
+						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
+							Amount required
+						</mat-error>
+						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('min')">
+							End amount must be greater than 0.50
+						</mat-error>
+						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('max')">
+							End amount must be less than 999999.99
+						</mat-error>
+					</mat-form-field>
+					<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
+						End amount must be greater than start amount
+					</mat-error>
+				</div>
+			</ng-container>
+		</div>
 		<loading-spinner *ngIf="loading | async"></loading-spinner>
 		<div *ngIf="!(loading | async)" style="flex:1;display:flex;flex-direction:column">
 			<ng-container *ngIf="services | async;let serviceItems">
 				<ng-container *ngIf="serviceItems.length > 0; then showservices else noservices"></ng-container>
 				<ng-template #showservices>
-					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
-						<mat-form-field style="flex:none;width:150px;margin-right:10px">
-							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="changePaymentType()">
-								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
-							</mat-select>
-						</mat-form-field>
-						<ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-							<div style="display:flex;flex-direction:row;align-items:center">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
-									<mat-form-field style="width:100px;margin-right:10px">
-										<mat-select formControlName="currency" (selectionChange)="saveChanges()">
-											<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
-										</mat-select>
-									</mat-form-field>
-									<mat-form-field style="flex:none;width:100px">
-										<input
-											matInput
-											#startAmount
-											placeholder="Start amount e.g. 1.00"
-											formControlName="startAmount"
-											(change)="saveChanges()"/>
-										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('pattern')">
-											Amount required
-										</mat-error>
-										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('min')">
-											Start amount must be greater than 0.50
-										</mat-error>
-										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
-											Start amount must be less than 999999.99
-										</mat-error>
-										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
-											Start amount must be less than 999999.99
-										</mat-error>
-									</mat-form-field>
-								</div>
-								<div style="flex:none;margin-right:5px">To</div>
-								<mat-form-field style="flex:none;width:100px">
-									<input
-										matInput
-										#endAmount
-										placeholder="End amount e.g. 10.00"
-										formControlName="endAmount"
-										(change)="saveChanges()"/>
-									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
-										Amount required
-									</mat-error>
-									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('min')">
-										End amount must be greater than 0.50
-									</mat-error>
-									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('max')">
-										End amount must be less than 999999.99
-									</mat-error>
-								</mat-form-field>
-								<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
-									End amount must be greater than start amount
-								</mat-error>
-							</div>
-						</ng-container>
-					</div>
 					<ng-container *ngFor="let service of serviceItems; trackBy: trackServices">
 						<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
 							<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
