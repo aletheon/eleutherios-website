@@ -5,6 +5,66 @@
 			<div style="display:flex;flex-direction:row;align-items:center">
 				<h4 style="flex:none">Services(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
 				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+					<!-- payment controls -->
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+						<mat-form-field style="flex:none;width:100px;margin-right:10px">
+							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="getServicesList()">
+								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+							<div style="display:flex;flex-direction:row;align-items:center">
+								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+									<mat-form-field style="width:100px;margin-right:10px">
+										<mat-select formControlName="currency" (selectionChange)="getServicesList()">
+											<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+										</mat-select>
+									</mat-form-field>
+									<mat-form-field style="flex:none;width:100px">
+										<input
+											matInput
+											#startAmount
+											placeholder="Start amount e.g. 1.00"
+											formControlName="startAmount"
+											(change)="getServicesList()"/>
+										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('pattern')">
+											Amount required
+										</mat-error>
+										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('min')">
+											Start amount must be greater than 0.50
+										</mat-error>
+										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
+											Start amount must be less than 999999.99
+										</mat-error>
+										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
+											Start amount must be less than 999999.99
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div style="flex:none;margin-right:5px">To</div>
+								<mat-form-field style="flex:none;width:100px">
+									<input
+										matInput
+										#endAmount
+										placeholder="End amount e.g. 10.00"
+										formControlName="endAmount"
+										(change)="getServicesList()"/>
+									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
+										Amount required
+									</mat-error>
+									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('min')">
+										End amount must be greater than 0.50
+									</mat-error>
+									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('max')">
+										End amount must be less than 999999.99
+									</mat-error>
+								</mat-form-field>
+								<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
+									End amount must be greater than start amount
+								</mat-error>
+							</div>
+						</ng-container>
+					</div>
 					<div style="flex:none;margin-right:5px">
 						<mat-checkbox formControlName="includeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="includeTagsInSearchClick()"></mat-checkbox>
 					</div>
@@ -47,65 +107,6 @@
 			</div>
 		</div>
 		<!-- search results -->
-		<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
-			<mat-form-field style="flex:none;width:150px">
-				<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="getServicesList()">
-					<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
-				</mat-select>
-			</mat-form-field>
-			<ng-container *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
-				<div style="display:flex;flex-direction:row;align-items:center;margin-left:10px">
-					<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
-						<mat-form-field style="width:100px;margin-right:10px">
-							<mat-select formControlName="currency" (selectionChange)="getServicesList()">
-								<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
-							</mat-select>
-						</mat-form-field>
-						<mat-form-field style="flex:none;width:100px">
-							<input
-								matInput
-								#startAmount
-								placeholder="Start amount e.g. 1.00"
-								formControlName="startAmount"
-								(change)="getServicesList()"/>
-							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('pattern')">
-								Amount required
-							</mat-error>
-							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('min')">
-								Start amount must be greater than 0.50
-							</mat-error>
-							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
-								Start amount must be less than 999999.99
-							</mat-error>
-							<mat-error *ngIf="serviceGroup.get('startAmount').hasError('max')">
-								Start amount must be less than 999999.99
-							</mat-error>
-						</mat-form-field>
-					</div>
-					<div style="flex:none;margin-right:5px">To</div>
-					<mat-form-field style="flex:none;width:100px">
-						<input
-							matInput
-							#endAmount
-							placeholder="End amount e.g. 10.00"
-							formControlName="endAmount"
-							(change)="getServicesList()"/>
-						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
-							Amount required
-						</mat-error>
-						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('min')">
-							End amount must be greater than 0.50
-						</mat-error>
-						<mat-error *ngIf="serviceGroup.get('endAmount').hasError('max')">
-							End amount must be less than 999999.99
-						</mat-error>
-					</mat-form-field>
-					<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
-						End amount must be greater than start amount
-					</mat-error>
-				</div>
-			</ng-container>
-		</div>
 		<loading-spinner *ngIf="loading | async"></loading-spinner>
 		<div *ngIf="!(loading | async)" style="flex:1;display:flex;flex-direction:column">
 			<ng-container *ngIf="services | async;let serviceItems">

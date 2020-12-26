@@ -29,7 +29,7 @@
 				<ng-container *ngIf="notificationGroup.get('type').value == 'Service'">
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1">
-							<mat-form-field style="width:150px">
+							<mat-form-field style="width:100px">
 								<mat-select formControlName="paymentType" (selectionChange)="saveChanges()">
 									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
 								</mat-select>
@@ -38,12 +38,12 @@
 					</div>
 					<div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center" *ngIf="notificationGroup.get('paymentType').value == 'Payment'">
 						<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
-							<mat-form-field style="width:150px;margin-right:10px">
+							<mat-form-field style="width:100px;margin-right:10px">
 								<mat-select formControlName="currency" (selectionChange)="saveChanges()">
 									<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
 								</mat-select>
 							</mat-form-field>
-							<mat-form-field style="flex:none">
+							<mat-form-field style="flex:none;width:100px">
 								<input
 									matInput
 									#startAmount
@@ -65,25 +65,23 @@
 							</mat-form-field>
 						</div>
 						<div style="flex:none;margin-right:5px">To</div>
-						<div style="flex:none">
-							<mat-form-field>
-								<input
-									matInput
-									#endAmount
-									placeholder="End amount e.g. 10.00"
-									formControlName="endAmount"
-									(change)="saveChanges()"/>
-								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
-									Amount required
-								</mat-error>
-								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('min')">
-									End amount must be greater than 0.50
-								</mat-error>
-								<mat-error *ngIf="notificationGroup.get('endAmount').hasError('max')">
-									End amount must be less than 999999.99
-								</mat-error>
-							</mat-form-field>
-						</div>
+						<mat-form-field style="flex:none;width:100px">
+							<input
+								matInput
+								#endAmount
+								placeholder="End amount e.g. 10.00"
+								formControlName="endAmount"
+								(change)="saveChanges()"/>
+							<mat-error *ngIf="notificationGroup.get('endAmount').hasError('pattern')">
+								Amount required
+							</mat-error>
+							<mat-error *ngIf="notificationGroup.get('endAmount').hasError('min')">
+								End amount must be greater than 0.50
+							</mat-error>
+							<mat-error *ngIf="notificationGroup.get('endAmount').hasError('max')">
+								End amount must be less than 999999.99
+							</mat-error>
+						</mat-form-field>
 						<mat-error style="flex:none" *ngIf="notificationGroup.errors?.range">
 							End amount must be greater than start amount
 						</mat-error>

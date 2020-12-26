@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, ValidatorFn, Validators, ValidationErrors } from '@angular/forms';
 import {
   SiteTotalService,
   UserService,
@@ -117,8 +117,8 @@ export class ServiceListComponent implements OnInit, OnDestroy {
         includeTagsInSearch:  [''],
         paymentType:          [''],
         currency:             [''],
-        startAmount:          [''],
-        endAmount:            ['']
+        startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+        endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       });
       this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
       this.serviceGroup.get('paymentType').setValue('Any');

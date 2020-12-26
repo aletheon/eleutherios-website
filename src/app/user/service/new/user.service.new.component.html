@@ -69,7 +69,7 @@
 			</div>
 			<div style="display:flex;flex-direction:row;align-items:center">
 				<div style="flex:1">
-					<mat-form-field style="width:150px">
+					<mat-form-field style="width:100px">
 						<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="saveChanges()">
 							<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
 						</mat-select>
@@ -80,7 +80,7 @@
 				<ng-container *ngIf="auth.user | async;let userItem">
 					<ng-container *ngIf="userItem.stripeOnboardingStatus == 'Authorized'; else onboarduser">
 						<div style="display:flex;flex-direction:row;align-items:center">
-							<mat-form-field style="flex:none">
+							<mat-form-field style="flex:none;width:100px">
 								<input
 									matInput
 									#amount
@@ -103,7 +103,7 @@
 						</div>
 						<div style="display:flex;flex-direction:row;align-items:center">
 							<div style="flex:1">
-								<mat-form-field style="width:150px">
+								<mat-form-field style="width:100px">
 									<mat-select formControlName="typeOfPayment" (selectionChange)="saveChanges()">
 										<mat-option *ngFor="let t of typesOfPayments" [value]="t">{{ t }}</mat-option>
 									</mat-select>
