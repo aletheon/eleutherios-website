@@ -101,8 +101,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -122,6 +142,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
@@ -190,8 +211,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -211,6 +252,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(key.toLowerCase()).endAt(key.toLowerCase()+"\uf8ff").limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
@@ -295,8 +337,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -316,6 +378,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
@@ -384,8 +447,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -405,6 +488,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
@@ -489,8 +573,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -510,6 +614,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
@@ -578,8 +683,28 @@ export class ServiceService {
           );
           return tempObservable;
         }
-        else {
+        else if (paymentType == 'Free'){
           let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).where('paymentType', '==', 'Free').limit(numberOfItems+1));
+          let tempObservable = tempCollection.valueChanges().pipe(
+            map(arr => {
+              return arr.filter(service => {
+                if (tempFilterTitle == true){
+                  if (service.title.length > 0)
+                    return true;
+                  else
+                    return false;
+                }
+                else return true;
+              }).map(service => {
+                return { ...service };
+              });
+            })
+          );
+          return tempObservable;
+        }
+        else {
+          // return both Payment and Free services
+          let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
           let tempObservable = tempCollection.valueChanges().pipe(
             map(arr => {
               return arr.filter(service => {
@@ -599,6 +724,7 @@ export class ServiceService {
         }
       }
       else {
+        // return both Payment and Free services
         let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1));
         let tempObservable = tempCollection.valueChanges().pipe(
           map(arr => {
