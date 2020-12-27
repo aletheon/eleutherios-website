@@ -24,7 +24,6 @@
 										<input
 											matInput
 											#startAmount
-											placeholder="Start amount e.g. 1.00"
 											formControlName="startAmount"
 											(change)="getServicesList()"/>
 										<mat-error *ngIf="serviceGroup.get('startAmount').hasError('pattern')">
@@ -46,7 +45,6 @@
 									<input
 										matInput
 										#endAmount
-										placeholder="End amount e.g. 10.00"
 										formControlName="endAmount"
 										(change)="getServicesList()"/>
 									<mat-error *ngIf="serviceGroup.get('endAmount').hasError('pattern')">
