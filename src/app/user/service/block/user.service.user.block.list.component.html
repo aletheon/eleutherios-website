@@ -11,7 +11,7 @@
       <ng-container *ngIf="serviceUserBlockItems.length > 0; then showserviceuserblocks else noserviceuserblocks"></ng-container>
       <ng-template #showserviceuserblocks>
         <ng-container *ngFor="let serviceUserBlock of serviceUserBlockItems; trackBy: trackServiceUserBlocks">
-          <div class="alert alert-danger" style="margin-bottom:5px">
+          <div class="alert alert-danger" style="padding:5px;margin-bottom:5px">
             <ng-container *ngIf="serviceUserBlock.forum | async; then showforum"></ng-container>
             <ng-template #showforum>
               <ng-container *ngIf="serviceUserBlock.forum | async as forum">

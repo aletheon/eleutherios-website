@@ -16,6 +16,7 @@ import {
   UserServiceService,
   UserServiceImageService,
   UserForumImageService,
+  UserServiceTagService,
   UserTagService,
   ServiceService,
   TagService,
@@ -101,6 +102,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
     private userServiceService: UserServiceService,
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
+    private userServiceTagService: UserServiceTagService,
     private userTagService: UserTagService,
     private serviceService: ServiceService,
     private tagService: TagService,
@@ -353,10 +355,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
                       
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -366,6 +369,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -413,10 +422,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
                       
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -426,6 +436,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -623,69 +639,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
-                    switchMap(services => {
-                      if (services && services.length > 0) {
-                        let observables = services.map(service => {
-                          if (service) {
-                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                              switchMap(serviceImages => {
-                                if (serviceImages && serviceImages.length > 0){
-                                  let getDownloadUrl$: Observable<any>;
-          
-                                  if (serviceImages[0].tinyUrl)
-                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-          
-                                  return combineLatest([getDownloadUrl$]).pipe(
-                                    switchMap(results => {
-                                      const [downloadUrl] = results;
-                                      
-                                      if (downloadUrl)
-                                        serviceImages[0].url = downloadUrl;
-                                      else
-                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
-                                      return of(serviceImages[0]);
-                                    })
-                                  );
-                                }
-                                else return of(null);
-                              })
-                            );
-
-                            return combineLatest([getDefaultServiceImage$]).pipe(
-                              switchMap(results => {
-                                const [defaultServiceImage] = results;
-
-                                if (defaultServiceImage)
-                                  service.defaultServiceImage = of(defaultServiceImage);
-                                else {
-                                  let tempImage = {
-                                    url: '../../../assets/defaultTiny.jpg'
-                                  };
-                                  service.defaultServiceImage = of(tempImage);
-                                }
-                                return of(service);
-                              })
-                            );
-                          }
-                          else return of(null);
-                        });
-
-                        return zip(...observables, (...results) => {
-                          return results.map((result, i) => {
-                            return services[i];
-                          });
-                        });
-                      }
-                      else return of([]);
-                    })
-                  );
+                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
                 })
               ).subscribe();
 
               // preload, service search results
-              that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+              that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
                 switchMap(services => {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
@@ -714,10 +673,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                             else return of(null);
                           })
                         );
+                        let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                        return combineLatest([getDefaultServiceImage$]).pipe(
+                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImage] = results;
+                            const [defaultServiceImage, serviceTags] = results;
 
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
@@ -727,6 +687,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
+
+                            if (serviceTags)
+                              service.serviceTags = of(serviceTags);
+                            else
+                              service.serviceTags = of([]);
+
                             return of(service);
                           })
                         );
@@ -752,69 +718,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
-                    switchMap(services => {
-                      if (services && services.length > 0) {
-                        let observables = services.map(service => {
-                          if (service) {
-                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                              switchMap(serviceImages => {
-                                if (serviceImages && serviceImages.length > 0){
-                                  let getDownloadUrl$: Observable<any>;
-          
-                                  if (serviceImages[0].tinyUrl)
-                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-          
-                                  return combineLatest([getDownloadUrl$]).pipe(
-                                    switchMap(results => {
-                                      const [downloadUrl] = results;
-                                      
-                                      if (downloadUrl)
-                                        serviceImages[0].url = downloadUrl;
-                                      else
-                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
-                                      return of(serviceImages[0]);
-                                    })
-                                  );
-                                }
-                                else return of(null);
-                              })
-                            );
-
-                            return combineLatest([getDefaultServiceImage$]).pipe(
-                              switchMap(results => {
-                                const [defaultServiceImage] = results;
-
-                                if (defaultServiceImage)
-                                  service.defaultServiceImage = of(defaultServiceImage);
-                                else {
-                                  let tempImage = {
-                                    url: '../../../assets/defaultTiny.jpg'
-                                  };
-                                  service.defaultServiceImage = of(tempImage);
-                                }
-                                return of(service);
-                              })
-                            );
-                          }
-                          else return of(null);
-                        });
-
-                        return zip(...observables, (...results) => {
-                          return results.map((result, i) => {
-                            return services[i];
-                          });
-                        });
-                      }
-                      else return of([]);
-                    })
-                  );
+                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
                 })
               ).subscribe();
 
               // preload, service search results
-              that.searchServiceResults = that.serviceService.tagSearch('', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+              that.searchServiceResults = that.serviceService.tagSearch('', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
                 switchMap(services => {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
@@ -843,10 +752,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                             else return of(null);
                           })
                         );
+                        let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                        return combineLatest([getDefaultServiceImage$]).pipe(
+                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImage] = results;
+                            const [defaultServiceImage, serviceTags] = results;
 
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
@@ -856,6 +766,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
+
+                            if (serviceTags)
+                              service.serviceTags = of(serviceTags);
+                            else
+                              service.serviceTags = of([]);
+
                             return of(service);
                           })
                         );
@@ -923,10 +839,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
 
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -936,6 +853,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -983,10 +906,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
                     
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -996,6 +920,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+                      
                     return of(service);
                   })
                 );
@@ -1054,10 +984,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
                       
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -1067,6 +998,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -1114,10 +1051,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
                       
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -1127,6 +1065,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -1178,10 +1122,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
                     
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1191,6 +1136,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -1238,10 +1189,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
                     
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1251,6 +1203,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -1314,70 +1272,13 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm => 
-          this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value)
+          this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
         )
       );
       
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
-            switchMap(services => {
-              if (services && services.length > 0){
-                let observables = services.map(service => {
-                  if (service){
-                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                      switchMap(serviceImages => {
-                        if (serviceImages && serviceImages.length > 0){
-                          let getDownloadUrl$: Observable<any>;
-    
-                          if (serviceImages[0].tinyUrl)
-                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-    
-                          return combineLatest([getDownloadUrl$]).pipe(
-                            switchMap(results => {
-                              const [downloadUrl] = results;
-                              
-                              if (downloadUrl)
-                                serviceImages[0].url = downloadUrl;
-                              else
-                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                
-                              return of(serviceImages[0]);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
-          
-                    return combineLatest([getDefaultServiceImage$]).pipe(
-                      switchMap(results => {
-                        const [defaultServiceImage] = results;
-                        
-                        if (defaultServiceImage)
-                          service.defaultServiceImage = of(defaultServiceImage);
-                        else {
-                          let tempImage = {
-                            url: '../../../assets/defaultTiny.jpg'
-                          };
-                          service.defaultServiceImage = of(tempImage);
-                        }
-                        return of(service);
-                      })
-                    );
-                  }
-                  else return of(null);
-                });
-          
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return services[i];
-                  });
-                });
-              }
-              else return of([]);
-            })
-          );
+          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
         })
       ).subscribe();
 
@@ -1410,10 +1311,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
                     
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1423,6 +1325,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -1444,70 +1352,13 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm => 
-          this.serviceService.search(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
+          this.serviceService.search(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
         )
       );
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
-            switchMap(services => {
-              if (services && services.length > 0){
-                let observables = services.map(service => {
-                  if (service){
-                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                      switchMap(serviceImages => {
-                        if (serviceImages && serviceImages.length > 0){
-                          let getDownloadUrl$: Observable<any>;
-    
-                          if (serviceImages[0].tinyUrl)
-                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-    
-                          return combineLatest([getDownloadUrl$]).pipe(
-                            switchMap(results => {
-                              const [downloadUrl] = results;
-                              
-                              if (downloadUrl)
-                                serviceImages[0].url = downloadUrl;
-                              else
-                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                
-                              return of(serviceImages[0]);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
-
-                    return combineLatest([getDefaultServiceImage$]).pipe(
-                      switchMap(results => {
-                        const [defaultServiceImage] = results;
-                        
-                        if (defaultServiceImage)
-                          service.defaultServiceImage = of(defaultServiceImage);
-                        else {
-                          let tempImage = {
-                            url: '../../../assets/defaultTiny.jpg'
-                          };
-                          service.defaultServiceImage = of(tempImage);
-                        }
-                        return of(service);
-                      })
-                    );
-                  }
-                  else return of(null);
-                });
-          
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return services[i];
-                  });
-                });
-              }
-              else return of([]);
-            })
-          );
+          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
         })
       ).subscribe();
 
@@ -1540,10 +1391,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
                     
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1553,6 +1405,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );

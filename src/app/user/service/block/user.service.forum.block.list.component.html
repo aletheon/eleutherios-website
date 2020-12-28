@@ -14,7 +14,7 @@
 					<ng-container *ngIf="serviceForumBlock.service | async; then showservice"></ng-container>
 					<ng-template #showservice>
 						<ng-container *ngIf="serviceForumBlock.service | async as service">
-							<div [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="margin-bottom:5px">
+							<div [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="padding:5px;margin-bottom:5px">
 								<div style="display:flex;flex-direction:row">
 									<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 									<ng-template #showdefaultserviceimage>

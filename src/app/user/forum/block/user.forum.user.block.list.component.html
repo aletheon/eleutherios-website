@@ -11,7 +11,7 @@
       <ng-container *ngIf="forumUserBlockItems.length > 0; then showforumuserblocks else noforumuserblocks"></ng-container>
       <ng-template #showforumuserblocks>
         <ng-container *ngFor="let forumUserBlock of forumUserBlockItems; trackBy: trackForumUserBlocks">
-          <div [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="margin-bottom:5px">
+          <div [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="padding:5px;margin-bottom:5px">
             <ng-container *ngIf="forumUserBlock.service | async; then showservice"></ng-container>
             <ng-template #showservice>
               <ng-container *ngIf="forumUserBlock.service | async as service">

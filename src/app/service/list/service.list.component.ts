@@ -180,7 +180,6 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
-
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
       
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
