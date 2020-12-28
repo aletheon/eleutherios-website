@@ -41,7 +41,7 @@
         </div>
 
         <!-- user control -->
-        <button class="btn btn-default" style="flex:none;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
+        <button class="btn btn-default" style="flex:none;padding:5px 10px 5px 10px;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
         <mat-menu #mainMenu="matMenu">
           <ng-container *ngIf="userTotal | async as total">
             <button mat-menu-item [matMenuTriggerFor]="forums">Forums({{ total.forumCount }})</button>

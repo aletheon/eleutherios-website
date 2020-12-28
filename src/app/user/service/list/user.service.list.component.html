@@ -41,7 +41,7 @@
 									</mat-form-field>
 								</div>
 								<div style="flex:none;margin-right:5px">To</div>
-								<mat-form-field style="flex:none;width:100px">
+								<mat-form-field style="flex:none;;margin-right:5px;width:100px">
 									<input
 										matInput
 										#endAmount
@@ -57,7 +57,7 @@
 										End amount must be less than 999999.99
 									</mat-error>
 								</mat-form-field>
-								<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
+								<mat-error style="flex:none;;margin-right:5px" *ngIf="serviceGroup.errors?.range">
 									End amount must be greater than start amount
 								</mat-error>
 							</div>

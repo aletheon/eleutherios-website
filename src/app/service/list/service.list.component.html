@@ -6,7 +6,7 @@
 				<h4 style="flex:none">Services(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
 				<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
 					<!-- payment controls -->
-					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;">
 						<mat-form-field style="flex:none;width:100px;margin-right:10px">
 							<mat-select formControlName="paymentType" #select="matSelect" (selectionChange)="getServicesList()">
 								<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
@@ -41,7 +41,7 @@
 									</mat-form-field>
 								</div>
 								<div style="flex:none;margin-right:5px">To</div>
-								<mat-form-field style="flex:none;width:100px">
+								<mat-form-field style="flex:none;;margin-right:5px;width:100px">
 									<input
 										matInput
 										#endAmount
@@ -57,7 +57,7 @@
 										End amount must be less than 999999.99
 									</mat-error>
 								</mat-form-field>
-								<mat-error style="flex:none" *ngIf="serviceGroup.errors?.range">
+								<mat-error style="flex:none;margin-right:5px" *ngIf="serviceGroup.errors?.range">
 									End amount must be greater than start amount
 								</mat-error>
 							</div>

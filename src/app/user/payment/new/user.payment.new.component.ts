@@ -196,114 +196,111 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     // );
 
 
-    // HERE ROB BEFORE CONTINUING WITH PAYMENTS DO SERVICE SEARCH PAYMENT AMOUNT - START -> END
-
-
-    // var stripe = Stripe(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
-    // this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+    var stripe = Stripe(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+    this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
 
     // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5 
-    // this.showSpinner = true;
-    // this.hidePaymentButton = true;
+    this.showSpinner = true;
+    this.hidePaymentButton = true;
 
-    // if (this._paymentIntent){
-    //   console.log('got a payment intent ' + this._paymentIntent.id);
+    if (this._paymentIntent){
+      console.log('got a payment intent ' + this._paymentIntent.id);
 
-    //   this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-    //     payment_method: {
-    //       card: this.card,
-    //       billing_details: {
-    //         name: this._user.displayName,
-    //         email: this._user.email
-    //       },
-    //     }
-    //   })
-    //   .subscribe((result) => {
-    //     console.log('confirmCardPayment result ' + JSON.stringify(result));
+      this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+        payment_method: {
+          card: this.card,
+          billing_details: {
+            name: this._user.displayName,
+            email: this._user.email
+          },
+        }
+      })
+      .subscribe((result) => {
+        console.log('confirmCardPayment result ' + JSON.stringify(result));
 
-    //     if (result.error) {
-    //       // Show error to your customer (e.g., insufficient funds)
-    //       console.log(result.error.message);
-    //     } else {
-    //       // The payment has been processed!
-    //       // if (result.paymentIntent.status === 'succeeded') {
-    //       //   // Show a success message to your customer
-    //       // }
-    //       console.log('status ' + result.paymentIntent.status);
-    //     }
-    //     this.showSpinner = false;
-    //     this.hidePaymentButton = false;
-    //   });
-    // }
-    // else {
-    //   const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-    //   createPaymentIntent({
-    //     sellerUid: this.serviceGroup.get('uid').value,
-    //     sellerServiceId: this.serviceGroup.get('serviceId').value,
-    //     buyerUid: this.userServicesCtrl.value.uid,
-    //     buyerServiceId: this.userServicesCtrl.value.serviceId
-    //   }).then(result => {
-    //     console.log('created paymentIntent result ' + JSON.stringify(result));
+        if (result.error) {
+          // Show error to your customer (e.g., insufficient funds)
+          console.log(result.error.message);
+        } else {
+          // The payment has been processed!
+          // if (result.paymentIntent.status === 'succeeded') {
+          //   // Show a success message to your customer
+          // }
+          console.log('status ' + result.paymentIntent.status);
+        }
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
+    }
+    else {
+      const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+      createPaymentIntent({
+        sellerUid: this.serviceGroup.get('uid').value,
+        sellerServiceId: this.serviceGroup.get('serviceId').value,
+        buyerUid: this.userServicesCtrl.value.uid,
+        buyerServiceId: this.userServicesCtrl.value.serviceId
+      }).then(result => {
+        console.log('created paymentIntent result ' + JSON.stringify(result));
 
-    //     if (result){
-    //       this._paymentIntent = result.data;
+        if (result){
+          this._paymentIntent = result.data;
 
-    //       this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-    //         payment_method: {
-    //           card: this.card,
-    //           billing_details: {
-    //             name: this._user.displayName,
-    //             email: this._user.email
-    //           },
-    //         },
-    //       })
-    //       .subscribe((result) => {
-    //         console.log('confirmCardPayment result ' + JSON.stringify(result));
+          this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+            payment_method: {
+              card: this.card,
+              billing_details: {
+                name: this._user.displayName,
+                email: this._user.email
+              },
+            },
+          })
+          .subscribe((result) => {
+            console.log('confirmCardPayment result ' + JSON.stringify(result));
 
-    //         if (result.error) {
-    //           // Show error to your customer (e.g., insufficient funds)
-    //           console.log(result.error.message);
-    //         } else {
-    //           // The payment has been processed!
-    //           console.log('status ' + result.paymentIntent.status);
+            if (result.error) {
+              // Show error to your customer (e.g., insufficient funds)
+              console.log(result.error.message);
+            } else {
+              // The payment has been processed!
+              console.log('status ' + result.paymentIntent.status);
 
-    //           if (result.paymentIntent.status === 'succeeded') {
-    //             const snackBarRef = this.snackbar.openFromComponent(
-    //               NotificationSnackBar,
-    //               {
-    //                 duration: 8000,
-    //                 data: 'Success!',
-    //                 panelClass: ['green-snackbar']
-    //               }
-    //             );
-    //           }
-    //           else {
-    //             const snackBarRef = this.snackbar.openFromComponent(
-    //               NotificationSnackBar,
-    //               {
-    //                 duration: 8000,
-    //                 data: 'An unknown problem occurred status ' + result.paymentIntent.status,
-    //                 panelClass: ['red-snackbar']
-    //               }
-    //             );
-    //           }  
-    //         }
-    //         this.showSpinner = false;
-    //         this.hidePaymentButton = false;
-    //       });
-    //     }
-    //     else {
-    //       this.showSpinner = false;
-    //       this.hidePaymentButton = false;
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
+              if (result.paymentIntent.status === 'succeeded') {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Success!',
+                    panelClass: ['green-snackbar']
+                  }
+                );
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'An unknown problem occurred status ' + result.paymentIntent.status,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }  
+            }
+            this.showSpinner = false;
+            this.hidePaymentButton = false;
+          });
+        }
+        else {
+          this.showSpinner = false;
+          this.hidePaymentButton = false;
+        }
+      })
+      .catch(error => {
+        console.error(error);
 
-    //     this.showSpinner = false;
-    //     this.hidePaymentButton = false;
-    //   });
-    // }
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
+    }
   }
 
   ngOnInit () {
