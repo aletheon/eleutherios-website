@@ -11,8 +11,8 @@
 			<ng-container *ngIf="tagItems.length > 0; then showtags else notags"></ng-container>
 			<ng-template #showtags>
 				<ng-container *ngFor="let tag of tagItems; trackBy: trackTags">
-					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:10px;margin-bottom:5px;align-items:center">
-						<p style="flex:1">{{ tag.tag }}</p>
+					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
+						<p style="flex:1;margin-left:5px">{{ tag.tag }}</p>
 						<div style="flex:none;margin-right:5px">
 							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#f2dede" matTooltip="Forums">{{ tag.forumCount }}</span>
 						</div>

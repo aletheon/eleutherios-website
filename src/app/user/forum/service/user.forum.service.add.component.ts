@@ -639,12 +639,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
+                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value);
                 })
               ).subscribe();
 
               // preload, service search results
-              that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+              that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
                 switchMap(services => {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
@@ -673,7 +673,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                             else return of(null);
                           })
                         );
-                        let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+                        let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
                         return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
@@ -718,12 +718,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
+                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value);
                 })
               ).subscribe();
 
               // preload, service search results
-              that.searchServiceResults = that.serviceService.tagSearch('', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+              that.searchServiceResults = that.serviceService.tagSearch('', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
                 switchMap(services => {
                   if (services && services.length > 0) {
                     let observables = services.map(service => {
@@ -752,7 +752,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                             else return of(null);
                           })
                         );
-                        let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+                        let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
                         return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
