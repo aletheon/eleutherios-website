@@ -160,9 +160,9 @@
 			</div>
 			<!-- START OF SERVICES SECTION -->
 			<div style="margin-bottom:20px">
-				<h5 style="padding:0px">Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
 				<!-- registrants -->
-				<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+				<h5 style="padding:0px">Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
+				<div style="display:flex;flex-direction:row;overflow-x:auto">
 					<ng-container *ngIf="registrants | async;let registrantItems">
 						<ng-container *ngIf="registrantItems.length > 0">
 							<ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
@@ -207,7 +207,7 @@
 					<!-- service -->
 					<div style="display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
 						<!-- payment -->
-						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+						<div style="flex:none;display:flex;flex-direction:row">
 							<mat-form-field style="flex:none;width:100px;margin-right:10px">
 								<mat-select formControlName="searchPaymentType" #select="matSelect" (selectionChange)="searchServices()">
 									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
@@ -288,7 +288,7 @@
 						</div>
 					</div>
 					<!-- tag results -->
-					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:5px">
 						<ng-container *ngIf="searchServiceTags.length > 0; then showsearchservicetags else nosearchservicetags">
 							<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 								*ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
@@ -313,10 +313,17 @@
 													</div>
 												</ng-container>
 											</ng-template>
-											<p style="flex:1;margin-right:5px">
+											<div style="flex:1;margin-right:5px">
 												<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
 												<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
-											</p>
+											</div>
+											<div *ngIf="service.paymentType == 'Payment'" style="flex:none;margin-right:5px">
+                        <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+                      </div>
+                      <div style="flex:none;margin-right:5px">
+                        <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                        <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                      </div>
 											<div style="flex:none">
 												<mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add</mat-icon>
 											</div>
