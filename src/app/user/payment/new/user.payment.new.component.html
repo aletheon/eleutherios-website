@@ -18,7 +18,7 @@
     <form [formGroup]="serviceGroup" novalidate>
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-flow:wrap">
-          <div class="alert alert-info" style="flex:none;padding:5px;width:100%;display:flex;flex-direction:column">
+          <div class="alert alert-info" style="flex:none;padding:10px;width:100%;display:flex;flex-direction:column">
             <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>
