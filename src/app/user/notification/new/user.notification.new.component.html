@@ -151,7 +151,7 @@
 								<ng-container *ngFor="let result of searchResultItems; trackBy: trackResults">
 									<ng-container *ngIf="notificationGroup.get('type').value == 'Forum'; then showforumresult else showserviceresult"></ng-container>
 									<ng-template #showforumresult>
-										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 											<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
 												<ng-container *ngIf="result.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 												<ng-template #showdefaultforumimage>
@@ -193,7 +193,7 @@
 										</div>
 									</ng-template>
 									<ng-template #showserviceresult>
-										<div [ngClass]="result.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+										<div [ngClass]="result.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 											<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
 												<ng-container *ngIf="result.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 												<ng-template #showdefaultserviceimage>
