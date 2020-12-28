@@ -53,7 +53,7 @@
 				<ng-container *ngIf="forumItems.length > 0; then showforums else noforums"></ng-container>
 				<ng-template #showforums>
 					<ng-container *ngFor="let forum of forumItems; trackBy: trackForums">
-						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 							<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 								<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 								<ng-template #showdefaultforumimage>

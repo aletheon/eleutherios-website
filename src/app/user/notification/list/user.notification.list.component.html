@@ -63,7 +63,7 @@
 					<ng-container *ngFor="let notification of notificationItems; trackBy: trackNotifications">
 						<ng-container *ngIf="notification.type == 'Forum'; then showforumresult else showserviceresult"></ng-container>
 						<ng-template #showforumresult>
-							<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+							<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 								<div style="flex:none;display:flex;flex-direction:row;justify-content:center;flex-wrap:wrap">
 									<div style="flex:1;margin-right:5px">
 										<p style="word-break: break-all">
@@ -103,7 +103,7 @@
 							</div>
 						</ng-template>
 						<ng-template #showserviceresult>
-							<div [ngClass]="notification.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+							<div [ngClass]="notification.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 								<div style="flex:none;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center">
 									<div style="flex:1;margin-right:5px">
 										<p style="word-break: break-all">
