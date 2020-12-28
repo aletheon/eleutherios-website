@@ -181,7 +181,7 @@
               <div *ngIf="searchServiceResultItems.length > 0; then showsearchserviceresults else nosearchserviceresults"></div>
               <ng-template #showsearchserviceresults>
                 <ng-container *ngFor="let service of searchServiceResultItems; trackBy: trackSearchServiceResults">
-                  <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+                  <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
                     <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                       <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                       <ng-template #showdefaultserviceimage>

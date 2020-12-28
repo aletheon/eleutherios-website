@@ -186,14 +186,14 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   pay(){
-    const snackBarRef = this.snackbar.openFromComponent(
-      NotificationSnackBar,
-      {
-        duration: 8000,
-        data: 'The payment gateway system is still being implemented',
-        panelClass: ['red-snackbar']
-      }
-    );
+    // const snackBarRef = this.snackbar.openFromComponent(
+    //   NotificationSnackBar,
+    //   {
+    //     duration: 8000,
+    //     data: 'The payment gateway system is still being implemented',
+    //     panelClass: ['red-snackbar']
+    //   }
+    // );
 
 
     // HERE ROB BEFORE CONTINUING WITH PAYMENTS DO SERVICE SEARCH PAYMENT AMOUNT - START -> END
