@@ -72,6 +72,8 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   public registrants: Observable<any[]>;
   public forums: Observable<any[]>;
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
+  public paymentTypes: string[] = ['Any', 'Free', 'Payment'];
+  public currencies: string[] = ['AUD', 'BRL', 'GBP', 'BGN', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'RON', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD'];
   public forumTags: Observable<any[]>;
   public forumImages: Observable<any[]>;
   public images: Observable<any[]>;
@@ -85,8 +87,8 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   public serviceSearchTagCtrl: FormControl;
   public tagForumCtrl: FormControl;
   public searchServiceTags: any[] = [];
-  public searchServiceIncludeTagsInSearch: boolean;
-  public searchPrivateServices: boolean;
+  public searchServiceIncludeTagsInSearch: boolean = true;
+  public searchPrivateServices: boolean = true;
   public loading: Observable<boolean> = this._loading.asObservable();
   
   constructor(public auth: AuthService,
@@ -182,8 +184,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         if (forum){
           this._initialForumSubscription.unsubscribe();
           this.forum = this.userForumService.getForum(this.auth.uid, params['forumId']);
-          this.searchPrivateServices = true;
-          this.searchServiceIncludeTagsInSearch = true;
           this.initForm();
         }
         else {
@@ -218,11 +218,19 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       includeDescriptionInDetailPage:     [''],
       includeImagesInDetailPage:          [''],
       includeTagsInDetailPage:            [''],
+      searchPaymentType:                  [''],
+      searchCurrency:                     [''],
+      searchStartAmount:                  ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      searchEndAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       searchPrivateServices:              [''],
       searchServiceIncludeTagsInSearch:   [''],
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
+    this.forumGroup.get('searchPaymentType').setValue('Any');
+    this.forumGroup.get('searchCurrency').setValue('NZD');
+    this.forumGroup.get('searchStartAmount').setValue(1);
+    this.forumGroup.get('searchEndAmount').setValue(10);
     this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
     this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
 
@@ -868,7 +876,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -928,7 +936,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         );
       }
       else {
-        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -990,9 +998,9 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  searchServiceIncludeTagsInSearchClick () {
+  searchServices () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1052,7 +1060,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       );
     }
     else {
-      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1388,7 +1396,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1448,7 +1456,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         );
       }
       else {
-        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1580,9 +1588,11 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  searchPrivateServicesClick () {
-    const that = this;
+  searchPaymentServices () {
 
+  }
+
+  searchPrivateServicesClick () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
@@ -1593,7 +1603,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
             switchMap(services => {
               if (services && services.length > 0){
                 let observables = services.map(service => {
@@ -1654,7 +1664,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         })
       ).subscribe();
 
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1723,7 +1733,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
             switchMap(services => {
               if (services && services.length > 0){
                 let observables = services.map(service => {
@@ -1784,7 +1794,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         })
       ).subscribe();
 
-      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1847,14 +1857,23 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
 
   saveChanges () {
     if (this.forumGroup.status != 'VALID') {
-      console.log('form is not valid, cannot save to database');
-      setTimeout(() => {
-        for (let i in this.forumGroup.controls) {
-          this.forumGroup.controls[i].markAsTouched();
-        }
-        this.titleRef.nativeElement.focus();
-      }, 500);
-      return;
+      // exclude payment search controls
+      if (!(this.forumGroup.get('searchStartAmount').hasError('pattern') || 
+        this.forumGroup.get('searchStartAmount').hasError('min') || 
+        this.forumGroup.get('searchStartAmount').hasError('max') || 
+        this.forumGroup.get('searchEndAmount').hasError('pattern') || 
+        this.forumGroup.get('searchEndAmount').hasError('min') || 
+        this.forumGroup.get('searchEndAmount').hasError('max') ||
+        this.forumGroup.errors?.range)) {
+          console.log('form is not valid, cannot save to database');
+          setTimeout(() => {
+            for (let i in this.forumGroup.controls) {
+              this.forumGroup.controls[i].markAsTouched();
+            }
+            this.titleRef.nativeElement.focus();
+          }, 500);
+          return;
+      }
     }
 
     let tempTitle = this.forumGroup.get('title').value.replace(/\s\s+/g,' ');

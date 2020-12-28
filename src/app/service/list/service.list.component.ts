@@ -117,8 +117,8 @@ export class ServiceListComponent implements OnInit, OnDestroy {
         includeTagsInSearch:  [''],
         paymentType:          [''],
         currency:             [''],
-        startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
-        endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+        startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+        endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       });
       this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
       this.serviceGroup.get('paymentType').setValue('Any');
