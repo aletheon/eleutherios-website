@@ -230,9 +230,64 @@
 				<!-- search -->
 				<div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px">
 					<!-- service -->
-					<div style="text-align:right">
-						<mat-checkbox formControlName="searchPrivateServices" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateServicesClick()" style="margin-right:10px"></mat-checkbox>
-						<mat-checkbox formControlName="searchServiceIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchServiceIncludeTagsInSearchClick()"></mat-checkbox>
+					<div style="display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
+						<!-- payment -->
+						<div style="flex:none;display:flex;flex-direction:row">
+							<mat-form-field style="flex:none;width:100px;margin-right:10px">
+								<mat-select formControlName="searchPaymentType" #select="matSelect" (selectionChange)="searchServices()">
+									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<ng-container *ngIf="forumGroup.get('searchPaymentType').value == 'Payment'">
+								<div style="display:flex;flex-direction:row;align-items:center">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+										<mat-form-field style="width:100px;margin-right:10px">
+											<mat-select formControlName="searchCurrency" (selectionChange)="searchServices()">
+												<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+											</mat-select>
+										</mat-form-field>
+										<mat-form-field style="flex:none;width:100px">
+											<input
+												matInput	
+												#startAmount
+												formControlName="searchStartAmount"
+												(change)="searchServices()"/>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('pattern')">
+												Amount required
+											</mat-error>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('min')">
+												Start amount must be greater than 0.50
+											</mat-error>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('max')">
+												Start amount must be less than 999999.99
+											</mat-error>
+										</mat-form-field>
+									</div>
+									<div style="flex:none;margin-right:5px">To</div>
+									<mat-form-field style="flex:none;width:100px">
+										<input
+											matInput
+											#endAmount
+											formControlName="searchEndAmount"
+											(change)="searchServices()"/>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('pattern')">
+											Amount required
+										</mat-error>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('min')">
+											End amount must be greater than 0.50
+										</mat-error>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('max')">
+											End amount must be less than 999999.99
+										</mat-error>
+									</mat-form-field>
+									<mat-error style="flex:none" *ngIf="forumGroup.errors?.range">
+										End amount must be greater than start amount
+									</mat-error>
+								</div>
+							</ng-container>
+						</div>
+						<mat-checkbox style="flex:none;margin-right:5px" formControlName="searchPrivateServices" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateServicesClick()"></mat-checkbox>
+						<mat-checkbox style="flex:none" formControlName="searchServiceIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchServices()"></mat-checkbox>
 					</div>
 					<div>
 						<mat-form-field style="width:100%">
@@ -283,15 +338,44 @@
 													</div>
 												</ng-container>
 											</ng-template>
-											<p style="flex:1;margin-right:5px">
+											<div style="flex:1;margin-right:5px">
 												<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
 												<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
-											</p>
+											</div>
+                      <div style="flex:none;margin-right:5px">
+                        <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                        <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                      </div>
 											<div style="flex:none">
-												<mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer" matTooltip="Add service">add</mat-icon>
+												<mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add</mat-icon>
 											</div>
 										</div>
 									</div>
+									<ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
+										<div style="flex:none;display:flex;flex-direction:row">
+											<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+											<ng-template #showtags>
+												<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+													<ng-container *ngFor="let serviceTag of serviceTagItems">
+														<span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+													</ng-container>
+												</div>
+											</ng-template>
+											<ng-container *ngIf="service.paymentType == 'Payment'">
+												<ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+												<ng-template #showtagswithpayment>
+													<div style="flex:none">
+														<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+													</div>
+												</ng-template>
+												<ng-template #showtagswithoutpayment>
+													<div style="flex:1;text-align:right">
+														<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+													</div>
+												</ng-template>
+											</ng-container>
+										</div>
+									</ng-container>
 								</ng-container>
 							</ng-template>
 							<ng-template #nosearchserviceresults>
