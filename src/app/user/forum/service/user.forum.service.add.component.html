@@ -29,10 +29,65 @@
         <!-- search -->
         <div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px;margin-bottom:20px">
           <!-- service -->
-          <div style="text-align:right">
-            <mat-checkbox formControlName="searchPrivateServices" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateServicesClick()" style="margin-right:10px"></mat-checkbox>
-            <mat-checkbox formControlName="searchServiceIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchServiceIncludeTagsInSearchClick()"></mat-checkbox>
-          </div>
+					<div style="display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
+						<!-- payment -->
+						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+							<mat-form-field style="flex:none;width:100px;margin-right:10px">
+								<mat-select formControlName="searchPaymentType" #select="matSelect" (selectionChange)="searchServices()">
+									<mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<ng-container *ngIf="forumGroup.get('searchPaymentType').value == 'Payment'">
+								<div style="display:flex;flex-direction:row;align-items:center">
+									<div style="flex:none;display:flex;flex-direction:row;margin-right:5px">
+										<mat-form-field style="width:100px;margin-right:10px">
+											<mat-select formControlName="searchCurrency" (selectionChange)="searchServices()">
+												<mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+											</mat-select>
+										</mat-form-field>
+										<mat-form-field style="flex:none;width:100px">
+											<input
+												matInput	
+												#startAmount
+												formControlName="searchStartAmount"
+												(change)="searchServices()"/>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('pattern')">
+												Amount required
+											</mat-error>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('min')">
+												Start amount must be greater than 0.50
+											</mat-error>
+											<mat-error *ngIf="forumGroup.get('searchStartAmount').hasError('max')">
+												Start amount must be less than 999999.99
+											</mat-error>
+										</mat-form-field>
+									</div>
+									<div style="flex:none;margin-right:5px">To</div>
+									<mat-form-field style="flex:none;width:100px">
+										<input
+											matInput
+											#endAmount
+											formControlName="searchEndAmount"
+											(change)="searchServices()"/>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('pattern')">
+											Amount required
+										</mat-error>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('min')">
+											End amount must be greater than 0.50
+										</mat-error>
+										<mat-error *ngIf="forumGroup.get('searchEndAmount').hasError('max')">
+											End amount must be less than 999999.99
+										</mat-error>
+									</mat-form-field>
+									<mat-error style="flex:none" *ngIf="forumGroup.errors?.range">
+										End amount must be greater than start amount
+									</mat-error>
+								</div>
+							</ng-container>
+						</div>
+						<mat-checkbox style="flex:none;margin-right:5px" formControlName="searchPrivateServices" matTooltip="Private" matTooltipPosition="above" (change)="searchPrivateServicesClick()"></mat-checkbox>
+						<mat-checkbox style="flex:none" formControlName="searchServiceIncludeTagsInSearch" matTooltip="Include Tags" matTooltipPosition="above" (change)="searchServices()"></mat-checkbox>
+					</div>
           <div>
             <mat-form-field style="width:100%">
               <input matInput placeholder="Type a service" [matAutocomplete]="autoSearchServices" [formControl]="searchServiceCtrl">

@@ -1588,10 +1588,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  searchPaymentServices () {
-
-  }
-
   searchPrivateServicesClick () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(

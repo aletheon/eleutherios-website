@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import {
   SiteTotalService,
   UserActivityService,
@@ -322,7 +322,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -382,7 +382,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         );
       }
       else {
-        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -536,11 +536,19 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       includeDescriptionInDetailPage:     [''],
       includeImagesInDetailPage:          [''],
       includeTagsInDetailPage:            [''],
+      searchPaymentType:                  [''],
+      searchCurrency:                     [''],
+      searchStartAmount:                  ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      searchEndAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       searchPrivateServices:              [''],
       searchServiceIncludeTagsInSearch:   [''],
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
+    this.forumGroup.get('searchPaymentType').setValue('Any');
+    this.forumGroup.get('searchCurrency').setValue('NZD');
+    this.forumGroup.get('searchStartAmount').setValue(1);
+    this.forumGroup.get('searchEndAmount').setValue(10);
     this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
     this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
 
@@ -882,6 +890,129 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
     });
   }
 
+  searchServices () {
+    if (this.forumGroup.get('searchPrivateServices').value == true){
+      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+        switchMap(services => {
+          if (services && services.length > 0){
+            let observables = services.map(service => {
+              if (service){
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
+                  switchMap(results => {
+                    const [defaultServiceImage] = results;
+
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultTiny.jpg'
+                      };
+                      service.defaultServiceImage = of(tempImage);
+                    }
+                    return of(service);
+                  })
+                );
+              }
+              else return of(null);
+            });
+      
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return services[i];
+              });
+            });
+          }
+          else return of([]);
+        })
+      );
+    }
+    else {
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+        switchMap(services => {
+          if (services && services.length > 0){
+            let observables = services.map(service => {
+              if (service){
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultServiceImage$]).pipe(
+                  switchMap(results => {
+                    const [defaultServiceImage] = results;
+                    
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultTiny.jpg'
+                      };
+                      service.defaultServiceImage = of(tempImage);
+                    }
+                    return of(service);
+                  })
+                );
+              }
+              else return of(null);
+            });
+      
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return services[i];
+              });
+            });
+          }
+          else return of([]);
+        })
+      );
+    }
+  }
+
   removeSearchServiceTag (tag) {
     const tagIndex = _.findIndex(this.searchServiceTags, function(t) { return t.tagId == tag.tagId; });
     
@@ -892,7 +1023,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -952,7 +1083,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         );
       }
       else {
-        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1016,7 +1147,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
   searchServiceIncludeTagsInSearchClick () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1076,7 +1207,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       );
     }
     else {
-      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1187,7 +1318,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
       
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
             switchMap(services => {
               if (services && services.length > 0){
                 let observables = services.map(service => {
@@ -1248,7 +1379,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         })
       ).subscribe();
 
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1317,7 +1448,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
             switchMap(services => {
               if (services && services.length > 0){
                 let observables = services.map(service => {
@@ -1378,7 +1509,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         })
       ).subscribe();
 
-      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
