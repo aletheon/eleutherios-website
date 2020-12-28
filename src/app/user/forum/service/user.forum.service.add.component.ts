@@ -73,6 +73,8 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   public matAutoCompleteSearchServiceTags: Observable<any[]>;
   public searchServiceResults: Observable<any[]> = of([]);
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
+  public paymentTypes: string[] = ['Any', 'Free', 'Payment'];
+  public currencies: string[] = ['AUD', 'BRL', 'GBP', 'BGN', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'ILS', 'JPY', 'MYR', 'MXN', 'TWD', 'NZD', 'NOK', 'PHP', 'PLN', 'RON', 'RUB', 'SGD', 'SEK', 'CHF', 'THB', 'USD'];
   public registrants: Observable<any[]>;
   public userServices: Observable<any[]>;
   public defaultRegistrant: any;

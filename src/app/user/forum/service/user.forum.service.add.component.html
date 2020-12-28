@@ -26,6 +26,62 @@
       </div>
       <!-- body -->
       <div style="flex:1">
+        <div style="margin-bottom:5px">
+          <!-- registrants -->
+          <h5 style="padding:0px">Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
+          <div style="display:flex;flex-direction:row">
+            <ng-container *ngIf="registrants | async;let registrantItems">
+              <ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
+              <ng-template #showregistrants>
+                <ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
+                  <ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
+                  <ng-template #showservice>
+                    <ng-container *ngIf="registrant.service | async;let service">
+                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-bottom:5px;flex-wrap:nowrap">
+                        <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+                        <ng-template #showdefaultserviceimage>
+                          <ng-container *ngIf="service.defaultServiceImage | async;let image">
+                            <div style="flex:none;margin-right:5px">
+                              <img [src]="image.url">
+                            </div>
+                          </ng-container>
+                        </ng-template>
+                        <p style="flex:1;margin-right:5px">
+                          <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+                          <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+                        </p>
+                        <div style="flex:none">
+                          <ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
+                          <ng-template #showforumowner>
+                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>  
+                          </ng-template>
+                          <ng-template #shownotforumowner>
+                            <ng-container *ngIf="auth.uid == service.uid; then showblockcontrol"></ng-container>
+                            <ng-template #showblockcontrol>
+                              <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
+                                <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+                              </mat-select>
+                            </ng-template>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </ng-template>
+                </ng-container>
+              </ng-template>
+              <ng-template #noregistrants>
+                <p style="flex:none;color:#999;font-size:90%">
+                  <i>No Services</i>
+                </p>
+              </ng-template>
+            </ng-container>
+          </div>
+          <!-- paging -->
+          <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+            <button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
+            <button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
+          </div>
+        </div>
         <!-- search -->
         <div style="border:1px solid rgb(160, 160, 160);padding:10px;border-radius:2px;margin-bottom:20px">
           <!-- service -->
@@ -154,62 +210,6 @@
                 </p>
               </ng-template>
             </ng-container>
-          </div>
-        </div>
-        <div>
-          <!-- registrants -->
-          <h5 style="padding:0px">Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
-          <div style="flex:1;display:flex;flex-direction:column">
-            <ng-container *ngIf="registrants | async;let registrantItems">
-              <ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
-              <ng-template #showregistrants>
-                <ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
-                  <ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
-                  <ng-template #showservice>
-                    <ng-container *ngIf="registrant.service | async;let service">
-                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-bottom:5px;flex-wrap:nowrap">
-                        <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-                        <ng-template #showdefaultserviceimage>
-                          <ng-container *ngIf="service.defaultServiceImage | async;let image">
-                            <div style="flex:none;margin-right:5px">
-                              <img [src]="image.url">
-                            </div>
-                          </ng-container>
-                        </ng-template>
-                        <p style="flex:1;margin-right:5px">
-                          <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
-                          <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
-                        </p>
-                        <div style="flex:none">
-                          <ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
-                          <ng-template #showforumowner>
-                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>  
-                          </ng-template>
-                          <ng-template #shownotforumowner>
-                            <ng-container *ngIf="auth.uid == service.uid; then showblockcontrol"></ng-container>
-                            <ng-template #showblockcontrol>
-                              <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
-                                <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-                              </mat-select>
-                            </ng-template>
-                          </ng-template>
-                        </div>
-                      </div>
-                    </ng-container>
-                  </ng-template>
-                </ng-container>
-              </ng-template>
-              <ng-template #noregistrants>
-                <p style="flex:none;color:#999;font-size:90%">
-                  <i>No Services</i>
-                </p>
-              </ng-template>
-            </ng-container>
-          </div>
-          <!-- paging -->
-          <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
-            <button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
-            <button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
           </div>
         </div>
       </div>
