@@ -108,9 +108,6 @@ ii.   go to http://localhost:4200/
 
 ### 5. Contribute
 
-Discuss or provide feedback.
-https://www.facebook.com/groups/2982366048442234/
-
 Help fix bugs or resolve issues.
 https://github.com/aletheon/eleutherios-website/issues
 
