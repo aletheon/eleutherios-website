@@ -105,9 +105,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       if(this._loading.getValue() == false) {
         clearInterval(intervalId);
 
-        // delay the loading of the card element to allow
-        // for the seller service to load, and provide us with the
-        // connected (merchant) account
+        // delay the loading of the card element to allow for the seller service to load, and provide us with the connected (merchant) account
+        // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5
         this._loadCardListener.subscribe(result => {
           if (result == true){
             this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
@@ -186,121 +185,117 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   pay(){
-    const snackBarRef = this.snackbar.openFromComponent(
-      NotificationSnackBar,
-      {
-        duration: 8000,
-        data: 'The payment gateway system is still being implemented',
-        panelClass: ['red-snackbar']
-      }
-    );
+    // const snackBarRef = this.snackbar.openFromComponent(
+    //   NotificationSnackBar,
+    //   {
+    //     duration: 8000,
+    //     data: 'The payment gateway system is still being implemented',
+    //     panelClass: ['red-snackbar']
+    //   }
+    // );
 
+     
+    this.showSpinner = true;
+    this.hidePaymentButton = true;
 
-    // var stripe = Stripe(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
-    // this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
+    if (this._paymentIntent){
+      console.log('got a payment intent ' + this._paymentIntent.id);
 
-    // // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5 
-    // this.showSpinner = true;
-    // this.hidePaymentButton = true;
+      this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+        payment_method: {
+          card: this.card,
+          billing_details: {
+            name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
+            email: this._user.email
+          },
+        }
+      })
+      .subscribe((result) => {
+        console.log('confirmCardPayment result ' + JSON.stringify(result));
 
-    // if (this._paymentIntent){
-    //   console.log('got a payment intent ' + this._paymentIntent.id);
+        if (result.error) {
+          // Show error to your customer (e.g., insufficient funds)
+          console.log(result.error.message);
+        } else {
+          // The payment has been processed!
+          // if (result.paymentIntent.status === 'succeeded') {
+          //   // Show a success message to your customer
+          // }
+          console.log('status ' + result.paymentIntent.status);
+        }
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
+    }
+    else {
+      const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+      createPaymentIntent({
+        sellerUid: this.serviceGroup.get('uid').value,
+        sellerServiceId: this.serviceGroup.get('serviceId').value,
+        buyerUid: this.userServicesCtrl.value.uid,
+        buyerServiceId: this.userServicesCtrl.value.serviceId
+      }).then(result => {
+        console.log('created paymentIntent result ' + JSON.stringify(result));
 
-    //   this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-    //     payment_method: {
-    //       card: this.card,
-    //       billing_details: {
-    //         name: this._user.displayName,
-    //         email: this._user.email
-    //       },
-    //     }
-    //   })
-    //   .subscribe((result) => {
-    //     console.log('confirmCardPayment result ' + JSON.stringify(result));
+        if (result){
+          this._paymentIntent = result.data;
 
-    //     if (result.error) {
-    //       // Show error to your customer (e.g., insufficient funds)
-    //       console.log(result.error.message);
-    //     } else {
-    //       // The payment has been processed!
-    //       // if (result.paymentIntent.status === 'succeeded') {
-    //       //   // Show a success message to your customer
-    //       // }
-    //       console.log('status ' + result.paymentIntent.status);
-    //     }
-    //     this.showSpinner = false;
-    //     this.hidePaymentButton = false;
-    //   });
-    // }
-    // else {
-    //   const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-    //   createPaymentIntent({
-    //     sellerUid: this.serviceGroup.get('uid').value,
-    //     sellerServiceId: this.serviceGroup.get('serviceId').value,
-    //     buyerUid: this.userServicesCtrl.value.uid,
-    //     buyerServiceId: this.userServicesCtrl.value.serviceId
-    //   }).then(result => {
-    //     console.log('created paymentIntent result ' + JSON.stringify(result));
+          this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+            payment_method: {
+              card: this.card,
+              billing_details: {
+                name: this._user.displayName,
+                email: this._user.email
+              },
+            },
+          })
+          .subscribe((result) => {
+            console.log('confirmCardPayment result ' + JSON.stringify(result));
 
-    //     if (result){
-    //       this._paymentIntent = result.data;
+            if (result.error) {
+              // Show error to your customer (e.g., insufficient funds)
+              console.log(result.error.message);
+            } else {
+              // The payment has been processed!
+              console.log('status ' + result.paymentIntent.status);
 
-    //       this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-    //         payment_method: {
-    //           card: this.card,
-    //           billing_details: {
-    //             name: this._user.displayName,
-    //             email: this._user.email
-    //           },
-    //         },
-    //       })
-    //       .subscribe((result) => {
-    //         console.log('confirmCardPayment result ' + JSON.stringify(result));
+              if (result.paymentIntent.status === 'succeeded') {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Success!',
+                    panelClass: ['green-snackbar']
+                  }
+                );
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'An unknown problem occurred status ' + result.paymentIntent.status,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }  
+            }
+            this.showSpinner = false;
+            this.hidePaymentButton = false;
+          });
+        }
+        else {
+          this.showSpinner = false;
+          this.hidePaymentButton = false;
+        }
+      })
+      .catch(error => {
+        console.error(error);
 
-    //         if (result.error) {
-    //           // Show error to your customer (e.g., insufficient funds)
-    //           console.log(result.error.message);
-    //         } else {
-    //           // The payment has been processed!
-    //           console.log('status ' + result.paymentIntent.status);
-
-    //           if (result.paymentIntent.status === 'succeeded') {
-    //             const snackBarRef = this.snackbar.openFromComponent(
-    //               NotificationSnackBar,
-    //               {
-    //                 duration: 8000,
-    //                 data: 'Success!',
-    //                 panelClass: ['green-snackbar']
-    //               }
-    //             );
-    //           }
-    //           else {
-    //             const snackBarRef = this.snackbar.openFromComponent(
-    //               NotificationSnackBar,
-    //               {
-    //                 duration: 8000,
-    //                 data: 'An unknown problem occurred status ' + result.paymentIntent.status,
-    //                 panelClass: ['red-snackbar']
-    //               }
-    //             );
-    //           }  
-    //         }
-    //         this.showSpinner = false;
-    //         this.hidePaymentButton = false;
-    //       });
-    //     }
-    //     else {
-    //       this.showSpinner = false;
-    //       this.hidePaymentButton = false;
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-
-    //     this.showSpinner = false;
-    //     this.hidePaymentButton = false;
-    //   });
-    // }
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
+    }
   }
 
   ngOnInit () {
