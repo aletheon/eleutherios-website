@@ -1099,7 +1099,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
       this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
         if (service){
-          this._initialServiceSubscription.unsubscribe();   /// HERE ROB FIX ALL THESE!
+          this._initialServiceSubscription.unsubscribe();
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;
@@ -1122,8 +1122,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   private initForm () {
     const that = this;
-    console.log('initForm');
-
+    
     this.serviceGroup = this.fb.group({
       serviceId:                      [''],
       uid:                            [''],
