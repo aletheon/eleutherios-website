@@ -90,6 +90,26 @@
             <div style="flex:none">
               <mat-error id="card-errors"></mat-error>
             </div>
+
+            <!-- HERE ROB ADD USER/PAYMENT/VIEW -->
+
+            <!-- <ng-container *ngIf="payment | async; then showpayment"></ng-container>
+            <ng-template #showpayment>
+              <ng-container *ngIf="payment | async;let paymentItem">
+                <ng-container *ngIf="paymentItem.status == 'Pending">
+                  <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+                    <span style="flex:none;margin-right:5px" class="label label-warning">Pending</span>
+                    <a [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: paymentItem.paymentId }" style="flex:none;color:#1B1B1B" matTooltip="View payment">{{ paymentItem.paymentId }}</a>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="paymentItem.status == 'Success">
+                  <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+                    <span style="flex:none;margin-right:5px" class="label label-success">Success</span>
+                    <a [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: paymentItem.paymentId }" style="flex:none;color:#1B1B1B" matTooltip="View payment">{{ paymentItem.paymentId }}</a>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </ng-template> -->
           </div>
         </ng-container>
       </div>

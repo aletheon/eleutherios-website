@@ -146,76 +146,76 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
 
     console.log('event ' + JSON.stringify(event));
 
-    switch (event.type) {
-      case 'payment_intent.created':
-        console.log('payment_intent.created');
+    // switch (event.type) {
+    //   case 'payment_intent.created':
+    //     console.log('payment_intent.created');
 
-        intent = event.data.object;
-        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
-        // update payment
-        const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
-        const createPaymentRef = createPaymentSnapshot.ref;
-        const payment = createPaymentSnapshot.data();
-        await createPaymentRef.update({ status: 'Pending' });
+    //     // update payment
+    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const createPaymentRef = createPaymentSnapshot.ref;
+    //     const payment = createPaymentSnapshot.data();
+    //     await createPaymentRef.update({ status: 'Pending' });
 
-        // create receipt
-        const receiptId = uuid.v4().replace(/-/g, '');
-        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
-          receiptId: receiptId,
-          paymentId: payment.paymentId,
-          amount: payment.amount,
-          currency: payment.currency,
-          title: payment.title,
-          description: payment.description,
-          quantity: payment.quantity,
-          status: 'Pending',
-          buyerUid: payment.buyerUid,
-          buyerServiceId: payment.buyerServiceId,
-          sellerUid: payment.sellerUid,
-          sellerServiceId: payment.sellerServiceId,
-          paymentIntent: intent,
-          lastUpdateDate: FieldValue.serverTimestamp(),
-          creationDate: FieldValue.serverTimestamp()
-        });
-        break;
-      case 'payment_intent.succeeded':
-        console.log('payment_intent.succeeded');
+    //     // create receipt
+    //     const receiptId = uuid.v4().replace(/-/g, '');
+    //     await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
+    //       receiptId: receiptId,
+    //       paymentId: payment.paymentId,
+    //       amount: payment.amount,
+    //       currency: payment.currency,
+    //       title: payment.title,
+    //       description: payment.description,
+    //       quantity: payment.quantity,
+    //       status: 'Pending',
+    //       buyerUid: payment.buyerUid,
+    //       buyerServiceId: payment.buyerServiceId,
+    //       sellerUid: payment.sellerUid,
+    //       sellerServiceId: payment.sellerServiceId,
+    //       paymentIntent: intent,
+    //       lastUpdateDate: FieldValue.serverTimestamp(),
+    //       creationDate: FieldValue.serverTimestamp()
+    //     });
+    //     break;
+    //   case 'payment_intent.succeeded':
+    //     console.log('payment_intent.succeeded');
 
-        intent = event.data.object;
-        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
-        // update payment
-        const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
-        const successPaymentRef = successPaymentSnapshot.ref;
-        const successPayment = successPaymentSnapshot.data();
-        await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     // update payment
+    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const successPaymentRef = successPaymentSnapshot.ref;
+    //     const successPayment = successPaymentSnapshot.data();
+    //     await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
 
-        // update receipt
-        const successReceiptSnapshot = await admin.firestore().collection(`users/${successPayment.sellerUid}/receipts`).doc(successPayment.receiptId).get();
-        const successReceiptRef = successReceiptSnapshot.ref;
-        await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
-        break;
-      case 'payment_intent.payment_failed':
-        console.log('payment_intent.payment_failed');
+    //     // update receipt
+    //     const successReceiptSnapshot = await admin.firestore().collection(`users/${successPayment.sellerUid}/receipts`).doc(successPayment.receiptId).get();
+    //     const successReceiptRef = successReceiptSnapshot.ref;
+    //     await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     break;
+    //   case 'payment_intent.payment_failed':
+    //     console.log('payment_intent.payment_failed');
 
-        intent = event.data.object;
-        metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
         
-        // update payment
-        const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
-        const failPaymentRef = failPaymentSnapshot.ref;
-        const failPayment = failPaymentSnapshot.data();
-        await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     // update payment
+    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const failPaymentRef = failPaymentSnapshot.ref;
+    //     const failPayment = failPaymentSnapshot.data();
+    //     await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
 
-        // update receipt
-        const failReceiptSnapshot = await admin.firestore().collection(`users/${failPayment.sellerUid}/receipts`).doc(failPayment.receiptId).get();
-        const failReceiptRef = failReceiptSnapshot.ref;
-        await failReceiptRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
-        break;
-      default:
-        console.log('got unknown type ' + event.type);
-    }
+    //     // update receipt
+    //     const failReceiptSnapshot = await admin.firestore().collection(`users/${failPayment.sellerUid}/receipts`).doc(failPayment.receiptId).get();
+    //     const failReceiptRef = failReceiptSnapshot.ref;
+    //     await failReceiptRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     break;
+    //   default:
+    //     console.log('got unknown type ' + event.type);
+    // }
     return res.json({ received: true });
   }
   catch (error) {
@@ -282,10 +282,31 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       // customer making this payment
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
             
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        // create receipt
+        const receiptId = uuid.v4().replace(/-/g, '');
+        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
+          receiptId: receiptId,
+          paymentId: payment.paymentId,
+          amount: payment.amount,
+          currency: payment.currency,
+          title: payment.title,
+          description: payment.description,
+          quantity: payment.quantity,
+          status: 'Pending',
+          buyerUid: payment.buyerUid,
+          buyerServiceId: payment.buyerServiceId,
+          sellerUid: payment.sellerUid,
+          sellerServiceId: payment.sellerServiceId,
+          paymentIntent: payment.paymentIntent,
+          lastUpdateDate: FieldValue.serverTimestamp(),
+          creationDate: FieldValue.serverTimestamp()
+        });
       }
       return res.json({ received: true });
     }
@@ -298,10 +319,18 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       // customer making this payment
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
             
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        // receipt of seller receiving this payment
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).where('paymentId', '==', payment.paymentId).limit(1).get();
+
+        if (userReceiptSnapshot.size > 0){
+          await snapshot.docs[0].ref.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+        }
       }
       return res.json({ received: true });
     }
@@ -314,10 +343,18 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       // customer making this payment
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
             
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        // receipt of seller receiving this payment
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).where('paymentId', '==', payment.paymentId).limit(1).get();
+
+        if (userReceiptSnapshot.size > 0){
+          await snapshot.docs[0].ref.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
+        }
       }
       return res.json({ received: true });
     }

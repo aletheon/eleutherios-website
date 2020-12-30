@@ -225,8 +225,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             // The payment has been processed!
             console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
   
-            // this._paymentIntent
-            this.payment = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId);
+            // subscribe to the payment
+            this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+              this.payment = of(payment);
+            });
   
             if (result.paymentIntent.status === 'succeeded') {
               // 1) fetch+show payment link to end user for this transaction
@@ -294,8 +296,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 // The payment has been processed!
                 console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
       
-                // this._paymentIntent
-                this.payment = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId);
+                // subscribe to the payment
+                this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+                  this.payment = of(payment);
+                });
       
                 if (result.paymentIntent.status === 'succeeded') {
                   // 1) fetch+show payment link to end user for this transaction

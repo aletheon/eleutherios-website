@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UserPaymentNewComponent } from './new/user.payment.new.component';
+import { UserPaymentViewComponent } from './view/user.payment.view.component';
 
 import { StripeService } from 'ngx-stripe';
 import {
@@ -38,7 +39,8 @@ import {
     AppRoutingModule
   ],
   declarations: [
-    UserPaymentNewComponent
+    UserPaymentNewComponent,
+    UserPaymentViewComponent
   ],
   providers: [
     StripeService,
