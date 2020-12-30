@@ -193,7 +193,6 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     //     panelClass: ['red-snackbar']
     //   }
     // );
-
      
     this.showSpinner = true;
     this.hidePaymentButton = true;
