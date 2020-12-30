@@ -1,7 +1,7 @@
 export interface Payment {
   paymentId: string,
   uid: string, // id of user creating this payment
-  receiptId: string,
+  receiptId: string, // associated receipt for the seller receiving this payment
   amount: number, // amount to pay
   currency: string, // [usd, nzd, aud etc]
   title: string, // title of product/service

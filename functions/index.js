@@ -285,11 +285,11 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var payment = paymentSnapshot.data();
             
       if (paymentSnapshot.exists){
-        // change status to pending to inform user we have received their payment and awaiting their payment
-        await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
-
         // create receipt
         const receiptId = uuid.v4().replace(/-/g, '');
+
+        // Set receiptId and change status to pending to inform user we have received their payment
+        await paymentRef.update({ status: 'Pending', receiptId: receiptId, lastUpdateDate: FieldValue.serverTimestamp() });
         await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
           receiptId: receiptId,
           paymentId: payment.paymentId,
@@ -324,13 +324,11 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+        
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
 
-        // receipt of seller receiving this payment
-        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).where('paymentId', '==', payment.paymentId).limit(1).get();
-
-        if (userReceiptSnapshot.size > 0){
-          await snapshot.docs[0].ref.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
-        }
+        if (userReceiptSnapshot.exists)
+          await userReceiptSnapshot.ref.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
     }
@@ -349,12 +347,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
 
-        // receipt of seller receiving this payment
-        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).where('paymentId', '==', payment.paymentId).limit(1).get();
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
 
-        if (userReceiptSnapshot.size > 0){
-          await snapshot.docs[0].ref.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
-        }
+        if (userReceiptSnapshot.exists)
+          await userReceiptSnapshot.ref.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
     }

@@ -308,7 +308,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: `Congratulations your payment ${this.serviceGroup.get('currency').value} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
+                      data: `Congratulations your payment of ${this.serviceGroup.get('currency').value.toUpperCase()} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
                       panelClass: ['green-snackbar']
                     }
                   );
