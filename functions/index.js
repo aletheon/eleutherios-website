@@ -245,9 +245,6 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
-
-        console.log('account ' + JSON.stringify(account));
-
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
@@ -260,9 +257,6 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
-
-        console.log('account ' + JSON.stringify(account));
-
         await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
@@ -275,9 +269,6 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
-
-        console.log('account ' + JSON.stringify(account));
-
         await userRef.update({ stripeOnboardingStatus: account.charges_enabled ? 'Authorized' : 'Pending', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
       }
       return res.json({ received: true });
@@ -287,10 +278,15 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-      var account = await stripe.accounts.retrieve(event.account);
 
-      console.log('account ' + JSON.stringify(account));
-
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+            
+      if (paymentSnapshot.exists){
+        // change status to pending to inform user we have received their payment and awaiting their payment
+        await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.succeeded'){
@@ -298,10 +294,15 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-      var account = await stripe.accounts.retrieve(event.account);
 
-      console.log('account ' + JSON.stringify(account));
-
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+            
+      if (paymentSnapshot.exists){
+        // change status to pending to inform user we have received their payment and awaiting their payment
+        await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
@@ -309,10 +310,15 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
-      var account = await stripe.accounts.retrieve(event.account);
-      
-      console.log('account ' + JSON.stringify(account));
 
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+            
+      if (paymentSnapshot.exists){
+        // change status to pending to inform user we have received their payment and awaiting their payment
+        await paymentRef.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
       return res.json({ received: true });
     }
     else {
@@ -353,7 +359,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     
     const newPayment = {
       paymentId: uuid.v4().replace(/-/g, ''),
-      uid: userId,
+      uid: buyerUid,
       receiptId: '',
       amount: sellerService.amount,
       currency: sellerService.currency,
@@ -372,7 +378,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
     console.log('newPayment ' + JSON.stringify(newPayment));
 
-    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).doc(newPayment.paymentId).get();
+    const paymentSnapshot = await admin.firestore().collection(`users/${newPayment.uid}/payments`).doc(newPayment.paymentId).get();
     const paymentRef = paymentSnapshot.ref;
     await paymentRef.set(newPayment);
 

@@ -197,127 +197,150 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     this.showSpinner = true;
     this.hidePaymentButton = true;
 
-    if (this._paymentIntent){
-      console.log('got a payment intent ' + this._paymentIntent.id);
-
-      this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-        payment_method: {
-          card: this.card,
-          billing_details: {
-            name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
-            email: this._user.email
-          },
-        }
-      })
-      .subscribe((result) => {
-        if (result.error) {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: result.error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-        }
-        else {
-          // The payment has been processed!
-          if (result.paymentIntent.status === 'succeeded') {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Success',
-                panelClass: ['green-snackbar']
-              }
-            );
+    try {
+      if (this._paymentIntent){
+        console.log('got a payment intent ' + this._paymentIntent.id);
+  
+        this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+          payment_method: {
+            card: this.card,
+            billing_details: {
+              name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
+              email: this._user.email
+            },
           }
-          else {
+        })
+        .subscribe((result) => {
+          if (result.error) {
             const snackBarRef = this.snackbar.openFromComponent(
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: result.paymentIntent.status,
+                data: result.error.message,
                 panelClass: ['red-snackbar']
               }
             );
           }
-        }
-        this.showSpinner = false;
-        this.hidePaymentButton = false;
-      });
-    }
-    else {
-      const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-      createPaymentIntent({
-        sellerUid: this.serviceGroup.get('uid').value,
-        sellerServiceId: this.serviceGroup.get('serviceId').value,
-        buyerUid: this.userServicesCtrl.value.uid,
-        buyerServiceId: this.userServicesCtrl.value.serviceId
-      }).then(result => {
-        console.log('created paymentIntent result ' + JSON.stringify(result));
-
-        if (result){
-          this._paymentIntent = result.data;
-
-          this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-            payment_method: {
-              card: this.card,
-              billing_details: {
-                name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
-                email: this._user.email
-              },
-            },
-          })
-          .subscribe((result) => {
-            if (result.error) {
+          else {
+            // The payment has been processed!
+            console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
+  
+            // this._paymentIntent
+            this.payment = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId);
+  
+            if (result.paymentIntent.status === 'succeeded') {
+              // 1) fetch+show payment link to end user for this transaction
+              // 2) show success message
               const snackBarRef = this.snackbar.openFromComponent(
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: result.error.message,
-                  panelClass: ['red-snackbar']
+                  data: `Congratulations your payment ${this.serviceGroup.get('currency').value} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
+                  panelClass: ['green-snackbar']
                 }
               );
             }
             else {
-              // The payment has been processed!
-              if (result.paymentIntent.status === 'succeeded') {
+              // 1) fetch+show pending link to end user for this transaction
+              // 2) show pending message
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: result.paymentIntent.status,
+                  panelClass: ['red-snackbar']
+                }
+              );
+            }
+          }
+          this.showSpinner = false;
+          this.hidePaymentButton = false;
+        });
+      }
+      else {
+        const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+        createPaymentIntent({
+          sellerUid: this.serviceGroup.get('uid').value,
+          sellerServiceId: this.serviceGroup.get('serviceId').value,
+          buyerUid: this.userServicesCtrl.value.uid,
+          buyerServiceId: this.userServicesCtrl.value.serviceId
+        }).then(result => {
+          console.log('created paymentIntent result ' + JSON.stringify(result));
+  
+          if (result){
+            this._paymentIntent = result.data;
+  
+            this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+              payment_method: {
+                card: this.card,
+                billing_details: {
+                  name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
+                  email: this._user.email
+                },
+              },
+            })
+            .subscribe((result) => {
+              if (result.error) {
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: 'Success',
-                    panelClass: ['green-snackbar']
-                  }
-                );
-              }
-              else {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: result.paymentIntent.status,
+                    data: result.error.message,
                     panelClass: ['red-snackbar']
                   }
                 );
               }
-            }
+              else {
+                // The payment has been processed!
+                console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
+      
+                // this._paymentIntent
+                this.payment = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId);
+      
+                if (result.paymentIntent.status === 'succeeded') {
+                  // 1) fetch+show payment link to end user for this transaction
+                  // 2) show success message
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: `Congratulations your payment ${this.serviceGroup.get('currency').value} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
+                      panelClass: ['green-snackbar']
+                    }
+                  );
+                }
+                else {
+                  // 1) fetch+show pending link to end user for this transaction
+                  // 2) show pending message
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: result.paymentIntent.status,
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                }
+              }
+              this.showSpinner = false;
+              this.hidePaymentButton = false;
+            });
+          }
+          else {
             this.showSpinner = false;
             this.hidePaymentButton = false;
-          });
-        }
-        else {
+          }
+        })
+        .catch(error => {
+          console.error(error);
+  
           this.showSpinner = false;
           this.hidePaymentButton = false;
-        }
-      })
-      .catch(error => {
-        console.error(error);
-
-        this.showSpinner = false;
-        this.hidePaymentButton = false;
-      });
+        });
+      }
+    }
+    catch (error) {
+      throw error;
     }
   }
 
