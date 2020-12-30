@@ -210,17 +210,38 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
       })
       .subscribe((result) => {
-        console.log('confirmCardPayment result ' + JSON.stringify(result));
-
         if (result.error) {
-          // Show error to your customer (e.g., insufficient funds)
-          console.log(result.error.message);
-        } else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: result.error.message,
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+        else {
           // The payment has been processed!
-          // if (result.paymentIntent.status === 'succeeded') {
-          //   // Show a success message to your customer
-          // }
-          console.log('status ' + result.paymentIntent.status);
+          if (result.paymentIntent.status === 'succeeded') {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Success',
+                panelClass: ['green-snackbar']
+              }
+            );
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: result.paymentIntent.status,
+                panelClass: ['red-snackbar']
+              }
+            );
+          }
         }
         this.showSpinner = false;
         this.hidePaymentButton = false;
@@ -243,27 +264,30 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             payment_method: {
               card: this.card,
               billing_details: {
-                name: this._user.displayName,
+                name: `${this.serviceGroup.get('title').value} + #${this.serviceGroup.get('serviceId').value}`,
                 email: this._user.email
               },
             },
           })
           .subscribe((result) => {
-            console.log('confirmCardPayment result ' + JSON.stringify(result));
-
             if (result.error) {
-              // Show error to your customer (e.g., insufficient funds)
-              console.log(result.error.message);
-            } else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: result.error.message,
+                  panelClass: ['red-snackbar']
+                }
+              );
+            }
+            else {
               // The payment has been processed!
-              console.log('status ' + result.paymentIntent.status);
-
               if (result.paymentIntent.status === 'succeeded') {
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: 'Success!',
+                    data: 'Success',
                     panelClass: ['green-snackbar']
                   }
                 );
@@ -273,11 +297,11 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: 'An unknown problem occurred status ' + result.paymentIntent.status,
+                    data: result.paymentIntent.status,
                     panelClass: ['red-snackbar']
                   }
                 );
-              }  
+              }
             }
             this.showSpinner = false;
             this.hidePaymentButton = false;
