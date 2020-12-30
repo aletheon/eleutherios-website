@@ -205,7 +205,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
           payment_method: {
             card: this.card,
             billing_details: {
-              name: `#${this.serviceGroup.get('serviceId').value} ${this.serviceGroup.get('title').value}`,
+              name: `PaymentId ${this._paymentIntent.metadata.paymentId}`,
               email: this._user.email
             },
           }
@@ -276,7 +276,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
               payment_method: {
                 card: this.card,
                 billing_details: {
-                  name: `#${this.serviceGroup.get('serviceId').value} ${this.serviceGroup.get('title').value}`,
+                  name: `PaymentId ${this._paymentIntent.metadata.paymentId}`,
                   email: this._user.email
                 },
               },
