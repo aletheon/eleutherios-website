@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or marketplace, where people or businesses can serve one another, through the same forum, customer request or conversation.
 
-For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner could gather the food from their store and charge the customer directly or wait until the goods we're delivered.  The person could have the groceries delivered by scaling the forum and creating a sub-forum for a delivery service.  The delivery service, could scale the forum again and create another sub-forum, for a healthcare worker to be the person, that delivers the food to the quarantined person.
+For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner could gather the food from their store and charge the customer directly or wait until the goods we're delivered.  The person could have the groceries delivered by scaling the forum and creating a sub-forum for a delivery service.  The delivery service could scale the forum again and create another sub-forum, for a healthcare worker to be the person that delivers the food to the quarantined person.
 
 ```bash
 Forum (Food)
@@ -16,7 +16,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or serializing the forum, customer request or conversation, that services (people or business) are having about food, not the service or work, that they are trying to provide or perform. People or businesses, still provide or perform the same service or work in the world, but within the relevant forum or conversation.
+In this example, Eleutherios is scaling or serializing the forum, customer request or conversation, that services (people or business) are having about food.  Not the service or work, that they are trying to provide or perform. People or businesses, still provide or perform the same service or work in the world, but within the relevant forum or conversation.
 
 #### Features:
 
