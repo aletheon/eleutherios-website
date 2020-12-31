@@ -8,108 +8,17 @@
   <loading-spinner *ngIf="loading | async"></loading-spinner>
   <div *ngIf="!(loading | async)" style="flex:1;display:flex;flex-direction:column">
     <ng-container *ngIf="payments | async;let paymentItems">
-
-      <!-- here rob convert over to payments list -->
-
-
-      <ng-container *ngIf="serviceItems.length > 0; then showservices else noservices"></ng-container>
-      <ng-template #showservices>
-        <ng-container *ngFor="let service of serviceItems; trackBy: trackServices">
-          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
-            <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-              <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-              <ng-template #showdefaultserviceimage>
-                <ng-container *ngIf="service.defaultServiceImage | async;let image">
-                  <div style="flex:none;margin-right:10px">
-                    <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-                    <ng-template #showimage>
-                      <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="cursor:pointer">
-                    </ng-template>
-                    <ng-template #noimage>
-                      <img [src]="image.url">
-                    </ng-template>
-                  </div>
-                </ng-container>
-              </ng-template>
-              <div style="flex:1;margin-right:5px">
-                <p style="word-break: break-all">
-                  <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
-                </p>
-              </div>
-              <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-                <!-- other button controls -->
-                <div style="flex:none;margin-right:5px">
-                  <star-rating-control
-                      [rating]="service.rate"
-                      [showHalfStars]="true"
-                      [starType]="'svg'"
-                      [readOnly]="true">
-                    </star-rating-control>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <ng-container *ngIf="service.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
-                  <ng-template #showpublictype>
-                    <mat-icon onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
-                  </ng-template>
-                  <ng-template #showprivatetype>
-                    <mat-icon onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
-                  </ng-template>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-icon onclick="event.stopPropagation()" (click)="delete(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-checkbox *ngIf="service.title.length > 0" matTooltip="Index" [checked]="service.indexed" (change)="indexDeindexService(service)"></mat-checkbox>
-                  <mat-checkbox *ngIf="service.title.length == 0" matTooltip="Index" [checked]="service.indexed" disabled="true"></mat-checkbox>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Add forum">add_box</mat-icon>
-                </div>
-                <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add_circle</mat-icon>
-                </div>
-              </div>
-            </div>
-            <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
-              <div style="flex:none;display:flex;flex-direction:row">
-                <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-                <ng-template #showtags>
-                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
-                    <ng-container *ngFor="let serviceTag of serviceTagItems">
-                      <span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
-                    </ng-container>
-                  </div>
-                </ng-template>
-                <ng-container *ngIf="service.paymentType == 'Payment'">
-                  <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
-                  <ng-template #showtagswithpayment>
-                    <div style="flex:none">
-                      <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                    </div>
-                  </ng-template>
-                  <ng-template #showtagswithoutpayment>
-                    <div style="flex:1;text-align:right">
-                      <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                    </div>
-                  </ng-template>
-                </ng-container>
-              </div>
-            </ng-container>
+      <ng-container *ngIf="paymentItems.length > 0; then showpayments else nopayments"></ng-container>
+      <ng-template #showpayments>
+        <ng-container *ngFor="let payment of paymentItems; trackBy: trackPayments">
+          <div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
+            <a [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="color:#1B1B1B" matTooltip="{{ payment.paymentId }}">{{ payment.paymentId }}</a>
           </div>
         </ng-container>
       </ng-template>
-      <ng-template #noservices>
+      <ng-template #nopayments>
         <p style="flex:none;color:#999;font-size:90%">
-          <i>No Services</i>
+          <i>No Payments</i>
         </p>
       </ng-template>
     </ng-container>
