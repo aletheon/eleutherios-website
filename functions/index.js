@@ -411,7 +411,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
     const paymentSnapshot = await admin.firestore().collection(`users/${newPayment.uid}/payments`).doc(newPayment.paymentId).get();
     const paymentRef = paymentSnapshot.ref;
-    await paymentRef.set(newPayment);
+    const paymentSet = await paymentRef.set(newPayment);
 
     console.log('seller.stripeAccountId ' + seller.stripeAccountId);
 
@@ -425,7 +425,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     });
     console.log('paymentIntent ' + JSON.stringify(paymentIntent));
 
-    await paymentRef.update({ paymentIntent: paymentIntent });
+    const paymentUpdate = await paymentRef.update({ paymentIntent: paymentIntent });
     return Promise.resolve(paymentIntent);
   }
   catch (error) {

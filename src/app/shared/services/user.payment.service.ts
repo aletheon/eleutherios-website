@@ -65,4 +65,11 @@ export class UserPaymentService {
     const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(paymentId);
     return paymentRef.delete();
   }
+
+  public getPayments (parentUserId: string, numberOfItems: number, key?: any): Observable<any[]> {
+    if (!key)
+      return this.afs.collection<any>(`users/${parentUserId}/payments`, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1)).valueChanges();
+    else
+      return this.afs.collection<any>(`users/${parentUserId}/payments`, ref => ref.orderBy('creationDate','desc').startAt(key.toLowerCase()).limit(numberOfItems+1)).valueChanges();
+  }
 }

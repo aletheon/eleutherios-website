@@ -53,6 +53,7 @@ export class HeaderComponent implements OnInit {
               this.userTotal = of(total);
             else {
               let total = {
+                activityCount: 0,
                 forumCount: 0,
                 serviceCount: 0,
                 notificationCount: 0,
@@ -66,7 +67,11 @@ export class HeaderComponent implements OnInit {
                 forumBlockCount: 0,
                 serviceBlockCount: 0,
                 forumUserBlockCount: 0,
-                serviceUserBlockCount: 0
+                serviceUserBlockCount: 0,
+                paymentCount: 0,
+                receiptCount: 0,
+                paymentAmount: 0,
+                receiptAmount: 0
               };
               this.userTotal = of(total);
             }
