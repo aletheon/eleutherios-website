@@ -286,12 +286,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
             
       if (paymentSnapshot.exists){
         // create receipt
-        const receiptId = uuid.v4().replace(/-/g, '');
-
         // Set receiptId and change status to pending to inform user we have received their payment
-        await paymentRef.update({ status: 'Pending', receiptId: receiptId, lastUpdateDate: FieldValue.serverTimestamp() });
-        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
-          receiptId: receiptId,
+        await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).set({
+          receiptId: payment.receiptId,
           paymentId: payment.paymentId,
           amount: payment.amount,
           currency: payment.currency,
@@ -393,7 +391,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const newPayment = {
       paymentId: uuid.v4().replace(/-/g, ''),
       uid: buyerUid,
-      receiptId: '',
+      receiptId: uuid.v4().replace(/-/g, ''),
       amount: sellerService.amount,
       currency: sellerService.currency,
       title: sellerService.title,

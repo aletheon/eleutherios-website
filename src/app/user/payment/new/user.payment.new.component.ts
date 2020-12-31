@@ -197,154 +197,184 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     this.showSpinner = true;
     this.hidePaymentButton = true;
 
-    try {
-      if (this._paymentIntent){
-        console.log('got a payment intent ' + this._paymentIntent.id);
-  
-        this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-          payment_method: {
-            card: this.card,
-            billing_details: {
-              name: `Eleutherios PaymentId: ${this._paymentIntent.metadata.paymentId}`,
-              email: this._user.email
-            },
-          }
-        })
-        .subscribe((result) => {
-          if (result.error) {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: result.error.message,
-                panelClass: ['red-snackbar']
-              }
-            );
-          }
-          else {
-            // The payment has been processed!
-            console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
-  
-            // subscribe to the payment
-            this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
-              this.payment = of(payment);
-            });
-  
-            if (result.paymentIntent.status === 'succeeded') {
-              // 1) fetch+show payment link to end user for this transaction
-              // 2) show success message
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: `Congratulations your payment ${this.serviceGroup.get('currency').value} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
-                  panelClass: ['green-snackbar']
-                }
-              );
+    if (this._paymentIntent){
+      console.log('got a payment intent ' + this._paymentIntent.id);
+
+      this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
+        if (tempPayment){
+          console.log('got payment ' + JSON.stringify(tempPayment));
+
+          this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+            payment_method: {
+              card: this.card,
+              billing_details: {
+                name: `ReceiptId: ${tempPayment.receiptId}`,
+                email: this._user.email
+              },
             }
-            else {
-              // 1) fetch+show pending link to end user for this transaction
-              // 2) show pending message
+          })
+          .subscribe((result) => {
+            if (result.error) {
+              this.showSpinner = false;
+              this.hidePaymentButton = false;
+
               const snackBarRef = this.snackbar.openFromComponent(
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: result.paymentIntent.status,
+                  data: result.error.message,
                   panelClass: ['red-snackbar']
                 }
               );
             }
-          }
-          this.showSpinner = false;
-          this.hidePaymentButton = false;
-        });
-      }
-      else {
-        const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
-        createPaymentIntent({
-          sellerUid: this.serviceGroup.get('uid').value,
-          sellerServiceId: this.serviceGroup.get('serviceId').value,
-          buyerUid: this.userServicesCtrl.value.uid,
-          buyerServiceId: this.userServicesCtrl.value.serviceId
-        }).then(result => {
-          console.log('created paymentIntent result ' + JSON.stringify(result));
-  
-          if (result){
-            this._paymentIntent = result.data;
-  
-            this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
-              payment_method: {
-                card: this.card,
-                billing_details: {
-                  name: `Eleutherios PaymentId: ${this._paymentIntent.metadata.paymentId}`,
-                  email: this._user.email
-                },
-              },
-            })
-            .subscribe((result) => {
-              if (result.error) {
+            else {
+              // The payment has been processed!
+              console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
+
+              // subscribe to the payment
+              this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+                this.payment = of(payment);
+              });
+    
+              this.card.clear();
+              this.userServicesCtrl.reset();
+              this.showSpinner = false;
+              this.hidePaymentButton = true;
+    
+              if (result.paymentIntent.status === 'succeeded') {
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: result.error.message,
-                    panelClass: ['red-snackbar']
+                    data: `Congratulations your payment ${this.serviceGroup.get('currency').value} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
+                    panelClass: ['green-snackbar']
                   }
                 );
               }
               else {
-                // The payment has been processed!
-                console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
-      
-                // subscribe to the payment
-                this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
-                  this.payment = of(payment);
-                });
-      
-                if (result.paymentIntent.status === 'succeeded') {
-                  // 1) fetch+show payment link to end user for this transaction
-                  // 2) show success message
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: result.paymentIntent.status,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }
+            }
+          });
+        }
+        else {
+          console.log('no payment');
+          this.showSpinner = false;
+          this.hidePaymentButton = false;
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
+    }
+    else {
+      const createPaymentIntent = firebase.functions().httpsCallable('createPaymentIntent');
+      createPaymentIntent({
+        sellerUid: this.serviceGroup.get('uid').value,
+        sellerServiceId: this.serviceGroup.get('serviceId').value,
+        buyerUid: this.userServicesCtrl.value.uid,
+        buyerServiceId: this.userServicesCtrl.value.serviceId
+      }).then(result => {
+        console.log('created paymentIntent result ' + JSON.stringify(result));
+
+        if (result){
+          this._paymentIntent = result.data;
+
+          this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
+            if (tempPayment){
+              console.log('got a payment ' + JSON.stringify(tempPayment));
+
+              this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
+                payment_method: {
+                  card: this.card,
+                  billing_details: {
+                    name: `ReceiptId: ${tempPayment.receiptId}`,
+                    email: this._user.email
+                  },
+                },
+              })
+              .subscribe((result) => {
+                if (result.error) {
+                  this.showSpinner = false;
+                  this.hidePaymentButton = false;
+
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: `Congratulations your payment of ${this.serviceGroup.get('currency').value.toUpperCase()} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
-                      panelClass: ['green-snackbar']
-                    }
-                  );
-                }
-                else {
-                  // 1) fetch+show pending link to end user for this transaction
-                  // 2) show pending message
-                  const snackBarRef = this.snackbar.openFromComponent(
-                    NotificationSnackBar,
-                    {
-                      duration: 8000,
-                      data: result.paymentIntent.status,
+                      data: result.error.message,
                       panelClass: ['red-snackbar']
                     }
                   );
                 }
-              }
+                else {
+                  // The payment has been processed!
+                  console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
+
+                  // subscribe to the payment
+                  this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+                    this.payment = of(payment);
+                  });
+
+                  this.card.clear();
+                  this.userServicesCtrl.reset();
+                  this.showSpinner = false;
+                  this.hidePaymentButton = true;
+        
+                  if (result.paymentIntent.status === 'succeeded') {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: `Congratulations your payment of ${this.serviceGroup.get('currency').value.toUpperCase()} ${this.serviceGroup.get('amount').value.toFixed(2)} was successful`,
+                        panelClass: ['green-snackbar']
+                      }
+                    );
+                  }
+                  else {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: result.paymentIntent.status,
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+                  }
+                }
+              });
+            }
+            else {
+              console.log('no payment');
               this.showSpinner = false;
               this.hidePaymentButton = false;
-            });
-          }
-          else {
+            }
+          })
+          .catch(error => {
+            console.error(error);
             this.showSpinner = false;
             this.hidePaymentButton = false;
-          }
-        })
-        .catch(error => {
-          console.error(error);
-  
+          })
+        }
+        else {
           this.showSpinner = false;
           this.hidePaymentButton = false;
-        });
-      }
-    }
-    catch (error) {
-      throw error;
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        this.showSpinner = false;
+        this.hidePaymentButton = false;
+      });
     }
   }
 
