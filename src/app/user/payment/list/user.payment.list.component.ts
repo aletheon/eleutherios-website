@@ -4,6 +4,9 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import {
   SiteTotalService,
+  UserServiceService,
+  UserServiceImageService,
+  UserServiceTagService,
   UserPaymentService,
   NoTitlePipe
 } from '../../../shared';
@@ -11,8 +14,9 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, zip } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
 @Component({
@@ -38,6 +42,9 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
+    private userServiceService: UserServiceService,
+    private userServiceImageService: UserServiceImageService,
+    private userServiceTagService: UserServiceTagService,
     private userPaymentService: UserPaymentService,
     private snackbar: MatSnackBar,
     private router: Router) {
@@ -87,7 +94,66 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       switchMap(payments => {
         if (payments && payments.length > 0){
           let observables = payments.map(payment => {
-            return of(payment);
+            let getService$ = this.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).pipe(
+              switchMap(service => {
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+    
+                      if (serviceImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+    
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+                          
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+            
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [defaultServiceImage, serviceTags] = results;
+    
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
+                    else
+                      service.defaultServiceImage = of(null);
+    
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else {
+                      service.serviceTags = of([]);
+                    }
+                    return of(service);
+                  })
+                );
+              })
+            );
+  
+            return combineLatest([getService$]).pipe(
+              switchMap(results => {
+                const [service] = results;
+
+                if (service)
+                  payment.service = of(service)
+                else
+                  payment.service = of(null);
+
+                return of(payment);
+              })
+            );
           });
     
           return zip(...observables, (...results) => {
