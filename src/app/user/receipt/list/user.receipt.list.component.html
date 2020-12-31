@@ -1,6 +1,6 @@
 <div style="display:flex;flex-direction:column;overflow-y:auto;padding:10px 20px 10px 20px">
   <!-- header -->
-  <div style="flex:none;flex;flex-direction:row;align-items:center">
+  <div style="flex:none;display:flex;flex-direction:row;align-items:center">
     <h4 style="flex:1">Receipts(<ng-container *ngIf="total | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h4>
     <back></back>
   </div>
@@ -11,7 +11,7 @@
       <ng-container *ngIf="receiptItems.length > 0; then showreceipts else noreceipts"></ng-container>
       <ng-template #showreceipts>
         <ng-container *ngFor="let receipt of receiptItems; trackBy: trackReceipts">
-          <div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
+          <div class="panel panel-default" style="display:flex;flex-direction:row;padding:10px;margin-bottom:5px;align-items:center">
             <a [routerLink]="['/user/receipt/view']" [queryParams]="{ receiptId: receipt.receiptId }" style="color:#1B1B1B" matTooltip="{{ receipt.receiptId }}">{{ receipt.receiptId }}</a>
           </div>
         </ng-container>
