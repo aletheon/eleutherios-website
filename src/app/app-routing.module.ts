@@ -71,6 +71,8 @@ import { UserSettingEditComponent } from './user/setting/edit/user.setting.edit.
 import { UserPaymentNewComponent } from './user/payment/new/user.payment.new.component';
 import { UserPaymentListComponent } from './user/payment/list/user.payment.list.component';
 import { UserPaymentViewComponent } from './user/payment/view/user.payment.view.component';
+import { UserReceiptListComponent } from './user/receipt/list/user.receipt.list.component';
+import { UserReceiptViewComponent } from './user/receipt/view/user.receipt.view.component';
 
 const routes: Routes = [
   // **********************************************
@@ -263,6 +265,16 @@ const routes: Routes = [
   {
     path: 'user/payment/view',
     component: UserPaymentViewComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'user/receipt/list',
+    component: UserReceiptListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'user/receipt/view',
+    component: UserReceiptViewComponent,
     canActivate: [AuthGuard]
   },
   {

@@ -57,6 +57,7 @@ import { UserNotificationModule } from './user/notification/user.notification.mo
 import { UserServiceModule } from './user/service/user.service.module';
 import { UserSettingModule } from './user/setting/user.setting.module';
 import { UserPaymentModule } from './user/payment/user.payment.module';
+import { UserReceiptModule } from './user/receipt/user.receipt.module';
 import { UserTagModule } from './user/tag/user.tag.module';
 
 // Some components (mat-slide-toggle, mat-slider, matTooltip) rely on HammerJS for gestures. In order to get the full feature-set of these components, HammerJS must be loaded into the application.
@@ -119,6 +120,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserServiceModule,
     UserSettingModule,
     UserPaymentModule,
+    UserReceiptModule,
     UserTagModule,
     StarRatingModule.forRoot(),
     FacebookModule.forRoot(),

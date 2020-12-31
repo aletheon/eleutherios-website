@@ -290,6 +290,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
         await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
         await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).set({
           receiptId: payment.receiptId,
+          uid: payment.sellerUid,
           paymentId: payment.paymentId,
           amount: payment.amount,
           currency: payment.currency,

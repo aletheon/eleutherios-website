@@ -4,7 +4,7 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import {
   SiteTotalService,
-  UserPaymentService,
+  UserReceiptService,
   NoTitlePipe
 } from '../../../shared';
 
@@ -16,11 +16,11 @@ import { switchMap } from 'rxjs/operators';
 import * as _ from "lodash";
 
 @Component({
-  selector: 'user-payment-list',
-  templateUrl: './user.payment.list.component.html',
-  styleUrls: ['./user.payment.list.component.css']
+  selector: 'user-receipt-list',
+  templateUrl: './user.receipt.list.component.html',
+  styleUrls: ['./user.receipt.list.component.css']
 })
-export class UserPaymentListComponent implements OnInit, OnDestroy {
+export class UserReceiptListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
   private _subscription: Subscription;
@@ -31,14 +31,14 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   public nextKey: any;
   public prevKeys: any[] = [];
   public loading: Observable<boolean> = this._loading.asObservable();
-  public payments: Observable<any[]> = of([]);
-  public paymentsArray: any[] = [];
+  public receipts: Observable<any[]> = of([]);
+  public receiptsArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
   
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
-    private userPaymentService: UserPaymentService,
+    private userReceiptService: UserReceiptService,
     private snackbar: MatSnackBar,
     private router: Router) {
   }
@@ -54,7 +54,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       this._siteTotalSubscription.unsubscribe();
   }
 
-  trackPayments (index, payment) { return payment.paymentId; }
+  trackReceipts (index, receipt) { return receipt.receiptId; }
 
   ngOnInit () {
     // get params
@@ -65,60 +65,60 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       this._siteTotalSubscription = this.siteTotalService.getTotal(this.auth.uid)
         .subscribe(total => {
           if (total){
-            if (total.paymentCount == 0)
+            if (total.receiptCount == 0)
               this._total.next(-1);
             else
-              this._total.next(total.paymentCount);
+              this._total.next(total.receiptCount);
           }
         }
       );
-      this.getPaymentsList();
+      this.getReceiptsList();
     });
   }
 
-  getPaymentsList (key?: any) {
+  getReceiptsList (key?: any) {
     if (this._subscription)
       this._subscription.unsubscribe();
     
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userPaymentService.getPayments(this.auth.uid, this.numberItems, key).pipe(
-      switchMap(payments => {
-        if (payments && payments.length > 0){
-          let observables = payments.map(payment => {
-            return of(payment);
+    this._subscription = this.userReceiptService.getReceipts(this.auth.uid, this.numberItems, key).pipe(
+      switchMap(receipts => {
+        if (receipts && receipts.length > 0){
+          let observables = receipts.map(receipt => {
+            return of(receipt);
           });
     
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
-              return payments[i];
+              return receipts[i];
             });
           });
         }
         else return of([]);
       })
     )
-    .subscribe(payments => {
-      this.paymentsArray = _.slice(payments, 0, this.numberItems);
-      this.payments = of(this.paymentsArray);
-      this.nextKey = _.get(payments[this.numberItems], 'creationDate');
+    .subscribe(receipts => {
+      this.receiptsArray = _.slice(receipts, 0, this.numberItems);
+      this.receipts = of(this.receiptsArray);
+      this.nextKey = _.get(receipts[this.numberItems], 'creationDate');
       this._loading.next(false);
     });
   }
 
-  delete (payment) {
-    this.userPaymentService.delete(payment.uid, payment.paymentId);
+  delete (receipt) {
+    this.userReceiptService.delete(receipt.uid, receipt.receiptId);
   }
 
   onNext () {
-    this.prevKeys.push(_.first(this.paymentsArray)['creationDate']);
-    this.getPaymentsList(this.nextKey);
+    this.prevKeys.push(_.first(this.receiptsArray)['creationDate']);
+    this.getReceiptsList(this.nextKey);
   }
   
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key
-    this.getPaymentsList(prevKey);
+    this.getReceiptsList(prevKey);
   }
 }

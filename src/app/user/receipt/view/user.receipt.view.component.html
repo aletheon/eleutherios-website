@@ -1,0 +1,15 @@
+<loading-spinner *ngIf="loading | async"></loading-spinner>
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
+	<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+		<h4 style="flex:none">Receipt View</h4>
+		<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+			<back></back>
+		</div>
+	</div>
+	<div style="flex:1">
+		<!-- START OF USER DETAILS SECTION -->
+		<form [formGroup]="receiptGroup" novalidate>
+			Viewing receipt with id {{ receiptGroup.get('receiptId').value }}
+		</form>
+	</div>
+</div>

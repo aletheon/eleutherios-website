@@ -44,7 +44,7 @@ export class UserReceiptService {
     });
   }
 
-  public getReceipts (parentUserId: string, receiptId: string): Observable<any> {
+  public getReceipt (parentUserId: string, receiptId: string): Observable<any> {
     return this.afs.collection(`users/${parentUserId}/receipts`).doc(receiptId).valueChanges();
   }
 
@@ -64,5 +64,12 @@ export class UserReceiptService {
   public delete (parentUserId: string, receiptId: string) {
     const receiptRef = this.afs.collection(`users/${parentUserId}/receipts`).doc(receiptId);
     return receiptRef.delete();
+  }
+
+  public getReceipts (parentUserId: string, numberOfItems: number, key?: any): Observable<any[]> {
+    if (!key)
+      return this.afs.collection<any>(`users/${parentUserId}/receipts`, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1)).valueChanges();
+    else
+      return this.afs.collection<any>(`users/${parentUserId}/receipts`, ref => ref.orderBy('creationDate','desc').startAt(key.toLowerCase()).limit(numberOfItems+1)).valueChanges();
   }
 }
