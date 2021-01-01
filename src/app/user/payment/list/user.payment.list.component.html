@@ -36,9 +36,6 @@
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
                 <div style="flex:none;margin-right:5px">
-                  <span [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="padding:5px;cursor:pointer" class="label label-default">{{ payment.paymentId }}</span>
-                </div>
-                <div style="flex:none;margin-right:5px">
                   <ng-container *ngIf="payment.status == 'Pending'">
                     <span style="padding:5px" class="label label-warning">Pending</span>
                   </ng-container>
@@ -78,6 +75,11 @@
                 </ng-template>
               </div>
             </ng-container>
+          </div>
+          <div style="display:flex;flex-direction:row;align-items:center">
+            <div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Payment #">{{ payment.paymentId }}</span></div>
+            <div style="flex:1;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt #">{{ payment.receiptId }}</span></div>
+            <div style="flex:none"><span style="padding:5px" class="label label-default" matTooltip="Payment Intent #">{{ payment.paymentIntentId }}</span></div>
           </div>
         </ng-container>
       </ng-template>
