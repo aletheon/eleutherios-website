@@ -404,7 +404,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       buyerServiceId: buyerServiceId,
       sellerUid: sellerUid,
       sellerServiceId: sellerServiceId,
-      paymentIntent: null,
+      paymentIntentId: '',
       creationDate: FieldValue.serverTimestamp(),
       lastUpdateDate: FieldValue.serverTimestamp()
     };
@@ -427,7 +427,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     });
     console.log('paymentIntent ' + JSON.stringify(paymentIntent));
 
-    const paymentUpdate = await paymentRef.update({ paymentIntent: paymentIntent });
+    const paymentUpdate = await paymentRef.update({ paymentIntentId: paymentIntent.id });
     return Promise.resolve(paymentIntent);
   }
   catch (error) {

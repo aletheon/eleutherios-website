@@ -31,7 +31,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   private _totalSubscription: Subscription;
   private _siteTotalSubscription: Subscription;
 
-  public numberItems: number = 2;
+  public numberItems: number = 12;
   public nextKey: any;
   public prevKeys: any[] = [];
   public loading: Observable<boolean> = this._loading.asObservable();

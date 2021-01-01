@@ -70,6 +70,6 @@ export class UserReceiptService {
     if (!key)
       return this.afs.collection<any>(`users/${parentUserId}/receipts`, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1)).valueChanges();
     else
-      return this.afs.collection<any>(`users/${parentUserId}/receipts`, ref => ref.orderBy('creationDate','desc').startAt(key.toLowerCase()).limit(numberOfItems+1)).valueChanges();
+      return this.afs.collection<any>(`users/${parentUserId}/receipts`, ref => ref.orderBy('creationDate','desc').startAt(key).limit(numberOfItems+1)).valueChanges();
   }
 }

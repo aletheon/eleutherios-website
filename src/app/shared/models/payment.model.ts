@@ -13,7 +13,7 @@ export interface Payment {
   buyerServiceId: string, // id of the service creating the payment
   sellerUid: string, // id of the user receiving the payment
   sellerServiceId: string, // id of the service receiving the payment
-  paymentIntent: object,
+  paymentIntentId: string,
   lastUpdateDate: object,
   creationDate: object
 }
