@@ -78,6 +78,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       paymentId:                        [''],
       amount:                           [''],
       currency:                         [''],
+      type:                             [''],
       title:                            [''],
       description:                      [''],
       quantity:                         [''],
@@ -86,7 +87,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       buyerServiceId:                   [''],
       sellerUid:                        [''],
       sellerServiceId:                  [''],
-      paymentIntent:                    [''],
+      paymentIntentId:                  [''],
       lastUpdateDate:                   [''],
       creationDate:                     ['']
     });
