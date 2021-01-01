@@ -94,63 +94,45 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       switchMap(payments => {
         if (payments && payments.length > 0){
           let observables = payments.map(payment => {
-            let getService$ = this.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).pipe(
-              switchMap(service => {
-                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                  switchMap(serviceImages => {
-                    if (serviceImages && serviceImages.length > 0){
-                      let getDownloadUrl$: Observable<any>;
-    
-                      if (serviceImages[0].smallUrl)
-                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-    
-                      return combineLatest([getDownloadUrl$]).pipe(
-                        switchMap(results => {
-                          const [downloadUrl] = results;
-                          
-                          if (downloadUrl)
-                            serviceImages[0].url = downloadUrl;
-                          else
-                            serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
-                          return of(serviceImages[0]);
-                        })
-                      );
-                    }
-                    else return of(null);
-                  })
-                );
-                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
+              switchMap(serviceImages => {
+                if (serviceImages && serviceImages.length > 0){
+                  let getDownloadUrl$: Observable<any>;
 
-                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
-                  switchMap(results => {
-                    const [defaultServiceImage, serviceTags] = results;
-    
-                    if (defaultServiceImage)
-                      service.defaultServiceImage = of(defaultServiceImage);
-                    else
-                      service.defaultServiceImage = of(null);
-    
-                    if (serviceTags)
-                      service.serviceTags = of(serviceTags);
-                    else {
-                      service.serviceTags = of([]);
-                    }
-                    return of(service);
-                  })
-                );
+                  if (serviceImages[0].smallUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+                      
+                      if (downloadUrl)
+                        serviceImages[0].url = downloadUrl;
+                      else
+                        serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+        
+                      return of(serviceImages[0]);
+                    })
+                  );
+                }
+                else return of(null);
               })
             );
+            let getServiceTags$ = this.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
   
-            return combineLatest([getService$]).pipe(
+            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
               switchMap(results => {
-                const [service] = results;
-
-                if (service)
-                  payment.service = of(service)
+                const [defaultServiceImage, serviceTags] = results;
+                if (defaultServiceImage)
+                  payment.defaultServiceImage = of(defaultServiceImage);
                 else
-                  payment.service = of(null);
+                  payment.defaultServiceImage = of(null);
 
+                if (serviceTags)
+                  payment.serviceTags = of(serviceTags);
+                else {
+                  payment.serviceTags = of([]);
+                }
                 return of(payment);
               })
             );

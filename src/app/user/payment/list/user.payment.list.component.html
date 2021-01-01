@@ -12,81 +12,75 @@
       <ng-template #showpayments>
         <ng-container *ngFor="let payment of paymentItems; trackBy: trackPayments">
           <div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
-            <ng-container *ngIf="payment.service | async">
-              <ng-container *ngIf="payment.service | async;let service">
-                <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-                  <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-                  <ng-template #showdefaultserviceimage>
-                    <ng-container *ngIf="service.defaultServiceImage | async;let image">
-                      <div style="flex:none;margin-right:10px">
-                        <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-                        <ng-template #showimage>
-                          <img *ngIf="service.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
-                          <img *ngIf="service.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
-                        </ng-template>
-                        <ng-template #noimage>
-                          <img [src]="image.url">
-                        </ng-template>
-                      </div>
-                    </ng-container>
-                  </ng-template>
-                  <div style="flex:1;margin-right:5px">
-                    <p style="word-break: break-all">
-                      <a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
-                    </p>
-                  </div>
-                  <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-                    <!-- other button controls -->
-                    <div style="flex:none;margin-right:5px">
-                      <ng-container *ngIf="payment.status == 'Pending'">
-                        <span style="padding:5px" class="label label-warning">Pending</span>
-                      </ng-container>
-                      <ng-container *ngIf="payment.status == 'Success'">
-                        <span style="padding:5px" class="label label-success">Success</span>
-                      </ng-container>
-                      <ng-container *ngIf="payment.status == 'Failed'">
-                        <span style="padding:5px" class="label label-danger">Failed</span>
-                      </ng-container>
-                    </div>
-                    <div class="label label-default" matTooltip="{{ payment.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
-                      {{ payment.creationDate.toDate() | amTimeAgo }}
-                    </div>
-                    <mat-icon [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View Payment">description</mat-icon>
-                  </div>
-                </div>
-                <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
-                  <div style="flex:none;display:flex;flex-direction:row">
-                    <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-                    <ng-template #showtags>
-                      <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
-                        <ng-container *ngFor="let serviceTag of serviceTagItems">
-                          <span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
-                        </ng-container>
-                      </div>
+            <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+              <ng-container *ngIf="payment.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+              <ng-template #showdefaultserviceimage>
+                <ng-container *ngIf="payment.defaultServiceImage | async;let image">
+                  <div style="flex:none;margin-right:10px">
+                    <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                    <ng-template #showimage>
+                      <img *ngIf="payment.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: payment.sellerServiceId }' style="cursor:pointer">
+                      <img *ngIf="payment.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: payment.sellerServiceId }' style="cursor:pointer">
                     </ng-template>
-                    <ng-container *ngIf="service.paymentType == 'Payment'">
-                      <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
-                      <ng-template #showtagswithpayment>
-                        <div style="flex:none">
-                          <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                        </div>
-                      </ng-template>
-                      <ng-template #showtagswithoutpayment>
-                        <div style="flex:1;text-align:right">
-                          <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                        </div>
-                      </ng-template>
-                    </ng-container>
+                    <ng-template #noimage>
+                      <img [src]="image.url">
+                    </ng-template>
                   </div>
                 </ng-container>
-              </ng-container>
+              </ng-template>
+              <div style="flex:1;margin-right:5px">
+                <p style="word-break: break-all">
+                  <a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.title }}{{ payment.description.length > 0 ? (' - ' + payment.description | truncate: 80) : '' }}">{{ payment.title | noTitle | truncate: 35 }} <i *ngIf="payment.description.length > 0">- {{ payment.description | truncate: 80 }}</i></a>
+                </p>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+                <!-- other button controls -->
+                <div style="flex:none;margin-right:5px">
+                  <ng-container *ngIf="payment.status == 'Pending'">
+                    <span style="padding:5px" class="label label-warning">Pending</span>
+                  </ng-container>
+                  <ng-container *ngIf="payment.status == 'Success'">
+                    <span style="padding:5px" class="label label-success">Success</span>
+                  </ng-container>
+                  <ng-container *ngIf="payment.status == 'Failed'">
+                    <span style="padding:5px" class="label label-danger">Failed</span>
+                  </ng-container>
+                </div>
+                <div class="label label-default" matTooltip="{{ payment.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
+                  {{ payment.creationDate.toDate() | amTimeAgo }}
+                </div>
+                <mat-icon [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View Payment">description</mat-icon>
+              </div>
+            </div>
+            <ng-container *ngIf="payment.serviceTags | async;let serviceTagItems">
+              <div style="flex:none;display:flex;flex-direction:row">
+                <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+                <ng-template #showtags>
+                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+                    <ng-container *ngFor="let serviceTag of serviceTagItems">
+                      <span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+                    </ng-container>
+                  </div>
+                </ng-template>
+                <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+                <ng-template #showtagswithpayment>
+                  <div style="flex:none">
+                    {{ payment.currency.toUpperCase() }} {{ payment.amount.toFixed(2) }}
+                  </div>
+                </ng-template>
+                <ng-template #showtagswithoutpayment>
+                  <div style="flex:1;text-align:right">
+                    {{ payment.currency.toUpperCase() }} {{ payment.amount.toFixed(2) }}
+                  </div>
+                </ng-template>
+              </div>
             </ng-container>
           </div>
         </ng-container>
       </ng-template>
-      <ng-template #noservices>
+      <ng-template #nopayments>
         <p style="flex:none;color:#999;font-size:90%">
-          <i>No Services</i>
+          <i>No Payments</i>
         </p>
       </ng-template>
     </ng-container>

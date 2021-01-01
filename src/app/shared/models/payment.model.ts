@@ -4,6 +4,7 @@ export interface Payment {
   receiptId: string, // associated receipt for the seller receiving this payment
   amount: number, // amount to pay
   currency: string, // [usd, nzd, aud etc]
+  type: string, // [public or private]
   title: string, // title of product/service
   description: string, // description of product/service
   quantity: number, // number of units ordered

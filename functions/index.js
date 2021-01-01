@@ -395,6 +395,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       receiptId: uuid.v4().replace(/-/g, ''),
       amount: sellerService.amount,
       currency: sellerService.currency,
+      type: sellerService.type,
       title: sellerService.title,
       description: sellerService.description,
       quantity: 1,
