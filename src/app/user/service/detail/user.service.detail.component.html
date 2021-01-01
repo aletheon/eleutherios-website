@@ -31,6 +31,9 @@
 				<h4 matTooltip="{{ serviceItem.title }}">{{ serviceItem.title | noTitle }}</h4>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+				<div class="label label-danger" *ngIf="serviceItem.paymentId && serviceItem.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
+					Sold
+				</div>
 				<div class="label label-default" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ serviceItem.creationDate.toDate() | amTimeAgo }}
 				</div>

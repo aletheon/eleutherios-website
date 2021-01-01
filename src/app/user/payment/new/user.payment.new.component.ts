@@ -391,23 +391,45 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             this._userServiceSubscription.unsubscribe();
             
             if (service.paymentType == 'Payment'){
-              this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
-              this.initForm();
+              if (service.indexed == true && service.paymentId.length == 0){
+                this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
+                this.initForm();
+              }
+              else {
+                if (service.indexed == false){
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'The service has been removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'The service has already been sold',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
+              }
             }
             else {
               const snackBarRef = this.snackbar.openFromComponent(
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: `Service was changed to free`,
+                  data: 'Service was changed to free',
                   panelClass: ['red-snackbar']
                 }
               );
-
-              if (service.type == 'Public')
-                this.router.navigate(['/']);
-              else
-                this.router.navigate(['/']);
+              this.router.navigate(['/']);
             }
           }
           else {
@@ -443,7 +465,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       rate:                               [''],
       paymentType:                        [''],
       amount:                             [''],
+      typeOfPayment:                      [''],
       currency:                           [''],
+      paymentId:                          [''],
+      paymentUserId:                      [''],
       includeDescriptionInDetailPage:     [''],
       includeImagesInDetailPage:          [''],
       includeTagsInDetailPage:            [''],
@@ -471,7 +496,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             rate: service.rate,
             paymentType: service.paymentType,
             amount: service.amount,
+            typeOfPayment: service.typeOfPayment,
             currency: service.currency,
+            paymentId: service.paymentId,
+            paymentUserId: service.paymentUserId,
             includeDescriptionInDetailPage: service.includeDescriptionInDetailPage,
             includeImagesInDetailPage: service.includeImagesInDetailPage,
             includeTagsInDetailPage: service.includeTagsInDetailPage,
