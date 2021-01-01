@@ -35,6 +35,9 @@
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 							<!-- other button controls -->
 							<div style="flex:none;margin-right:5px">
+								<span [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: paymentItem.paymentId }" style="padding:5px;cursor:pointer" class="label label-default">{{ paymentItem.paymentId }}</span>
+							</div>
+							<div style="flex:none;margin-right:5px">
 								<ng-container *ngIf="paymentItem.status == 'Pending'">
 									<span style="padding:5px" class="label label-warning">Pending</span>
 								</ng-container>
@@ -45,7 +48,7 @@
 									<span style="padding:5px" class="label label-danger">Failed</span>
 								</ng-container>
 							</div>
-							<div class="label label-default" matTooltip="{{ paymentItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
+							<div class="label label-default" matTooltip="{{ paymentItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 								{{ paymentItem.creationDate.toDate() | amTimeAgo }}
 							</div>
 						</div>
