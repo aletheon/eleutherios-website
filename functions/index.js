@@ -293,6 +293,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
           uid: payment.sellerUid,
           paymentId: payment.paymentId,
           amount: payment.amount,
+          type: payment.type,
           currency: payment.currency,
           title: payment.title,
           description: payment.description,
@@ -302,7 +303,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
           buyerServiceId: payment.buyerServiceId,
           sellerUid: payment.sellerUid,
           sellerServiceId: payment.sellerServiceId,
-          paymentIntent: payment.paymentIntent,
+          paymentIntentId: payment.paymentIntentId,
           lastUpdateDate: FieldValue.serverTimestamp(),
           creationDate: FieldValue.serverTimestamp()
         });
@@ -325,9 +326,17 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
         await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
         
         var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
+        var sellerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/services`).doc(payment.sellerServiceId).get();
 
         if (userReceiptSnapshot.exists)
           await userReceiptSnapshot.ref.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        if (sellerSnapshot.exists){
+          var sellerService = sellerSnapshot.data();
+
+          if (sellerService.typeOfPayment == 'One-off')
+            await sellerSnapshot.ref.update({ indexed: false, userIdPaymentId: `${payment.uid}:${payment.paymentId}`, lastUpdateDate: FieldValue.serverTimestamp() });
+        }
       }
       return res.json({ received: true });
     }

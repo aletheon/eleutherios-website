@@ -13,6 +13,7 @@ export interface Service {
   amount: number, // amount to pay for this service { min: 0.50 USD, max: 999,999.99 }
   typeOfPayment: string, // [One-off|On-going]
   currency: string, // [usd, nzd, aud etc]
+  userIdPaymentId: string, // if sold as one-off set id of payment that bought it
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
   includeTagsInDetailPage: boolean,

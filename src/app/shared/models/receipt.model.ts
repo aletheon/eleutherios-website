@@ -4,6 +4,7 @@ export interface Receipt {
   paymentId: string,
   amount: number, // amount to pay
   currency: string, // [usd, nzd, aud etc]
+  type: string, // [public or private]
   title: string, // title of product/service
   description: string, // description of product/service
   quantity: number, // number of units ordered
@@ -12,7 +13,7 @@ export interface Receipt {
   buyerServiceId: string, // id of the service creating the payment
   sellerUid: string, // id of the user receiving the payment
   sellerServiceId: string, // id of the service receiving the payment
-  paymentIntent: object,
+  paymentIntentId: string,
   lastUpdateDate: object,
   creationDate: object
 }
