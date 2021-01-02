@@ -40,13 +40,10 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
   public alertsArray: any[] = [];
   public type: string = 'All';
   public total: Observable<number> = this._total.asObservable();
-  
-  
 
   // HERE ROB
 
   // - fix user pages with userId being called?
-  // - check if stripe connect account can include customer that just bought something from them?
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute, 
