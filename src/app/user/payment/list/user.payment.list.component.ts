@@ -4,7 +4,6 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import {
   SiteTotalService,
-  UserServiceService,
   UserServiceImageService,
   UserServiceTagService,
   UserPaymentService,
@@ -42,7 +41,6 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
-    private userServiceService: UserServiceService,
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
     private userPaymentService: UserPaymentService,

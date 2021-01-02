@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackModule } from '../../shared';
 import { PipeModule } from '../../shared';
+import { MomentModule } from 'angular2-moment';
 import { AppRoutingModule } from '../../app-routing.module';
 import { LoadingSpinnerModule } from '../../shared';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -36,6 +37,7 @@ import {
     LoadingSpinnerModule,
     BackModule,
     PipeModule,
+    MomentModule,
     AppRoutingModule
   ],
   declarations: [

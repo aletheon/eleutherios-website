@@ -4,9 +4,9 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import {
   SiteTotalService,
-  UserServiceService,
   UserReceiptService,
   UserServiceImageService,
+  UserServiceTagService,
   NoTitlePipe
 } from '../../../shared';
 
@@ -41,9 +41,9 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
-    private userServiceService: UserServiceService,
     private userReceiptService: UserReceiptService,
     private userServiceImageService: UserServiceImageService,
+    private userServiceTagService: UserServiceTagService,
     private snackbar: MatSnackBar,
     private router: Router) {
   }
@@ -92,8 +92,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
       switchMap(receipts => {
         if (receipts && receipts.length > 0){
           let observables = receipts.map(receipt => {
-            let getService$ = this.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
-            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
+            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
@@ -117,24 +116,21 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
+            let getServiceTags$ = this.userServiceTagService.getTags(receipt.sellerUid, receipt.sellerServiceId);
   
-            return combineLatest([getService$, getDefaultServiceImage$]).pipe(
+            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
               switchMap(results => {
-                const [service, defaultServiceImage] = results;
-
-                if (service)
-                  receipt.service = of(service)
-                else
-                  receipt.service = of(null);
-
+                const [defaultServiceImage, serviceTags] = results;
+                
                 if (defaultServiceImage)
                   receipt.defaultServiceImage = of(defaultServiceImage);
+                else
+                  receipt.defaultServiceImage = of(null);
+
+                if (serviceTags)
+                  receipt.serviceTags = of(serviceTags);
                 else {
-                  let tempImage = {
-                    smallUrl: '../../../assets/defaultThumbnail.jpg',
-                    name: 'No image'
-                  };
-                  receipt.defaultServiceImage = of(tempImage);
+                  receipt.serviceTags = of([]);
                 }
                 return of(receipt);
               })
