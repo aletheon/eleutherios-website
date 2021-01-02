@@ -209,7 +209,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
               payment_method: {
                 card: this.card,
                 billing_details: {
-                  name: `ReceiptId: ${tempPayment.receiptId}`,
+                  name: this.serviceGroup.get('title').value,
                   email: this._user.email
                 },
               }
@@ -298,7 +298,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                   payment_method: {
                     card: this.card,
                     billing_details: {
-                      name: `ReceiptId: ${tempPayment.receiptId}`,
+                      name: this.serviceGroup.get('title').value,
                       email: this._user.email
                     },
                   },

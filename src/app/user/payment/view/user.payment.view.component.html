@@ -35,6 +35,7 @@
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 							<!-- other button controls -->
+							<span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Stripe Payment Intent Id">{{ paymentItem.paymentIntentId }}</span>
 							<div style="flex:none;margin-right:5px">
 								<ng-container *ngIf="paymentItem.status == 'Pending'">
 									<span style="padding:5px" class="label label-warning">Pending</span>
@@ -75,13 +76,9 @@
 						</div>
 					</ng-container>
 				</div>
-				<div style="display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Payment Id">PID</span></div>
-					<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default">{{ paymentItem.paymentId }}</span></div>
-					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">RID</span></div>
-					<div style="flex:1;margin-right:5px"><span style="padding:5px" class="label label-default">{{ paymentItem.receiptId }}</span></div>
-					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Stripe Payment Intent Id">Stripe PIID</span></div>
-					<div style="flex:none"><span style="padding:5px" class="label label-default">{{ paymentItem.paymentIntentId }}</span></div>
+				<div style="display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+					<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Payment Id">{{ paymentItem.paymentId }}</span></div>
+					<div style="flex:none"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ paymentItem.receiptId }}</span></div>
 				</div>
 			</form>
 		</div>
