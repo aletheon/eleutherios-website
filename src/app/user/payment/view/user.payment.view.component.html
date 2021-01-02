@@ -29,7 +29,8 @@
 						</ng-template>
 						<div style="flex:1;margin-right:5px">
 							<p style="word-break: break-all">
-								<a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.title }}{{ paymentItem.description.length > 0 ? (' - ' + paymentItem.description | truncate: 80) : '' }}">{{ paymentItem.title | noTitle | truncate: 35 }} <i *ngIf="paymentItem.description.length > 0">- {{ paymentItem.description | truncate: 80 }}</i></a>
+								<a *ngIf="paymentItem.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.title }}{{ paymentItem.description.length > 0 ? (' - ' + paymentItem.description | truncate: 80) : '' }}">{{ paymentItem.title | noTitle | truncate: 35 }} <i *ngIf="paymentItem.description.length > 0">- {{ paymentItem.description | truncate: 80 }}</i></a>
+								<a *ngIf="paymentItem.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.title }}{{ paymentItem.description.length > 0 ? (' - ' + paymentItem.description | truncate: 80) : '' }}">{{ paymentItem.title | noTitle | truncate: 35 }} <i *ngIf="paymentItem.description.length > 0">- {{ paymentItem.description | truncate: 80 }}</i></a>
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">

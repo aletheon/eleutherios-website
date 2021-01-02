@@ -1,15 +1,89 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
-	<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-		<h4 style="flex:none">Receipt View</h4>
-		<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-			<back></back>
+	<ng-container *ngIf="receipt | async;let receiptItem">
+		<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+			<h4 style="flex:none">Receipt View</h4>
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+				<back></back>
+			</div>
 		</div>
-	</div>
-	<div style="flex:1">
-		<!-- START OF USER DETAILS SECTION -->
-		<form [formGroup]="receiptGroup" novalidate>
-			Viewing receipt with id {{ receiptGroup.get('receiptId').value }}
-		</form>
-	</div>
+		<div style="flex:1">
+			<!-- START OF USER DETAILS SECTION -->
+			<form [formGroup]="receiptGroup" novalidate>
+				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+					<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+						<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+						<ng-template #showdefaultserviceimage>
+							<ng-container *ngIf="defaultServiceImage | async;let image">
+								<div style="flex:none;margin-right:10px">
+									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+									<ng-template #showimage>
+										<img *ngIf="receiptItem.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: receiptItem.sellerServiceId }' style="cursor:pointer">
+										<img *ngIf="receiptItem.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receiptItem.sellerServiceId }' style="cursor:pointer">
+									</ng-template>
+									<ng-template #noimage>
+										<img [src]="image.url">
+									</ng-template>
+								</div>
+							</ng-container>
+						</ng-template>
+						<div style="flex:1;margin-right:5px">
+							<p style="word-break: break-all">
+								<a *ngIf="receiptItem.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: receiptItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.title }}{{ receiptItem.description.length > 0 ? (' - ' + receiptItem.description | truncate: 80) : '' }}">{{ receiptItem.title | noTitle | truncate: 35 }} <i *ngIf="receiptItem.description.length > 0">- {{ receiptItem.description | truncate: 80 }}</i></a>
+								<a *ngIf="receiptItem.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.title }}{{ receiptItem.description.length > 0 ? (' - ' + receiptItem.description | truncate: 80) : '' }}">{{ receiptItem.title | noTitle | truncate: 35 }} <i *ngIf="receiptItem.description.length > 0">- {{ receiptItem.description | truncate: 80 }}</i></a>
+							</p>
+						</div>
+						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+							<!-- other button controls -->
+							<div style="flex:none;margin-right:5px">
+								<ng-container *ngIf="receiptItem.status == 'Pending'">
+									<span style="padding:5px" class="label label-warning">Pending</span>
+								</ng-container>
+								<ng-container *ngIf="receiptItem.status == 'Success'">
+									<span style="padding:5px" class="label label-success">Success</span>
+								</ng-container>
+								<ng-container *ngIf="receiptItem.status == 'Failed'">
+									<span style="padding:5px" class="label label-danger">Failed</span>
+								</ng-container>
+							</div>
+							<div class="label label-default" matTooltip="{{ receiptItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+								{{ receiptItem.creationDate.toDate() | amTimeAgo }}
+							</div>
+						</div>
+					</div>
+					<ng-container *ngIf="serviceTags | async;let serviceTagItems">
+						<div style="flex:none;display:flex;flex-direction:row">
+							<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+							<ng-template #showtags>
+								<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+									<ng-container *ngFor="let serviceTag of serviceTagItems">
+										<span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+									</ng-container>
+								</div>
+							</ng-template>
+							<ng-container *ngIf="serviceTagItems.length > 0; then showtagswithreceipt else showtagswithoutreceipt"></ng-container>
+                <ng-template #showtagswithreceipt>
+                  <div style="flex:none">
+                    <div style="color:#1B1B1B">{{ receiptItem.currency.toUpperCase() }} {{ receiptItem.amount.toFixed(2) }}</div>
+                  </div>
+                </ng-template>
+                <ng-template #showtagswithoutreceipt>
+                  <div style="flex:1;text-align:right">
+                    <div style="color:#1B1B1B">{{ receiptItem.currency.toUpperCase() }} {{ receiptItem.amount.toFixed(2) }}</div>
+                  </div>
+                </ng-template>
+						</div>
+					</ng-container>
+				</div>
+				<div style="display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Payment Id">PID</span></div>
+					<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default">{{ receiptItem.paymentId }}</span></div>
+					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">RID</span></div>
+					<div style="flex:1;margin-right:5px"><span style="padding:5px" class="label label-default">{{ receiptItem.receiptId }}</span></div>
+					<div style="flex:none;margin-right:2px"><span style="padding:5px" class="label label-default" matTooltip="Stripe Payment Intent Id">Stripe PIID</span></div>
+					<div style="flex:none"><span style="padding:5px" class="label label-default">{{ receiptItem.paymentIntentId }}</span></div>
+				</div>
+			</form>
+		</div>
+	</ng-container>
 </div>
