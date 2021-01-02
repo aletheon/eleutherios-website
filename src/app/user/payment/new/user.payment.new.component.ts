@@ -399,7 +399,6 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             panelClass: ['red-snackbar']
           }
         );
-        this.router.navigate(['/']);
       }
     }
   }
