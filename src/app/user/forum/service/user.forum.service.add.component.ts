@@ -502,8 +502,47 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             this._initialForumSubscription.unsubscribe();
 
             if (forum.title.length > 0){
-              this.forum = this.userForumService.getForum(this.userId, this.forumId);
-              this.initForm();
+              if (this.auth.uid == forum.uid || forum.type == 'Public'){
+                this.forum = this.userForumService.getForum(this.userId, this.forumId);
+                this.initForm();
+              }
+              else {
+                // ensure user is serving in the forum before viewing it
+                this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.userId, this.forumId, this.auth.uid)
+                  .then(registrant => {
+                    if (registrant){
+                      this.forum = this.userForumService.getForum(this.userId, this.forumId);
+                      this.initForm();
+                    }
+                    else {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: `You don't have any services serving in the forum '${forum.title}'`,
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+
+                      if (forum.type == 'Private')
+                        this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
+                      else
+                        this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                    }
+                  }
+                )
+                .catch(error => {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: error.message,
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                });
+              }
             }
             else {
               const snackBarRef = this.snackbar.openFromComponent(

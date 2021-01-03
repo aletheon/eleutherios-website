@@ -215,11 +215,13 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               this._tempForum = forum;
 
               if (forum.uid == this.auth.uid){
+                // allow owner to create new forum
                 this.parentForum = this.userForumService.getForum(this.parentForumUserId, this.parentForumId);
                 this.forum = this.userForumService.create(this.auth.uid, childForum);
                 this.initForm();
               }
               else {
+                // ensure end user is registered in forum before creating a new one
                 this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.parentForumUserId, this.parentForumId, this.auth.uid)
                   .then(registrant => {
                     if (registrant){

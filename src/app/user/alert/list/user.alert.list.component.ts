@@ -41,11 +41,6 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
   public type: string = 'All';
   public total: Observable<number> = this._total.asObservable();
 
-  // HERE ROB
-
-  // - fix user pages with userId being called?
-
-  constructor(public auth: AuthService,
     private route: ActivatedRoute, 
     private siteTotalService: SiteTotalService,
     private userAlertService: UserAlertService,
