@@ -614,24 +614,18 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         if (forum){
           this.forumGroup.patchValue(forum);
 
-          console.log('here 1');
-
           if (this.auth.uid == forum.uid || forum.type == 'Public'){
-            console.log('im here');
             // ok to add service
           }
           else {
-            console.log('here now');
             // ensure user is serving in the forum
             this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.auth.uid)
               .then(registrant => {
                 if (registrant){
-                  console.log('im here 2');
                   this.forum = this.userForumService.getForum(this.userId, this.forumId);
                   this.initForm();
                 }
                 else {
-                  console.log('im here 3');
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
@@ -649,7 +643,6 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
             )
             .catch(error => {
-              console.log('im hereeee ' + error);
               const snackBarRef = this.snackbar.openFromComponent(
                 NotificationSnackBar,
                 {
