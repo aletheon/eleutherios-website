@@ -500,6 +500,10 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                 this.initForm();
               }
               else {
+                // Redirect to public page if it is public
+                if (service.type == 'Public')
+                  this.router.navigate(['/service/detail'], { queryParams: { serviceId: service.serviceId } });
+
                 if (service.indexed == true){
                   // check permissions
                   this.checkPermissions(this.auth.uid, service)
@@ -593,6 +597,10 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
           if (service.uid == this.auth.uid)
             this._canViewDetail.next(true);
           else {
+            // Redirect to public page if it is public
+            if (service.type == 'Public')
+              this.router.navigate(['/service/detail'], { queryParams: { serviceId: service.serviceId } });
+
             if (service.indexed == true){
               // check permissions
               this.checkPermissions(this.auth.uid, service)

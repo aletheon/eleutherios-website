@@ -520,6 +520,10 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
             this.initForm();
           }
           else {
+            // Redirect to public page if it is public
+            if (forum.type == 'Public')
+              this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+
             if (forum.indexed == true){
               // check permissions
               this.checkPermissions(forum)
@@ -599,6 +603,10 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
           if (forum.uid == this.auth.uid)
             this._canViewDetail.next(true);
           else {
+            // Redirect to public page if it is public
+            if (forum.type == 'Public')
+              this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+
             if (forum.indexed == true){
               // check permissions
               this.checkPermissions(forum)
