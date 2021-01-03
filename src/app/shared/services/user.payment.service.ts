@@ -35,7 +35,7 @@ export class UserPaymentService {
           if (doc.exists)
             resolve(doc.data());
           else
-            reject(`Payment with paymentId ${paymentId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);

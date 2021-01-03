@@ -61,7 +61,7 @@ export class UserImageService {
         if (doc.exists)
           resolve(doc.data());
         else
-          reject(`Image with imageId ${imageId} was not found`);
+          resolve(null);
       })
       .catch(error => {
         reject(error);

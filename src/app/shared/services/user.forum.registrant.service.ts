@@ -24,7 +24,7 @@ export class UserForumRegistrantService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            reject(`Registrant with serviceId ${serviceId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);
@@ -44,7 +44,7 @@ export class UserForumRegistrantService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            reject(`Registrant with userId ${userId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);

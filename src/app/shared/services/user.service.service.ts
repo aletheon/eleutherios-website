@@ -36,7 +36,7 @@ export class UserServiceService {
           if (doc.exists)
             resolve(doc.data());
           else
-            reject(`Service with serviceId ${serviceId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);

@@ -611,8 +611,57 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
     this._forumSubscription = this.forum
       .subscribe(forum => {
-        if (forum)
+        if (forum){
           this.forumGroup.patchValue(forum);
+
+          console.log('here 1');
+
+          if (this.auth.uid == forum.uid || forum.type == 'Public'){
+            console.log('im here');
+            // ok to add service
+          }
+          else {
+            console.log('here now');
+            // ensure user is serving in the forum
+            this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.auth.uid)
+              .then(registrant => {
+                if (registrant){
+                  console.log('im here 2');
+                  this.forum = this.userForumService.getForum(this.userId, this.forumId);
+                  this.initForm();
+                }
+                else {
+                  console.log('im here 3');
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: `You don't have any services serving in the forum '${forum.title}'`,
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+
+                  if (forum.type == 'Private')
+                    this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
+                  else
+                    this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                }
+              }
+            )
+            .catch(error => {
+              console.log('im hereeee ' + error);
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: error.message,
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            });
+          }
+        }
       }
     );
 

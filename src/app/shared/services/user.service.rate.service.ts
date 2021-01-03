@@ -72,7 +72,7 @@ export class UserServiceRateService {
           if (doc.exists)
             resolve(doc.data());
           else
-            reject(`ServiceRate with serviceRateId ${serviceRateId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);
@@ -96,7 +96,7 @@ export class UserServiceRateService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            reject(`ServiceRate with serviceId ${serviceId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);

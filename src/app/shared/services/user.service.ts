@@ -98,7 +98,7 @@ export class UserService {
         if (doc.exists)
           resolve(doc.data());
         else
-          reject(`User with userId ${parentUserId} was not found`);
+          resolve(null);
       })
       .catch(error => {
         reject(error);

@@ -72,7 +72,7 @@ export class UserServiceReviewService {
           if (doc.exists)
             resolve(doc.data());
           else
-            reject(`ServiceReview with serviceReviewId ${serviceReviewId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);
@@ -96,7 +96,7 @@ export class UserServiceReviewService {
           if (snapshot.size > 0)
             resolve(snapshot.docs[0].data());
           else
-            reject(`ServiceReview with serviceId ${serviceId} was not found`);
+            resolve(null);
         })
         .catch(error => {
           reject(error);
