@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -47,8 +47,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
     private userServiceTagService: UserServiceTagService,
     private fb: FormBuilder, 
     private router: Router,
-    private snackbar: MatSnackBar,
-    private changeDetector : ChangeDetectorRef) {
+    private snackbar: MatSnackBar) {
   }
 
   ngOnDestroy () {
@@ -171,7 +170,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
         // call load
         load().then(() => {
           this._loading.next(false);
-          this.changeDetector.detectChanges();
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

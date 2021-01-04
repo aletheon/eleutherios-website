@@ -523,11 +523,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                           panelClass: ['red-snackbar']
                         }
                       );
-
-                      if (forum.type == 'Private')
-                        this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
-                      else
-                        this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                      this.router.navigate(['/']);
                     }
                   }
                 )
@@ -553,11 +549,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   panelClass: ['red-snackbar']
                 }
               );
-
-              if (forum.type == 'Private')
-                this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
-              else
-                this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+              this.router.navigate(['/']);
             }
           }
           else {
@@ -614,13 +606,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         if (forum){
           this.forumGroup.patchValue(forum);
 
-          // HERE ROB TIDY THIS UP
-
           if (this.auth.uid == forum.uid || forum.type == 'Public'){
             // ok to add service
           }
           else {
-            // ensure user is serving in the forum
+            // ensure user is serving in forum to continue viewing this page
             this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.auth.uid)
               .then(registrant => {
                 if (registrant){
@@ -636,11 +626,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       panelClass: ['red-snackbar']
                     }
                   );
-
-                  if (forum.type == 'Private')
-                    this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
-                  else
-                    this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                  this.router.navigate(['/']);
                 }
               }
             )

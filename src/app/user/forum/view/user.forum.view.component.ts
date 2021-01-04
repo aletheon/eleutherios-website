@@ -207,11 +207,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     panelClass: ['red-snackbar']
                   }
                 );
-
-                if (forum.type == 'Private')
-                  this.router.navigate(['/user/forum/detail'], { queryParams: { userId: this.userId, forumId: this.forumId } });
-                else
-                  this.router.navigate(['/forum/detail'], { queryParams: { forumId: this.forumId } });
+                this.router.navigate(['/']);
               }
             }
           )
@@ -330,11 +326,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       panelClass: ['red-snackbar']
                     }
                   );
-
-                  if (that._tempForum.type == 'Private')
-                    that.router.navigate(['/user/forum/detail'], { queryParams: { userId: that._tempForum.uid, forumId: that._tempForum.forumId } });
-                  else
-                    that.router.navigate(['/forum/detail'], { queryParams: { forumId: that._tempForum.forumId } });
+                  this.router.navigate(['/']);
                 }
               }
             );

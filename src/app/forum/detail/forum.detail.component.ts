@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { Router } from '@angular/router';
@@ -95,8 +95,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private router: Router,
     private snackbar: MatSnackBar,
-    private location: Location,
-    private changeDetector : ChangeDetectorRef) {
+    private location: Location) {
       this.userServicesCtrl = new FormControl();
   }
 
@@ -496,6 +495,8 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       if (forumId){
         this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
           this._initialForumSubscription.unsubscribe();
+
+          console.log('Still here');
           
           if (forum){
             this.forum = this.forumService.getForum(forumId);
@@ -706,7 +707,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
         // call load
         load().then(() => {
           this._loading.next(false);
-          this.changeDetector.detectChanges();
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();

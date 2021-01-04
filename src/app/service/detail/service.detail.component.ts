@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef, Input } from '@angular/core';
+import { Component, AfterViewInit, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -97,8 +97,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private route: ActivatedRoute,
     private snackbar: MatSnackBar,
     private location: Location,
-    private http: HttpClient,
-    private changeDetector : ChangeDetectorRef) {
+    private http: HttpClient) {
       this.userForumsCtrl = new FormControl();
   }
 
@@ -716,7 +715,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         // call load
         load().then(() => {
           this._loading.next(false);
-          this.changeDetector.detectChanges();
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -62,8 +62,7 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
     private userForumTagService: UserForumTagService,
     private fb: FormBuilder,
     private router: Router,
-    private snackbar: MatSnackBar,
-    private changeDetector : ChangeDetectorRef) {
+    private snackbar: MatSnackBar) {
     }
 
   ngOnDestroy () {
@@ -121,11 +120,7 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
                         panelClass: ['red-snackbar']
                       }
                     );
-  
-                    if (forum.type == 'Private')
-                      this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
-                    else
-                      this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                    this.router.navigate(['/']);
                   }
                 }
               )
@@ -203,11 +198,7 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
                       panelClass: ['red-snackbar']
                     }
                   );
-
-                  if (forum.type == 'Private')
-                    this.router.navigate(['/user/forum/detail'], { queryParams: { userId: forum.uid, forumId: forum.forumId } });
-                  else
-                    this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+                  this.router.navigate(['/']);
                 }
               }
             )
@@ -270,7 +261,6 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
         // call load
         load().then(() => {
           this._loading.next(false);
-          this.changeDetector.detectChanges();
 
           runOnceSubscription.unsubscribe();
         })

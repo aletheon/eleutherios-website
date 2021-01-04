@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -47,8 +47,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     private userForumTagService: UserForumTagService,
     private fb: FormBuilder, 
     private router: Router,
-    private snackbar: MatSnackBar,
-    private changeDetector : ChangeDetectorRef) {
+    private snackbar: MatSnackBar) {
   }
 
   descriptionPanelEvent (state: string) {
@@ -219,7 +218,6 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
         // call load
         load().then(() => {
           this._loading.next(false);
-          this.changeDetector.detectChanges();
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
