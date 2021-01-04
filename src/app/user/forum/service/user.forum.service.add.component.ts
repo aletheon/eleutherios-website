@@ -489,8 +489,6 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   ngOnInit () {
     const that = this;
     this._loading.next(true);
-    this.nextKey = null;
-    this.prevKeys = [];
 
     this.route.queryParams.subscribe((params: Params) => {
       this.forumId = params['forumId'];
@@ -695,7 +693,76 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             );
 
             // get registrants for this forum
-            that.getRegistrantsList(forum.uid, forum.forumId);
+            that.registrants = that.userForumRegistrantService.getRegistrants(forum.uid, forum.forumId).pipe(
+              switchMap(registrants => { // get the service
+                if (registrants && registrants.length > 0){
+                  let observables = registrants.map(registrant => {
+                    let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
+                      switchMap(service => {
+                        if (service) {
+                          let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                            switchMap(serviceImages => {
+                              if (serviceImages && serviceImages.length > 0){
+                                let getDownloadUrl$: Observable<any>;
+
+                                if (serviceImages[0].tinyUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+                        
+                                return combineLatest([getDownloadUrl$]).pipe(
+                                  switchMap(results => {
+                                    const [downloadUrl] = results;
+                                    
+                                    if (downloadUrl)
+                                      serviceImages[0].url = downloadUrl;
+                                    else
+                                      serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                        
+                                    return of(serviceImages[0]);
+                                  })
+                                );
+                              }
+                              else return of(null);
+                            })
+                          );
+                          
+                          return combineLatest([getDefaultServiceImage$]).pipe(
+                            switchMap(results => {
+                              const [defaultServiceImage] = results;
+
+                              if (defaultServiceImage)
+                                service.defaultServiceImage = of(defaultServiceImage);
+                              else {
+                                let tempImage = {
+                                  url: '../../../assets/defaultTiny.jpg'
+                                };
+                                service.defaultServiceImage = of(tempImage);
+                              }
+                              return of(service);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
+
+                    return combineLatest([getService$]).pipe(
+                      switchMap(results => {
+                        const [service] = results;
+                        
+                        if (service)
+                          registrant.service = of(service);
+                        else {
+                          registrant.service = of(null);
+                        }
+                        return of(registrant);
+                      })
+                    );
+                  });
+                  return zip(...observables);
+                }
+                else return of([]);
+              })
+            );
 
             // get default forum image
             that.getDefaultForumImage();
@@ -1497,102 +1564,5 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         })
       );
     }
-  }
-
-  getRegistrantsList (userId: string, forumId: string, key?: any) {
-    if (this._registrantsSubscription)
-      this._registrantsSubscription.unsubscribe();
-
-    // loading
-    this._loading.next(true);
-
-    // get registrants for this forum
-    this._registrantsSubscription = this.userForumRegistrantService.searchRegistrants(userId, forumId, this._numberOfItems, key).pipe(
-      switchMap(registrants => { // get the service
-        if (registrants && registrants.length > 0){
-          let observables = registrants.map(registrant => {
-            let getService$ = this.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
-              switchMap(service => {
-                if (service) {
-                  let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                    switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
-
-                        if (serviceImages[0].tinyUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-                            
-                            if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
-                            else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                
-                            return of(serviceImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-                  
-                  return combineLatest([getDefaultServiceImage$]).pipe(
-                    switchMap(results => {
-                      const [defaultServiceImage] = results;
-
-                      if (defaultServiceImage)
-                        service.defaultServiceImage = of(defaultServiceImage);
-                      else {
-                        let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
-                        };
-                        service.defaultServiceImage = of(tempImage);
-                      }
-                      return of(service);
-                    })
-                  );
-                }
-                else return of(null);
-              })
-            );
-
-            return combineLatest([getService$]).pipe(
-              switchMap(results => {
-                const [service] = results;
-                
-                if (service)
-                  registrant.service = of(service);
-                else {
-                  registrant.service = of(null);
-                }
-                return of(registrant);
-              })
-            );
-          });
-          return zip(...observables);
-        }
-        else return of([]);
-      })
-    )
-    .subscribe(registrants => {
-      this._registrantsArray = _.slice(registrants, 0, this._numberOfItems);
-      this.registrants = of(this._registrantsArray);
-      this.nextKey = _.get(registrants[this._numberOfItems], 'creationDate');
-      this._loading.next(false);
-    });
-  }
-
-  onNext () {
-    this.prevKeys.push(_.first(this._registrantsArray)['creationDate']);
-    this.getRegistrantsList(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.nextKey);
-  }
-  
-  onPrev () {
-    const prevKey = _.last(this.prevKeys); // get last key
-    this.prevKeys = _.dropRight(this.prevKeys); // delete last key
-    this.getRegistrantsList(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, prevKey);
   }
 }

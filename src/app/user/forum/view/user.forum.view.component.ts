@@ -510,6 +510,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                         registrants[i].service = of(result);
                       else
                         registrants[i].service = of(null);
+                        
                       return registrants[i];
                     });
                   });

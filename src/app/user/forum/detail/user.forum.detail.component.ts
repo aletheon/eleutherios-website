@@ -561,7 +561,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: 'Forum does not exist or was recently removed 2222',
+              data: 'Forum does not exist or was recently removed',
               panelClass: ['red-snackbar']
             }
           );
