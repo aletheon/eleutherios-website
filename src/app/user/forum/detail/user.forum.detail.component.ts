@@ -512,9 +512,9 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
       }
   
       this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
+        this._initialForumSubscription.unsubscribe();
+
         if (forum){
-          this._initialForumSubscription.unsubscribe();
-          
           if (forum.uid == this.auth.uid){
             this._canViewDetail.next(true);
             this.forum = this.userForumService.getForum(forumUserId, forumId);

@@ -97,9 +97,9 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
 
       this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId)
         .subscribe(forum => {
+          this._initialForumSubscription.unsubscribe();
+
           if (forum){
-            this._initialForumSubscription.unsubscribe();
-            
             if (forum.uid == this.auth.uid){
               this.forum = this.userForumService.getForum(this.userId, this.forumId);
               this.initForm();

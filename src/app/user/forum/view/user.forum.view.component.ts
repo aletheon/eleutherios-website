@@ -186,8 +186,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
       this.messageSharingService.changeViewForumId('');
 
       this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).subscribe(forum => {
+        this._initialForumSubscription.unsubscribe();
+
         if (forum){
-          this._initialForumSubscription.unsubscribe();
           this._tempForum = forum;
 
           // ensure user is serving in the forum before viewing it

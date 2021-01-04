@@ -498,9 +498,9 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
       this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId)
         .subscribe(forum => {
-          if (forum){
-            this._initialForumSubscription.unsubscribe();
+          this._initialForumSubscription.unsubscribe();
 
+          if (forum){
             if (forum.title.length > 0){
               if (this.auth.uid == forum.uid || forum.type == 'Public'){
                 this.forum = this.userForumService.getForum(this.userId, this.forumId);

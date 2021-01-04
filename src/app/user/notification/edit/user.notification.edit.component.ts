@@ -211,8 +211,9 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
 
     this.route.queryParams.subscribe((params: Params) => {
       this._initialNotificationSubscription = this.userNotificationService.getNotification(this.auth.uid, params['notificationId']).subscribe(notification => {
+        this._initialNotificationSubscription.unsubscribe();
+
         if (notification){
-          this._initialNotificationSubscription.unsubscribe();
           this.notification = this.userNotificationService.getNotification(this.auth.uid, params['notificationId']);
           this.initForm();
         }

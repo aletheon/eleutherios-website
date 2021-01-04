@@ -208,9 +208,9 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
 
       this._initialForumSubscription = this.userForumService.getForum(this.parentForumUserId, this.parentForumId)
         .subscribe(forum => {
+          this._initialForumSubscription.unsubscribe();
+
           if (forum){
-            this._initialForumSubscription.unsubscribe();
-            
             if (forum.title.length > 0){
               this._tempForum = forum;
 

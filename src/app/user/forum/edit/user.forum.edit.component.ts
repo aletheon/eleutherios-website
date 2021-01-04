@@ -183,8 +183,9 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
 
     this.route.queryParams.subscribe((params: Params) => {
       this._initialForumSubscription = this.userForumService.getForum(this.auth.uid, params['forumId']).subscribe(forum => {
+        this._initialForumSubscription.unsubscribe();
+
         if (forum){
-          this._initialForumSubscription.unsubscribe();
           this.forum = this.userForumService.getForum(this.auth.uid, params['forumId']);
           this.initForm();
         }

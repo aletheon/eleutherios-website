@@ -70,8 +70,9 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
 
     this.route.queryParams.subscribe((params: Params) => {
       this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.auth.uid, params['receiptId']).subscribe(receipt => {
+        this._initialReceiptSubscription.unsubscribe();
+
         if (receipt){
-          this._initialReceiptSubscription.unsubscribe();
           this.receipt = this.userReceiptService.getReceipt(this.auth.uid, params['receiptId']);
           this.initForm();
         }

@@ -70,8 +70,9 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
 
     this.route.queryParams.subscribe((params: Params) => {
       this._initialPaymentSubscription = this.userPaymentService.getPayment(this.auth.uid, params['paymentId']).subscribe(payment => {
+        this._initialPaymentSubscription.unsubscribe();
+
         if (payment){
-          this._initialPaymentSubscription.unsubscribe();
           this.payment = this.userPaymentService.getPayment(this.auth.uid, params['paymentId']);
           this.initForm();
         }
