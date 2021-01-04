@@ -494,8 +494,9 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       if (serviceId){
         this._initialServiceSubscription = this.serviceService.getService(serviceId)
           .subscribe(service => {
+            this._initialServiceSubscription.unsubscribe();
+
             if (service){
-              this._initialServiceSubscription.unsubscribe();
               this.service = this.serviceService.getService(serviceId);
               this.initForm();
             }

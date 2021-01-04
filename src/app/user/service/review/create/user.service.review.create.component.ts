@@ -137,9 +137,9 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
       if (parentServiceUserId && parentServiceId){
         this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
                   // check permissions

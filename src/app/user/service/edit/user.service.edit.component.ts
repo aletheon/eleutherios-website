@@ -1098,8 +1098,9 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         this._onboarding = true;
 
       this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
+        this._initialServiceSubscription.unsubscribe();
+
         if (service){
-          this._initialServiceSubscription.unsubscribe();
           this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
           this.searchPrivateForums = true;
           this.searchForumIncludeTagsInSearch = true;

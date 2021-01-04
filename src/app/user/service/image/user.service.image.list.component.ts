@@ -99,9 +99,9 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
         // ensure service exists
         this._initialServiceSubscription = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               // authenticate
               let canViewDetail: boolean = false;
 

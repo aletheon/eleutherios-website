@@ -120,9 +120,9 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
       if (parentServiceUserId && parentServiceId){
         this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               if (service.uid == this.auth.uid){
                 this._canViewService.next(true);
                 this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);

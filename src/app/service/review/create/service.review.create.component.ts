@@ -115,9 +115,9 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
       if (parentServiceId){
         this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
                   this.service = this.serviceService.getService(parentServiceId);

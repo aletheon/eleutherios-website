@@ -491,9 +491,9 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
       if (serviceId){
         this._initialServiceSubscription = this.userServiceService.getService(serviceUserId, serviceId)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               if (service.uid == this.auth.uid){
                 this._canViewDetail.next(true);
                 this.service = this.userServiceService.getService(serviceUserId, serviceId);

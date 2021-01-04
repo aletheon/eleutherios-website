@@ -495,8 +495,9 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
 
       if (forumId){
         this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
+          this._initialForumSubscription.unsubscribe();
+          
           if (forum){
-            this._initialForumSubscription.unsubscribe();
             this.forum = this.forumService.getForum(forumId);
             this.initForm();
           }
@@ -505,7 +506,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: 'Forum does not exist or was recently removed',
+                data: 'Forum does not exist or was recently removed 3',
                 panelClass: ['red-snackbar']
               }
             );
@@ -560,7 +561,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: 'Forum does not exist or was recently removed',
+              data: 'Forum does not exist or was recently removed 4',
               panelClass: ['red-snackbar']
             }
           );

@@ -614,6 +614,8 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         if (forum){
           this.forumGroup.patchValue(forum);
 
+          // HERE ROB TIDY THIS UP
+
           if (this.auth.uid == forum.uid || forum.type == 'Public'){
             // ok to add service
           }

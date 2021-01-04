@@ -97,8 +97,9 @@ export class ServiceReviewViewComponent implements OnInit, OnDestroy  {
       if (parentServiceId){
         this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
           .subscribe(service => {
+            this._initialServiceSubscription.unsubscribe();
+
             if (service){
-              this._initialServiceSubscription.unsubscribe();
               this.service = this.serviceService.getService(parentServiceId);
               this.initForm();
             }

@@ -1004,9 +1004,9 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
 
         this._initialServiceSubscription = this.userServiceService.getService(requestServiceUserId, requestServiceId)
           .subscribe(requestService => {
-            if (requestService){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (requestService){
               if (requestService.title.length == 0){
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,

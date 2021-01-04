@@ -93,9 +93,9 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
       if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('serviceId').value.length > 0){
         this._initialServiceSubscription = this.serviceService.getService(this.serviceGroup.get('serviceId').value)
           .subscribe(service => {
-            if (service){
-              this._initialServiceSubscription.unsubscribe();
+            this._initialServiceSubscription.unsubscribe();
 
+            if (service){
               // authenticate
               let canViewDetail: boolean = false;
 

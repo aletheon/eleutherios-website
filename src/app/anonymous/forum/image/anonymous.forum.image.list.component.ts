@@ -99,7 +99,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: 'Forum does not exist or was recently removed',
+                  data: 'Forum does not exist or was recently removed 2',
                   panelClass: ['red-snackbar']
                 }
               );

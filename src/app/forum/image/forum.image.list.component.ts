@@ -98,8 +98,9 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
       // ensure forum exists
       this._initialForumSubscription = this.forumSerivce.getForum(this.forumGroup.get('forumId').value)
         .subscribe(forum => {
+          this._initialForumSubscription.unsubscribe();
+          
           if (forum){
-            this._initialForumSubscription.unsubscribe();
             this.forum = this.forumSerivce.getForum(this.forumGroup.get('forumId').value);
             this.initForm();
           }
