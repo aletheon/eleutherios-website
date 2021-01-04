@@ -289,7 +289,7 @@
 					</div>
 					<!-- tag results -->
 					<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:5px">
-						<ng-container *ngIf="searchServiceTags.length > 0; then showsearchservicetags else nosearchservicetags">
+						<ng-container *ngIf="searchServiceTags.length > 0">
 							<div class="label label-default" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px"
 								*ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
 								<span>{{ tag.tag }}</span>

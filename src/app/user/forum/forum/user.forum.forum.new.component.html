@@ -242,7 +242,7 @@
             </div>
             <!-- tag results -->
             <div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
-              <ng-container *ngIf="searchServiceTags.length > 0;">
+              <ng-container *ngIf="searchServiceTags.length > 0">
                 <div [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;display:flex;flex-direction:row;margin-right:5px;align-items:center"
                   *ngFor="let tag of searchServiceTags; trackBy: trackSearchServiceTags">
                   <span>{{ tag.tag }}</span>
