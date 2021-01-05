@@ -33,6 +33,9 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     private snackbar: MatSnackBar) {
   }
 
+  // 1) give end users ability to change username (by default give them their userId as their username in createUser)
+  // 2) clean up subscriptions so they are unsubscribed from properly
+
   pushNotificationSave () {
     const that = this;
 

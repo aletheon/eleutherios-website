@@ -105,6 +105,7 @@ export class AuthService {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
+          userName: user.uid,
           stripeCustomerId: '',
           stripeAccountId: '',
           stripeOnboardingStatus: '',
