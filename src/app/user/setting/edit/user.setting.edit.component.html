@@ -13,9 +13,32 @@
 				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
 					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
 				</div>
-				<!-- <p *ngIf="userItem.receivePushNotifications == false" class="panel panel-default" style="margin-bottom:10px;padding:6px">
-					<b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).
-				</p> -->
+				<div style="margin-bottom:10px">
+					<mat-form-field style="width:100%">
+						<input
+							matInput
+							#displayNameRef
+							placeholder="Display Name"
+							formControlName="displayName"
+							(change)="saveChanges()">
+						<mat-error *ngIf="!userGroup.get('displayName').valid || userGroup.get('displayName').touched">
+							Display name is required
+						</mat-error>
+					</mat-form-field>
+				</div>
+				<div style="margin-bottom:10px">
+					<mat-form-field style="width:100%">
+						<input
+							matInput
+							#usernameRef
+							placeholder="Username"
+							formControlName="username"
+							(change)="saveChanges()">
+						<mat-error *ngIf="!userGroup.get('username').valid || userGroup.get('username').touched">
+							User name is required
+						</mat-error>
+					</mat-form-field>
+				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading" style="display:flex;flex-direction:row">
 						<div style="flex:1">

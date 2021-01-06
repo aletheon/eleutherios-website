@@ -2,7 +2,7 @@ export interface User {
   uid: string,
   email: string, // email of the user
   displayName?: string, // display name
-  userName: string, // display name
+  username: string, // display name
   stripeCustomerId: string,
   stripeAccountId: string,
   stripeOnboardingStatus: string, // [Pending, Authorized, Deauthorized]

@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import {
   PushMessageService,
   UserService
@@ -20,6 +20,8 @@ import * as firebase from 'firebase/app';
   styleUrls: ['./user.setting.edit.component.css']
 })
 export class UserSettingEditComponent implements OnInit, OnDestroy {
+  @ViewChild('displayNameRef', { static: false }) displayNameRef: ElementRef;
+  @ViewChild('usernameRef', { static: false }) usernameRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _userSubscription: Subscription;
   
@@ -33,7 +35,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     private snackbar: MatSnackBar) {
   }
 
-  // 1) give end users ability to change username (by default give them their userId as their username in createUser)
+  // 1) give end users ability to change username
   // 2) clean up subscriptions so they are unsubscribed from properly
 
   pushNotificationSave () {
@@ -93,37 +95,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
       this.pushMessageService.getPermission(this.auth.uid);
   }
 
-  saveChanges () {
-    if (this.userGroup.status != 'VALID') {
-      console.log('user is not valid, cannot save to database');
-      return;
-    }
-  
-    const data = {
-      uid: this.userGroup.get('uid').value,
-      email: this.userGroup.get('email').value,
-      displayName: this.userGroup.get('displayName').value,
-      receivePushNotifications: this.userGroup.get('receivePushNotifications').value,
-      receiveForumAlertNotifications: this.userGroup.get('receiveForumAlertNotifications').value,
-      receiveServiceAlertNotifications: this.userGroup.get('receiveServiceAlertNotifications').value,
-      receiveForumPostNotifications: this.userGroup.get('receiveForumPostNotifications').value,
-      receiveAlphaNotification: this.userGroup.get('receiveAlphaNotification').value,
-      lastUpdateDate: this.userGroup.get('lastUpdateDate').value,
-      creationDate: this.userGroup.get('creationDate').value
-    }
-  
-    this.userService.update(this.auth.uid, data).then(() => {
-      const snackBarRef = this.snackbar.openFromComponent(
-        NotificationSnackBar,
-        {
-          duration: 5000,
-          data: 'Settings saved',
-          panelClass: ['green-snackbar']
-        }
-      );
-    });
-  }
-
   delete () {
     const snackBarRef = this.snackbar.openFromComponent(
       NotificationSnackBar,
@@ -151,7 +122,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this.userGroup = this.fb.group({
       uid:                              [''],
       email:                            [''],
-      displayName:                      [''],
+      displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
+      username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       receivePushNotifications:         [''],
       receiveForumAlertNotifications:   [''],
       receiveServiceAlertNotifications: [''],
@@ -167,9 +139,6 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         this.userGroup.patchValue(user);
 
         if (user.receivePushNotifications == false){
-
-
-
           this.userGroup.get('receiveForumAlertNotifications').disable();
           this.userGroup.get('receiveServiceAlertNotifications').disable();
           this.userGroup.get('receiveForumPostNotifications').disable();
@@ -181,6 +150,72 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         }
       }
       this._loading.next(false);
+    });
+  }
+
+  saveChanges () {
+    if (this.userGroup.status != 'VALID') {
+      if (this.userGroup.get('displayName').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.userGroup.controls) {
+            this.userGroup.controls[i].markAsTouched();
+          }
+          this.displayNameRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.userGroup.get('displayName').hasError('pattern')){
+        setTimeout(() => {
+          for (let i in this.userGroup.controls) {
+            this.userGroup.controls[i].markAsTouched();
+          }
+          this.displayNameRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.userGroup.get('username').hasError('required')) {
+        setTimeout(() => {
+          for (let i in this.userGroup.controls) {
+            this.userGroup.controls[i].markAsTouched();
+          }
+          this.usernameRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+      else if (this.userGroup.get('username').hasError('pattern')){
+        setTimeout(() => {
+          for (let i in this.userGroup.controls) {
+            this.userGroup.controls[i].markAsTouched();
+          }
+          this.usernameRef.nativeElement.focus();
+        }, 500);
+        return;
+      }
+    }
+  
+    const data = {
+      uid: this.userGroup.get('uid').value,
+      email: this.userGroup.get('email').value,
+      displayName: this.userGroup.get('displayName').value,
+      username: this.userGroup.get('username').value,
+      receivePushNotifications: this.userGroup.get('receivePushNotifications').value,
+      receiveForumAlertNotifications: this.userGroup.get('receiveForumAlertNotifications').value,
+      receiveServiceAlertNotifications: this.userGroup.get('receiveServiceAlertNotifications').value,
+      receiveForumPostNotifications: this.userGroup.get('receiveForumPostNotifications').value,
+      receiveAlphaNotification: this.userGroup.get('receiveAlphaNotification').value,
+      lastUpdateDate: this.userGroup.get('lastUpdateDate').value,
+      creationDate: this.userGroup.get('creationDate').value
+    }
+  
+    this.userService.update(this.auth.uid, data).then(() => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 5000,
+          data: 'Settings saved',
+          panelClass: ['green-snackbar']
+        }
+      );
     });
   }
 }
