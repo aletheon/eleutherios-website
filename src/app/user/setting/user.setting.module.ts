@@ -8,6 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { AppRoutingModule } from '../../app-routing.module';
 
 import { UserSettingEditComponent } from './edit/user.setting.edit.component';
 
@@ -23,6 +24,7 @@ import {
     MatSnackBarModule,
     MatCheckboxModule,
     MatIconModule,
+    AppRoutingModule,
     CommonModule,
     MatInputModule,
     LoadingSpinnerModule,

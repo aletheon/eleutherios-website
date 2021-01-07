@@ -31,19 +31,19 @@
 						<input
 							matInput
 							#usernameRef
-							placeholder="Username"
+							placeholder="User name"
 							formControlName="username"
 							(change)="saveChanges()">
 						<mat-error *ngIf="userGroup.get('username').value.length == 0">
 							User name is required
 						</mat-error>
 						<mat-error *ngIf="userGroup.get('username').hasError('pattern')">
-							User name is invalid must be 6-20 alphanumeric characters
+							User name is invalid must be 3-20 alphanumeric characters, dot, underscore, no spaces
 						</mat-error>
 					</mat-form-field>
 				</div>
 				<div style="margin-bottom:10px;font-size:0.85em">
-					<a [routerLink]="['/']" [queryParams]="{ username: userGroup.get('username').value }" style="word-break: break-all;color:#1B1B1B;cursor:pointer">http://localhost:4200/{{ userGroup.get('username').value }}</a>
+					<a [routerLink]="['/', userGroup.get('username').value]" style="word-break: break-all;color:#1B1B1B">http://localhost:4200/{{ userGroup.get('username').value }}</a>
 				</div>
 				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
 					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>

@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   PushMessageService,
   UserService
@@ -29,10 +31,12 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   public loading: Observable<boolean> = this._loading.asObservable();
 
   constructor(public auth: AuthService,
+    private route: ActivatedRoute,
     private userService: UserService,
     private pushMessageService: PushMessageService,
     private fb: FormBuilder, 
-    private snackbar: MatSnackBar) {
+    private snackbar: MatSnackBar,
+    private router: Router) {
   }
 
   // 1) give end users ability to change username
@@ -122,8 +126,11 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this.userGroup = this.fb.group({
       uid:                              [''],
       email:                            [''],
+
+      // HERE ROB HAVE TO ALLOW FOR SPACES IN DISPLAY NAME ETC
+
       displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
-      username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
+      username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       receivePushNotifications:         [''],
       receiveForumAlertNotifications:   [''],
       receiveServiceAlertNotifications: [''],
