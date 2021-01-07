@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import {
   PushMessageService,
   UserService
@@ -122,7 +122,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this.userGroup = this.fb.group({
       uid:                              [''],
       email:                            [''],
-      displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
+      displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{6,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       receivePushNotifications:         [''],
       receiveForumAlertNotifications:   [''],

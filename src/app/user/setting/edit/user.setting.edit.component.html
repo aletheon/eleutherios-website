@@ -10,8 +10,20 @@
 		<!-- START OF USER DETAILS SECTION -->
 		<form [formGroup]="userGroup" novalidate>
 			<ng-container *ngIf="auth.user | async;let userItem">
-				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
-					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
+				<div style="margin-bottom:10px">
+					here {{ uuidtest }}
+				</div>
+				<div style="margin-bottom:10px">
+					here 
+				</div>
+				<div style="margin-bottom:10px">
+					here 
+				</div>
+				<div style="margin-bottom:10px">
+					here 
+				</div>
+				<div style="margin-bottom:10px">
+					here 
 				</div>
 				<div style="margin-bottom:10px">
 					<mat-form-field style="width:100%">
@@ -21,8 +33,11 @@
 							placeholder="Display Name"
 							formControlName="displayName"
 							(change)="saveChanges()">
-						<mat-error *ngIf="!userGroup.get('displayName').valid || userGroup.get('displayName').touched">
+						<mat-error *ngIf="userGroup.get('displayName').value.length == 0">
 							Display name is required
+						</mat-error>
+						<mat-error *ngIf="userGroup.get('displayName').hasError('pattern')">
+							Display name is invalid must be 3-20 alphanumeric characters
 						</mat-error>
 					</mat-form-field>
 				</div>
@@ -34,10 +49,16 @@
 							placeholder="Username"
 							formControlName="username"
 							(change)="saveChanges()">
-						<mat-error *ngIf="!userGroup.get('username').valid || userGroup.get('username').touched">
+						<mat-error *ngIf="userGroup.get('username').value.length == 0">
 							User name is required
 						</mat-error>
+						<mat-error *ngIf="userGroup.get('username').hasError('pattern')">
+							User name is invalid must be 6-20 alphanumeric characters
+						</mat-error>
 					</mat-form-field>
+				</div>
+				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
+					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading" style="display:flex;flex-direction:row">
