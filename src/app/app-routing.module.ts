@@ -199,7 +199,7 @@ const routes: Routes = [
   // user routines
   // **********************************************
   {
-    path: ':user',
+    path: ':username',
     component: UserProfileComponent,
     canActivate: [AuthGuard]
   },

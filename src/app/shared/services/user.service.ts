@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
 
 import * as firebase from 'firebase/app';
-import { Observable, defer } from 'rxjs';
+import { Observable, from } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -108,5 +108,28 @@ export class UserService {
 
   public getUser (parentUserId: string): Observable<any> {
     return this.afs.doc<User>(`users/${parentUserId}`).valueChanges();
+  }
+
+  public getUserByUsername (username: string): Observable<any> {
+    const that = this;
+
+    var getByUsername = function () {
+      return new Promise((resolve, reject) => {
+        let query = that.afs.collection<User>('users', ref => ref.where('username', '==', username).limit(1)).ref;
+
+        query.get()
+          .then(snapshot => {
+            if (snapshot.size > 0)
+              resolve(snapshot.docs[0].data());
+            else
+              resolve(null);
+          })
+          .catch(error => {
+            reject(error);
+          }
+        );
+      });
+    };
+    return from(getByUsername());
   }
 }
