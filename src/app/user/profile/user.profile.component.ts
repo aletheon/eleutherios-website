@@ -12,7 +12,6 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
-import * as async from 'async'
 import * as firebase from 'firebase/app';
 
 @Component({
