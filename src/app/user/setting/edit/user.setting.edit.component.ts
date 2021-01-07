@@ -11,6 +11,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
+import { environment } from '../../../../environments/environment'
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import * as async from 'async'
@@ -29,6 +30,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   
   public userGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public url: string = environment.url;
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
