@@ -149,8 +149,15 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
           this.userGroup.get('receiveForumPostNotifications').enable();
         }
       }
-      this._loading.next(false);
     });
+
+    // run once subscription
+    const runOnceSubscription = this.auth.user
+      .subscribe(user => {
+        this._loading.next(false);
+        runOnceSubscription.unsubscribe();
+      }
+    );
   }
 
   saveChanges () {

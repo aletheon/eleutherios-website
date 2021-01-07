@@ -38,6 +38,7 @@ import { ServiceReviewViewComponent } from './service/review/view/service.review
 
 // user
 
+import { UserProfileComponent } from './user/profile/user.profile.component';
 import { UserImageListComponent } from './user/image/list/user.image.list.component';
 import { UserImageViewComponent } from './user/image/view/user.image.view.component';
 import { UserServiceNewComponent } from './user/service/new/user.service.new.component';
@@ -197,6 +198,11 @@ const routes: Routes = [
   // **********************************************
   // user routines
   // **********************************************
+  {
+    path: ':user',
+    component: UserProfileComponent,
+    canActivate: [AuthGuard]
+  },
   {
     path: 'user/image/list',
     component: UserImageListComponent,

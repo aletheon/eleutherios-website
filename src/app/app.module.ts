@@ -59,6 +59,7 @@ import { UserSettingModule } from './user/setting/user.setting.module';
 import { UserPaymentModule } from './user/payment/user.payment.module';
 import { UserReceiptModule } from './user/receipt/user.receipt.module';
 import { UserTagModule } from './user/tag/user.tag.module';
+import { UserProfileModule } from './user/profile/user.profile.module';
 
 // Some components (mat-slide-toggle, mat-slider, matTooltip) rely on HammerJS for gestures. In order to get the full feature-set of these components, HammerJS must be loaded into the application.
 // You can add HammerJS to your application via npm, a CDN (such as the Google CDN), or served directly from your app.
@@ -122,6 +123,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserPaymentModule,
     UserReceiptModule,
     UserTagModule,
+    UserProfileModule,
     StarRatingModule.forRoot(),
     FacebookModule.forRoot(),
     NgxStripeModule.forRoot(environment.stripeTestKey)
