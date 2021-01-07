@@ -115,7 +115,7 @@ export class UserService {
 
     var getByUsername = function () {
       return new Promise((resolve, reject) => {
-        let query = that.afs.collection<User>('users', ref => ref.where('username', '==', username).limit(1)).ref;
+        let query = that.afs.collection("users").ref.where('username', '==', username);
 
         query.get()
           .then(snapshot => {

@@ -46,12 +46,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let username = params['username'];
+    let username = this.router.url.substring(this.router.url.lastIndexOf('/') + 1);
 
+    if (username && username.length > 0){
       this._initialUserSubscription = this.userService.getUserByUsername(username).subscribe(user => {
         this._initialUserSubscription.unsubscribe();
-
+  
         if (user){
           this.user = this.userService.getUserByUsername(username);
           this.initForm();
@@ -68,7 +68,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         }
       });
-    });
+    }
+    else {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: `Username was not provided`,
+          panelClass: ['red-snackbar']
+        }
+      );
+      this.router.navigate(['/']);
+    }
   }
 
   private initForm () {

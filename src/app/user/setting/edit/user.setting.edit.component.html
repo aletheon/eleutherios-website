@@ -26,7 +26,7 @@
 						</mat-error>
 					</mat-form-field>
 				</div>
-				<div style="margin-bottom:10px">
+				<div style="margin-bottom:0px">
 					<mat-form-field style="width:100%">
 						<input
 							matInput
@@ -42,8 +42,8 @@
 						</mat-error>
 					</mat-form-field>
 				</div>
-				<div style="margin-bottom:10px">
-					Public profile link: <a [routerLink]="['/profile']" [queryParams]="{ username: userGroup.get('username').value }" style="word-break: break-all;color:#1B1B1B">http://localhost:4200/profile/{{ userGroup.get('username').value }}</a>
+				<div style="margin-bottom:10px;font-size:0.85em">
+					<a [routerLink]="['/']" [queryParams]="{ username: userGroup.get('username').value }" style="word-break: break-all;color:#1B1B1B;cursor:pointer">http://localhost:4200/{{ userGroup.get('username').value }}</a>
 				</div>
 				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
 					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
