@@ -141,7 +141,7 @@ export class LoginLinkComponent implements OnInit {
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName,
-                    username: user.uid.substring(0,12),
+                    username: user.uid.substring(0,20),
                     stripeCustomerId: '',
                     stripeAccountId: '',
                     stripeOnboardingStatus: '',
