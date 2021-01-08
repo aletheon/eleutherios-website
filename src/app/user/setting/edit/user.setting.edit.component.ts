@@ -30,6 +30,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   
   public userGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public userNameAlreadyExists: boolean = false;
   public url: string = environment.url;
 
   constructor(public auth: AuthService,
@@ -128,10 +129,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     this.userGroup = this.fb.group({
       uid:                              [''],
       email:                            [''],
-
-      // HERE ROB HAVE TO ALLOW FOR SPACES IN DISPLAY NAME AND VALIDATE THAT USERNAME IS NOT ALREADY TAKEN
-
-      displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
+      displayName:                      ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9\s]{3,20}$/)]],
       username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       receivePushNotifications:         [''],
       receiveForumAlertNotifications:   [''],
@@ -170,6 +168,9 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   }
 
   saveChanges () {
+    const that = this;
+    this.userNameAlreadyExists = false;
+
     if (this.userGroup.status != 'VALID') {
       if (this.userGroup.get('displayName').hasError('required')) {
         setTimeout(() => {
@@ -208,30 +209,69 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
         return;
       }
     }
-  
-    const data = {
-      uid: this.userGroup.get('uid').value,
-      email: this.userGroup.get('email').value,
-      displayName: this.userGroup.get('displayName').value,
-      username: this.userGroup.get('username').value,
-      receivePushNotifications: this.userGroup.get('receivePushNotifications').value,
-      receiveForumAlertNotifications: this.userGroup.get('receiveForumAlertNotifications').value,
-      receiveServiceAlertNotifications: this.userGroup.get('receiveServiceAlertNotifications').value,
-      receiveForumPostNotifications: this.userGroup.get('receiveForumPostNotifications').value,
-      receiveAlphaNotification: this.userGroup.get('receiveAlphaNotification').value,
-      lastUpdateDate: this.userGroup.get('lastUpdateDate').value,
-      creationDate: this.userGroup.get('creationDate').value
-    }
-  
-    this.userService.update(this.auth.uid, data).then(() => {
-      const snackBarRef = this.snackbar.openFromComponent(
-        NotificationSnackBar,
-        {
-          duration: 5000,
-          data: 'Settings saved',
-          panelClass: ['green-snackbar']
+
+    let saveData = function () {
+      return new Promise((resolve, reject) => {
+        const data = {
+          uid: that.userGroup.get('uid').value,
+          email: that.userGroup.get('email').value,
+          displayName: that.userGroup.get('displayName').value.replace(/\s\s+/g,' '),
+          username: that.userGroup.get('username').value,
+          receivePushNotifications: that.userGroup.get('receivePushNotifications').value,
+          receiveForumAlertNotifications: that.userGroup.get('receiveForumAlertNotifications').value,
+          receiveServiceAlertNotifications: that.userGroup.get('receiveServiceAlertNotifications').value,
+          receiveForumPostNotifications: that.userGroup.get('receiveForumPostNotifications').value,
+          receiveAlphaNotification: that.userGroup.get('receiveAlphaNotification').value,
+          lastUpdateDate: that.userGroup.get('lastUpdateDate').value,
+          creationDate: that.userGroup.get('creationDate').value
         }
-      );
-    });
+      
+        that.userService.update(that.auth.uid, data).then(() => {
+          const snackBarRef = that.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 5000,
+              data: 'Settings saved',
+              panelClass: ['green-snackbar']
+            }
+          );
+          resolve(null);
+        })
+        .catch(error => {
+          reject(error);
+        });
+      });
+    };
+
+    // ensure username is not already taken
+    const validateUserSubscription = this.auth.user
+      .subscribe(user => {
+        validateUserSubscription.unsubscribe();
+
+        if (user.username != this.userGroup.get('username').value){
+          this.userService.validateUsername(this.userGroup.get('username').value).then(exists => {
+            if (!exists){
+              console.log('saving data');
+              saveData();
+            }
+            else {
+              const snackBarRef = that.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 5000,
+                  data: `The username '${this.userGroup.get('username').value}' is already being used`,
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.usernameRef.nativeElement.focus();
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          });
+        }
+        else saveData();
+      }
+    );
   }
 }

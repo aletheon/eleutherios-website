@@ -132,4 +132,22 @@ export class UserService {
     };
     return from(getByUsername());
   }
+
+  public validateUsername (username: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      let query = this.afs.collection("users").ref.where('username', '==', username);
+
+      query.get()
+        .then(snapshot => {
+          if (snapshot.size > 0)
+            resolve(true);
+          else
+            resolve(false);
+        })
+        .catch(error => {
+          reject(error);
+        }
+      );
+    });
+  }
 }

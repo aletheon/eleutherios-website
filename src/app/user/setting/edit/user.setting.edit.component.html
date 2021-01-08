@@ -31,14 +31,17 @@
 						<input
 							matInput
 							#usernameRef
-							placeholder="User name"
+							placeholder="Username"
 							formControlName="username"
 							(change)="saveChanges()">
 						<mat-error *ngIf="userGroup.get('username').value.length == 0">
-							User name is required
+							Username is required
 						</mat-error>
 						<mat-error *ngIf="userGroup.get('username').hasError('pattern')">
-							User name is invalid must be 3-20 alphanumeric characters, dot, underscore, no spaces
+							Username is invalid must be 3-20 alphanumeric characters, dot, underscore, no spaces
+						</mat-error>
+						<mat-error *ngIf="userNameAlreadyExists">
+							Username has already been taken
 						</mat-error>
 					</mat-form-field>
 				</div>
