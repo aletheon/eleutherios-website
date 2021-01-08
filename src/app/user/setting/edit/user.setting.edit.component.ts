@@ -250,10 +250,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
         if (user.username != this.userGroup.get('username').value){
           this.userService.validateUsername(this.userGroup.get('username').value).then(exists => {
-            if (!exists){
-              console.log('saving data');
+            if (!exists)
               saveData();
-            }
             else {
               const snackBarRef = that.snackbar.openFromComponent(
                 NotificationSnackBar,
