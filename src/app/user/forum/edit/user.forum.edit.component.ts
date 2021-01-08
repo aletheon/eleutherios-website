@@ -213,7 +213,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       parentUid:                          [''],
       uid:                                [''],
       type:                               [''],
-      title:                              ['', Validators.required ],
+      title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
       title_lowercase:                    [''],
       description:                        [''],
       website:                            [''],
@@ -1708,7 +1708,10 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
             for (let i in this.forumGroup.controls) {
               this.forumGroup.controls[i].markAsTouched();
             }
-            this.titleRef.nativeElement.focus();
+
+            if (this.forumGroup.get('title').hasError('required')) {
+              this.titleRef.nativeElement.focus();
+            }
           }, 500);
           return;
       }
@@ -1717,46 +1720,34 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     let tempTitle = this.forumGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
-      if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
-        const forum: Forum = {
-          forumId: this.forumGroup.get('forumId').value,
-          parentId: this.forumGroup.get('parentId').value,
-          parentUid: this.forumGroup.get('parentUid').value,
-          uid: this.forumGroup.get('uid').value,
-          type: this.forumGroup.get('type').value,
-          title: tempTitle,
-          title_lowercase: tempTitle.toLowerCase(),
-          description: this.forumGroup.get('description').value.trim(),
-          website: this.forumGroup.get('website').value.trim(),
-          indexed: this.forumGroup.get('indexed').value != undefined ? this.forumGroup.get('indexed').value : false,
-          includeDescriptionInDetailPage: this.forumGroup.get('includeDescriptionInDetailPage').value,
-          includeImagesInDetailPage: this.forumGroup.get('includeImagesInDetailPage').value,
-          includeTagsInDetailPage: this.forumGroup.get('includeTagsInDetailPage').value,
-          creationDate: this.forumGroup.get('creationDate').value,
-          lastUpdateDate: this.forumGroup.get('lastUpdateDate').value
-        };
-        
-        this.userForumService.update(this.auth.uid, forum.forumId, forum).then(() => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 5000,
-              data: 'Forum saved',
-              panelClass: ['green-snackbar']
-            }
-          );
-        });
-      }
-      else {
-        const snackBarRef =this.snackbar.openFromComponent(
+      const forum: Forum = {
+        forumId: this.forumGroup.get('forumId').value,
+        parentId: this.forumGroup.get('parentId').value,
+        parentUid: this.forumGroup.get('parentUid').value,
+        uid: this.forumGroup.get('uid').value,
+        type: this.forumGroup.get('type').value,
+        title: tempTitle,
+        title_lowercase: tempTitle.toLowerCase(),
+        description: this.forumGroup.get('description').value.trim(),
+        website: this.forumGroup.get('website').value.trim(),
+        indexed: this.forumGroup.get('indexed').value != undefined ? this.forumGroup.get('indexed').value : false,
+        includeDescriptionInDetailPage: this.forumGroup.get('includeDescriptionInDetailPage').value,
+        includeImagesInDetailPage: this.forumGroup.get('includeImagesInDetailPage').value,
+        includeTagsInDetailPage: this.forumGroup.get('includeTagsInDetailPage').value,
+        creationDate: this.forumGroup.get('creationDate').value,
+        lastUpdateDate: this.forumGroup.get('lastUpdateDate').value
+      };
+      
+      this.userForumService.update(this.auth.uid, forum.forumId, forum).then(() => {
+        const snackBarRef = this.snackbar.openFromComponent(
           NotificationSnackBar,
           {
-            duration: 8000,
-            data: `Invalid characters we're located in the title field, valid characters include [A-Za-z0-9]`,
-            panelClass: ['red-snackbar']
+            duration: 5000,
+            data: 'Forum saved',
+            panelClass: ['green-snackbar']
           }
         );
-      }
+      });
     }
     else {
       const snackBarRef =this.snackbar.openFromComponent(

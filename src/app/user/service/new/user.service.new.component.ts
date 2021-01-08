@@ -1159,7 +1159,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       serviceId:                      [''],
       uid:                            [''],
       type:                           [''],
-      title:                          ['', Validators.required ],
+      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
       title_lowercase:                [''],
       description:                    [''],
       website:                        [''],
@@ -2261,59 +2261,47 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     let tempTitle = this.serviceGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
-      if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
-        const data = {
-          serviceId: this.serviceGroup.get('serviceId').value,
-          uid: this.serviceGroup.get('uid').value,
-          type: this.serviceGroup.get('type').value,
-          title: tempTitle,
-          title_lowercase: tempTitle.toLowerCase(),
-          description: this.serviceGroup.get('description').value.trim(),
-          website: this.serviceGroup.get('website').value.trim(),
-          default: this.serviceGroup.get('default').value,
-          indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
-          rate: this.serviceGroup.get('rate').value,
-          paymentType: this.serviceGroup.get('paymentType').value,
-          amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
-          typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
-          currency: this.serviceGroup.get('currency').value,
-          paymentId: this.serviceGroup.get('paymentId').value,
-          paymentUserId: this.serviceGroup.get('paymentUserId').value,
-          includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
-          includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
-          includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,
-          lastUpdateDate: this.serviceGroup.get('lastUpdateDate').value,
-          creationDate: this.serviceGroup.get('creationDate').value
-        };
-        
-        this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
-          if (window.localStorage.getItem('serviceForum')){
-            let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
-            window.localStorage.removeItem('serviceForum');
-            this.addForum(serviceForum);
-          }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 5000,
-                data: 'Service saved',
-                panelClass: ['green-snackbar']
-              }
-            );
-          }
-        });
-      }
-      else {
-        const snackBarRef =this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: `Invalid characters we're located in the title field, valid characters include [A-Za-z0-9]`,
-            panelClass: ['red-snackbar']
-          }
-        );
-      }
+      const data = {
+        serviceId: this.serviceGroup.get('serviceId').value,
+        uid: this.serviceGroup.get('uid').value,
+        type: this.serviceGroup.get('type').value,
+        title: tempTitle,
+        title_lowercase: tempTitle.toLowerCase(),
+        description: this.serviceGroup.get('description').value.trim(),
+        website: this.serviceGroup.get('website').value.trim(),
+        default: this.serviceGroup.get('default').value,
+        indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
+        rate: this.serviceGroup.get('rate').value,
+        paymentType: this.serviceGroup.get('paymentType').value,
+        amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
+        typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
+        currency: this.serviceGroup.get('currency').value,
+        paymentId: this.serviceGroup.get('paymentId').value,
+        paymentUserId: this.serviceGroup.get('paymentUserId').value,
+        includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
+        includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
+        includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,
+        lastUpdateDate: this.serviceGroup.get('lastUpdateDate').value,
+        creationDate: this.serviceGroup.get('creationDate').value
+      };
+      
+      this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
+        if (window.localStorage.getItem('serviceForum')){
+          let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
+          window.localStorage.removeItem('serviceForum');
+          this.addForum(serviceForum);
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 5000,
+              data: 'Service saved',
+              panelClass: ['green-snackbar']
+            }
+          );
+        }
+      });
     }
     else {
       const snackBarRef =this.snackbar.openFromComponent(

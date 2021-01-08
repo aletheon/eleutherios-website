@@ -33,7 +33,6 @@
 				<div style="flex:1">
 					<mat-form-field style="width:150px">
 						<mat-select formControlName="type" #select="matSelect" (selectionChange)="saveChanges()">
-							<!-- <mat-select-trigger>{{ select.selected?.value }}</mat-select-trigger> -->
 							<mat-option *ngFor="let t of types" [value]="t">{{ t }}</mat-option>
 						</mat-select>
 					</mat-form-field>
@@ -47,7 +46,7 @@
 						placeholder="Title"
 						formControlName="title"
 						(change)="saveChanges()">
-					<mat-error *ngIf="!forumGroup.get('title').valid">
+					<mat-error *ngIf="forumGroup.get('title').hasError('required')">
 						Title is required
 					</mat-error>
 					<mat-error *ngIf="forumGroup.get('title').hasError('pattern')">
