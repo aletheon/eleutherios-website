@@ -1709,9 +1709,8 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
               this.forumGroup.controls[i].markAsTouched();
             }
 
-            if (this.forumGroup.get('title').hasError('required')) {
+            if (this.forumGroup.get('title').hasError('required') || this.forumGroup.get('title').hasError('pattern'))
               this.titleRef.nativeElement.focus();
-            }
           }, 500);
           return;
       }

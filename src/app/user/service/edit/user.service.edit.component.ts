@@ -2234,7 +2234,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   saveChanges () {
     if (this.serviceGroup.status != 'VALID') {
-      if (this.serviceGroup.get('title').hasError('required')) {
+      if (this.serviceGroup.get('title').hasError('required') || this.serviceGroup.get('title').hasError('pattern')) {
         setTimeout(() => {
           for (let i in this.serviceGroup.controls) {
             this.serviceGroup.controls[i].markAsTouched();
@@ -2274,8 +2274,8 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
         typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
         currency: this.serviceGroup.get('currency').value,
-        paymentId: this.serviceGroup.get('paymentId').value,
-        paymentUserId: this.serviceGroup.get('paymentUserId').value,
+        paymentId: this.serviceGroup.get('paymentId').value ? this.serviceGroup.get('paymentId').value : '',
+        paymentUserId: this.serviceGroup.get('paymentUserId').value ? this.serviceGroup.get('paymentUserId').value : '',
         includeDescriptionInDetailPage: this.serviceGroup.get('includeDescriptionInDetailPage').value,
         includeImagesInDetailPage: this.serviceGroup.get('includeImagesInDetailPage').value,
         includeTagsInDetailPage: this.serviceGroup.get('includeTagsInDetailPage').value,
