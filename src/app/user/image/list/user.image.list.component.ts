@@ -88,33 +88,45 @@ export class UserImageListComponent implements OnInit, OnDestroy {
 
   changeImageName (image, newName: string) {
     if (image.name.trim() != newName.trim()){
-      let updatedImage: Image = {
-        imageId: image.imageId,
-        uid: image.uid,
-        name: newName.trim(),
-        filePath: image.filePath,
-        tinyUrl: image.tinyUrl,
-        smallUrl: image.smallUrl,
-        mediumUrl: image.mediumUrl,
-        largeUrl: image.largeUrl,
-        default: image.default,
-        lastUpdateDate: image.lastUpdateDate,
-        creationDate: image.creationDate
-      };
-
-      this.userImageService.update(image.uid, image.imageId, updatedImage).then(() => {
-        const snackBarRef = this.snackbar.openFromComponent(
+      if (/^[A-Za-z0-9\s]*$/.test(newName.trim())){
+        let updatedImage: Image = {
+          imageId: image.imageId,
+          uid: image.uid,
+          name: newName.trim(),
+          filePath: image.filePath,
+          tinyUrl: image.tinyUrl,
+          smallUrl: image.smallUrl,
+          mediumUrl: image.mediumUrl,
+          largeUrl: image.largeUrl,
+          default: image.default,
+          lastUpdateDate: image.lastUpdateDate,
+          creationDate: image.creationDate
+        };
+  
+        this.userImageService.update(image.uid, image.imageId, updatedImage).then(() => {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 5000,
+              data: 'Image saved',
+              panelClass: ['green-snackbar']
+            }
+          );
+        })
+        .catch(error => {
+          console.log('changeImageName error ' + error);
+        }); 
+      }
+      else {
+        const snackBarRef =this.snackbar.openFromComponent(
           NotificationSnackBar,
           {
-            duration: 5000,
-            data: 'Image saved',
-            panelClass: ['green-snackbar']
+            duration: 8000,
+            data: `Invalid characters found, valid characters include [A-Za-z0-9]`,
+            panelClass: ['red-snackbar']
           }
         );
-      })
-      .catch(error => {
-        console.log('changeImageName error ' + error);
-      });
+      }
     }
   }
 

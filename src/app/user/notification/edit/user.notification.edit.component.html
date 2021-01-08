@@ -97,8 +97,11 @@
 							placeholder="Title"
 							formControlName="title"
 							(change)="saveChanges()">
-						<mat-error *ngIf="!notificationGroup.get('title').valid || notificationGroup.get('title').touched">
+						<mat-error *ngIf="notificationGroup.get('title').hasError('required')">
 							Title is required
+						</mat-error>
+						<mat-error *ngIf="notificationGroup.get('title').hasError('pattern')">
+							Invalid characters, valid characters include [A-Za-z0-9]
 						</mat-error>
 					</mat-form-field>
 				</div>

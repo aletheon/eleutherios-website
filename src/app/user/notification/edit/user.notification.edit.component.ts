@@ -238,7 +238,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       notificationId:                 [''],
       uid:                            [''],
       type:                           [''],
-      title:                          ['', Validators.required ],
+      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
       active:                         [''],
       paymentType:                    [''],
       currency:                       [''],
@@ -551,7 +551,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
 
   saveChanges () {
     if (this.notificationGroup.status != 'VALID') {
-      if (this.notificationGroup.get('title').hasError('required')) {
+      if (this.notificationGroup.get('title').hasError('required') || this.notificationGroup.get('title').hasError('pattern')) {
         setTimeout(() => {
           for (let i in this.notificationGroup.controls) {
             this.notificationGroup.controls[i].markAsTouched();
@@ -621,43 +621,31 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
     let tempTitle = this.notificationGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
-      if (/^[A-Za-z0-9\s]*$/.test(tempTitle)){
-        const notification: Notification = {
-          notificationId: this.notificationGroup.get('notificationId').value,
-          uid: this.notificationGroup.get('uid').value,
-          type: this.notificationGroup.get('type').value,
-          title: tempTitle,
-          title_lowercase: tempTitle.toLowerCase(),
-          active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
-          paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : 'Free',
-          currency: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('currency').value : '',
-          startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('startAmount').value, 2) : 1.00,
-          endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('endAmount').value, 2) : 10.00,
-          lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
-          creationDate: this.notificationGroup.get('creationDate').value,
-        };
-        
-        this.userNotificationService.update(this.auth.uid, notification.notificationId, notification).then(() => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 5000,
-              data: 'Notification saved',
-              panelClass: ['green-snackbar']
-            }
-          );
-        });
-      }
-      else {
-        const snackBarRef =this.snackbar.openFromComponent(
+      const notification: Notification = {
+        notificationId: this.notificationGroup.get('notificationId').value,
+        uid: this.notificationGroup.get('uid').value,
+        type: this.notificationGroup.get('type').value,
+        title: tempTitle,
+        title_lowercase: tempTitle.toLowerCase(),
+        active: this.notificationGroup.get('active').value != undefined ? this.notificationGroup.get('active').value : false,
+        paymentType: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('paymentType').value : 'Free',
+        currency: this.notificationGroup.get('type').value == 'Service' ? this.notificationGroup.get('currency').value : '',
+        startAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('startAmount').value, 2) : 1.00,
+        endAmount: (this.notificationGroup.get('type').value == 'Service' && this.notificationGroup.get('paymentType').value == 'Payment') ? _.ceil(this.notificationGroup.get('endAmount').value, 2) : 10.00,
+        lastUpdateDate: this.notificationGroup.get('lastUpdateDate').value,
+        creationDate: this.notificationGroup.get('creationDate').value,
+      };
+      
+      this.userNotificationService.update(this.auth.uid, notification.notificationId, notification).then(() => {
+        const snackBarRef = this.snackbar.openFromComponent(
           NotificationSnackBar,
           {
-            duration: 8000,
-            data: `Invalid characters we're located in the title field, valid characters include [A-Za-z0-9]`,
-            panelClass: ['red-snackbar']
+            duration: 5000,
+            data: 'Notification saved',
+            panelClass: ['green-snackbar']
           }
         );
-      }
+      });
     }
     else {
       const snackBarRef =this.snackbar.openFromComponent(
