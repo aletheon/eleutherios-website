@@ -43,10 +43,10 @@
 					</mat-form-field>
 				</div>
 				<div style="margin-bottom:10px;font-size:0.85em">
-					<a [routerLink]="['/', userGroup.get('username').value]" style="word-break: break-all;color:#1B1B1B">{{ url }}{{ userGroup.get('username').value }}</a>
+					<div class="label label-default" style="margin-right:5px">Profile Link</div><a [routerLink]="['/', userGroup.get('username').value]" style="word-break: break-all;color:#1B1B1B">{{ url }}{{ userGroup.get('username').value }}</a>
 				</div>
 				<div *ngIf="userItem.receivePushNotifications == false" class="alert alert-warning" style="padding:0px;margin-bottom:10px">
-					<div class="panel-body"><b>Please note:</b> If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
+					<div class="panel-body"><b>Please note: </b>If you are using chrome and have previously blocked Eleutherios from sending you push notifications, then you must unblock Eleutherios in your Chrome settings to receive push notifications again (chrome://settings/content/notifications).</div>
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading" style="display:flex;flex-direction:row">

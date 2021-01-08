@@ -129,7 +129,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
       uid:                              [''],
       email:                            [''],
 
-      // HERE ROB HAVE TO ALLOW FOR SPACES IN DISPLAY NAME ETC
+      // HERE ROB HAVE TO ALLOW FOR SPACES IN DISPLAY NAME AND VALIDATE THAT USERNAME IS NOT ALREADY TAKEN
 
       displayName:                      ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
       username:                         ['', [Validators.required, Validators.pattern(/^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/)]],
