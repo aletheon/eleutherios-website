@@ -1,7 +1,13 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;height:100%">
 	<ng-container *ngIf="user | async;let userItem">
-		<h4 style="flex:none;margin-left:10px;margin-bottom:0px">{{ userItem.displayName }}</h4>
+		<!-- displayName -->
+		<h4 style="flex:none;margin-left:10px;margin-bottom:5px">{{ userItem.displayName }}</h4>
+		<!-- website -->
+		<div *ngIf="userItem.website && userItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:5px">
+			<mat-icon style="flex:none;margin:0 5px 0 10px">link</mat-icon>
+			<span style="flex:none" [innerHTML]="userItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+		</div>
 		<ng-container *ngIf="publicForums | async;let publicForumItems">
 			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
 			<ng-template #showpublicforums>
