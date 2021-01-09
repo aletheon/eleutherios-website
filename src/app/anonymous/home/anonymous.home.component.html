@@ -90,6 +90,14 @@
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
+                <div style="flex:none;margin-right:5px">
+                  <star-rating-control
+                    [rating]="service.rate"
+                    [showHalfStars]="true"
+                    [starType]="'svg'"
+                    [readOnly]="true">
+                  </star-rating-control>
+                </div>
                 <div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
                   {{ service.creationDate.toDate() | amTimeAgo }}
                 </div>

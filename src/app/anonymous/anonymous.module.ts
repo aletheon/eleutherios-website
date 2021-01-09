@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxAutoScrollModule } from "ngx-auto-scroll";
 import { LinkyModule } from 'angular-linky';
+import { StarRatingModule } from 'angular-star-rating';
 
 import { AnonymousHomeComponent } from './home/anonymous.home.component';
 import { AnonymousForumDetailComponent } from './forum/detail/anonymous.forum.detail.component';
@@ -54,7 +55,8 @@ import {
     LoadingSpinnerModule,
     AppRoutingModule,
     NgxAutoScrollModule,
-    LinkyModule
+    LinkyModule,
+    StarRatingModule
   ],
   declarations: [
     AnonymousHomeComponent,
