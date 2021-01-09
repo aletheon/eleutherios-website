@@ -111,13 +111,19 @@
                 <ng-container *ngIf="service.paymentType == 'Payment'">
                   <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
                   <ng-template #showtagswithpayment>
-                    <div style="flex:none">
-                      <a [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+                    <div style="flex:none;display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
+                      <div class="label label-danger" *ngIf="service.paymentId && service.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
+                        Sold
+                      </div>
+                      <a [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
                     </div>
                   </ng-template>
                   <ng-template #showtagswithoutpayment>
-                    <div style="flex:1;text-align:right">
-                      <a [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+                    <div style="flex:1;display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
+                      <div class="label label-danger" *ngIf="service.paymentId && service.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
+                        Sold
+                      </div>
+                      <a [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
                     </div>
                   </ng-template>
                 </ng-container>
