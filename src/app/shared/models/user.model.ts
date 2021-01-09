@@ -3,6 +3,7 @@ export interface User {
   email: string, // email of the user
   displayName?: string,
   username: string,
+  website: string, // website of the user
   stripeCustomerId: string,
   stripeAccountId: string,
   stripeOnboardingStatus: string, // [Pending, Authorized, Deauthorized]
