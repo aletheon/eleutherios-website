@@ -25,12 +25,12 @@
 									</ng-container>
 								</ng-template>
 
-
+								
 
 								<!-- here rob copy the profile forum/service other controls over to anonymous home, forum, service - detail pages -->
 
 
-								
+
 
 								<div style="flex:1;margin-right:5px">
 									<a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>

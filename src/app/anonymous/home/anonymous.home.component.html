@@ -30,10 +30,15 @@
                 <div class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
                   {{ forum.creationDate.toDate() | amTimeAgo }}
                 </div>
-                <div style="flex:none">
-                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+                <div style="flex:none;margin-right:5px">
+                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>										
                 </div>
-              </div>
+                <div style="flex:none;margin-right:5px">
+                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
+                </div>
+                <div style="flex:none">
+                  <mat-icon [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
+                </div>
             </div>
             <ng-container *ngIf="forum.forumTags | async;let forumTagItems">
               <ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
