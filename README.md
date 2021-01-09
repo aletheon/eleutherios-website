@@ -29,7 +29,7 @@ In this example, Eleutherios is scaling or managing the forum, customer request 
 * Shared process or manifest (redundancy)
 * AI (automation)
 
-Eleutherios, is built with an HTML/javascript (Angular) frontend and node.js (nosql/firebase) backend.
+Eleutherios is built with a real-time pub/sub, node.js (nosql/firestore) backend and an HTML/javascript (Angular) frontend.
 
 # Installation and Setup
 
