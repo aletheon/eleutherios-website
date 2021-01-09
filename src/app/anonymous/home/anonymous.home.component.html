@@ -39,6 +39,7 @@
                 <div style="flex:none">
                   <mat-icon [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
                 </div>
+              </div>
             </div>
             <ng-container *ngIf="forum.forumTags | async;let forumTagItems">
               <ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
