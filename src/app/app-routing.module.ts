@@ -118,6 +118,10 @@ const routes: Routes = [
   // anonymous routines
   // **********************************************
   {
+    path: ':username',
+    component: UserProfileComponent,
+  },
+  {
     path: 'anonymous/home',
     component: AnonymousHomeComponent
   },
@@ -198,11 +202,6 @@ const routes: Routes = [
   // **********************************************
   // user routines
   // **********************************************
-  {
-    path: ':username',
-    component: UserProfileComponent,
-    canActivate: [AuthGuard]
-  },
   {
     path: 'user/image/list',
     component: UserImageListComponent,

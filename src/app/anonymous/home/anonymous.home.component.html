@@ -6,7 +6,7 @@
       <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Forums</h4>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
         <ng-container *ngFor="let forum of publicForumItems; trackBy: trackPublicForums">
-          <div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+          <div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
             <div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
               <ng-template #showdefaultforumimage>
@@ -61,7 +61,7 @@
       <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h4>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
         <ng-container *ngFor="let service of publicServiceItems; trackBy: trackPublicServices">
-          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
+          <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
             <div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>

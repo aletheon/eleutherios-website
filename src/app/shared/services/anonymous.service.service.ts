@@ -95,4 +95,58 @@ export class AnonymousServiceService {
       return tempObservable;
     }
   }
+
+  public getUserServices (parentUserId: string, numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+    let collectionName: string = 'anonymousservices';
+    let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    if (includeTagsInSearch !== undefined){
+      if (includeTagsInSearch == true){
+        if (tags && tags.length > 0){
+          tags.sort();
+          collectionName = `anonymousservicescollection/${tags.toString().replace(/,/gi,'')}/services`;
+        }
+      }
+      else collectionName = 'anonymousservicesnotags';
+    }
+
+    if (!key){
+      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where("uid" , "==", parentUserId).limit(numberOfItems+1));
+      let tempObservable = tempCollection.valueChanges().pipe(
+        map(arr => {
+          return arr.filter(forum => {
+            if (tempFilterTitle == true){
+              if (forum.title.length > 0)
+                return true;
+              else
+                return false;
+            }
+            else return true;
+          }).map(forum => {
+            return { ...forum };
+          });
+        })
+      );
+      return tempObservable;
+    }
+    else {
+      let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').where("uid" , "==", parentUserId).startAt(key).limit(numberOfItems+1));
+      let tempObservable = tempCollection.valueChanges().pipe(
+        map(arr => {
+          return arr.filter(forum => {
+            if (tempFilterTitle == true){
+              if (forum.title.length > 0)
+                return true;
+              else
+                return false;
+            }
+            else return true;
+          }).map(forum => {
+            return { ...forum };
+          });
+        })
+      );
+      return tempObservable;
+    }
+  }
 }

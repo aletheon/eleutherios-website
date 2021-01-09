@@ -48,12 +48,13 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
   trackPublicServices (index, service) { return service.serviceId; }
 
   ngOnInit () {
+    const that = this;
+    this._loading.next(true);
+
     // redirect user if they are already logged in
     if (this.auth.uid && this.auth.uid.length > 0)
       this.router.navigate(['/']);
-
-    const that = this;
-    this._loading.next(true);
+    
     let load = async function(){
       try {
         // public forums
