@@ -242,7 +242,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       active:                         [''],
       paymentType:                    [''],
       currency:                       [''],
-      startAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      startAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
       endAmount:                      ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       lastUpdateDate:                 [''],
       creationDate:                   ['']
