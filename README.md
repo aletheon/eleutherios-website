@@ -82,8 +82,7 @@ Eleutherios uses functions to modify the behavior of the system and its data bef
 ```bash
 i.   cd functions
 ii.  npm install
-iii. firebase login
-iv.  firebase deploy --only functions
+iii. firebase deploy --only functions
 ```
 
 ### 3. Setup firebase
