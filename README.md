@@ -64,8 +64,15 @@ export const environment = {
     messagingSenderId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     appId: "xxxxxxxxxxxxx",
     measurementId: "xxxxxxxxxxxxx"
-  }
+  },
+  googleTagManagerId: "xxxxxxxxxxxxx",
+  stripeTestKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  url: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 };
+```
+```bash
+iv.   firebase login
+v.    firebase init
 ```
 
 ### 2. Login to firebase and deploy functions folder
