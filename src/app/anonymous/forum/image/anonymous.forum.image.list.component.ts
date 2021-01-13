@@ -54,7 +54,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar) {
-    }
+  }
 
   ngOnDestroy () {
     if (this._subscription)

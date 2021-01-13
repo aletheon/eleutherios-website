@@ -201,8 +201,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
       this._loading.next(false);
     })
     .catch((error) =>{
-      console.log('here rob ' + error);
-      this.router.navigate(['/login']);
+      console.error(error);
     });
   }
 }
