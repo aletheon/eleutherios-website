@@ -26,12 +26,8 @@
 					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
-					<button *ngIf="forumItem.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-						<mat-icon matTooltip="Public">lock_open</mat-icon>
-					</button>
-					<button *ngIf="forumItem.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-						<mat-icon matTooltip="Private">lock</mat-icon>
-					</button>
+					<mat-icon *ngIf="forumItem.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
+					<mat-icon *ngIf="forumItem.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 				</div>
 				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
 					<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
@@ -288,9 +284,7 @@
 											<ng-template #showpublictype>
 												<ng-container *ngIf="forumForum.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 												<ng-template #showpublicenabledtype>
-													<button onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-														<mat-icon matTooltip="Public">lock_open</mat-icon>
-													</button>
+													<mat-icon onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 												</ng-template>
 												<ng-template #showpublicdisabledtype>
 													<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
@@ -299,9 +293,7 @@
 											<ng-template #showprivatetype>
 												<ng-container *ngIf="forumForum.uid == auth.uid; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
 												<ng-template #showprivateenabledtype>
-													<button onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-														<mat-icon matTooltip="Private">lock</mat-icon>
-													</button>
+													<mat-icon onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 												</ng-template>
 												<ng-template #showprivatedisabledtype>
 													<mat-icon style="color:lightgrey" matTooltip="Private">lock</mat-icon>

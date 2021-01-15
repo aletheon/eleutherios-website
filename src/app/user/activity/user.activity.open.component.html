@@ -31,20 +31,12 @@
             </div>
             <!-- type -->
             <div *ngIf="activity.uid == auth.uid" style="flex:none;margin-right:5px">
-              <button *ngIf="activity.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-                <mat-icon matTooltip="Public">lock_open</mat-icon>
-              </button>
-              <button *ngIf="activity.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
-                <mat-icon matTooltip="Private">lock</mat-icon>
-              </button>
+              <mat-icon *ngIf="activity.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
+              <mat-icon *ngIf="activity.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
             </div>
             <div *ngIf="activity.uid != auth.uid" style="flex:none;margin-right:5px">
-              <button *ngIf="activity.type == 'Public'" style="border:none;background:none;margin:0;padding:0;color:lightgrey">
-                <mat-icon matTooltip="Public">lock_open</mat-icon>
-              </button>
-              <button *ngIf="activity.type == 'Private'" style="border:none;background:none;margin:0;padding:0;color:lightgrey">
-                <mat-icon matTooltip="Private">lock</mat-icon>
-              </button>
+              <mat-icon *ngIf="activity.type == 'Public'" style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
+              <mat-icon *ngIf="activity.type == 'Private'" style="color:lightgrey" matTooltip="Private">lock</mat-icon>
             </div>
             <!-- receive posts -->
             <div style="flex:none;margin-right:5px">
