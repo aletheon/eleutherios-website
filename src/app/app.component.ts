@@ -50,11 +50,12 @@ export class AppComponent implements OnInit {
 
     // reset user
     const userSubscription = this.auth.user.subscribe(user =>{
+      userSubscription.unsubscribe();
+
       if (user){
         // reset activity highlight post state
         // done once each time the user loads the app
         this.auth.resetUserActivityHighlightPost(user.uid);
-        userSubscription.unsubscribe();
       }
     });
 

@@ -1122,7 +1122,9 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     this.searchPrivateForums = true;
     this.searchForumIncludeTagsInSearch = true;
 
-    this.auth.user.subscribe(user => {
+    const userSubscription = this.auth.user.subscribe(user => {
+      userSubscription.unsubscribe();
+      
       const service: Service = {
         serviceId: '',
         uid: this.auth.uid,
