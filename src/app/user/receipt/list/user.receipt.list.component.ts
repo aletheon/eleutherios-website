@@ -92,7 +92,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
       switchMap(receipts => {
         if (receipts && receipts.length > 0){
           let observables = receipts.map(receipt => {
-            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
@@ -116,7 +116,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-            let getServiceTags$ = this.userServiceTagService.getTags(receipt.sellerUid, receipt.sellerServiceId);
+            let getServiceTags$ = this.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
   
             return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
               switchMap(results => {
