@@ -190,8 +190,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        smallUrl: '../../../assets/defaultThumbnail.jpg',
-                        name: 'No image'
+                        url: '../../../assets/defaultThumbnail.jpg',
                       };
                       service.defaultServiceImage = of(tempImage);
                     }

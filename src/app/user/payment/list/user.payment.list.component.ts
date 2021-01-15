@@ -121,10 +121,15 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
             return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
               switchMap(results => {
                 const [defaultServiceImage, serviceTags] = results;
+
                 if (defaultServiceImage)
                   payment.defaultServiceImage = of(defaultServiceImage);
-                else
-                  payment.defaultServiceImage = of(null);
+                else {
+                  let tempImage = {
+                    url: '../../../assets/defaultThumbnail.jpg'
+                  };
+                  payment.defaultServiceImage = of(tempImage);
+                }
 
                 if (serviceTags)
                   payment.serviceTags = of(serviceTags);

@@ -121,11 +121,15 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
             return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
               switchMap(results => {
                 const [defaultServiceImage, serviceTags] = results;
-                
+
                 if (defaultServiceImage)
                   receipt.defaultServiceImage = of(defaultServiceImage);
-                else
-                  receipt.defaultServiceImage = of(null);
+                else {
+                  let tempImage = {
+                    url: '../../../assets/defaultThumbnail.jpg'
+                  };
+                  receipt.defaultServiceImage = of(tempImage);
+                }
 
                 if (serviceTags)
                   receipt.serviceTags = of(serviceTags);
