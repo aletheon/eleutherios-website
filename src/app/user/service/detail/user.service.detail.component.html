@@ -42,7 +42,9 @@
 					<ng-template #showpublictype>
 						<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 						<ng-template #showpublicenabledtype>
-							<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
+							<button onclick="event.stopPropagation()" (click)="changeType()" style="border:none;background:none;margin:0;padding:0">
+								<mat-icon matTooltip="Public">lock_open</mat-icon>
+							</button>
 						</ng-template>
 						<ng-template #showpublicdisabledtype>
 							<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
@@ -51,7 +53,9 @@
 					<ng-template #showprivatetype>
 						<ng-container *ngIf="serviceItem.uid == auth.uid; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
 						<ng-template #showprivateenabledtype>
-							<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Private">lock</mat-icon>
+							<button onclick="event.stopPropagation()" (click)="changeType()" style="border:none;background:none;margin:0;padding:0">
+								<mat-icon matTooltip="Private">lock</mat-icon>
+							</button>
 						</ng-template>
 						<ng-template #showprivatedisabledtype>
 							<mat-icon style="color:lightgrey" matTooltip="Private">lock</mat-icon>

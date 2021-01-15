@@ -89,13 +89,12 @@
 										{{ forum.creationDate.toDate() | amTimeAgo }}
 									</div>
 									<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
-										<ng-container *ngIf="forum.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
-										<ng-template #showpublictype>
-											<mat-icon onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
-										</ng-template>
-										<ng-template #showprivatetype>
-											<mat-icon onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
-										</ng-template>
+										<button *ngIf="forum.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forum)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
+											<mat-icon matTooltip="Public">lock_open</mat-icon>
+										</button>
+										<button *ngIf="forum.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(forum)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
+											<mat-icon matTooltip="Private">lock</mat-icon>
+										</button>
 									</div>
 									<div *ngIf="forum.uid == auth.uid" style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
