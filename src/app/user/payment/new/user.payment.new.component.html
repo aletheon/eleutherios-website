@@ -75,8 +75,10 @@
                   </mat-form-field>
                 </ng-template>
                 <ng-template #nouserservices>
-                  <div class="label label-warning" style="padding:5px">
-                    <a [routerLink]="['/user/service/new']" style="color:inherit" matTooltip="Create service">You don't have any services to pay with</a>
+                  <div style="margin-bottom:10px">
+                    <span class="label label-warning" style="padding:5px">
+                      <a [routerLink]="['/user/service/new']" style="color:inherit" matTooltip="Create service">You don't have any services to pay with</a>
+                    </span>
                   </div>
                 </ng-template>
               </ng-container>

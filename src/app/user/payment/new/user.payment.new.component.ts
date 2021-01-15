@@ -26,7 +26,7 @@ import {
 } from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -597,7 +597,18 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
             // get end user services
-            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
+            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true).pipe(
+              map(userServices => {
+                return userServices.filter(userService => {
+                  if (userService.indexed == true)
+                    return true;
+                  else
+                    return false;
+                }).map(userService => {
+                  return { ...userService };
+                });
+              }),
+            )
 
             // get connected user
             that._connectedUserSubscription = that.userService.getUser(service.uid).subscribe(user => {
