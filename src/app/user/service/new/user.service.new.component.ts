@@ -1137,7 +1137,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         indexed: false,
         rate: 0,
         paymentType: 'Free',
-        amount: 0,
+        amount: 0.50,
         typeOfPayment: 'One-off',
         currency: user.stripeCurrency,
         paymentId: '',

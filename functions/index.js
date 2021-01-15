@@ -228,6 +228,34 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
   let event;
 
+  async function updateUserServices(userId, currency) {
+    var snapshot = await admin.firestore().collection(`users/${userId}/services`).get();
+
+    if (snapshot.size > 0){
+      var promises = snapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.update({
+            currency: currency,
+            lastUpdateDate: FieldValue.serverTimestamp()
+          }).then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  }
+
   try {
     // Verify webhook signature and extract the event.
     // See https://stripe.com/docs/webhooks/signatures for more information.
@@ -246,6 +274,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
         await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+        await updateUserServices(snapshot.docs[0].data().uid, account.default_currency);
       }
       return res.json({ received: true });
     }
@@ -270,6 +299,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
         await userRef.update({ stripeOnboardingStatus: account.charges_enabled ? 'Authorized' : 'Pending', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+        await updateUserServices(snapshot.docs[0].data().uid, account.default_currency);
       }
       return res.json({ received: true });
     }
