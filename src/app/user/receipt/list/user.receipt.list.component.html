@@ -11,7 +11,7 @@
       <ng-container *ngIf="receiptItems.length > 0; then showreceipts else noreceipts"></ng-container>
       <ng-template #showreceipts>
         <ng-container *ngFor="let receipt of receiptItems; trackBy: trackReceipts">
-          <div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+          <div [ngClass]="receipt.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
             <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="receipt.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
               <ng-template #showdefaultserviceimage>

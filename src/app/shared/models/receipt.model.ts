@@ -5,9 +5,11 @@ export interface Receipt {
   amount: number, // amount to pay
   currency: string, // [usd, nzd, aud etc]
   buyerType: string,
+  buyerPaymentType: string,
   buyerTitle: string,
   buyerDescription: string,
   sellerType: string,
+  sellerPaymentType: string,
   sellerTitle: string,
   sellerDescription: string,
   quantity: number, // number of units ordered
