@@ -143,16 +143,15 @@
 										</star-rating-control>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
+										<p class="label label-default" style="padding:5px" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<ng-container *ngIf="service.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
-										<ng-template #showpublictype>
-											<mat-icon onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
-										</ng-template>
-										<ng-template #showprivatetype>
-											<mat-icon onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
-										</ng-template>
+										<button *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
+											<mat-icon matTooltip="Public">lock_open</mat-icon>
+										</button>
+										<button *ngIf="service.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(service)" style="border:none;background:none;margin:0;padding:0;color:#1B1B1B">
+											<mat-icon matTooltip="Private">lock</mat-icon>
+										</button>
 									</div>
 									<div style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
