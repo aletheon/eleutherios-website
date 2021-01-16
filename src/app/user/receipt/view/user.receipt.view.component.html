@@ -10,7 +10,7 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="receiptGroup" novalidate>
-				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+				<div [ngClass]="receiptItem.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 					<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 						<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 						<ng-template #showdefaultserviceimage>
@@ -18,8 +18,8 @@
 								<div style="flex:none;margin-right:10px">
 									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 									<ng-template #showimage>
-										<img *ngIf="receiptItem.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: receiptItem.sellerServiceId }' style="cursor:pointer">
-										<img *ngIf="receiptItem.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receiptItem.sellerServiceId }' style="cursor:pointer">
+										<img *ngIf="receiptItem.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: receiptItem.buyerServiceId }' style="cursor:pointer">
+										<img *ngIf="receiptItem.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receiptItem.buyerServiceId }' style="cursor:pointer">
 									</ng-template>
 									<ng-template #noimage>
 										<img [src]="image.url">
@@ -29,8 +29,8 @@
 						</ng-template>
 						<div style="flex:1;margin-right:5px">
 							<p style="word-break: break-all">
-								<a *ngIf="receiptItem.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: receiptItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.title }}{{ receiptItem.description.length > 0 ? (' - ' + receiptItem.description | truncate: 80) : '' }}">{{ receiptItem.title | noTitle | truncate: 35 }} <i *ngIf="receiptItem.description.length > 0">- {{ receiptItem.description | truncate: 80 }}</i></a>
-								<a *ngIf="receiptItem.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.title }}{{ receiptItem.description.length > 0 ? (' - ' + receiptItem.description | truncate: 80) : '' }}">{{ receiptItem.title | noTitle | truncate: 35 }} <i *ngIf="receiptItem.description.length > 0">- {{ receiptItem.description | truncate: 80 }}</i></a>
+								<a *ngIf="receiptItem.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: receiptItem.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.buyerTitle }}{{ receiptItem.buyerDescription.length > 0 ? (' - ' + receiptItem.buyerDescription | truncate: 80) : '' }}">{{ receiptItem.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receiptItem.buyerDescription.length > 0">- {{ receiptItem.buyerDescription | truncate: 80 }}</i></a>
+								<a *ngIf="receiptItem.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptItem.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.buyerTitle }}{{ receiptItem.buyerDescription.length > 0 ? (' - ' + receiptItem.buyerDescription | truncate: 80) : '' }}">{{ receiptItem.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receiptItem.buyerDescription.length > 0">- {{ receiptItem.buyerDescription | truncate: 80 }}</i></a>
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">

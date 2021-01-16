@@ -18,8 +18,8 @@
 								<div style="flex:none;margin-right:10px">
 									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 									<ng-template #showimage>
-										<img *ngIf="paymentItem.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: paymentItem.sellerServiceId }' style="cursor:pointer">
-										<img *ngIf="paymentItem.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: paymentItem.sellerServiceId }' style="cursor:pointer">
+										<img *ngIf="paymentItem.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: paymentItem.sellerServiceId }' style="cursor:pointer">
+										<img *ngIf="paymentItem.sellerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: paymentItem.sellerServiceId }' style="cursor:pointer">
 									</ng-template>
 									<ng-template #noimage>
 										<img [src]="image.url">
@@ -29,8 +29,8 @@
 						</ng-template>
 						<div style="flex:1;margin-right:5px">
 							<p style="word-break: break-all">
-								<a *ngIf="paymentItem.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.title }}{{ paymentItem.description.length > 0 ? (' - ' + paymentItem.description | truncate: 80) : '' }}">{{ paymentItem.title | noTitle | truncate: 35 }} <i *ngIf="paymentItem.description.length > 0">- {{ paymentItem.description | truncate: 80 }}</i></a>
-								<a *ngIf="paymentItem.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.title }}{{ paymentItem.description.length > 0 ? (' - ' + paymentItem.description | truncate: 80) : '' }}">{{ paymentItem.title | noTitle | truncate: 35 }} <i *ngIf="paymentItem.description.length > 0">- {{ paymentItem.description | truncate: 80 }}</i></a>
+								<a *ngIf="paymentItem.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.sellerTitle }}{{ paymentItem.sellerDescription.length > 0 ? (' - ' + paymentItem.sellerDescription | truncate: 80) : '' }}">{{ paymentItem.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="paymentItem.sellerDescription.length > 0">- {{ paymentItem.sellerDescription | truncate: 80 }}</i></a>
+								<a *ngIf="paymentItem.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentItem.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ paymentItem.sellerTitle }}{{ paymentItem.sellerDescription.length > 0 ? (' - ' + paymentItem.sellerDescription | truncate: 80) : '' }}">{{ paymentItem.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="paymentItem.sellerDescription.length > 0">- {{ paymentItem.sellerDescription | truncate: 80 }}</i></a>
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">

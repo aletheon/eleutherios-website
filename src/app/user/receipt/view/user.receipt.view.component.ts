@@ -99,9 +99,14 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       paymentId:                        [''],
       amount:                           [''],
       currency:                         [''],
-      type:                             [''],
-      title:                            [''],
-      description:                      [''],
+      buyerType:                        [''],
+      buyerPaymentType:                 [''],
+      buyerTitle:                       [''],
+      buyerDescription:                 [''],
+      sellerType:                       [''],
+      sellerPaymentType:                [''],
+      sellerTitle:                      [''],
+      sellerDescription:                [''],
       quantity:                         [''],
       status:                           [''],
       buyerUid:                         [''],
@@ -126,7 +131,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       if (receipt){
         let load = async function(){
           try {
-            that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+            that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
@@ -151,10 +156,17 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe(serviceImage => {
-              that.defaultServiceImage = of(serviceImage);
+              if (serviceImage)
+                that.defaultServiceImage = of(serviceImage);
+              else {
+                let tempImage = {
+                  url: '../../../assets/defaultThumbnail.jpg'
+                };
+                that.defaultServiceImage = of(tempImage);
+              }
             });
 
-            that._serviceTagSubscription = that.userServiceTagService.getTags(receipt.sellerUid, receipt.sellerServiceId).subscribe(serviceTags => {
+            that._serviceTagSubscription = that.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId).subscribe(serviceTags => {
               if (serviceTags && serviceTags.length > 0)
                 that.serviceTags = of(serviceTags);
               else
@@ -162,7 +174,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
             });
           }
           catch (error) {
-            console.log('here');
             throw error;
           }
         }

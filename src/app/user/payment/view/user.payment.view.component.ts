@@ -99,9 +99,14 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
       receiptId:                        [''],
       amount:                           [''],
       currency:                         [''],
-      type:                             [''],
-      title:                            [''],
-      description:                      [''],
+      buyerType:                        [''],
+      buyerPaymentType:                 [''],
+      buyerTitle:                       [''],
+      buyerDescription:                 [''],
+      sellerType:                       [''],
+      sellerPaymentType:                [''],
+      sellerTitle:                      [''],
+      sellerDescription:                [''],
       quantity:                         [''],
       status:                           [''],
       buyerUid:                         [''],
@@ -151,7 +156,14 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe(serviceImage => {
-              that.defaultServiceImage = of(serviceImage);
+              if (serviceImage)
+                that.defaultServiceImage = of(serviceImage);
+              else {
+                let tempImage = {
+                  url: '../../../assets/defaultThumbnail.jpg'
+                };
+                that.defaultServiceImage = of(tempImage);
+              }
             });
 
             that._serviceTagSubscription = that.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId).subscribe(serviceTags => {
@@ -162,7 +174,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
             });
           }
           catch (error) {
-            console.log('here');
             throw error;
           }
         }
