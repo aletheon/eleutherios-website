@@ -51,7 +51,7 @@
                 <div class="label label-default" matTooltip="{{ payment.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
                   {{ payment.creationDate.toDate() | amTimeAgo }}
                 </div>
-                <mat-icon [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View Payment">description</mat-icon>
+                <mat-icon [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
               </div>
             </div>
             <ng-container *ngIf="payment.serviceTags | async;let serviceTagItems">
