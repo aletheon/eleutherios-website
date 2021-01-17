@@ -92,30 +92,6 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
       switchMap(receipts => {
         if (receipts && receipts.length > 0){
           let observables = receipts.map(receipt => {
-            let getSellerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
-              switchMap(serviceImages => {
-                if (serviceImages && serviceImages.length > 0){
-                  let getDownloadUrl$: Observable<any>;
-
-                  if (serviceImages[0].tinyUrl)
-                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                  return combineLatest([getDownloadUrl$]).pipe(
-                    switchMap(results => {
-                      const [downloadUrl] = results;
-                      
-                      if (downloadUrl)
-                        serviceImages[0].url = downloadUrl;
-                      else
-                        serviceImages[0].url = '../../../assets/defaultiny.jpg';
-        
-                      return of(serviceImages[0]);
-                    })
-                  );
-                }
-                else return of(null);
-              })
-            );
             let getBuyerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
@@ -140,12 +116,35 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-            let getSellerServiceTags$ = this.userServiceTagService.getTags(receipt.sellerUid, receipt.sellerServiceId);
+            let getSellerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+              switchMap(serviceImages => {
+                if (serviceImages && serviceImages.length > 0){
+                  let getDownloadUrl$: Observable<any>;
+
+                  if (serviceImages[0].tinyUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+                      
+                      if (downloadUrl)
+                        serviceImages[0].url = downloadUrl;
+                      else
+                        serviceImages[0].url = '../../../assets/defaultiny.jpg';
+        
+                      return of(serviceImages[0]);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            );
             let getBuyerServiceTags$ = this.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
   
-            return combineLatest([getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$, getBuyerServiceTags$]).pipe(
+            return combineLatest([getBuyerDefaultServiceImage$, getSellerDefaultServiceImage$, getBuyerServiceTags$]).pipe(
               switchMap(results => {
-                const [sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags, buyerServiceTags] = results;
+                const [buyerDefaultServiceImage, sellerDefaultServiceImage, buyerServiceTags] = results;
 
                 if (sellerDefaultServiceImage)
                   receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
@@ -163,12 +162,6 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                     url: '../../../assets/defaultThumbnail.jpg'
                   };
                   receipt.buyerDefaultServiceImage = of(tempImage);
-                }
-
-                if (sellerServiceTags)
-                  receipt.sellerServiceTags = of(sellerServiceTags);
-                else {
-                  receipt.sellerServiceTags = of([]);
                 }
 
                 if (buyerServiceTags)

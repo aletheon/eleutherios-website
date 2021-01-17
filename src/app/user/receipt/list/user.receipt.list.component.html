@@ -55,7 +55,7 @@
               </div>
             </div>
             <ng-container *ngIf="receipt.buyerServiceTags | async;let buyerServiceTagItems">
-              <div style="flex:none;display:flex;flex-direction:row">
+              <div style="flex:none;display:flex;flex-direction:row;align-items:center">
                 <ng-container *ngIf="buyerServiceTagItems.length > 0; then showtags"></ng-container>
                 <ng-template #showtags>
                   <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
@@ -88,7 +88,6 @@
                         <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
                       </p>
                     </div>
-                    <div style="flex:none;color:#1B1B1B">{{ receipt.currency.toUpperCase() }} {{ receipt.amount.toFixed(2) }}</div>
                   </div>
                 </ng-template>
                 <ng-template #showtagswithoutreceipt>
@@ -115,10 +114,10 @@
                           <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
                         </p>
                       </div>
-                      <div style="flex:none;color:#1B1B1B">{{ receipt.currency.toUpperCase() }} {{ receipt.amount.toFixed(2) }}</div>
                     </div>
                   </div>
                 </ng-template>
+                <div style="flex:none;padding:5px;color:#1B1B1B">{{ receipt.currency.toUpperCase() }} {{ receipt.amount.toFixed(2) }}</div>
               </div>
             </ng-container>
           </div>
