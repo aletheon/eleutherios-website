@@ -1,20 +1,20 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
-<div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;height:100%">
+<div *ngIf="!(loading | async)" style="height:100%;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;padding:10px 20px 10px 20px">
 	<ng-container *ngIf="user | async;let userItem">
 		<!-- displayName -->
-		<h4 style="flex:none;margin-left:10px;margin-bottom:5px">{{ userItem.displayName }}</h4>
+		<h4 style="flex:none;margin-bottom:5px">{{ userItem.displayName }}</h4>
 		<!-- website -->
 		<div *ngIf="userItem.website && userItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:5px">
-			<mat-icon style="flex:none;margin:0 5px 0 10px">link</mat-icon>
+			<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
 			<span style="flex:none" [innerHTML]="userItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 		</div>
 		<ng-container *ngIf="publicForums | async;let publicForumItems">
 			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
 			<ng-template #showpublicforums>
-				<h5 style="flex:none;margin-left:10px;margin-bottom:0px">Forums</h5>
+				<h5 style="flex:none;margin-bottom:5px">Forums</h5>
 				<div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
 					<ng-container *ngFor="let forum of publicForumItems; trackBy: trackPublicForums">
-						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 							<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
 								<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 								<ng-template #showdefaultforumimage>
@@ -83,7 +83,7 @@
 				</div>
 			</ng-template>
 			<ng-template #nopublicforums>
-				<h5 style="flex:none;color:#999;font-size:90%;margin-left:10px;margin-bottom:0px">
+				<h5 style="flex:none;color:#999;font-size:90%;margin-bottom:0px">
 					<i>No Forums</i>
 				</h5>
 			</ng-template>
@@ -91,10 +91,10 @@
 		<ng-container *ngIf="publicServices | async;let publicServiceItems">
 			<ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else nopublicservices"></ng-container>
 			<ng-template #showpublicservices>
-				<h5 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h5>
-				<div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
+				<h5 style="flex:none;margin-bottom:5px">Services</h5>
+				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
 					<ng-container *ngFor="let service of publicServiceItems; trackBy: trackPublicServices">
-						<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:5px;margin-bottom:5px">
+						<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 							<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">
 								<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 								<ng-template #showdefaultserviceimage>
@@ -164,7 +164,7 @@
 									<ng-template #showtags>
 										<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
 											<ng-container *ngFor="let serviceTag of serviceTagItems">
-												<span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+												<span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;padding:5px;margin-right:5px">{{ serviceTag.tag }}</span>
 											</ng-container>
 										</div>
 									</ng-template>
@@ -196,7 +196,7 @@
 				</div>
 			</ng-template>
 			<ng-template #nopublicservices>
-				<h5 style="flex:none;color:#999;font-size:90%;margin-left:10px;margin-bottom:0px">
+				<h5 style="flex:none;color:#999;font-size:90%;margin-bottom:0px">
 					<i>No Services</i>
 				</h5>
 			</ng-template>
