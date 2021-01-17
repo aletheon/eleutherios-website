@@ -19,7 +19,7 @@
                   <div style="flex:none;margin-right:10px">
                     <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                     <ng-template #showimage>
-                      <img *ngIf="payment.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: payment.sellerServiceId }' style="cursor:pointer">
+                      <img *ngIf="payment.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }' style="cursor:pointer">
                       <img *ngIf="payment.sellerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: payment.sellerServiceId }' style="cursor:pointer">
                     </ng-template>
                     <ng-template #noimage>
@@ -30,13 +30,13 @@
               </ng-template>
               <div style="flex:1;margin-right:5px">
                 <p style="word-break: break-all">
-                  <a *ngIf="payment.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
+                  <a *ngIf="payment.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
                   <a *ngIf="payment.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
                 </p>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
-                <span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Stripe Payment Intent Id">{{ payment.paymentIntentId }}</span>
+                <span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Payment Id">{{ payment.paymentId }}</span>
                 <div style="flex:none;margin-right:5px">
                   <ng-container *ngIf="payment.status == 'Pending'">
                     <span style="padding:5px" class="label label-warning">Pending</span>

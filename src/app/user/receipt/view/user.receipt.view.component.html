@@ -18,7 +18,7 @@
 								<div style="flex:none;margin-right:10px">
 									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 									<ng-template #showimage>
-										<img *ngIf="receiptItem.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ serviceId: receiptItem.buyerServiceId }' style="cursor:pointer">
+										<img *ngIf="receiptItem.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receiptItem.buyerUid, serviceId: receiptItem.buyerServiceId }' style="cursor:pointer">
 										<img *ngIf="receiptItem.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receiptItem.buyerServiceId }' style="cursor:pointer">
 									</ng-template>
 									<ng-template #noimage>
@@ -29,13 +29,13 @@
 						</ng-template>
 						<div style="flex:1;margin-right:5px">
 							<p style="word-break: break-all">
-								<a *ngIf="receiptItem.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ serviceId: receiptItem.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.buyerTitle }}{{ receiptItem.buyerDescription.length > 0 ? (' - ' + receiptItem.buyerDescription | truncate: 80) : '' }}">{{ receiptItem.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receiptItem.buyerDescription.length > 0">- {{ receiptItem.buyerDescription | truncate: 80 }}</i></a>
+								<a *ngIf="receiptItem.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptItem.buyerUid, serviceId: receiptItem.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.buyerTitle }}{{ receiptItem.buyerDescription.length > 0 ? (' - ' + receiptItem.buyerDescription | truncate: 80) : '' }}">{{ receiptItem.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receiptItem.buyerDescription.length > 0">- {{ receiptItem.buyerDescription | truncate: 80 }}</i></a>
 								<a *ngIf="receiptItem.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptItem.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receiptItem.buyerTitle }}{{ receiptItem.buyerDescription.length > 0 ? (' - ' + receiptItem.buyerDescription | truncate: 80) : '' }}">{{ receiptItem.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receiptItem.buyerDescription.length > 0">- {{ receiptItem.buyerDescription | truncate: 80 }}</i></a>
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 							<!-- other button controls -->
-							<span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Stripe Payment Intent Id">{{ receiptItem.paymentIntentId }}</span>
+							<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ receiptItem.receiptId }}</span></div>
 							<div style="flex:none;margin-right:5px">
 								<ng-container *ngIf="receiptItem.status == 'Pending'">
 									<span style="padding:5px" class="label label-warning">Pending</span>
@@ -75,10 +75,6 @@
                 </ng-template>
 						</div>
 					</ng-container>
-				</div>
-				<div style="display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-					<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ receiptItem.receiptId }}</span></div>
-					<div style="flex:none"><span style="padding:5px" class="label label-default" matTooltip="Payment Id">{{ receiptItem.paymentId }}</span></div>
 				</div>
 			</form>
 		</div>

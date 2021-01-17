@@ -92,7 +92,31 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
       switchMap(receipts => {
         if (receipts && receipts.length > 0){
           let observables = receipts.map(receipt => {
-            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
+            let getSellerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+              switchMap(serviceImages => {
+                if (serviceImages && serviceImages.length > 0){
+                  let getDownloadUrl$: Observable<any>;
+
+                  if (serviceImages[0].tinyUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+                      
+                      if (downloadUrl)
+                        serviceImages[0].url = downloadUrl;
+                      else
+                        serviceImages[0].url = '../../../assets/defaultiny.jpg';
+        
+                      return of(serviceImages[0]);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            );
+            let getBuyerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
@@ -116,25 +140,41 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                 else return of(null);
               })
             );
-            let getServiceTags$ = this.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
+            let getSellerServiceTags$ = this.userServiceTagService.getTags(receipt.sellerUid, receipt.sellerServiceId);
+            let getBuyerServiceTags$ = this.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
   
-            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+            return combineLatest([getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$, getBuyerServiceTags$]).pipe(
               switchMap(results => {
-                const [defaultServiceImage, serviceTags] = results;
+                const [sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags, buyerServiceTags] = results;
 
-                if (defaultServiceImage)
-                  receipt.defaultServiceImage = of(defaultServiceImage);
+                if (sellerDefaultServiceImage)
+                  receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                else {
+                  let tempImage = {
+                    url: '../../../assets/defaultTiny.jpg'
+                  };
+                  receipt.sellerDefaultServiceImage = of(tempImage);
+                }
+
+                if (buyerDefaultServiceImage)
+                  receipt.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
                 else {
                   let tempImage = {
                     url: '../../../assets/defaultThumbnail.jpg'
                   };
-                  receipt.defaultServiceImage = of(tempImage);
+                  receipt.buyerDefaultServiceImage = of(tempImage);
                 }
 
-                if (serviceTags)
-                  receipt.serviceTags = of(serviceTags);
+                if (sellerServiceTags)
+                  receipt.sellerServiceTags = of(sellerServiceTags);
                 else {
-                  receipt.serviceTags = of([]);
+                  receipt.sellerServiceTags = of([]);
+                }
+
+                if (buyerServiceTags)
+                  receipt.buyerServiceTags = of(buyerServiceTags);
+                else {
+                  receipt.buyerServiceTags = of([]);
                 }
                 return of(receipt);
               })

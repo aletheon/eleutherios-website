@@ -205,8 +205,8 @@
 													</ng-container>
 												</ng-template>
 												<div style="flex:none;margin-right:5px">
-													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>													
+													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 												</div>
 												<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == registrant.uid">
 													<ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else showregistrantowner"></ng-container>
