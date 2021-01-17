@@ -31,13 +31,15 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _initialReceiptSubscription: Subscription;
   private _receiptSubscription: Subscription;
-  private _defaultServiceImageSubscription: Subscription;
-  private _serviceTagSubscription: Subscription;
+  private _sellerDefaultServiceImageSubscription: Subscription;
+  private _buyerDefaultServiceImageSubscription: Subscription;
+  private _buyerServiceTagSubscription: Subscription;
   
   public receiptGroup: FormGroup;
   public receipt: Observable<any>;
-  public defaultServiceImage: Observable<any>;
-  public serviceTags: Observable<any[]>;
+  public buyerDefaultServiceImage: Observable<any>;
+  public sellerDefaultServiceImage: Observable<any>;
+  public buyerServiceTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
 
   constructor(public auth: AuthService,
@@ -57,11 +59,14 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
     if (this._receiptSubscription)
       this._receiptSubscription.unsubscribe();
 
-    if (this._defaultServiceImageSubscription)
-      this._defaultServiceImageSubscription.unsubscribe();
+    if (this._sellerDefaultServiceImageSubscription)
+      this._sellerDefaultServiceImageSubscription.unsubscribe();
 
-    if (this._serviceTagSubscription)
-      this._serviceTagSubscription.unsubscribe();
+    if (this._buyerDefaultServiceImageSubscription)
+      this._buyerDefaultServiceImageSubscription.unsubscribe();
+
+    if (this._buyerServiceTagSubscription)
+      this._buyerServiceTagSubscription.unsubscribe();
   }
 
   ngOnInit () {
@@ -131,7 +136,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       if (receipt){
         let load = async function(){
           try {
-            that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
+            that._buyerDefaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
                   let getDownloadUrl$: Observable<any>;
@@ -157,20 +162,55 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
             )
             .subscribe(serviceImage => {
               if (serviceImage)
-                that.defaultServiceImage = of(serviceImage);
+                that.buyerDefaultServiceImage = of(serviceImage);
               else {
                 let tempImage = {
                   url: '../../../assets/defaultThumbnail.jpg'
                 };
-                that.defaultServiceImage = of(tempImage);
+                that.buyerDefaultServiceImage = of(tempImage);
               }
             });
 
-            that._serviceTagSubscription = that.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId).subscribe(serviceTags => {
+            that._sellerDefaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+              switchMap(serviceImages => {
+                if (serviceImages && serviceImages.length > 0){
+                  let getDownloadUrl$: Observable<any>;
+
+                  if (serviceImages[0].tinyUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+                      
+                      if (downloadUrl)
+                        serviceImages[0].url = downloadUrl;
+                      else
+                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+        
+                      return of(serviceImages[0]);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            )
+            .subscribe(serviceImage => {
+              if (serviceImage)
+                that.sellerDefaultServiceImage = of(serviceImage);
+              else {
+                let tempImage = {
+                  url: '../../../assets/defaultTiny.jpg'
+                };
+                that.sellerDefaultServiceImage = of(tempImage);
+              }
+            });
+
+            that._buyerServiceTagSubscription = that.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId).subscribe(serviceTags => {
               if (serviceTags && serviceTags.length > 0)
-                that.serviceTags = of(serviceTags);
+                that.buyerServiceTags = of(serviceTags);
               else
-                that.serviceTags = of([]);
+                that.buyerServiceTags = of([]);
             });
           }
           catch (error) {
