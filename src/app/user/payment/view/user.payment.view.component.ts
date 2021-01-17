@@ -2,12 +2,20 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import {
   SiteTotalService,
   UserPaymentService,
   UserServiceImageService,
   UserServiceTagService,
+  UserForumService,
+  UserServiceService,
+  UserServiceForumBlockService,
+  UserForumServiceBlockService,
+  UserServiceUserBlockService,
+  UserForumUserBlockService,
+  UserForumRegistrantService,
+  Registrant,
   NoTitlePipe,
   TruncatePipe
 } from '../../../shared';
@@ -40,6 +48,9 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   public buyerDefaultServiceImage: Observable<any>;
   public sellerDefaultServiceImage: Observable<any>;
   public sellerServiceTags: Observable<any[]>;
+  public userForums: Observable<any[]>;
+  public userForumsCtrl: FormControl;
+  public numberItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
 
   constructor(public auth: AuthService,
@@ -47,9 +58,17 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
     private userPaymentService: UserPaymentService,
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
-    private fb: FormBuilder, 
+    private userForumService: UserForumService,
+    private userServiceService: UserServiceService,
+    private userServiceForumBlockService: UserServiceForumBlockService,
+    private userForumServiceBlockService: UserForumServiceBlockService,
+    private userServiceUserBlockService: UserServiceUserBlockService,
+    private userForumUserBlockService: UserForumUserBlockService,
+    private userForumRegistrantService: UserForumRegistrantService,
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar) {
+      this.userForumsCtrl = new FormControl();
   }
 
   ngOnDestroy () {
@@ -67,6 +86,165 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
 
     if (this._sellerServiceTagSubscription)
       this._sellerServiceTagSubscription.unsubscribe();
+  }
+
+  addForum () {
+    if (this.userForumsCtrl.value.title.length > 0){
+      const sellerServiceSubscription = this.userServiceService.getService(this.paymentGroup.get('sellerUid').value, this.paymentGroup.get('sellerServiceId').value).subscribe(service => {
+        sellerServiceSubscription.unsubscribe();
+        
+        if (service){
+          this.userForumServiceBlockService.serviceIsBlocked(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.serviceId)
+            .then(serviceBlocked => {
+              if (!serviceBlocked) {
+                this.userServiceUserBlockService.userIsBlocked(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.uid)
+                  .then(serviceUserBlock => {
+                    if (!serviceUserBlock) {
+                      this.userServiceForumBlockService.forumIsBlocked(service.uid, service.serviceId, this.userForumsCtrl.value.forumId)
+                        .then(forumBlocked => {
+                          if (!forumBlocked) {
+                            this.userForumUserBlockService.userIsBlocked(service.uid, service.serviceId, this.userForumsCtrl.value.uid)
+                              .then(forumUserBlock => {
+                                if (!forumUserBlock) {
+                                  this.userForumRegistrantService.serviceIsServingInForumFromPromise(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.serviceId)
+                                    .then(isServing => {
+                                      if (!isServing) {
+                                        const newRegistrant: Registrant = {
+                                          registrantId: '',
+                                          parentId: '',
+                                          serviceId: service.serviceId,
+                                          uid: service.uid,
+                                          forumId: this.userForumsCtrl.value.forumId,
+                                          forumUid: this.userForumsCtrl.value.uid,
+                                          default: false,
+                                          indexed: service.indexed,
+                                          creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+                                          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+                                        };
+
+                                        this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.uid)
+                                          .then(registrant => {
+                                            if (registrant == null)
+                                              newRegistrant.default = true;
+
+                                            this.userForumRegistrantService.create(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, newRegistrant).then(() => {
+                                              // do something
+                                            })
+                                            .catch(error => {
+                                              const snackBarRef = this.snackbar.openFromComponent(
+                                                NotificationSnackBar,
+                                                {
+                                                  duration: 8000,
+                                                  data: error.message,
+                                                  panelClass: ['red-snackbar']
+                                                }
+                                              );
+                                            });
+                                          }
+                                        )
+                                        .catch(error => {
+                                          const snackBarRef = this.snackbar.openFromComponent(
+                                            NotificationSnackBar,
+                                            {
+                                              duration: 8000,
+                                              data: error.message,
+                                              panelClass: ['red-snackbar']
+                                            }
+                                          );
+                                        });
+                                      }
+                                      else {
+                                        const snackBarRef = this.snackbar.openFromComponent(
+                                          NotificationSnackBar,
+                                          {
+                                            duration: 8000,
+                                            data: `The service '${service.title}' is already serving in the forum '${this.userForumsCtrl.value.title}'`,
+                                            panelClass: ['red-snackbar']
+                                          }
+                                        );
+                                      }
+                                    })
+                                    .catch((error) => {
+                                      console.log("error adding forum to service " + JSON.stringify(error));
+                                    }
+                                  );
+                                }
+                                else {
+                                  const snackBarRef = this.snackbar.openFromComponent(
+                                    NotificationSnackBar,
+                                    {
+                                      duration: 8000,
+                                      data: `The user of the forum '${this.userForumsCtrl.value.title}' has been blocked from requesting the service '${service.title}'`,
+                                      panelClass: ['red-snackbar']
+                                    }
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                console.log("error adding forum to service " + JSON.stringify(error));
+                              }
+                            );
+                          }
+                          else {
+                            const snackBarRef = this.snackbar.openFromComponent(
+                              NotificationSnackBar,
+                              {
+                                duration: 8000,
+                                data: `The forum '${this.userForumsCtrl.value.title}' has been blocked from requesting the service '${service.title}'`,
+                                panelClass: ['red-snackbar']
+                              }
+                            );
+                          }
+                        })
+                        .catch((error) => {
+                          console.log("error adding forum to service " + JSON.stringify(error));
+                        }
+                      );
+                    }
+                    else {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: `The user of the service '${service.title}' has been blocked from serving in the forum '${this.userForumsCtrl.value.title}'`,
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                    }
+                  })
+                  .catch((error) => {
+                    console.log("error adding forum to service " + JSON.stringify(error));
+                  }
+                );
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: `The service '${service.title}' has been blocked from serving in the forum '${this.userForumsCtrl.value.title}'`,
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }
+            })
+            .catch((error) => {
+              console.log("error adding forum to service " + JSON.stringify(error));
+            }
+          );
+        }
+      });
+    }
+    else {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: `Forum is missing a title`,
+          panelClass: ['red-snackbar']
+        }
+      );
+    }
   }
 
   ngOnInit () {
@@ -212,6 +390,9 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
               else
                 that.sellerServiceTags = of([]);
             });
+
+            // forums this user has created so they can request the service serve in their forum(s)
+            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
           }
           catch (error) {
             throw error;

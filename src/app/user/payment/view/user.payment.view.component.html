@@ -10,7 +10,7 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="paymentGroup" novalidate>
-				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:10px">
 					<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 						<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 						<ng-template #showsellerdefaultserviceimage>
@@ -119,6 +119,25 @@
 						</div>
 					</ng-container>
 				</div>
+				<!-- user forums -->
+				<ng-container *ngIf="userForums | async;let userForumItems">
+					<ng-container *ngIf="userForumItems.length > 0; then showservices"></ng-container>
+					<ng-template #showservices>
+						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+							<div style="flex:none">
+								<mat-form-field>
+									<mat-select #select="matSelect" (selectionChange)="addForum()" placeholder="Add to forum" [formControl]="userForumsCtrl" style="margin-top:5px">
+										<mat-option *ngFor="let forum of userForumItems; trackBy: trackUserForums" [value]="forum" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }}</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</div>
+						</div>
+					</ng-template>
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+						<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: paymentItem.sellerUid, serviceId: paymentItem.sellerServiceId }' style="flex:none;color:#1B1B1B;margin-right:5px">Create forum</a>
+						<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: paymentItem.sellerUid, serviceId: paymentItem.sellerServiceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left">keyboard_arrow_right</a>
+					</div>
+				</ng-container>
 			</form>
 		</div>
 	</ng-container>
