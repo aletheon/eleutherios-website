@@ -154,8 +154,8 @@
 											<ng-container *ngIf="registrant.service | async;let service">
 												<ng-container *ngIf="service; then showservice"></ng-container>
 												<ng-template #showservice>
-													<ng-container *ngIf="service.uid == auth.uid || (service.type == 'Public' && service.indexed == true)">
-														<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px">
+													<ng-container *ngIf="forumItem.uid == auth.uid || service.type == 'Public' || service.uid == auth.uid">
+														<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:10px;margin-right:5px">
 															<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 																<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 																<ng-template #showdefaultserviceimage>

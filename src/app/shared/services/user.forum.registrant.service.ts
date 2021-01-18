@@ -174,7 +174,7 @@ export class UserForumRegistrantService {
   }
 
   public getRegistrants(parentUserId: string, forumId: string): Observable<any[]> {
-    return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/registrants`, ref => ref.where('indexed', '==', true).orderBy('creationDate', 'desc')).valueChanges();
+    return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/registrants`, ref => ref.orderBy('creationDate', 'desc')).valueChanges();
   }
 
   public searchRegistrants(parentUserId: string, forumId: string, numberOfItems: number, key?: any): Observable<any[]>{

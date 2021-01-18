@@ -5263,75 +5263,6 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
-  var updateWhereServings = function () {
-    return new Promise((resolve, reject) => {
-      if (newValue.indexed != previousValue.indexed){
-        admin.firestore().collection(`users/${userId}/services/${serviceId}/whereservings`)
-          .get().then(snapshot => {
-            if (snapshot.size > 0){
-              var promises = snapshot.docs.map(whereServingDoc => {
-                return new Promise((resolve, reject) => {
-                  var whereServing = whereServingDoc.data();
-                  var updateRegistrant = function(){
-                    return new Promise((resolve, reject) => {
-                      admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/registrants`).where("serviceId", "==", serviceId).get().then(registrantSnapshot => {
-                        if (registrantSnapshot.size > 0){
-                          var promises = registrantSnapshot.docs.map(registrantDoc => {
-                            return new Promise((resolve, reject) => {
-                              // have to update the registrant indexed value, because it's linked to the service being indexed or not.
-                              // don't want to show registrants, who's associated service is not indexed
-                              registrantDoc.ref.update({ indexed: newValue.indexed }).then(() => {
-                                resolve();
-                              })
-                              .catch(error => {
-                                reject(error);
-                              });
-                            });
-                          });
-
-                          Promise.all(promises).then(() => {
-                            resolve();
-                          })
-                          .catch(error => {
-                            reject(error);
-                          });    
-                        }
-                        else resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    });
-                  };
-
-                  // update the registrant
-                  updateRegistrant().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                });
-              });
-    
-              Promise.all(promises).then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            }
-            else resolve();
-          })
-          .catch(error => {
-            reject(error);
-          }
-        );
-      }
-      else resolve();
-    });
-  };
-
   var createOrUpdatePublicService = function (tags) {
     return new Promise((resolve, reject) => {
       var createPublicServiceCollectionTitles = function (tags) {
@@ -6262,50 +6193,45 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
 
   return getTags().then(tags => {
     return updateUserService(tags).then(() => {
-      return updateWhereServings().then(() => {
-        if (newValue.indexed == true && newValue.type == 'Public'){
-          return createOrUpdatePublicService(tags).then(() => {
-            return createOrUpdateAnonymousService(tags).then(() => {
-              return createAlerts(tags).then(() => {
+      if (newValue.indexed == true && newValue.type == 'Public'){
+        return createOrUpdatePublicService(tags).then(() => {
+          return createOrUpdateAnonymousService(tags).then(() => {
+            return createAlerts(tags).then(() => {
+              return Promise.resolve();
+            })
+            .catch(error => {
+              return Promise.reject(error);
+            });
+          })
+          .catch(error => {
+            return Promise.reject(error);
+          });
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      }
+      else {
+        return removePublicService(tags).then(() => {
+          return removeAnonymousService(tags).then(() => {
+            if (newValue.type == 'Private'){
+              return removeAlerts().then(() => {
                 return Promise.resolve();
               })
               .catch(error => {
                 return Promise.reject(error);
               });
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+            }
+            else return Promise.resolve();
           })
           .catch(error => {
             return Promise.reject(error);
           });
-        }
-        else {
-          return removePublicService(tags).then(() => {
-            return removeAnonymousService(tags).then(() => {
-              if (newValue.type == 'Private'){
-                return removeAlerts().then(() => {
-                  return Promise.resolve();
-                })
-                .catch(error => {
-                  return Promise.reject(error);
-                });
-              }
-              else return Promise.resolve();
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
-          })
-          .catch(error => {
-            return Promise.reject(error);
-          });
-        }
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      }
 		})
 		.catch(error => {
 			return Promise.reject(error);
@@ -13551,38 +13477,21 @@ exports.createUserForumRegistrant = functions.firestore.document("users/{userId}
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(forumId).update({ registrantCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return createRegistrantTotals().then(() => {
-          return createRegistrantActivity().then(() => {
-            return createWhereServing().then(() => {
-              return validateDefaultRegistrant().then(() => {
-                return Promise.resolve();
-              })
-              .catch(error => {
-                return Promise.reject(error);
-              });
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).select()
+		.get().then(snapshot => {
+			return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
+				if (totalSnapshot.exists())
+					return admin.database().ref("totals").child(forumId).update({ registrantCount: snapshot.size });
+				else
+					return Promise.resolve();
+			});
+		}
+	).then(() => {
+    return createRegistrantTotals().then(() => {
+      return createRegistrantActivity().then(() => {
+        return createWhereServing().then(() => {
+          return validateDefaultRegistrant().then(() => {
+            return Promise.resolve();
           })
           .catch(error => {
             return Promise.reject(error);
@@ -13595,11 +13504,14 @@ exports.createUserForumRegistrant = functions.firestore.document("users/{userId}
       .catch(error => {
         return Promise.reject(error);
       });
-    }
-  )
-  .catch(error => {
-    return Promise.reject(error);
-  });
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+	})
+	.catch(error => {
+		return Promise.reject(error);
+	});
 });
 
 // ********************************************************************************
@@ -13612,72 +13524,58 @@ exports.updateUserForumRegistrant = functions.firestore.document('users/{userId}
   var forumId = context.params.forumId;
   var registrantId = context.params.registrantId;
 
-  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(forumId).update({ registrantCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        // check if the default flag is being set
-        if (newValue.default == true && previousValue.default == false){
-          // find any other services that the user of the registrant is managing in the forum and that has it's default setting set to true
-          // and change it to false.  End users of forums or ones that are various pseudonymns in the same forum or request can only have 
-          // one default registrant at a time.
-          return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).where("uid", "==", newValue.uid).where("default", "==", true)
-            .get().then(snapshot => {
-              if (snapshot.size > 1){ // must be more than one registrant belonging to this user
-                var promises = snapshot.docs.map(doc => {
-                  return new Promise((resolve, reject) => {
-                    var data = doc.data();
+  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).select()
+		.get().then(snapshot => {
+			return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
+				if (totalSnapshot.exists())
+					return admin.database().ref("totals").child(forumId).update({ registrantCount: snapshot.size });
+				else
+					return Promise.resolve();
+			});
+		}
+	).then(() => {
+    // check if the default flag is being set
+    if (newValue.default == true && previousValue.default == false){
+      // find any other services that the user of the registrant is managing in the forum and that has it's default setting set to true
+      // and change it to false.  End users of forums or ones that are various pseudonymns in the same forum or request can only have 
+      // one default registrant at a time.
+      return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).where("uid", "==", newValue.uid).where("default", "==", true)
+        .get().then(snapshot => {
+          if (snapshot.size > 1){ // must be more than one registrant belonging to this user
+            var promises = snapshot.docs.map(doc => {
+              return new Promise((resolve, reject) => {
+                var data = doc.data();
 
-                    if (data.serviceId != newValue.serviceId){
-                      data.default = false;
+                if (data.serviceId != newValue.serviceId){
+                  data.default = false;
 
-                      doc.ref.update(data).then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
+                  doc.ref.update(data).then(() => {
+                    resolve();
+                  })
+                  .catch(error => {
+                    reject(error);
                   });
-                });
+                }
+                else resolve();
+              });
+            });
 
-                return Promise.all(promises).then(() => {
-                  return Promise.resolve();
-                })
-                .catch(error => {
-                  return Promise.reject(error);
-                });
-              }
-              else return Promise.resolve();
-            }
-          );
+            return Promise.all(promises).then(() => {
+              return Promise.resolve();
+            })
+            .catch(error => {
+              return Promise.reject(error);
+            });
+          }
+          else return Promise.resolve();
         }
-        else return Promise.resolve();
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+      );
     }
-  )
-  .catch(error => {
-    return Promise.reject(error);
-  });
+    else return Promise.resolve();
+	})
+	.catch(error => {
+		return Promise.reject(error);
+	});
 });
 
 // ********************************************************************************
@@ -13766,37 +13664,20 @@ exports.deleteUserForumRegistrant = functions.firestore.document("users/{userId}
   //   });
   // };
 
-  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(forumId).update({ registrantCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return removeWhereServing().then(() => {
-          return removeActivityRegistrant().then(() => {
-            return removeRegistrantTotals().then(() => {
-              return Promise.resolve();
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
-          })
-          .catch(error => {
-            return Promise.reject(error);
-          });
+  return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).select()
+		.get().then(snapshot => {
+			return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
+				if (totalSnapshot.exists())
+					return admin.database().ref("totals").child(forumId).update({ registrantCount: snapshot.size });
+				else
+					return Promise.resolve();
+			});
+		}
+	).then(() => {
+    return removeWhereServing().then(() => {
+      return removeActivityRegistrant().then(() => {
+        return removeRegistrantTotals().then(() => {
+          return Promise.resolve();
         })
         .catch(error => {
           return Promise.reject(error);
@@ -13805,11 +13686,14 @@ exports.deleteUserForumRegistrant = functions.firestore.document("users/{userId}
       .catch(error => {
         return Promise.reject(error);
       });
-    }
-  )
-  .catch(error => {
-    return Promise.reject(error);
-  });
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+	})
+	.catch(error => {
+		return Promise.reject(error);
+	});
 });
 
 // ********************************************************************************

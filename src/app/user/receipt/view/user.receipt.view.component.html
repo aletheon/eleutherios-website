@@ -35,7 +35,6 @@
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 							<!-- other button controls -->
-							<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ receiptItem.receiptId }}</span></div>
 							<div style="flex:none;margin-right:5px">
 								<ng-container *ngIf="receiptItem.status == 'Pending'">
 									<span style="padding:5px" class="label label-warning">Pending</span>
@@ -47,6 +46,7 @@
 									<span style="padding:5px" class="label label-danger">Failed</span>
 								</ng-container>
 							</div>
+							<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ receiptItem.receiptId }}</span></div>
 							<div class="label label-default" matTooltip="{{ receiptItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 								{{ receiptItem.creationDate.toDate() | amTimeAgo }}
 							</div>
@@ -119,6 +119,25 @@
 						</div>
 					</ng-container>
 				</div>
+				<!-- user forums -->
+				<ng-container *ngIf="userForums | async;let userForumItems">
+					<ng-container *ngIf="userForumItems.length > 0; then showservices"></ng-container>
+					<ng-template #showservices>
+						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+							<div style="flex:none">
+								<mat-form-field>
+									<mat-select #select="matSelect" (selectionChange)="addForum()" placeholder="Add to forum" [formControl]="userForumsCtrl" style="margin-top:5px">
+										<mat-option *ngFor="let forum of userForumItems; trackBy: trackUserForums" [value]="forum" matTooltip="{{ forum.title }}">{{ forum.title | truncate: 35 }}</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</div>
+						</div>
+					</ng-template>
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+						<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: receiptItem.buyerUid, serviceId: receiptItem.buyerServiceId }' style="flex:none;color:#1B1B1B;margin-right:5px">Create forum</a>
+						<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: receiptItem.buyerUid, serviceId: receiptItem.buyerServiceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left">keyboard_arrow_right</a>
+					</div>
+				</ng-container>
 			</form>
 		</div>
 	</ng-container>

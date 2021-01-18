@@ -36,7 +36,6 @@
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
-                <span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Receipt Id">{{ receipt.receiptId }}</span>
                 <div style="flex:none;margin-right:5px">
                   <ng-container *ngIf="receipt.status == 'Pending'">
                     <span style="padding:5px" class="label label-warning">Pending</span>
@@ -48,6 +47,7 @@
                     <span style="padding:5px" class="label label-danger">Failed</span>
                   </ng-container>
                 </div>
+                <span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Receipt Id">{{ receipt.receiptId }}</span>
                 <div class="label label-default" matTooltip="{{ receipt.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
                   {{ receipt.creationDate.toDate() | amTimeAgo }}
                 </div>
