@@ -89,8 +89,8 @@
 										{{ forum.creationDate.toDate() | amTimeAgo }}
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="forum.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 										<mat-icon *ngIf="forum.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
+										<mat-icon *ngIf="forum.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>

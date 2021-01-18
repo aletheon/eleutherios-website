@@ -146,8 +146,8 @@
 										<p class="label label-default" style="padding:5px" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ service.creationDate.toDate() | amTimeAgo }}</p>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 										<mat-icon *ngIf="service.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
+										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>

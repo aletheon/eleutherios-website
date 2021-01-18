@@ -146,8 +146,8 @@
 										{{ service.creationDate.toDate() | amTimeAgo }}
 									</div>
 									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 										<mat-icon *ngIf="service.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
+										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 									</div>
 									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Edit">edit</mat-icon>
