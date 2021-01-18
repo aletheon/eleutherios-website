@@ -320,12 +320,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
       if (payment){
         let load = async function(){
           try {
-            
-            
-            // HERE ROB COPY OVER TO RECEIPT VIEW PAGE
-
-
-            
             that._sellerServiceSubscription = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).subscribe(service => {
               if (service){
                 that.paymentGroup.get('sellerType').setValue(service.type);
