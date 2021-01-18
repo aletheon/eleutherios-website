@@ -326,7 +326,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       panelClass: ['red-snackbar']
                     }
                   );
-                  this.router.navigate(['/']);
+                  that.router.navigate(['/']);
                 }
               }
             );

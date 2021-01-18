@@ -26,7 +26,7 @@
               <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' style="color:#1B1B1B;outline: 0" matTooltipPosition="after" matTooltip="{{ activity.title }}{{ activity.description.length > 0 ? (' - ' + activity.description | truncate: 80) : '' }}">{{ activity.title | truncate: 25 }}</a>
             </div>
             <!-- date -->
-            <div style="flex:none">
+            <div style="flex:none;margin-right:5px">
               <div class="label label-default" matTooltip="{{ activity.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ activity.forumCreationDate.toDate() | amTimeAgo }}</div>
             </div>
             <!-- type -->
