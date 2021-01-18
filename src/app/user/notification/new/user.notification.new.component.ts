@@ -225,7 +225,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       notificationId:                 [''],
       uid:                            [''],
       type:                           [''],
-      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
+      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
       active:                         [''],
       paymentType:                    [''],
       currency:                       [''],

@@ -52,7 +52,7 @@
               Title is required
             </mat-error>
             <mat-error *ngIf="forumGroup.get('title').hasError('pattern')">
-              Invalid characters, valid characters include [A-Za-z0-9]
+              Invalid characters, valid characters include [A-Za-z0-9._space]
             </mat-error>
           </mat-form-field>
         </div>

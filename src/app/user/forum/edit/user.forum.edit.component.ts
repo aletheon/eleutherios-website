@@ -213,7 +213,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       parentUid:                          [''],
       uid:                                [''],
       type:                               [''],
-      title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
+      title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
       title_lowercase:                    [''],
       description:                        [''],
       website:                            [''],

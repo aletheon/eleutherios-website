@@ -238,7 +238,7 @@ export class UserNotificationEditComponent implements OnInit, OnDestroy, AfterVi
       notificationId:                 [''],
       uid:                            [''],
       type:                           [''],
-      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9\s]*$/)]],
+      title:                          ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
       active:                         [''],
       paymentType:                    [''],
       currency:                       [''],
