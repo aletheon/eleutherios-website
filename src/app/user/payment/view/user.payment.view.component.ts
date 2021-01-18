@@ -282,7 +282,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    let firstTimeThrough: boolean = true;
     
     this.paymentGroup = this.fb.group({
       paymentId:                        [''],
