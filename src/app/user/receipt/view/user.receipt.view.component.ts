@@ -39,6 +39,8 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _initialReceiptSubscription: Subscription;
   private _receiptSubscription: Subscription;
+  private _sellerServiceSubscription: Subscription;
+  private _buyerServiceSubscription: Subscription;
   private _sellerDefaultServiceImageSubscription: Subscription;
   private _buyerDefaultServiceImageSubscription: Subscription;
   private _buyerServiceTagSubscription: Subscription;
@@ -78,6 +80,12 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
     if (this._receiptSubscription)
       this._receiptSubscription.unsubscribe();
 
+    if (this._sellerServiceSubscription)
+      this._sellerServiceSubscription.unsubscribe();
+
+    if (this._buyerServiceSubscription)
+      this._buyerServiceSubscription.unsubscribe();
+    
     if (this._sellerDefaultServiceImageSubscription)
       this._sellerDefaultServiceImageSubscription.unsubscribe();
 
@@ -314,6 +322,24 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       if (receipt){
         let load = async function(){
           try {
+            that._buyerServiceSubscription = that.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId).subscribe(service => {
+              if (service){
+                that.receiptGroup.get('buyerType').setValue(service.type);
+                that.receiptGroup.get('buyerPaymentType').setValue(service.paymentType);
+                that.receiptGroup.get('buyerTitle').setValue(service.title);
+                that.receiptGroup.get('buyerDescription').setValue(service.description);
+              }
+            });
+
+            that._sellerServiceSubscription = that.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId).subscribe(service => {
+              if (service){
+                that.receiptGroup.get('sellerType').setValue(service.type);
+                that.receiptGroup.get('sellerPaymentType').setValue(service.paymentType);
+                that.receiptGroup.get('sellerTitle').setValue(service.title);
+                that.receiptGroup.get('sellerDescription').setValue(service.description);
+              }
+            });
+
             that._buyerDefaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){

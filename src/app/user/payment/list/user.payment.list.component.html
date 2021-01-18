@@ -84,8 +84,8 @@
                     </ng-template>
                     <div style="flex:1;margin-right:5px">
                       <p style="word-break: break-all">
-                        <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.buyerDescription.length > 0">- {{ payment.buyerDescription | truncate: 80 }}</i></a>
-                        <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.buyerDescription.length > 0">- {{ payment.buyerDescription | truncate: 80 }}</i></a>
+                        <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
                       </p>
                     </div>
                   </div>
@@ -110,8 +110,8 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.buyerDescription.length > 0">- {{ payment.buyerDescription | truncate: 80 }}</i></a>
-                          <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.buyerDescription.length > 0">- {{ payment.buyerDescription | truncate: 80 }}</i></a>
+                          <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
                         </p>
                       </div>
                     </div>

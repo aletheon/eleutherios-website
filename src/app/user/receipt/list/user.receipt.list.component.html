@@ -84,8 +84,8 @@
                     </ng-template>
                     <div style="flex:1;margin-right:5px">
                       <p style="word-break: break-all">
-                        <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
-                        <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
+                        <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                       </p>
                     </div>
                   </div>
@@ -110,8 +110,8 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
-                          <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
+                          <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                         </p>
                       </div>
                     </div>
