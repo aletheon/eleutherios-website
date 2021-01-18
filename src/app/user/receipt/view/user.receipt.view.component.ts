@@ -307,7 +307,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       if (receipt){
         this.receiptGroup.patchValue(receipt);
       }
-      this._loading.next(false);
     });
 
     // run once subscription

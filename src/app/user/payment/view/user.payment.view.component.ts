@@ -39,6 +39,8 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _initialPaymentSubscription: Subscription;
   private _paymentSubscription: Subscription;
+  private _sellerServiceSubscription: Subscription;
+  private _buyerServiceSubscription: Subscription;
   private _buyerDefaultServiceImageSubscription: Subscription;
   private _sellerDefaultServiceImageSubscription: Subscription;
   private _sellerServiceTagSubscription: Subscription;
@@ -77,6 +79,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
 
     if (this._paymentSubscription)
       this._paymentSubscription.unsubscribe();
+
+    if (this._buyerServiceSubscription)
+      this._buyerServiceSubscription.unsubscribe();
+
+    if (this._sellerServiceSubscription)
+      this._sellerServiceSubscription.unsubscribe();
 
     if (this._buyerDefaultServiceImageSubscription)
       this._buyerDefaultServiceImageSubscription.unsubscribe();
@@ -274,6 +282,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
+    let firstTimeThrough: boolean = true;
     
     this.paymentGroup = this.fb.group({
       paymentId:                        [''],
@@ -305,7 +314,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
       if (payment){
         this.paymentGroup.patchValue(payment);
       }
-      this._loading.next(false);
     });
 
     // run once subscription
@@ -313,6 +321,24 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
       if (payment){
         let load = async function(){
           try {
+            that._sellerServiceSubscription = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).subscribe(service => {
+              if (service){
+                that.paymentGroup.get('sellerType').setValue(service.type);
+                that.paymentGroup.get('sellerPaymentType').setValue(service.paymentType);
+                that.paymentGroup.get('sellerTitle').setValue(service.title);
+                that.paymentGroup.get('sellerDescription').setValue(service.description);
+              }
+            });
+
+            that._buyerServiceSubscription = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId).subscribe(service => {
+              if (service){
+                that.paymentGroup.get('buyerType').setValue(service.type);
+                that.paymentGroup.get('buyerPaymentType').setValue(service.paymentType);
+                that.paymentGroup.get('buyerTitle').setValue(service.title);
+                that.paymentGroup.get('buyerDescription').setValue(service.description);
+              }
+            });
+
             that._sellerDefaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
