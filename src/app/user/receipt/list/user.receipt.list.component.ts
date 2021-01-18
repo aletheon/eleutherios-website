@@ -7,6 +7,7 @@ import {
   UserReceiptService,
   UserServiceImageService,
   UserServiceTagService,
+  UserServiceService,
   NoTitlePipe
 } from '../../../shared';
 
@@ -44,6 +45,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
     private userReceiptService: UserReceiptService,
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
+    private userServiceService: UserServiceService,
     private snackbar: MatSnackBar,
     private router: Router) {
   }
@@ -92,6 +94,8 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
       switchMap(receipts => {
         if (receipts && receipts.length > 0){
           let observables = receipts.map(receipt => {
+            let getBuyerService$ = this.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
+            let getSellerService$ = this.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
             let getBuyerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
@@ -142,9 +146,9 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
             );
             let getBuyerServiceTags$ = this.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
   
-            return combineLatest([getBuyerDefaultServiceImage$, getSellerDefaultServiceImage$, getBuyerServiceTags$]).pipe(
+            return combineLatest([getBuyerService$, getSellerService$, getBuyerDefaultServiceImage$, getSellerDefaultServiceImage$, getBuyerServiceTags$]).pipe(
               switchMap(results => {
-                const [buyerDefaultServiceImage, sellerDefaultServiceImage, buyerServiceTags] = results;
+                const [buyerService, sellerService, buyerDefaultServiceImage, sellerDefaultServiceImage, buyerServiceTags] = results;
 
                 if (sellerDefaultServiceImage)
                   receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
@@ -168,6 +172,20 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.buyerServiceTags = of(buyerServiceTags);
                 else {
                   receipt.buyerServiceTags = of([]);
+                }
+
+                if (buyerService){
+                  receipt.buyerType = buyerService.type;
+                  receipt.buyerPaymentType = buyerService.paymentType;
+                  receipt.buyerTitle = buyerService.title;
+                  receipt.buyerDescription = buyerService.description;
+                }
+
+                if (sellerService){
+                  receipt.sellerType = sellerService.type;
+                  receipt.sellerPaymentType = sellerService.paymentType;
+                  receipt.sellerTitle = sellerService.title;
+                  receipt.sellerDescription = sellerService.description;
                 }
                 return of(receipt);
               })

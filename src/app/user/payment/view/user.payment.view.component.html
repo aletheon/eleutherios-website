@@ -64,7 +64,7 @@
 							</ng-template>
 							<ng-container *ngIf="sellerServiceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
 							<ng-template #showtagswithpayment>
-								<div [ngClass]="paymentItem.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:wrap">
+								<div [ngClass]="paymentItem.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
 									<ng-container *ngIf="buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
 									<ng-template #showbuyerdefaultserviceimage>
 										<ng-container *ngIf="buyerDefaultServiceImage | async;let image">

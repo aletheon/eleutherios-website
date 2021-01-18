@@ -7,6 +7,7 @@ import {
   UserServiceImageService,
   UserServiceTagService,
   UserPaymentService,
+  UserServiceService,
   NoTitlePipe
 } from '../../../shared';
 
@@ -44,6 +45,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
     private userPaymentService: UserPaymentService,
+    private userServiceService: UserServiceService,
     private snackbar: MatSnackBar,
     private router: Router) {
   }
@@ -92,6 +94,8 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       switchMap(payments => {
         if (payments && payments.length > 0){
           let observables = payments.map(payment => {
+            let getSellerService$ = this.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
+            let getBuyerService$ = this.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
             let getSellerDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
@@ -142,9 +146,9 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
             );
             let getSellerServiceTags$ = this.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
   
-            return combineLatest([getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
+            return combineLatest([getSellerService$, getBuyerService$, getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
               switchMap(results => {
-                const [sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
+                const [sellerService, buyerService, sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
 
                 if (sellerDefaultServiceImage)
                   payment.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
@@ -168,6 +172,20 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
                   payment.sellerServiceTags = of(sellerServiceTags);
                 else {
                   payment.sellerServiceTags = of([]);
+                }
+
+                if (sellerService){
+                  payment.sellerType = sellerService.type;
+                  payment.sellerPaymentType = sellerService.paymentType;
+                  payment.sellerTitle = sellerService.title;
+                  payment.sellerDescription = sellerService.description;
+                }
+
+                if (buyerService){
+                  payment.buyerType = buyerService.type;
+                  payment.buyerPaymentType = buyerService.paymentType;
+                  payment.buyerTitle = buyerService.title;
+                  payment.buyerDescription = buyerService.description;
                 }
                 return of(payment);
               })
