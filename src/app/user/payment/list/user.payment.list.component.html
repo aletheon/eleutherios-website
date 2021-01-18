@@ -58,7 +58,7 @@
               <div style="flex:none;display:flex;flex-direction:row;align-items:center">
                 <ng-container *ngIf="sellerServiceTagItems.length > 0; then showtags"></ng-container>
                 <ng-template #showtags>
-                  <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+                  <div style="flex:1;display:flex;flex-direction:row">
                     <ng-container *ngFor="let serviceTag of sellerServiceTagItems">
                       <span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
                     </ng-container>
@@ -66,7 +66,7 @@
                 </ng-template>
                 <ng-container *ngIf="sellerServiceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
                 <ng-template #showtagswithpayment>
-                  <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:wrap">
+                  <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                     <ng-container *ngIf="payment.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                     <ng-template #showbuyerdefaultserviceimage>
                       <ng-container *ngIf="payment.buyerDefaultServiceImage | async;let image">
