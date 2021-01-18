@@ -553,7 +553,6 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
                                         forumId: this.forumGroup.get('forumId').value,
                                         forumUid: this.forumGroup.get('uid').value,
                                         default: false,
-                                        indexed: service.indexed,
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };

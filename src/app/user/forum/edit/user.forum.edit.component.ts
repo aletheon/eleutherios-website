@@ -1085,7 +1085,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                                         forumId: this.forumGroup.get('forumId').value,
                                         forumUid: this.forumGroup.get('uid').value,
                                         default: false,
-                                        indexed: service.indexed,
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };

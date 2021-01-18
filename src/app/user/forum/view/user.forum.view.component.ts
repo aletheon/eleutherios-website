@@ -949,7 +949,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
         forumId: event.value.forumId,
         forumUid: event.value.forumUid,
         default: true,
-        indexed: event.value.indexed,
         lastUpdateDate: event.value.lastUpdateDate,
         creationDate: event.value.creationDate
       }

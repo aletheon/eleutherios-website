@@ -6,7 +6,6 @@ export interface Registrant {
   forumId: string, // id of the forum managing this registrant
   forumUid: string, // id of the user managing the forum
   default: boolean, // default registrant
-  indexed: boolean, // whether this registrant is indexed or hidden
   lastUpdateDate: object,
   creationDate: object 
 }

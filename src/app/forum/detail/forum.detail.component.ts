@@ -223,7 +223,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                                         forumId: this.forumGroup.get('forumId').value,
                                         forumUid: this.forumGroup.get('uid').value,
                                         default: false,
-                                        indexed: this.userServicesCtrl.value.indexed,
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };

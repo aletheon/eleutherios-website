@@ -225,7 +225,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                         forumId: this.userForumsCtrl.value.forumId,
                                         forumUid: this.userForumsCtrl.value.uid,
                                         default: false,
-                                        indexed: this.serviceGroup.get('indexed').value,
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };

@@ -638,7 +638,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                                       forumId: forum.forumId,
                                       forumUid: forum.uid,
                                       default: false,
-                                      indexed: this.serviceGroup.get('indexed').value,
                                       creationDate: firebase.firestore.FieldValue.serverTimestamp(),
                                       lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
                                     };

@@ -117,7 +117,6 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                                           forumId: this.userForumsCtrl.value.forumId,
                                           forumUid: this.userForumsCtrl.value.uid,
                                           default: false,
-                                          indexed: service.indexed,
                                           creationDate: firebase.firestore.FieldValue.serverTimestamp(),
                                           lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
                                         };
