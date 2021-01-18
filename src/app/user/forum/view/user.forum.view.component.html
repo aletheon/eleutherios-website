@@ -18,8 +18,8 @@
 					</ng-container>
 				</ng-template>
 			</div>
-			<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-				<h4 style="flex:none;margin-right:5px" matTooltip="{{ forumItem.title }}">{{ forumItem.title }}</h4>
+			<div style="flex:none;margin-right:5px">
+				<h4 matTooltip="{{ forumItem.title }}">{{ forumItem.title }}</h4>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
 				<div class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
