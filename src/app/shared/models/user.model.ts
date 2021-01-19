@@ -2,6 +2,7 @@ export interface User {
   uid: string,
   email: string, // email of the user
   displayName?: string,
+  photoUrl?: string,
   username: string,
   website: string, // website of the user
   stripeCustomerId: string,

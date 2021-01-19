@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
@@ -20,7 +20,8 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private ngZone: NgZone
   ) {
     this.user = this.afAuth.authState.pipe(
       switchMap(user => {
@@ -57,84 +58,112 @@ export class AuthService {
     });
   }
 
-  facebookLogin(accessToken){
-    return new Promise<void>((resolve, reject) => {
-      this.afAuth.signInWithCredential(firebase.auth.FacebookAuthProvider.credential(accessToken))
-        .then((credential) => {
-          this.updateUserData(credential.user);
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        }
-      );
-    });
-  }
+  // facebookLogin(accessToken){
+  //   return new Promise<void>((resolve, reject) => {
+  //     this.afAuth.signInWithCredential(firebase.auth.FacebookAuthProvider.credential(accessToken))
+  //       .then((credential) => {
+  //         this.updateUserData(credential.user);
+  //         resolve();
+  //       })
+  //       .catch(error => {
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
 
-  googleLogin(){
-    const provider = new firebase.auth.GoogleAuthProvider();
-    return this.oAuthLogin(provider);
-  }
+  // googleLogin(){
+  //   const provider = new firebase.auth.GoogleAuthProvider();
+  //   return this.oAuthLogin(provider);
+  // }
 
-  oAuthLogin(provider){
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
+  // signInWithEmail(email: string, password: string) {
+  //   return this.afAuth.signInWithEmailAndPassword(email, password)
+  //     .then((res) => {
+  //       console.log('AuthService::Successful Email login', res);
+  //       return this.ngZone.run(() => this.router.navigate(['/']));
+  //     }
+  //   );
+  // }
+
+  // signUpWithEmail(email: string, password: string) {
+  //   return this.afAuth.createUserWithEmailAndPassword(email, password);
+  // }
+
+  // oAuthLogin(provider){
+  //   provider.setCustomParameters({
+  //     prompt: 'select_account'
+  //   });
     
-    return this.afAuth.signInWithPopup(provider)
-      .then((credential) => {
-        this.updateUserData(credential.user);
-      }
-    );
-  }
+  //   return this.afAuth.signInWithPopup(provider)
+  //     .then((credential) => {
+  //       this.updateUserData(credential.user);
+  //     }
+  //   );
+  // }
 
-  updateUserData(user){
-    // sets user data to firestore on login
-    const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+  // updateUserData(user){
+  //   console.log('updateUserData ' + JSON.stringify(user));
 
-    userRef.ref.get().then((doc) => {
-      if (doc.exists) {
-        const data: any = {
-          email: user.email,
-          displayName: user.displayName,
-          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        userRef.update(data);
-      } else {
-        const data: User = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          username: user.uid.substring(0,20),
-          website: '',
-          stripeCustomerId: '',
-          stripeAccountId: '',
-          stripeOnboardingStatus: '',
-          stripeCurrency: '',
-          fcmToken: '',
-          receivePushNotifications: false,
-          receiveForumAlertNotifications: false,
-          receiveServiceAlertNotifications: false,
-          receiveForumPostNotifications: false,
-          receiveAlphaNotification: false,
-          creationDate: firebase.firestore.FieldValue.serverTimestamp(),
-          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        this.userService.create(user.uid, data);
-      }
-    }).catch(error => {
-      console.log("Error getting document:", error);
-    });
-  }
+  //   // sets user data to firestore on login
+  //   const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+
+  //   userRef.ref.get().then((doc) => {
+  //     if (doc.exists) {
+  //       const data: any = {
+  //         email: user.email,
+  //         displayName: user.displayName,
+  //         photoUrl: user.photoUrl,
+  //         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+  //       };
+  //       userRef.update(data);
+  //     } else {
+  //       const data: User = {
+  //         uid: user.uid,
+  //         email: user.email,
+  //         displayName: user.displayName,
+  //         photoUrl: user.photoUrl,
+  //         username: user.uid.substring(0,20),
+  //         website: '',
+  //         stripeCustomerId: '',
+  //         stripeAccountId: '',
+  //         stripeOnboardingStatus: '',
+  //         stripeCurrency: '',
+  //         fcmToken: '',
+  //         receivePushNotifications: false,
+  //         receiveForumAlertNotifications: false,
+  //         receiveServiceAlertNotifications: false,
+  //         receiveForumPostNotifications: false,
+  //         receiveAlphaNotification: false,
+  //         creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+  //         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+  //       };
+  //       this.userService.create(user.uid, data);
+  //     }
+  //   }).catch(error => {
+  //     console.log("Error getting document:", error);
+  //   });
+  // }
 
   signOut() {
-    this.afAuth.signOut().then(() => {
-      this.router.navigate(['/login']).then(() => {
-        this.uid = '';  
-      });
-    })
-    .catch(error => {
-      console.log('Sign out failed', error);
-    });
+    this.ngZone.run(() =>
+      this.afAuth.signOut().then(() => {
+        this.router.navigate(['/login']).then(() => {
+          this.uid = '';  
+        });
+      })
+      .catch(error => {
+        console.log('Sign out failed', error);
+      })
+    );
+
+    // this.afAuth.signOut().then(() => {
+    //   this.router.navigate(['/login']).then(() => {
+    //     this.uid = '';  
+    //   });
+    // })
+    // .catch(error => {
+    //   console.log('Sign out failed', error);
+    // });
   }
 }
