@@ -75,13 +75,13 @@ export class LoginComponent implements OnInit {
           const userRef: AngularFirestoreDocument<User> = that.afs.doc(`users/${authResult.user.uid}`);
           userRef.ref.get().then((doc) => {
             if (doc.exists) {
-              const data: any = {
-                email: authResult.user.email,
-                displayName: authResult.user.displayName,
-                photoUrl: authResult.user.photoURL,
-                lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
-              };
-              userRef.update(data);
+              // const data: any = {
+              //   email: authResult.user.email,
+              //   displayName: authResult.user.displayName,
+              //   photoUrl: authResult.user.photoURL,
+              //   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
+              // };
+              // userRef.update(data);
             } else {
               const data: User = {
                 uid: authResult.user.uid,
