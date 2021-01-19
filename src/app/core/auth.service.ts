@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -19,8 +19,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
     private router: Router,
-    private userService: UserService,
-    private ngZone: NgZone
+    private userService: UserService
   ) {
     this.user = this.afAuth.authState.pipe(
       switchMap(user => {
@@ -58,15 +57,13 @@ export class AuthService {
   }
 
   signOut() {
-    this.ngZone.run(() =>
-      this.afAuth.signOut().then(() => {
-        this.router.navigate(['/login']).then(() => {
-          this.uid = '';  
-        });
-      })
-      .catch(error => {
-        console.log('Sign out failed', error);
-      })
-    );
+    this.afAuth.signOut().then(() => {
+      this.router.navigate(['/login']).then(() => {
+        this.uid = '';  
+      });
+    })
+    .catch(error => {
+      console.log('Sign out failed', error);
+    });
   }
 }
