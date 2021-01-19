@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private auth: AuthService,
     private afAuth: AngularFireAuth,
+    private afs: AngularFirestore,
     private route: ActivatedRoute,
     private fb: FacebookService,
     private userService: UserService,
@@ -42,6 +43,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit () {
+    const that = this;
+    
     // redirect the user if they are logged in
     if (this.auth.uid && this.auth.uid.length > 0){
       // get ids for other sources
@@ -65,29 +68,26 @@ export class LoginComponent implements OnInit {
         firebase.auth.FacebookAuthProvider.PROVIDER_ID,
         firebase.auth.EmailAuthProvider.PROVIDER_ID
       ],
+      tosUrl: 'https://eleutherios.org.nz/tos',
+      privacyPolicyUrl: 'https://eleutherios.org.nz/privacy',
       callbacks: {
-        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-          const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${authResult.user.uid}`);
-
+        signInSuccessWithAuthResult: function (authResult) {
+          const userRef: AngularFirestoreDocument<User> = that.afs.doc(`users/${authResult.user.uid}`);
           userRef.ref.get().then((doc) => {
             if (doc.exists) {
-              console.log('got existing user with userId ' + JSON.stringify(authResult.user.uid));
-
               const data: any = {
                 email: authResult.user.email,
                 displayName: authResult.user.displayName,
-                photoUrl: authResult.user.photoUrl,
+                photoUrl: authResult.user.photoURL,
                 lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
               };
               userRef.update(data);
             } else {
-              console.log('creating new user with userId ' + JSON.stringify(authResult.user.uid));
-
               const data: User = {
                 uid: authResult.user.uid,
                 email: authResult.user.email,
                 displayName: authResult.user.displayName,
-                photoUrl: authResult.user.photoUrl,
+                photoUrl: authResult.user.photoURL,
                 username: authResult.user.uid.substring(0,20),
                 website: '',
                 stripeCustomerId: '',
@@ -103,12 +103,12 @@ export class LoginComponent implements OnInit {
                 creationDate: firebase.firestore.FieldValue.serverTimestamp(),
                 lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
               };
-              this.userService.create(authResult.user.uid, data);
+              that.userService.create(authResult.user.uid, data);
             }
           }).catch(error => {
-            console.log("Error getting document:", error);
+            console.error(error);
           });
-          return true;
+          return false;
         },
         uiShown: function () {
           // The widget is rendered.
@@ -120,42 +120,4 @@ export class LoginComponent implements OnInit {
     this._ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
     this._ui.start('#firebaseui-auth-container', uiConfig);
   }
-
-  // loginWithGoogle () {
-  //   this.auth.googleLogin()
-  //     .then(() => {
-  //       this.router.navigate(['/']);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);  
-  //     }
-  //   );
-  // }
-
-  // loginWithFacebook () {
-  //   this.fb.login({scope: 'email, public_profile'})
-  //     .then((response: LoginResponse) => {
-  //       this.auth.facebookLogin(response.authResponse.accessToken).then(() => {
-  //         this.router.navigate(['/']);
-  //       })
-  //       .catch(error => {
-  //         // cannot register with an existing or the same email address
-  //         if (_.includes(error.message, 'An account already exists with the same email address')){
-  //           const snackBarRef = this.snackbar.openFromComponent(
-  //             NotificationSnackBar,
-  //             {
-  //               duration: 8000,
-  //               data: `The email address ${error.email} already exists`,
-  //               panelClass: ['red-snackbar']
-  //             }
-  //           );
-  //         }
-  //         else console.error(error);
-  //       });
-  //     })
-  //     .catch(error => {
-  //       console.error(error);
-  //     }
-  //   );
-  // }
 }
