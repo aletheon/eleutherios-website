@@ -8,7 +8,6 @@ import { IsLoggedIn } from './core/is.logged.in.guard';
 import { AboutComponent } from './about/about.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
-import { LoginLinkComponent } from './login/login.link.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptableUsePolicyComponent } from './aup/acceptable.use.policy.component';
 import { TermsOfServiceComponent } from './tos/terms.of.service.component';
@@ -107,11 +106,6 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [IsLoggedIn]
-  },
-  {
-    path: 'login/link',
-    component: LoginLinkComponent,
     canActivate: [IsLoggedIn]
   },
   // **********************************************

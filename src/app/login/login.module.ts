@@ -12,7 +12,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LoadingSpinnerModule } from '../shared';
 
 import { LoginComponent } from './login.component';
-import { LoginLinkComponent } from './login.link.component';
 
 @NgModule({
   imports: [
@@ -28,8 +27,7 @@ import { LoginLinkComponent } from './login.link.component';
     MatIconModule
   ],
   declarations: [
-    LoginComponent,
-    LoginLinkComponent
+    LoginComponent
   ],
   providers: [
     FacebookService,
