@@ -75,8 +75,6 @@ export class LoginComponent implements OnInit {
           const userRef: AngularFirestoreDocument<User> = that.afs.doc(`users/${authResult.user.uid}`);
           userRef.ref.get().then((doc) => {
             if (doc.exists) {
-              console.log('user exists updating user');
-
               // const data: any = {
               //   email: authResult.user.email,
               //   displayName: authResult.user.displayName,
@@ -85,8 +83,6 @@ export class LoginComponent implements OnInit {
               // };
               // userRef.update(data);
             } else {
-              console.log('doesnt exist creating user');
-
               const data: User = {
                 uid: authResult.user.uid,
                 email: authResult.user.email,
