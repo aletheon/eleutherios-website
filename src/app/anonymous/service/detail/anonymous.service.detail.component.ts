@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
-
+import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   AnonymousServiceService,
   UserServiceImageService,
   UserServiceTagService,
   NoTitlePipe
 } from '../../../shared';
+import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
@@ -39,6 +40,9 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
   public serviceTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
+  public qrCodeUrl: string = '';
+  public elementType = NgxQrcodeElementTypes.URL;
+  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
   
   constructor(private auth: AuthService,
     private route: ActivatedRoute,
@@ -221,6 +225,8 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
 
             // get default service image
             that.getDefaultServiceImage();
+
+            that.qrCodeUrl = environment.url + "anonymous/service/detail?serviceId=" + service.serviceId;
           }
           catch (error) {
             throw error;

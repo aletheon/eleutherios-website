@@ -4,13 +4,14 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material/expansion';
-
+import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   AnonymousForumService,
   UserForumImageService,
   UserForumTagService,
   NoTitlePipe
 } from '../../../shared';
+import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
@@ -39,6 +40,9 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
   public forumTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultForumImage: Observable<any>;
+  public qrCodeUrl: string = '';
+  public elementType = NgxQrcodeElementTypes.URL;
+  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
   
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -209,6 +213,8 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
 
             // get default forum image
             that.getDefaultForumImage();
+
+            that.qrCodeUrl = environment.url + "anonymous/forum/detail?forumId=" + forum.forumId;
           }
           catch (error) {
             throw error;
