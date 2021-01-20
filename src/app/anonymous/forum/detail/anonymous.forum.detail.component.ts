@@ -31,6 +31,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
+  private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
 
@@ -127,26 +128,24 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
           this.router.navigate(['/forum/detail'], { queryParams: { forumId: forumId } });
         }
 
-        this.anonymousForumService.getForumFromPromise(forumId)
-          .then(forum => {
-            if (forum){
-              this.forum = this.anonymousForumService.getForum(forumId);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum does not exist or was recently removed 1',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/anonymous/home']);
-            }
+        this._initialForumSubscription = this.anonymousForumService.getForum(forumId).subscribe(forum => {
+          this._initialForumSubscription.unsubscribe();
+
+          if (forum){
+            this.forum = this.anonymousForumService.getForum(forumId);
+            this.initForm();
           }
-        ).catch(error => {
-          console.error(error);
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Forum does not exist or was recently removed',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/anonymous/home']);
+          }
         });
       }
       else {

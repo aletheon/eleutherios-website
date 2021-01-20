@@ -32,6 +32,7 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
+  private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
   
@@ -126,35 +127,26 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
           this.router.navigate(['/service/detail'], { queryParams: { serviceId: serviceId } });
         }
         
-        this.anonymousServiceService.getServiceFromPromise(serviceId)
-          .then(service => {
-            if (service){
-              this.service = this.anonymousServiceService.getService(serviceId);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/anonymous/home']);
-            }
+        this._initialServiceSubscription = this.anonymousServiceService.getService(serviceId).subscribe(service => {
+          this._initialServiceSubscription.unsubscribe();
+
+          console.log('service ' + JSON.stringify(service));
+
+          if (service){
+            this.service = this.anonymousServiceService.getService(serviceId);
+            this.initForm();
           }
-        )
-        .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error.message,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/anonymous/home']);
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'Service does not exist or was recently removed',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/anonymous/home']);
+          }
         });
       }
       else {

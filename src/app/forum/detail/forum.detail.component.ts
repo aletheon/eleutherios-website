@@ -509,7 +509,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: 'Forum does not exist or was recently removed 3',
+                data: 'Forum does not exist or was recently removed',
                 panelClass: ['red-snackbar']
               }
             );
@@ -564,7 +564,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             NotificationSnackBar,
             {
               duration: 8000,
-              data: 'Forum does not exist or was recently removed 4',
+              data: 'Forum does not exist or was recently removed',
               panelClass: ['red-snackbar']
             }
           );
