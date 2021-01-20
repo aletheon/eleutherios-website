@@ -16,6 +16,7 @@ import { MomentModule } from 'angular2-moment';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { LinkyModule } from 'angular-linky';
 import { StarRatingModule } from 'angular-star-rating';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AuthGuard } from './core/auth.guard';
@@ -124,6 +125,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserReceiptModule,
     UserTagModule,
     UserProfileModule,
+    NgxQRCodeModule,
     StarRatingModule.forRoot(),
     FacebookModule.forRoot(),
     NgxStripeModule.forRoot(environment.stripeTestKey)

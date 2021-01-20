@@ -18,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { MomentModule } from 'angular2-moment';
 import { LinkyModule } from 'angular-linky';
 import { StarRatingModule } from 'angular-star-rating';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { ServiceDetailComponent } from './detail/service.detail.component';
 import { ServiceImageListComponent } from './image/service.image.list.component';
@@ -70,6 +71,7 @@ import {
     MomentModule,
     LinkyModule,
     StarRatingModule,
+    NgxQRCodeModule,
     AppRoutingModule
   ],
   declarations: [

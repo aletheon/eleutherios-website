@@ -18,6 +18,7 @@ import { PipeModule } from '../../shared';
 import { MomentModule } from 'angular2-moment';
 import { LinkyModule } from 'angular-linky';
 import { StarRatingModule } from 'angular-star-rating';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { UserServiceNewComponent } from './new/user.service.new.component';
 import { UserServiceEditComponent } from './edit/user.service.edit.component';
@@ -70,6 +71,7 @@ import {
     MomentModule,
     LinkyModule,
     StarRatingModule,
+    NgxQRCodeModule,
     AppRoutingModule
   ],
   declarations: [

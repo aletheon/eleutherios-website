@@ -178,7 +178,7 @@
 											<ng-container *ngIf="forum; then showforum"></ng-container>
 											<ng-template #showforum>
 												<ng-container *ngIf="forum.uid == auth.uid || forum.type == 'Public'">
-													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
+													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap">
 														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 															<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 															<ng-template #showdefaultforumimage>

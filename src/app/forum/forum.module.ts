@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { MomentModule } from 'angular2-moment';
 import { NgxAutoScrollModule } from "ngx-auto-scroll";
 import { LinkyModule } from 'angular-linky';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { ForumDetailComponent } from './detail/forum.detail.component';
 import { ForumImageListComponent } from './image/forum.image.list.component';
@@ -71,6 +72,7 @@ import {
     MomentModule,
     AppRoutingModule,
     NgxAutoScrollModule,
+    NgxQRCodeModule,
     LinkyModule
   ],
   declarations: [

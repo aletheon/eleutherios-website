@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgxAutoScrollModule } from "ngx-auto-scroll";
 import { LinkyModule } from 'angular-linky';
 import { StarRatingModule } from 'angular-star-rating';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { AnonymousHomeComponent } from './home/anonymous.home.component';
 import { AnonymousForumDetailComponent } from './forum/detail/anonymous.forum.detail.component';
@@ -56,7 +57,8 @@ import {
     AppRoutingModule,
     NgxAutoScrollModule,
     LinkyModule,
-    StarRatingModule
+    StarRatingModule,
+    NgxQRCodeModule
   ],
   declarations: [
     AnonymousHomeComponent,

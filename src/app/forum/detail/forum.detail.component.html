@@ -131,7 +131,7 @@
 											<ng-container *ngIf="service; then showservice"></ng-container>
 											<ng-template #showservice>
 												<ng-container *ngIf="forumItem.uid == auth.uid || service.uid == auth.uid">
-													<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px">
+													<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap">
 														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 															<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 															<ng-template #showdefaultserviceimage>
