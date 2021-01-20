@@ -494,8 +494,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       if (forumId){
         this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
           this._initialForumSubscription.unsubscribe();
-
-          console.log('Still here');
           
           if (forum){
             this.forum = this.forumService.getForum(forumId);

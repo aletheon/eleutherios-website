@@ -197,7 +197,7 @@
 								<ng-container *ngIf="whereServings | async;let whereServingItems">
 									<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
 									<ng-template #showwhereservings>
-										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap"
+										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap"
 											*ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
 											<ng-container *ngIf="whereServing.forum | async;let forum">
 												<ng-container *ngIf="forum; then showforum"></ng-container>
