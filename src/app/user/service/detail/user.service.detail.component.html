@@ -31,13 +31,10 @@
 				<h4 matTooltip="{{ serviceItem.title }}">{{ serviceItem.title | noTitle }}</h4>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
-				<div class="label label-danger" *ngIf="serviceItem.paymentId && serviceItem.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
-					Sold
-				</div>
 				<div class="label label-default" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ serviceItem.creationDate.toDate() | amTimeAgo }}
 				</div>
-				<div style="flex:none;margin-right:5px">
+				<div style="flex:none">
 					<ng-container *ngIf="serviceItem.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
 					<ng-template #showpublictype>
 						<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
@@ -62,13 +59,13 @@
 						</ng-template>
 					</ng-template>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
 					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;">
 					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService()"></mat-checkbox>
 					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -109,6 +106,20 @@
 					<div style="display:flex;flex-direction:row;align-items:center">
 						<div style="flex:1;display:flex;flex-direction:row;justify-content:start">
 							<div style="flex:none">
+								<ng-container *ngIf="serviceTags | async;let serviceTagItems">
+									<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
+										<div style="flex:none;display:flex;flex-direction:row">
+											<ng-container *ngFor="let serviceTag of serviceTagItems">
+												<span [ngClass]="serviceItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+											</ng-container>
+										</div>
+									</ng-container>
+									<ng-template #noservicetags></ng-template>
+								</ng-container>
+							</div>
+						</div>
+						<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+							<div style="flex:none">
 								<star-rating-control
 									[rating]="serviceGroup.get('rate').value"
 									[showHalfStars]="true"
@@ -116,8 +127,6 @@
 									[readOnly]="true">
 								</star-rating-control>
 							</div>
-						</div>
-						<div style="flex:none;display:flex;flex-direction:row">
 							<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
 								<mat-icon [routerLink]="['/user/service/rate/create']" [queryParams]="{ parentServiceUserId: serviceItem.uid, parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create rate">add_circle_outline</mat-icon>
 							</div>
@@ -149,8 +158,9 @@
 								</ng-container>
 							</div>
 							<ng-container *ngIf="serviceItem.paymentType == 'Payment'">
-								<div style="flex:none">
-									<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}</a>
+								<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+									<span class="label label-danger" *ngIf="serviceItem.paymentId && serviceItem.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">Sold</span>
+									<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}</a>
 								</div>
 							</ng-container>
 						</div>
@@ -163,7 +173,7 @@
 							(closed)="descriptionPanelEvent('contracted')"
 							class="mat-elevation-z0"
 							*ngIf="serviceItem.description.length > 0"
-							style="margin-bottom:10px">
+							style="margin-top:5px">
 							<mat-expansion-panel-header style="display:flex;flex-direction:row">
 								<mat-panel-title #descriptionPanelTitle style="flex:none">
 									{{ serviceItem.description | truncate: 80 }}
@@ -178,26 +188,13 @@
 							<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
 							<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 						</div>
-						<!-- tags -->
-						<div style="flex:none;margin-bottom:10px">
-							<ng-container *ngIf="serviceTags | async;let serviceTagItems">
-								<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
-									<div style="flex:none;display:flex;flex-direction:row">
-										<ng-container *ngFor="let serviceTag of serviceTagItems">
-											<span [ngClass]="serviceItem.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
-										</ng-container>
-									</div>
-								</ng-container>
-								<ng-template #noservicetags></ng-template>
-							</ng-container>
-						</div>
 						<!-- forums -->
 						<div style="flex:none;margin-bottom:10px">
 							<div style="display:flex;flex-direction:row;overflow-x:auto">
 								<ng-container *ngIf="whereServings | async;let whereServingItems">
 									<ng-container *ngIf="whereServingItems.length > 0; then showwhereservings else nowhereservings"></ng-container>
 									<ng-template #showwhereservings>
-										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap"
+										<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:10px 5px 0 0;flex-wrap:nowrap"
 											*ngFor="let whereServing of whereServingItems; trackBy: trackWhereServings">
 											<ng-container *ngIf="whereServing.forum | async;let forum">
 												<ng-container *ngIf="forum; then showforum"></ng-container>

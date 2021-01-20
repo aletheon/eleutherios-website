@@ -130,8 +130,6 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
         this._initialServiceSubscription = this.anonymousServiceService.getService(serviceId).subscribe(service => {
           this._initialServiceSubscription.unsubscribe();
 
-          console.log('service ' + JSON.stringify(service));
-
           if (service){
             this.service = this.anonymousServiceService.getService(serviceId);
             this.initForm();

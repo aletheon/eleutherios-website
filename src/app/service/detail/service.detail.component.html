@@ -6,7 +6,7 @@
 				<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 				<ng-template #showdefaultserviceimage>
 					<ng-container *ngIf="defaultServiceImage | async;let image">
-						<div style="flex:none;margin-right:10px">
+						<div style="flex:none">
 							<ng-container *ngIf="image.url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 							<ng-template #showimage>
 								<img [src]="image.url" [routerLink]="['/service/image/list']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="cursor:pointer">
@@ -34,7 +34,7 @@
 				<div class="label label-default" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ serviceItem.creationDate.toDate() | amTimeAgo }}
 				</div>
-				<div style="flex:none;margin-right:5px">
+				<div style="flex:none">
 					<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 					<ng-template #showpublicenabledtype>
 						<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
@@ -43,13 +43,13 @@
 						<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
 					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
 					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService()"></mat-checkbox>
 					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -81,7 +81,7 @@
 				<!-- review/rating -->
 				<div style="display:flex;flex-direction:row;align-items:center">
 					<div style="flex:1;display:flex;flex-direction:row;justify-content:start">
-						<div style="flex:none;margin-bottom:10px">
+						<div style="flex:none">
 							<ng-container *ngIf="serviceTags | async;let serviceTagItems">
 								<ng-container *ngIf="serviceTagItems.length > 0; else noservicetags">
 									<div style="flex:none;display:flex;flex-direction:row">
@@ -94,8 +94,8 @@
 							</ng-container>
 						</div>
 					</div>
-					<div style="flex:none;display:flex;flex-direction:row">
-						<div style="flex:none;margin-right:5px">
+					<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+						<div style="flex:none">
 							<star-rating-control
 								[rating]="serviceGroup.get('rate').value"
 								[showHalfStars]="true"
@@ -134,7 +134,7 @@
 							</ng-container>
 						</div>
 						<ng-container *ngIf="serviceItem.paymentType == 'Payment'">
-							<div style="flex:none;display:flex;flex-direction:row">
+							<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 								<span class="label label-danger" *ngIf="serviceItem.paymentId && serviceItem.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">Sold</span>
 								<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ serviceItem.currency.toUpperCase() }} {{ serviceItem.amount.toFixed(2) }}</a>
 							</div>
@@ -149,7 +149,7 @@
 						(closed)="descriptionPanelEvent('contracted')"
 						class="mat-elevation-z0"
 						*ngIf="serviceItem.description.length > 0"
-						style="margin-bottom:10px">
+						style="margin-top:5px">
 						<mat-expansion-panel-header style="display:flex;flex-direction:row">
 							<mat-panel-title #descriptionPanelTitle style="flex:none">
 								{{ serviceItem.description | truncate: 80 }}
@@ -175,7 +175,7 @@
 											<ng-container *ngIf="forum; then showforum"></ng-container>
 											<ng-template #showforum>
 												<ng-container *ngIf="forum.uid == auth.uid || forum.type == 'Public'">
-													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap">
+													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:10px 5px 0 0;flex-wrap:nowrap">
 														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 															<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
 															<ng-template #showdefaultforumimage>
@@ -208,7 +208,7 @@
 									</ng-container>
 								</ng-template>
 								<ng-template #nowhereservings>
-									<p style="flex:none;color:#999;font-size:90%">
+									<p style="flex:none;color:#999;font-size:90%;margin-top:10px">
 										<i>No Forums</i>
 									</p>
 								</ng-template>
