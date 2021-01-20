@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   ClickEvent
 } from 'angular-star-rating';
@@ -29,6 +30,7 @@ import {
   User,
   NoTitlePipe
 } from '../../shared';
+import { environment } from '../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
@@ -76,6 +78,9 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
   public defaultReview: Observable<any>;
+  public qrCodeUrl: string = '';
+  public elementType = NgxQrcodeElementTypes.URL;
+  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
   
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -705,6 +710,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
             // get default service image
             that.getDefaultServiceImage();
+
+            that.qrCodeUrl = environment.url + "service/detail?serviceId=" + service.serviceId;
           }
           catch (error) {
             throw error;

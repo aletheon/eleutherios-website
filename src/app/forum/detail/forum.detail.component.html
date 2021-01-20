@@ -208,6 +208,15 @@
 						</ng-template>
 						<ng-template #noothercontrols></ng-template>
 					</ng-container>
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+						<ngx-qrcode
+							[elementType]="elementType"
+							[errorCorrectionLevel]="correctionLevel"
+							[value]="qrCodeUrl"
+							[cssClass]="bshadow"
+							[width]="150">
+						</ngx-qrcode>
+					</div>
 				</div>
 			</form>
 		</div>

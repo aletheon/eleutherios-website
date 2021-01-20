@@ -12,7 +12,7 @@
 			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
 			<ng-template #showpublicforums>
 				<h5 style="flex:none;margin-bottom:5px">Forums</h5>
-				<div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
+				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
 					<ng-container *ngFor="let forum of publicForumItems; trackBy: trackPublicForums">
 						<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 							<div style="flex:none;display:flex;flex-direction:row;margin-bottom:5px;align-items:center;flex-wrap:wrap">

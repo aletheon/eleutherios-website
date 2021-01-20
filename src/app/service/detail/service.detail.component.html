@@ -238,6 +238,15 @@
 							<a [routerLink]="['/user/forum/new']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left">keyboard_arrow_right</a>
 						</div>
 					</ng-container>
+					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+						<ngx-qrcode
+							[elementType]="elementType"
+							[errorCorrectionLevel]="correctionLevel"
+							[value]="qrCodeUrl"
+							[cssClass]="bshadow"
+							[width]="150">
+						</ngx-qrcode>
+					</div>
 				</div>
 			</form>
 		</div>

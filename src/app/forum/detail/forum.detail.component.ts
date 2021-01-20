@@ -6,6 +6,7 @@ import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 
 import {
   SiteTotalService,
@@ -27,6 +28,7 @@ import {
   ServiceUserBlock,
   NoTitlePipe
 } from '../../shared';
+import { environment } from '../../../environments/environment';
 
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
@@ -75,6 +77,9 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   public loading: Observable<boolean> = this._loading.asObservable();
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
   public defaultForumImage: Observable<any>;
+  public qrCodeUrl: string = '';
+  public elementType = NgxQrcodeElementTypes.URL;
+  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
   
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -695,6 +700,8 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
 
             // get default forum image
             that.getDefaultForumImage();
+
+            that.qrCodeUrl = environment.url + "forum/detail?forumId=" + forum.forumId;
           }
           catch (error) {
             throw error;
