@@ -55,6 +55,10 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
   trackServiceUserBlocks (index, userBlock) { return userBlock.serviceUserBlockId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys

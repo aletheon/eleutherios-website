@@ -64,6 +64,10 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
   trackReceipts (index, receipt) { return receipt.receiptId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys if the route changes either public/private

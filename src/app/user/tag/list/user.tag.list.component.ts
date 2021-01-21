@@ -52,6 +52,10 @@ export class UserTagListComponent implements OnInit, OnDestroy {
   trackTags (index, tag) { return tag.tagId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys if the route changes either public/private

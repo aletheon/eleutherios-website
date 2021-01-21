@@ -486,6 +486,10 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   trackSearchServiceResults (index, service) { return service.serviceId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     const that = this;
     this._loading.next(true);
 

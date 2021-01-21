@@ -50,16 +50,17 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
-  private _routeSubscription: any;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
   private _defaultReviewSubscription: Subscription;
+  private _routeSubscription: Subscription;
   private _imageCount = new BehaviorSubject(0);
   private _rateAverage = new BehaviorSubject(0);
   private _rateCount = new BehaviorSubject(0);
   private _reviewCount = new BehaviorSubject(0);
+  private _firstTimeThrough: boolean = true;
 
   public service: Observable<any>;
   public imageCount: Observable<number> = this._imageCount.asObservable();
@@ -430,7 +431,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnDestroy () {
     if (this._initialServiceSubscription)
       this._initialServiceSubscription.unsubscribe();
-      
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -475,9 +476,13 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit () {
-    this._loading.next(true);
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
 
-    this.route.queryParams.subscribe((params: Params) => {
+      this._loading.next(true);
+
+    this._routeSubscription = this.route.queryParams.subscribe((params: Params) => {
       let serviceId = params['serviceId'];
       let forumId = params['forumId'];
       let forumUserId = params['forumUserId'];
@@ -496,21 +501,41 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this.returnType = of('Notification');
         }
       }
-  
+
       if (serviceId){
         this.serviceService.getServiceFromPromise(serviceId).then(service => {
           if (service){
-            this._initialServiceSubscription = this.serviceService.getService(serviceId).subscribe(service => {
-              this.service = of(service);
-            });
-            this.initForm();
+            this._initialServiceSubscription = this.serviceService.getService(serviceId)
+              .subscribe(service => {
+                if (service){
+                  // this.service = this.serviceService.getService(serviceId);
+                  this.service = of(service);
+
+                  if (this._firstTimeThrough == true){
+                    this._firstTimeThrough = false;
+                    this.initForm();
+                  }
+                }
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Service does not exist or was recently removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
+              }
+            );
           }
           else {
             const snackBarRef = this.snackbar.openFromComponent(
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: 'There was no serviceId supplied',
+                data: 'Service does not exist or was recently removed',
                 panelClass: ['red-snackbar']
               }
             );
@@ -518,15 +543,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         })
         .catch(error => {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: error,
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
+          console.log(error);
         });
       }
       else {
@@ -570,165 +587,179 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     //  ongoing subscription
     this._serviceSubscription = this.service
       .subscribe(service => {
-        this.serviceGroup.patchValue(service);
+        if (service)
+          this.serviceGroup.patchValue(service);
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'Service does not exist or was recently removed',
+              panelClass: ['red-snackbar']
+            }
+          );
+          this.router.navigate(['/']);
+        }
       }
     );
 
     // run once subscription
     const runOnceSubscription = this.service.subscribe(service => {
-      let load = async function(){
-        try {
-          // service totals
-          that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
-            .subscribe(total => {
-              if (total) {                    
-                if (total.imageCount == 0)
-                  that._imageCount.next(-1);
-                else
-                  that._imageCount.next(total.imageCount);
+      if (service){
+        let load = async function(){
+          try {
+            // service totals
+            that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
+              .subscribe(total => {
+                if (total) {                    
+                  if (total.imageCount == 0)
+                    that._imageCount.next(-1);
+                  else
+                    that._imageCount.next(total.imageCount);
 
-                if (total.rateAverage == 0)
-                  that._rateAverage.next(-1);
-                else
-                  that._rateAverage.next(total.rateAverage);
+                  if (total.rateAverage == 0)
+                    that._rateAverage.next(-1);
+                  else
+                    that._rateAverage.next(total.rateAverage);
 
-                if (total.rateCount == 0)
-                  that._rateCount.next(-1);
-                else
-                  that._rateCount.next(total.rateCount);
+                  if (total.rateCount == 0)
+                    that._rateCount.next(-1);
+                  else
+                    that._rateCount.next(total.rateCount);
 
-                if (total.reviewCount == 0)
-                  that._reviewCount.next(-1);
-                else
-                  that._reviewCount.next(total.reviewCount);                
+                  if (total.reviewCount == 0)
+                    that._reviewCount.next(-1);
+                  else
+                    that._reviewCount.next(total.reviewCount);                
+                }
               }
-            }
-          );
+            );
 
-          // tags for this service
-          that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
+            // tags for this service
+            that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-          // which forums this service is serving in
-          that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
-            map(whereServings => {
-              return whereServings.filter(whereServing => {
-                if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
-                  return true;
-                else
-                  return false;
-              }).map(whereServing => {
-                return { ...whereServing };
-              });
-            }),
-            switchMap(whereServings => {
-              if (whereServings && whereServings.length > 0) {
-                let observables = whereServings.map(whereServing => {
-                  let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
-                    switchMap(forum => {
-                      if (forum) {
-                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
-                          switchMap(registrants => {
-                            if (registrants && registrants.length > 0)
-                              return of(registrants[0]);
-                            else
-                              return of(null);
-                          })
-                        );
-
-                        let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                          switchMap(forumImages => {
-                            if (forumImages && forumImages.length > 0){
-                              let getDownloadUrl$: Observable<any>;
-
-                              if (forumImages[0].tinyUrl)
-                                getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-
-                              return combineLatest([getDownloadUrl$]).pipe(
-                                switchMap(results => {
-                                  const [downloadUrl] = results;
-                                  
-                                  if (downloadUrl)
-                                    forumImages[0].url = downloadUrl;
-                                  else
-                                    forumImages[0].url = '../../assets/defaultTiny.jpg';
-                    
-                                  return of(forumImages[0]);
-                                })
-                              );
-                            }
-                            else return of(null);
-                          })
-                        );
-
-                        return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
-                          switchMap(results => {
-                            const [defaultRegistrant, defaultForumImage] = results;
-
-                            if (defaultRegistrant)
-                              forum.defaultRegistrant = of(defaultRegistrant);
-                            else
-                              forum.defaultRegistrant = of(null);
-                            
-                            if (defaultForumImage)
-                              forum.defaultForumImage = of(defaultForumImage);
-                            else {
-                              let tempImage = {
-                                url: '../../assets/defaultTiny.jpg'
-                              };
-                              forum.defaultForumImage = of(tempImage);
-                            }
-                            return of(forum);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
-                  return combineLatest([getForum$]).pipe(
-                    switchMap(results => {
-                      const [forum] = results;
-                      
-                      if (forum)
-                        whereServing.forum = of(forum);
-                      else {
-                        whereServing.forum = of(null);
-                      }
-                      return of(whereServing);
-                    })
-                  );
+            // which forums this service is serving in
+            that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
+              map(whereServings => {
+                return whereServings.filter(whereServing => {
+                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
+                    return true;
+                  else
+                    return false;
+                }).map(whereServing => {
+                  return { ...whereServing };
                 });
-                return zip(...observables);
-              }
-              else return of([]);
-            })
-          );
+              }),
+              switchMap(whereServings => {
+                if (whereServings && whereServings.length > 0) {
+                  let observables = whereServings.map(whereServing => {
+                    let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
+                      switchMap(forum => {
+                        if (forum) {
+                          let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                            switchMap(registrants => {
+                              if (registrants && registrants.length > 0)
+                                return of(registrants[0]);
+                              else
+                                return of(null);
+                            })
+                          );
 
-          // forums this user has created so they can request the service serve in their forum(s)
-          that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+                          let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                            switchMap(forumImages => {
+                              if (forumImages && forumImages.length > 0){
+                                let getDownloadUrl$: Observable<any>;
 
-          // get default service image
-          that.getDefaultServiceImage();
+                                if (forumImages[0].tinyUrl)
+                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
 
-          that.qrCodeUrl = environment.url + "service/detail?serviceId=" + service.serviceId;
-        }
-        catch (error) {
-          throw error;
-        }
-      }
+                                return combineLatest([getDownloadUrl$]).pipe(
+                                  switchMap(results => {
+                                    const [downloadUrl] = results;
+                                    
+                                    if (downloadUrl)
+                                      forumImages[0].url = downloadUrl;
+                                    else
+                                      forumImages[0].url = '../../assets/defaultTiny.jpg';
+                      
+                                    return of(forumImages[0]);
+                                  })
+                                );
+                              }
+                              else return of(null);
+                            })
+                          );
+
+                          return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
+                            switchMap(results => {
+                              const [defaultRegistrant, defaultForumImage] = results;
+
+                              if (defaultRegistrant)
+                                forum.defaultRegistrant = of(defaultRegistrant);
+                              else
+                                forum.defaultRegistrant = of(null);
+                              
+                              if (defaultForumImage)
+                                forum.defaultForumImage = of(defaultForumImage);
+                              else {
+                                let tempImage = {
+                                  url: '../../assets/defaultTiny.jpg'
+                                };
+                                forum.defaultForumImage = of(tempImage);
+                              }
+                              return of(forum);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
   
-      // call load
-      load().then(() => {
-        this._loading.next(false);
+                    return combineLatest([getForum$]).pipe(
+                      switchMap(results => {
+                        const [forum] = results;
+                        
+                        if (forum)
+                          whereServing.forum = of(forum);
+                        else {
+                          whereServing.forum = of(null);
+                        }
+                        return of(whereServing);
+                      })
+                    );
+                  });
+                  return zip(...observables);
+                }
+                else return of([]);
+              })
+            );
 
-        if (this._descriptionPanel)
-          this._descriptionPanel.open();
-          
-        runOnceSubscription.unsubscribe();
-      })
-      .catch((error) =>{
-        console.log('initForm ' + error);
-      });
+            // forums this user has created so they can request the service serve in their forum(s)
+            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+
+            // get default service image
+            that.getDefaultServiceImage();
+
+            that.qrCodeUrl = environment.url + "service/detail?serviceId=" + service.serviceId;
+          }
+          catch (error) {
+            throw error;
+          }
+        }
+    
+        // call load
+        load().then(() => {
+          this._loading.next(false);
+
+          if (this._descriptionPanel)
+            this._descriptionPanel.open();
+            
+          runOnceSubscription.unsubscribe();
+        })
+        .catch((error) =>{
+          console.log('initForm ' + error);
+        });
+      }
     });
   }
 

@@ -102,6 +102,10 @@ export class ForumListComponent implements OnInit, OnDestroy {
   trackForums (index, forum) { return forum.forumId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     this.nextKey = null;
     this.prevKeys = [];
     this.includeTagsInSearch = true;

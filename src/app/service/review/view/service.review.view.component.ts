@@ -86,6 +86,10 @@ export class ServiceReviewViewComponent implements OnInit, OnDestroy  {
   }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+
     this._loading.next(true);
     
     // get params

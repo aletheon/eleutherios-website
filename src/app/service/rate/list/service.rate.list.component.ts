@@ -90,6 +90,10 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
   trackServiceRates (index, serviceRate) { return serviceRate.serviceRateId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     this._loading.next(true);
     
     // get params

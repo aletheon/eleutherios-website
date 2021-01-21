@@ -106,6 +106,10 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   trackServices (index, service) { return service.serviceId; }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys if the route changes either public/private

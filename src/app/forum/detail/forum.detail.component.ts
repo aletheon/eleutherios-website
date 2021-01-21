@@ -464,6 +464,10 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     // get params
     const that = this;
 

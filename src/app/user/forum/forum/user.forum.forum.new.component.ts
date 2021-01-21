@@ -180,6 +180,10 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   }
   
   ngOnInit () {
+    // stick this in to fix authguard issue of reposting back to this page???
+    if (this.auth.uid.length == 0)
+      return false;
+      
     const that = this;
 
     this._loading.next(true);    
