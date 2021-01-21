@@ -82,13 +82,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   trackServiceImages (index, serviceImage) { return serviceImage.imageId; }
   trackServiceTags (index, serviceTag) { return serviceTag.tagId; }
 
-  ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-      
+  ngOnInit () {      
     this.nextKey = null;
     this.prevKeys = [];
     this.serviceGroup = this.fb.group({

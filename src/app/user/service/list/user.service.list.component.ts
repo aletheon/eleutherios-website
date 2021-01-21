@@ -109,13 +109,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
   trackSearchTags (index, tag) { return tag.tagId; }
   trackServices (index, service) { return service.serviceId; }
 
-  ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-      
+  ngOnInit () {      
     this.nextKey = null;
     this.prevKeys = [];
     this.includeTagsInSearch = true;

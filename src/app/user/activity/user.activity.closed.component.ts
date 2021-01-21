@@ -69,12 +69,6 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
   trackActivities (index, activity) { return activity.lastUpdateDate; }
 
   ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-      
     this._viewForumIdSubscription = this.messageSharingService.viewForumId.subscribe(forumId => {
       if (forumId)
         this._viewForumId = forumId;

@@ -152,13 +152,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   trackBreadcrumbs (index, breadcrumb) { return breadcrumb.forumId; }
 
   ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-    const that = this;
-
     this.route.queryParams.subscribe((params: Params) => {
       this.forumId = params['forumId'];
       this.userId = params['userId'];

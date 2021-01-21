@@ -61,12 +61,6 @@ export class UserServiceForumBlockListComponent implements OnInit, OnDestroy {
   trackServiceForumBlocks (index, forumBlock) { return forumBlock.forumBlockId; }
 
   ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-      
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys

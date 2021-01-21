@@ -133,12 +133,6 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit () {
-    // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0){
-      this.router.navigate(['/login']);
-      return false;
-    }
-      
     let previousRouteUrl = this.previousRouteService.getPreviousUrl();
     let prevKeys = [];
     let nextKey = null
