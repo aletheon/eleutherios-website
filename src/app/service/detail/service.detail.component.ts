@@ -60,7 +60,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private _rateAverage = new BehaviorSubject(0);
   private _rateCount = new BehaviorSubject(0);
   private _reviewCount = new BehaviorSubject(0);
-  private _firstTimeThrough: boolean = true;
 
   public service: Observable<any>;
   public imageCount: Observable<number> = this._imageCount.asObservable();
@@ -429,9 +428,6 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnDestroy () {
-    if (this._initialServiceSubscription)
-      this._initialServiceSubscription.unsubscribe();
-
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -499,48 +495,27 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       if (serviceId){
-        this.serviceService.getServiceFromPromise(serviceId).then(service => {
-          if (service){
-            this._initialServiceSubscription = this.serviceService.getService(serviceId)
-              .subscribe(service => {
-                if (service){
-                  // this.service = this.serviceService.getService(serviceId);
-                  this.service = of(service);
+        this._initialServiceSubscription = this.serviceService.getService(serviceId)
+          .subscribe(service => {
+            this._initialServiceSubscription.unsubscribe();
 
-                  if (this._firstTimeThrough == true){
-                    this._firstTimeThrough = false;
-                    this.initForm();
-                  }
+            if (service){
+              this.service = this.serviceService.getService(serviceId);
+              this.initForm();
+            }
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Service does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
                 }
-                else {
-                  const snackBarRef = this.snackbar.openFromComponent(
-                    NotificationSnackBar,
-                    {
-                      duration: 8000,
-                      data: 'Service does not exist or was recently removed',
-                      panelClass: ['red-snackbar']
-                    }
-                  );
-                  this.router.navigate(['/']);
-                }
-              }
-            );
+              );
+              this.router.navigate(['/']);
+            }
           }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Service does not exist or was recently removed',
-                panelClass: ['red-snackbar']
-              }
-            );
-            this.router.navigate(['/']);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+        );
       }
       else {
         const snackBarRef = this.snackbar.openFromComponent(
