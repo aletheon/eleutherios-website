@@ -35,6 +35,9 @@ export class ServiceService {
   }
 
   public getService(serviceId: string): Observable<any> {
+    console.log('trying to fetch service');
+
+
     return this.afs.collection('services').doc(serviceId).valueChanges();
   }
 
