@@ -58,10 +58,9 @@ export class AuthService {
 
   signOut() {
     this.afAuth.signOut().then(() => {
-      this.router.navigate(['/login']).then(() => {
-        this.user = of(null);
-        this.uid = '';
-      });
+      this.user = of(null);
+      this.uid = '';
+      // this.router.navigate(['/login']);
     })
     .catch(error => {
       console.log('Sign out failed', error);

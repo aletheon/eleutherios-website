@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './core/auth.guard';
-// import { IsLoggedIn } from './core/is.logged.in.guard';
+import { IsLoggedIn } from './core/is.logged.in.guard';
 
 // common
 
@@ -106,7 +106,7 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    // canActivate: [IsLoggedIn]
+    canActivate: [IsLoggedIn]
   },
   // **********************************************
   // anonymous routines
