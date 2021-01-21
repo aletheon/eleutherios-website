@@ -23,8 +23,6 @@ export class ServiceService {
 
   public getServiceFromPromise (serviceId: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      console.log('trying to fetch service promise');
-
       const serviceRef = this.afs.collection('services').doc(serviceId);
 
       serviceRef.ref.get().then(doc => {
@@ -37,9 +35,6 @@ export class ServiceService {
   }
 
   public getService(serviceId: string): Observable<any> {
-    console.log('trying to fetch service');
-
-
     return this.afs.collection('services').doc(serviceId).valueChanges();
   }
 
