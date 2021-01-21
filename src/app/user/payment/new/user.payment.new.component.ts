@@ -35,7 +35,6 @@ import * as firebase from 'firebase/app';
   styleUrls: ['./user.payment.new.component.css']
 })
 export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit {
-  // @ViewChild('card-element', { static: false }) _cardElement: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _loadCard = new BehaviorSubject(false);
   private _userSubscription: Subscription;
