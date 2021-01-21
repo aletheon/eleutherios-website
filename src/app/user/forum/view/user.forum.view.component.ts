@@ -222,7 +222,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
           });
         }
         else {
-          const snackBarRef = that.snackbar.openFromComponent(
+          const snackBarRef = this.snackbar.openFromComponent(
             NotificationSnackBar,
             {
               duration: 8000,
@@ -230,7 +230,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               panelClass: ['red-snackbar']
             }
           );
-          that.router.navigate(['/']);
+          this.router.navigate(['/']);
         }
       });
     });
