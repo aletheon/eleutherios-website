@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import {
   SiteTotalService,
@@ -37,7 +38,8 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
     private userForumPostService: UserForumPostService,
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
-    private messageSharingService: MessageSharingService) {
+    private messageSharingService: MessageSharingService,
+    private router: Router) {
   }
 
   setActivityHighlight(activity) {
@@ -68,8 +70,10 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     this._viewForumIdSubscription = this.messageSharingService.viewForumId.subscribe(forumId => {
       if (forumId)

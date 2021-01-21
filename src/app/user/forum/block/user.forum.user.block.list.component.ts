@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { Router } from '@angular/router';
 import {
   SiteTotalService,
   UserServiceService,
@@ -41,7 +42,8 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
     private userServiceImageService: UserServiceImageService,
     private userForumUserBlockService: UserForumUserBlockService,
     private userService: UserService,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private router: Router) {
   }
 
   ngOnDestroy () {
@@ -56,8 +58,10 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     // get params
     this.route.queryParams.subscribe((params: Params) => {

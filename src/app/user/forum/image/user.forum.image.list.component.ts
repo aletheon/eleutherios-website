@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import {
   SiteTotalService,
   UserForumService,
@@ -87,8 +87,10 @@ export class UserForumImageListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     this.nextKey = null;
     this.prevKeys = [];

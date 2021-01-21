@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
+import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, ValidatorFn, Validators, ValidationErrors } from '@angular/forms';
 import {
   SiteTotalService,
@@ -93,7 +94,8 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
     private serviceService: ServiceService,
     private tagService: TagService,
     private fb: FormBuilder, 
-    private snackbar: MatSnackBar) {
+    private snackbar: MatSnackBar,
+    private router: Router) {
       this.searchTagCtrl = new FormControl();
       this.tagSearchCtrl = new FormControl();
 
@@ -201,8 +203,10 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     this._loading.next(true);
     const notification: Notification = {

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import {
@@ -52,7 +53,8 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
     private userForumRegistrantService: UserForumRegistrantService,
     private userForumTagService: UserForumTagService,
     private userServiceTagService: UserServiceTagService,
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private router: Router) {
   }
 
   setViewedAlertFlag(alert) {
@@ -75,8 +77,10 @@ export class UserAlertListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     // get params
     this.route.queryParams.subscribe((params: Params) => {

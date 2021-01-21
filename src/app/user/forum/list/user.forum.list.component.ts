@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import {
@@ -63,7 +64,8 @@ export class UserForumListComponent implements OnInit, OnDestroy {
     private userForumService: UserForumService,
     private tagService: TagService,
     private snackbar: MatSnackBar,
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private router: Router) {
       this.searchForumCtrl = new FormControl();
       this.forumSearchTagCtrl = new FormControl();
 
@@ -99,8 +101,10 @@ export class UserForumListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     this.nextKey = null;
     this.prevKeys = [];

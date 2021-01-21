@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 import { AngularFireDatabase } from '@angular/fire/database';
@@ -53,7 +54,8 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
     private userForumUserBlockService: UserForumUserBlockService,
     private userForumRegistrantService: UserForumRegistrantService,
     private messageSharingService: MessageSharingService,
-    private snackbar: MatSnackBar) {
+    private snackbar: MatSnackBar,
+    private router: Router) {
   }
 
   setActivityHighlight(activity) {
@@ -167,8 +169,10 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     this._viewForumIdSubscription = this.messageSharingService.viewForumId.subscribe(forumId => {
       if (forumId)

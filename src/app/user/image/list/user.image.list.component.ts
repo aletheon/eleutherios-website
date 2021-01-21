@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { Router } from '@angular/router';
 import {
   SiteTotalService,
   UserImageService,
@@ -47,7 +48,8 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     private userImageService: UserImageService,
     private previousRouteService: PreviousRouteService,
     private route: ActivatedRoute,
-    private snackbar: MatSnackBar) {
+    private snackbar: MatSnackBar,
+    private router: Router) {
   }
 
   detectFiles (event) {
@@ -132,8 +134,10 @@ export class UserImageListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     // stick this in to fix authguard issue of reposting back to this page???
-    if (this.auth.uid.length == 0)
+    if (this.auth.uid.length == 0){
+      this.router.navigate(['/login']);
       return false;
+    }
       
     let previousRouteUrl = this.previousRouteService.getPreviousUrl();
     let prevKeys = [];
