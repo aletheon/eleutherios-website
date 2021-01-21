@@ -31,30 +31,9 @@
 		<div style="flex:1">
 			<form [formGroup]="serviceGroup" novalidate>
 				<div style="display:flex;flex-direction:column">
-					<!-- description -->
-					<mat-expansion-panel #descriptionPanel
-						(opened)="descriptionPanelEvent('expanded')"
-						(closed)="descriptionPanelEvent('contracted')"
-						class="mat-elevation-z0"
-						*ngIf="serviceItem.description.length > 0"
-						style="margin:5px 0 10px 0">
-						<mat-expansion-panel-header style="display:flex;flex-direction:row">
-							<mat-panel-title #descriptionPanelTitle style="flex:none">
-								{{ serviceItem.description | truncate: 80 }}
-							</mat-panel-title>
-						</mat-expansion-panel-header>
-						<p style="margin:0px;padding:0px;white-space:pre-wrap">
-							<span [innerHTML]="serviceItem.description | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
-						</p>
-					</mat-expansion-panel>
-					<!-- website -->
-					<div *ngIf="serviceItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
-						<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
-						<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
-					</div>
 					<!-- tags -->
 					<ng-container *ngIf="serviceTags | async;let serviceTagItems">
-						<div style="flex:none;display:flex;flex-direction:row;;margin-bottom:10px">
+						<div style="flex:none;display:flex;flex-direction:row">
 							<ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
 							<ng-template #showtags>
 								<div style="flex:1;display:flex;flex-direction:row">
@@ -80,6 +59,27 @@
 							</ng-container>
 						</div>
 					</ng-container>
+					<!-- description -->
+					<mat-expansion-panel #descriptionPanel
+						(opened)="descriptionPanelEvent('expanded')"
+						(closed)="descriptionPanelEvent('contracted')"
+						class="mat-elevation-z0"
+						*ngIf="serviceItem.description.length > 0"
+						style="margin:5px 0 10px 0">
+						<mat-expansion-panel-header style="display:flex;flex-direction:row">
+							<mat-panel-title #descriptionPanelTitle style="flex:none">
+								{{ serviceItem.description | truncate: 80 }}
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<p style="margin:0px;padding:0px;white-space:pre-wrap">
+							<span [innerHTML]="serviceItem.description | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+						</p>
+					</mat-expansion-panel>
+					<!-- website -->
+					<div *ngIf="serviceItem.website.length > 0" style="flex:none;display:flex;flex-direction:row;margin-bottom:10px">
+						<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
+						<span style="flex:none" [innerHTML]="serviceItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
+					</div>
           <div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create forum">Create forum</a>
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left" matTooltip="Create forum">keyboard_arrow_right</a>

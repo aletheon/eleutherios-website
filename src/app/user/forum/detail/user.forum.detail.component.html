@@ -36,11 +36,11 @@
 					<h4 matTooltip="{{ forumItem.title }}">{{ forumItem.title | noTitle }}</h4>
 				</ng-template>
 			</div>
-			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
+			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;flex-wrap:wrap">
 				<div class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
-				<div style="flex:none;margin-right:5px">
+				<div style="flex:none;align-items:center;margin-right:5px">
 					<ng-container *ngIf="forumItem.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
 					<ng-template #showpublictype>
 						<ng-container *ngIf="forumItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
@@ -96,7 +96,6 @@
 				</ng-template>
 				<ng-template #backtohistorypage>
 					<back></back>
-					<!-- <mat-icon onclick="event.stopPropagation()" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon> -->
 				</ng-template>
 			</div>
 		</div>
@@ -110,13 +109,26 @@
 			<div style="flex:1">
 				<form [formGroup]="forumGroup" novalidate>
 					<div style="display:flex;flex-direction:column">
+						<!-- tags -->
+						<div style="flex:none">
+							<ng-container *ngIf="forumTags | async;let forumTagItems">
+								<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+									<div style="flex:none;display:flex;flex-direction:row">
+										<ng-container *ngFor="let forumTag of forumTagItems">
+											<span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
+										</ng-container>
+									</div>
+								</ng-container>
+								<ng-template #noforumtags></ng-template>
+							</ng-container>
+						</div>
 						<!-- description -->
 						<mat-expansion-panel #descriptionPanel
 							(opened)="descriptionPanelEvent('expanded')"
 							(closed)="descriptionPanelEvent('contracted')"
 							class="mat-elevation-z0"
 							*ngIf="forumItem.description.length > 0"
-							style="margin-bottom:10px">
+							style="margin:5px 0 10px 0">
 							<mat-expansion-panel-header style="display:flex;flex-direction:row">
 								<mat-panel-title #descriptionPanelTitle style="flex:none">
 									{{ forumItem.description | truncate: 80 }}
@@ -131,21 +143,8 @@
 							<mat-icon style="flex:none;margin-right:5px">link</mat-icon>
 							<span style="flex:none" [innerHTML]="forumItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 						</div>
-						<!-- tags -->
-						<div style="flex:none;margin-bottom:10px">
-							<ng-container *ngIf="forumTags | async;let forumTagItems">
-								<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
-									<div style="flex:none;display:flex;flex-direction:row">
-										<ng-container *ngFor="let forumTag of forumTagItems">
-											<span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
-										</ng-container>
-									</div>
-								</ng-container>
-								<ng-template #noforumtags></ng-template>
-							</ng-container>
-						</div>
 						<!-- services -->
-						<div style="flex:none;margin-bottom:10px">
+						<div style="flex:none">
 							<div style="display:flex;flex-direction:row;overflow-x:auto">
 								<ng-container *ngIf="registrants | async;let registrantItems">
 									<ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
@@ -155,7 +154,7 @@
 												<ng-container *ngIf="service; then showservice"></ng-container>
 												<ng-template #showservice>
 													<ng-container *ngIf="forumItem.uid == auth.uid || service.type == 'Public' || service.uid == auth.uid">
-														<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap">
+														<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
 															<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 																<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 																<ng-template #showdefaultserviceimage>
@@ -212,7 +211,7 @@
 								<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
 									<div style="flex:none">
 										<mat-form-field>
-											<mat-select #select="matSelect" (selectionChange)="addService()" placeholder="Add service" [formControl]="userServicesCtrl" style="margin-top:5px" matTooltip="Add service">
+											<mat-select #select="matSelect" (selectionChange)="addService()" placeholder="Add service" [formControl]="userServicesCtrl" matTooltip="Add service">
 												<mat-option *ngFor="let service of userServiceItems; trackBy: trackUserServices" [value]="service" matTooltip="{{ service.title }}">{{ service.title | truncate: 35 }}</mat-option>
 											</mat-select>
 										</mat-form-field>
