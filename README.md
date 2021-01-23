@@ -16,7 +16,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or managing the forum, customer request or conversation, that services (people or business) are having about food.  Not the service or work, that they are trying to provide or perform concerning food. People or businesses, alternate between playing the role of the customer or the business depending on the nature of their request or the request, that is being asked of them..
+In this example, Eleutherios is scaling or managing the forum, customer request or conversation, that services (people or business) are having about food.  Not the service or work, that they are trying to provide or perform concerning food. People or businesses, alternate between playing the role of the customer or the business depending on the nature of their request or the request, that is being asked of them.
 
 #### Features:
 
