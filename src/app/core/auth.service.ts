@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { 
+import {
   UserService,
   User
 } from '../shared';
@@ -57,7 +57,7 @@ export class AuthService {
   }
 
   signOut() {
-    this.afAuth.signOut().then(() => {
+    return this.afAuth.signOut().then(() => {
       this.router.navigate(['/login']).then(() => {
         this.uid = '';
       });
