@@ -1,88 +1,86 @@
-<header>
-  <div class="navbar navbar-inverse" style="margin:0px;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-    <div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-left:10px">
-      <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
-      <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
-      <ng-template #showloggedinlogo>
-        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/']">Eleutherios(alpha)</h4>  
-      </ng-template>
-      <ng-template #showloggedoutlogo>
-        <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/anonymous/home']">Eleutherios(alpha)</h4>  
-      </ng-template>
-    </div>
-    <div style="flex:1;text-align:center">
-      <div fxLayout="row" fxLayoutAlign="center center">
-        <div>
-          <ng-container *ngIf="auth.user | async; then showloggedinpublictotals else showloggedoutpublictotals"></ng-container>
-          <ng-template #showloggedinpublictotals>
-            <a [routerLink]="['/forum/list']" style="padding-right:10px;color:#faebd7">Forums(<ng-container *ngIf="forumTotal | async as total">{{ total.count }}</ng-container>)</a>
-            <a [routerLink]="['/service/list']" style="padding-right:10px;color:#faebd7">Services(<ng-container *ngIf="serviceTotal | async as total">{{ total.count }}</ng-container>)</a>
-          </ng-template>
-          <ng-template #showloggedoutpublictotals>
-            <a [routerLink]="['/login']" style="padding-right:10px;color:#faebd7">Forums(<ng-container *ngIf="forumTotal | async as total">{{ total.count }}</ng-container>)</a>
-            <a [routerLink]="['/login']" style="padding-right:10px;color:#faebd7">Services(<ng-container *ngIf="serviceTotal | async as total">{{ total.count }}</ng-container>)</a>
-          </ng-template>
-        </div>
-      </div>
-    </div>
-    <ng-container *ngIf="auth.user | async; then authenticated else guest"></ng-container>
-
-    <!-- user logged in -->
-    <ng-template #authenticated>
-      <div *ngIf="auth.user | async as user" style="flex:none;display:flex;flex-direction:row;margin-right:10px">
-        <!-- alert control -->
-        <div style="flex:none;display:flex;flex-direction:row" *ngIf="userTotal | async as total">
-          <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:#A9C4EB" *ngIf="total.serviceAlertCount > 0" matTooltip="Service Alert" matTooltipPosition="below">
-            <a [routerLink]="['/user/alert/list']" style="color:#faebd7;text-decoration:none">{{ total.serviceAlertCount }}</a>
-          </div>
-          <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:rgb(250, 113, 108)" *ngIf="total.forumAlertCount > 0" matTooltip="Forum Alert" matTooltipPosition="below">
-            <a [routerLink]="['/user/alert/list']" style="color:#83796d;text-decoration:none">{{ total.forumAlertCount }}</a>
-          </div>
-        </div>
-
-        <!-- user control -->
-        <button class="btn btn-default" style="flex:none;padding:5px 10px 5px 10px;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
-        <mat-menu #mainMenu="matMenu">
-          <ng-container *ngIf="userTotal | async as total">
-            <button mat-menu-item [matMenuTriggerFor]="forums">Forums({{ total.forumCount }})</button>
-            <button mat-menu-item [matMenuTriggerFor]="services">Services({{ total.serviceCount }})</button>
-            <button mat-menu-item [matMenuTriggerFor]="notifications">Notifications({{ total.notificationCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/image/list']">Images({{ total.imageCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/tag/list']">Tags({{ total.tagCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/alert/list']">Alerts({{ total.alertCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/payment/list']">Payments({{ total.paymentCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/receipt/list']">Receipts({{ total.receiptCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/service/block/forum/list']">Service Forum Blocks({{ total.forumBlockCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/service/block/user/list']">Service User Blocks({{ total.serviceUserBlockCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/forum/block/service/list']">Forum Service Blocks({{ total.serviceBlockCount }})</button>
-            <button mat-menu-item [routerLink]="['/user/forum/block/user/list']">Forum User Blocks({{ total.forumUserBlockCount }})</button>
-          </ng-container>
-          <button mat-menu-item [routerLink]="['/user/setting/edit']">Settings</button>
-          <button mat-menu-item (click)="logout()">Logout</button>
-        </mat-menu>
-        <mat-menu #forums="matMenu">
-          <button mat-menu-item [routerLink]="['/user/forum/new']">New</button>
-          <button mat-menu-item [routerLink]="['/user/forum/list']">List</button>
-        </mat-menu>
-        <mat-menu #services="matMenu">
-          <button mat-menu-item [routerLink]="['/user/service/new']">New</button>
-          <button mat-menu-item [routerLink]="['/user/service/list']">List</button>
-        </mat-menu>
-        <mat-menu #notifications="matMenu">
-          <button mat-menu-item [routerLink]="['/user/notification/new']">New</button>
-          <button mat-menu-item [routerLink]="['/user/notification/list']">List</button>
-        </mat-menu>
-        <mat-menu #tags="matMenu">
-          <button mat-menu-item [routerLink]="['/user/tag/list']">List</button>
-        </mat-menu>
-      </div>
+<div class="navbar navbar-inverse" style="margin:0px;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+  <div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-left:10px">
+    <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
+    <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
+    <ng-template #showloggedinlogo>
+      <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/']">Eleutherios(alpha)</h4>
     </ng-template>
-
-    <!-- user not logged in -->
-    <ng-template #guest>
-      <div style="flex:none;margin-right:10px">
-        <a [routerLink]="['/login']" style="color:#faebd7">Login</a>
-      </div>
+    <ng-template #showloggedoutlogo>
+      <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/anonymous/home']">Eleutherios(alpha)</h4>
     </ng-template>
   </div>
-</header>
+  <div style="flex:1;text-align:center">
+    <div fxLayout="row" fxLayoutAlign="center center">
+      <div>
+        <ng-container *ngIf="auth.user | async; then showloggedinpublictotals else showloggedoutpublictotals"></ng-container>
+        <ng-template #showloggedinpublictotals>
+          <a [routerLink]="['/forum/list']" style="padding-right:10px;color:#faebd7">Forums(<ng-container *ngIf="forumTotal | async as total">{{ total.count }}</ng-container>)</a>
+          <a [routerLink]="['/service/list']" style="padding-right:10px;color:#faebd7">Services(<ng-container *ngIf="serviceTotal | async as total">{{ total.count }}</ng-container>)</a>
+        </ng-template>
+        <ng-template #showloggedoutpublictotals>
+          <a [routerLink]="['/login']" style="padding-right:10px;color:#faebd7">Forums(<ng-container *ngIf="forumTotal | async as total">{{ total.count }}</ng-container>)</a>
+          <a [routerLink]="['/login']" style="padding-right:10px;color:#faebd7">Services(<ng-container *ngIf="serviceTotal | async as total">{{ total.count }}</ng-container>)</a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngIf="auth.user | async; then authenticated else guest"></ng-container>
+
+  <!-- user logged in -->
+  <ng-template #authenticated>
+    <div *ngIf="auth.user | async as user" style="flex:none;display:flex;flex-direction:row;margin-right:10px">
+      <!-- alert control -->
+      <div style="flex:none;display:flex;flex-direction:row" *ngIf="userTotal | async as total">
+        <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:#A9C4EB" *ngIf="total.serviceAlertCount > 0" matTooltip="Service Alert" matTooltipPosition="below">
+          <a [routerLink]="['/user/alert/list']" style="color:#faebd7;text-decoration:none">{{ total.serviceAlertCount }}</a>
+        </div>
+        <div class="btn-circle" style="flex:none;color:#faebd7;margin-right:5px;background-color:rgb(250, 113, 108)" *ngIf="total.forumAlertCount > 0" matTooltip="Forum Alert" matTooltipPosition="below">
+          <a [routerLink]="['/user/alert/list']" style="color:#83796d;text-decoration:none">{{ total.forumAlertCount }}</a>
+        </div>
+      </div>
+
+      <!-- user control -->
+      <button class="btn btn-default" style="flex:none;padding:5px 10px 5px 10px;margin-left:5px" mat-button [matMenuTriggerFor]="mainMenu">Hi {{ user.displayName }}</button>
+      <mat-menu #mainMenu="matMenu">
+        <ng-container *ngIf="userTotal | async as total">
+          <button mat-menu-item [matMenuTriggerFor]="forums">Forums({{ total.forumCount }})</button>
+          <button mat-menu-item [matMenuTriggerFor]="services">Services({{ total.serviceCount }})</button>
+          <button mat-menu-item [matMenuTriggerFor]="notifications">Notifications({{ total.notificationCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/image/list']">Images({{ total.imageCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/tag/list']">Tags({{ total.tagCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/alert/list']">Alerts({{ total.alertCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/payment/list']">Payments({{ total.paymentCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/receipt/list']">Receipts({{ total.receiptCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/service/block/forum/list']">Service Forum Blocks({{ total.forumBlockCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/service/block/user/list']">Service User Blocks({{ total.serviceUserBlockCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/forum/block/service/list']">Forum Service Blocks({{ total.serviceBlockCount }})</button>
+          <button mat-menu-item [routerLink]="['/user/forum/block/user/list']">Forum User Blocks({{ total.forumUserBlockCount }})</button>
+        </ng-container>
+        <button mat-menu-item [routerLink]="['/user/setting/edit']">Settings</button>
+        <button mat-menu-item (click)="logout()">Logout</button>
+      </mat-menu>
+      <mat-menu #forums="matMenu">
+        <button mat-menu-item [routerLink]="['/user/forum/new']">New</button>
+        <button mat-menu-item [routerLink]="['/user/forum/list']">List</button>
+      </mat-menu>
+      <mat-menu #services="matMenu">
+        <button mat-menu-item [routerLink]="['/user/service/new']">New</button>
+        <button mat-menu-item [routerLink]="['/user/service/list']">List</button>
+      </mat-menu>
+      <mat-menu #notifications="matMenu">
+        <button mat-menu-item [routerLink]="['/user/notification/new']">New</button>
+        <button mat-menu-item [routerLink]="['/user/notification/list']">List</button>
+      </mat-menu>
+      <mat-menu #tags="matMenu">
+        <button mat-menu-item [routerLink]="['/user/tag/list']">List</button>
+      </mat-menu>
+    </div>
+  </ng-template>
+
+  <!-- user not logged in -->
+  <ng-template #guest>
+    <div style="flex:none;margin-right:10px">
+      <a [routerLink]="['/login']" style="color:#faebd7">Login</a>
+    </div>
+  </ng-template>
+</div>
