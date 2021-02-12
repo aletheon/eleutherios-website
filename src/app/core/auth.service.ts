@@ -56,14 +56,9 @@ export class AuthService {
     });
   }
 
-  signOut() {
-    return this.afAuth.signOut().then(() => {
-      this.router.navigate(['/login']).then(() => {
-        this.uid = '';
-      });
-    })
-    .catch(error => {
-      console.log('Sign out failed', error);
-    });
+  async signOut() {
+    await this.afAuth.signOut();
+    this.uid = '';
+    this.router.navigate(['/login']);
   }
 }

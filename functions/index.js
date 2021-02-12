@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const admin = require('firebase-admin'); // The Firebase Admin SDK to access the Firebase Realtime Database. 
+const admin = require('firebase-admin'); // The Firebase Admin SDK to access the Firebase Realtime Database.
 const firebase = admin.initializeApp(functions.config().firebase);
 const async = require('async');
 const _ = require('lodash');
@@ -21,7 +21,7 @@ const gcs = new Storage();
 const info = functions.config().info;
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
-const stripe = require("stripe")(functions.config().stripe.secret); // initialize stripe  
+const stripe = require("stripe")(functions.config().stripe.secret); // initialize stripe
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 const connectedEndpointSecret = functions.config().keys.connectedsigning;
@@ -201,7 +201,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
 
     //     intent = event.data.object;
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
-        
+
     //     // update payment
     //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
     //     const failPaymentRef = failPaymentSnapshot.ref;
@@ -294,7 +294,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       console.log('account.updated');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
-      
+
       if (snapshot.size > 0){
         var userRef = snapshot.docs[0].ref;
         var account = await stripe.accounts.retrieve(event.account);
@@ -313,7 +313,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
-            
+
       if (paymentSnapshot.exists){
         // create receipt
         // Set receiptId and change status to pending to inform user we have received their payment
@@ -355,11 +355,11 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
-            
+
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
-        
+
         var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
         var sellerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/services`).doc(payment.sellerServiceId).get();
 
@@ -385,7 +385,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
-            
+
       if (paymentSnapshot.exists){
         // change status to pending to inform user we have received their payment and awaiting their payment
         await paymentRef.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
@@ -432,7 +432,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const sellerService = sellerServiceSnapshot.data();
 
     console.log('sellerService ' + JSON.stringify(sellerService));
-    
+
     const newPayment = {
       paymentId: uuid.v4().replace(/-/g, ''),
       uid: buyerUid,
@@ -526,7 +526,7 @@ exports.onFileChange = functions.storage.object().onFinalize(object => {
   let thumbTempOutputFileName = `${userId}_${id}_thumb.jpg`;
   let mediumTempOutputFileName = `${userId}_${id}_medium.jpg`;
   let largeTempOutputFileName = `${userId}_${id}_large.jpg`;
-	
+
 	if (object.resourceState === 'not_exists') {
 		console.log('We deleted a file, exit...');
 		return null;
@@ -644,7 +644,7 @@ exports.onFileChange = functions.storage.object().onFinalize(object => {
 			});
 		});
   };
-  
+
   var createImages = function () {
     return new Promise((resolve, reject) => {
       async.parallel([
@@ -655,7 +655,7 @@ exports.onFileChange = functions.storage.object().onFinalize(object => {
           .catch(error => {
             callback(error);
           });
-        }, 
+        },
         function (callback){
           createThumbnail().then(() => {
             callback(null, null);
@@ -739,7 +739,7 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 			});
 		});
   };
-  
+
   var createCustomer = function () {
     return new Promise((resolve, reject) => {
       stripe.customers.create({
@@ -804,7 +804,7 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((snap, context) => {
 	var user = snap.data();
   var userId = context.params.userId;
-  
+
   // collections to delete:
   // deletedAlerts
 
@@ -818,7 +818,7 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 			});
 		});
   };
-  
+
   var deleteCustomer = function () {
     return new Promise((resolve, reject) => {
       if (user.stripeCustomerId){
@@ -1015,7 +1015,7 @@ exports.deleteUserActivity = functions.firestore.document("users/{userId}/activi
             });
           });
         });
-  
+
         Promise.all(promises).then(() => {
           return Promise.resolve();
         })
@@ -1094,7 +1094,7 @@ exports.createUserImage = functions.firestore.document("users/{userId}/images/{i
 
 	var createImageTotals = function () {
 		return new Promise((resolve, reject) => {
-			admin.database().ref('totals').child(imageId).set({ 
+			admin.database().ref('totals').child(imageId).set({
 				forumCount: 0,
 				serviceCount: 0,
 				postCount: 0
@@ -1146,7 +1146,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
 				  return new Promise((resolve, reject) => {
 					  var forum = doc.data();
 					  var forumImageRef = admin.firestore().collection(`users/${userId}/forums/${forum.forumId}/images`).doc(imageId);
-					
+
             forumImageRef.get().then(doc => {
               if (doc.exists){
                 doc.ref.update({
@@ -1158,7 +1158,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
                 })
                 .catch(error => {
                   reject(error);
-                });   
+                });
               }
               else resolve();
             })
@@ -1167,7 +1167,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
             });
           });
 				});
-		
+
 				Promise.all(promises).then(() => {
 					resolve();
 				})
@@ -1187,7 +1187,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
 					return new Promise((resolve, reject) => {
 						var service = doc.data();
 						var serviceImageRef = admin.firestore().collection(`users/${userId}/services/${service.serviceId}/images`).doc(imageId);
-						
+
 						serviceImageRef.get().then(doc => {
 							if (doc.exists){
 								doc.ref.update({
@@ -1199,7 +1199,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
 								})
 								.catch(error => {
 									reject(error);
-								});   
+								});
 							}
 							else resolve();
 						})
@@ -1208,7 +1208,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
 						});
 					});
 				});
-			
+
 				Promise.all(promises).then(() => {
 					resolve();
 				})
@@ -1221,7 +1221,7 @@ exports.updateUserImage = functions.firestore.document("users/{userId}/images/{i
       });
 		});
   };
-  
+
   return updateUserForumImages().then(() => {
     return updateUserServiceImages().then(() => {
       return Promise.resolve();
@@ -1262,7 +1262,7 @@ exports.deleteUserImage = functions.firestore.document("users/{userId}/images/{i
 					return new Promise((resolve, reject) => {
 						var forum = doc.data();
 						var forumImageRef = admin.firestore().collection(`users/${userId}/forums/${forum.forumId}/images`).doc(imageId);
-						
+
 						forumImageRef.get().then(doc => {
 							if (doc.exists){
 								doc.ref.delete().then(() => {
@@ -1279,7 +1279,7 @@ exports.deleteUserImage = functions.firestore.document("users/{userId}/images/{i
 						});
 					});
 				});
-		
+
 				Promise.all(promises).then(() => {
 					resolve();
 				})
@@ -1297,7 +1297,7 @@ exports.deleteUserImage = functions.firestore.document("users/{userId}/images/{i
 					return new Promise((resolve, reject) => {
 						var service = doc.data();
 						var serviceImageRef = admin.firestore().collection(`users/${userId}/services/${service.serviceId}/images`).doc(imageId);
-						
+
 						serviceImageRef.get().then(doc => {
 							if (doc.exists){
 								doc.ref.delete().then(() => {
@@ -1305,7 +1305,7 @@ exports.deleteUserImage = functions.firestore.document("users/{userId}/images/{i
 								})
 								.catch(error => {
 									reject(error);
-								});   
+								});
 							}
 							else resolve();
 						})
@@ -1314,7 +1314,7 @@ exports.deleteUserImage = functions.firestore.document("users/{userId}/images/{i
 						});
 					});
 				});
-		
+
 				Promise.all(promises).then(() => {
 					resolve();
 				})
@@ -1451,7 +1451,7 @@ exports.createUserAlert = functions.firestore.document("users/{userId}/alerts/{a
                               icon: url.length > 0 ? url : ''
                             }
                           };
-                          
+
                           // send push notification
                           admin.messaging().sendToDevice(fcmToken.token, payload).then(() => {
                             console.log('sent payload ' + JSON.stringify(payload));
@@ -1530,7 +1530,7 @@ exports.createUserAlert = functions.firestore.document("users/{userId}/alerts/{a
                               icon: url.length > 0 ? url : ''
                             }
                           };
-                          
+
                           // send push notification
                           admin.messaging().sendToDevice(fcmToken.token, payload).then(() => {
                             console.log('sent payload ' + JSON.stringify(payload));
@@ -1680,7 +1680,7 @@ exports.updateUserAlert = functions.firestore.document("users/{userId}/alerts/{a
       });
     });
 	};
-	
+
 	var updateServiceAlert = function () {
     return new Promise((resolve, reject) => {
       var alertRef = admin.firestore().collection(`services/${newValue.forumServiceId}/alerts`).doc(alertId);
@@ -1754,7 +1754,7 @@ exports.deleteUserAlert = functions.firestore.document("users/{userId}/alerts/{a
   var alert = snap.data();
   var userId = context.params.userId;
 	var alertId = context.params.alertId;
-	
+
 	var deleteForumAlert = function () {
     return new Promise((resolve, reject) => {
       var alertRef = admin.firestore().collection(`forums/${alert.forumServiceId}/alerts`).doc(alertId);
@@ -1794,7 +1794,7 @@ exports.deleteUserAlert = functions.firestore.document("users/{userId}/alerts/{a
       });
     });
   };
-  
+
   var createDeletedAlert = function () {
     return new Promise((resolve, reject) => {
       var deletedAlertRef = admin.firestore().collection(`users/${userId}/deletedAlerts`).doc(alertId);
@@ -1879,7 +1879,7 @@ exports.createUserTag = functions.firestore.document("users/{userId}/tags/{tagId
   var tag = snap.data();
   var userId = context.params.userId;
   var tagId = context.params.tagId;
-  
+
   var createPublicTag = function () {
     return new Promise((resolve, reject) => {
       var tagRef = admin.firestore().collection('tags').doc(tagId);
@@ -2104,7 +2104,7 @@ exports.createUserNotification = functions.firestore.document("users/{userId}/no
 
   var createNotificationTotals = function () {
     return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(notificationId).set({ 
+      admin.database().ref('totals').child(notificationId).set({
         alertCount: 0,
         tagCount: 0
       })
@@ -2151,7 +2151,7 @@ exports.createUserNotification = functions.firestore.document("users/{userId}/no
       }
     });
   };
-  
+
   var createForumOrServiceNotification = function () {
     return new Promise((resolve, reject) => {
       if (notification.type == 'Forum'){
@@ -2174,7 +2174,7 @@ exports.createUserNotification = functions.firestore.document("users/{userId}/no
       }
     });
   };
-	
+
   var createInternalForumOrServiceNotification = function () {
     return new Promise((resolve, reject) => {
       if (notification.type == 'Forum'){
@@ -2353,7 +2353,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 else resolve();
               });
             }
-            else { 
+            else {
               var serviceNotificationRef = admin.firestore().collection(`users/${userId}/servicenotificationscollection/${collectionTitle}/notifications`).doc(notificationId);
               serviceNotificationRef.get().then(doc => {
                 if (doc.exists){
@@ -2853,7 +2853,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
       }
     });
   };
-  
+
   var removeForumOrServiceNoTags = function (type) {
     return new Promise((resolve, reject) => {
       if (type == 'Forum'){
@@ -2960,7 +2960,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
       }
     });
 	};
-	
+
   // ******************************************************
   // create notification
   // ******************************************************
@@ -3126,7 +3126,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
       }
     });
   };
-  
+
   var updateUserNewValue = function (type, notification, tags) {
     return new Promise((resolve, reject) => {
       var updateNotification = function () {
@@ -3149,7 +3149,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 .catch(error => {
                   reject(error);
                 });
-              }              
+              }
             })
             .catch(error => {
               reject(error);
@@ -3173,7 +3173,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 .catch(error => {
                   reject(error);
                 });
-              }              
+              }
             })
             .catch(error => {
               reject(error);
@@ -3194,7 +3194,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
           })
           .catch(error => {
             reject(error);
-          }); 
+          });
         }
         else {
           updateUserForumOrServiceNoTags(type, notification).then(() => {
@@ -3210,7 +3210,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
       });
     });
   };
-  
+
   var updateInternalNewValue = function (type, notification, tags) {
     return new Promise((resolve, reject) => {
       var updateNotification = function () {
@@ -3462,7 +3462,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 });
               });
             }
-        
+
             var decreaseUserServiceNotificationCount = function () {
               return new Promise((resolve, reject) => {
                 admin.firestore().collection(`users/${userId}/notifications`).select()
@@ -3542,7 +3542,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 });
               });
             }
-        
+
             var increaseUserServiceNotificationCount = function () {
               return new Promise((resolve, reject) => {
                 admin.firestore().collection(`users/${userId}/notifications`).select()
@@ -3595,7 +3595,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
       });
     });
   };
-  
+
   var updateNewValue = function (type, notification, tags) {
     return new Promise((resolve, reject) => {
       updateNotificationNewValue(notification, tags).then(() => {
@@ -3652,7 +3652,7 @@ exports.updateUserNotification = functions.firestore.document("users/{userId}/no
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -3720,7 +3720,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
       });
     });
 	};
-	
+
   var removeUserForumOrServiceNotification = function () {
     return new Promise((resolve, reject) => {
       if (notification.type == 'Forum'){
@@ -3731,7 +3731,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -3747,7 +3747,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -3768,7 +3768,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -3784,7 +3784,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -3817,7 +3817,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             });
           });
         });
-  
+
         Promise.all(promises).then(() => {
           resolve();
         })
@@ -3872,7 +3872,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             }
           });
         });
-  
+
         Promise.all(promises).then(() => {
           resolve();
         })
@@ -3927,7 +3927,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
             }
           });
         });
-  
+
         Promise.all(promises).then(() => {
           resolve();
         })
@@ -4047,7 +4047,7 @@ exports.deleteUserNotification = functions.firestore.document("users/{userId}/no
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -4333,7 +4333,7 @@ exports.createUserNotificationTag = functions.firestore.document("users/{userId}
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4372,7 +4372,7 @@ exports.createUserNotificationTag = functions.firestore.document("users/{userId}
               }
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4425,7 +4425,7 @@ exports.createUserNotificationTag = functions.firestore.document("users/{userId}
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4464,7 +4464,7 @@ exports.createUserNotificationTag = functions.firestore.document("users/{userId}
               }
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4531,17 +4531,17 @@ exports.createUserNotificationTag = functions.firestore.document("users/{userId}
               else {
                 let newTags = [];
                 let oldTags = [];
-  
+
                 // get tags
                 for (let t in tags) {
                   newTags.push(tags[t]);
-      
+
                   if (tags[t] != tag.tag)
                     oldTags.push(tags[t]);
                 }
                 newTags.sort();
                 oldTags.sort();
-  
+
                 return removeUserNotificationCollectionTitles(oldTags).then(() => {
                   return removeInternalNotificationCollectionTitles(oldTags).then(() => {
                     if (notification){
@@ -4662,7 +4662,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4701,7 +4701,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
               }
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4742,7 +4742,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
                         .catch(error => {
                           callback(error);
                         });
-                      }, 
+                      },
                       function (callback){
                         // remove service notification
                         var serviceNotificationRef = admin.firestore().collection(`users/${userId}/servicenotificationscollection/${collectionTitle}/notifications`).doc(notificationId);
@@ -4781,7 +4781,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4818,7 +4818,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
                   .catch(error => {
                     callback(error);
                   });
-                }, 
+                },
                 function (callback){
                   // remove service notification
                   var serviceNotificationRef = admin.firestore().collection(`servicenotificationscollection/${collectionTitle}/notifications`).doc(notificationId);
@@ -4847,7 +4847,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
               );
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -4949,7 +4949,7 @@ exports.deleteUserNotificationTag = functions.firestore.document("users/{userId}
             // must be more tags than just the one being removed still remaining
             // so remove the old one's and create new ones with the ones remaining
             var tempTags = [];
-  
+
             for (var t in tags) {
               if (tags[t] != tag.tag)
                 tempTags.push(tags[t]);
@@ -5037,7 +5037,7 @@ exports.createUserService = functions.firestore.document("users/{userId}/service
 
   var createServiceTotals = function () {
     return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(serviceId).set({ 
+      admin.database().ref('totals').child(serviceId).set({
         forumCount: 0,
         tagCount: 0,
         imageCount: 0,
@@ -5197,7 +5197,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
             });
           });
         });
-  
+
         Promise.all(promises).then(() => {
           resolve();
         })
@@ -5293,7 +5293,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -5332,7 +5332,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -5462,7 +5462,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -5501,7 +5501,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -5688,7 +5688,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                           .catch(error => {
                                             callback(error);
                                           });
-                                        }, 
+                                        },
                                         function (callback){
                                           // user or private alerts
                                           var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
@@ -5825,7 +5825,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                                       .catch(error => {
                                         callback(error);
                                       });
-                                    }, 
+                                    },
                                     function (callback){
                                       // user or private alerts
                                       var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
@@ -5863,7 +5863,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                     );
                   });
                 };
-                
+
                 if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
                   if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
                     if (notification.currency && notification.currency.length > 0){
@@ -5899,13 +5899,13 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                 else resolve();
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -5941,7 +5941,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -5985,7 +5985,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removePublicCollectionTitles(tags).then(() => {
@@ -6040,7 +6040,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -6084,7 +6084,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removeAnonymousCollectionTitles(tags).then(() => {
@@ -6302,7 +6302,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -6332,7 +6332,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -6390,7 +6390,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                             })
                             .catch(error => {
                               reject(error);
-                            }); 
+                            });
                           });
                         });
 
@@ -6399,7 +6399,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                         })
                         .catch(error => {
                           reject(error);
-                        });    
+                        });
                       }
                       else resolve();
                     })
@@ -6424,7 +6424,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -6464,7 +6464,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -6519,7 +6519,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -6563,7 +6563,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removePublicCollectionTitles(tags).then(() => {
@@ -6618,7 +6618,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -6662,7 +6662,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removeAnonymousCollectionTitles(tags).then(() => {
@@ -6836,7 +6836,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -6845,7 +6845,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
       });
     });
   };
-  
+
   var removeServiceReviews = function () {
     return new Promise((resolve, reject) => {
       admin.firestore().collection(`users/${userId}/services/${serviceId}/servicereviews`).get().then(snapshot => {
@@ -6866,7 +6866,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -7094,7 +7094,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7122,7 +7122,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7150,7 +7150,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7186,7 +7186,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7222,7 +7222,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7258,7 +7258,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7334,17 +7334,17 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
                 else {
                   let newTags = [];
                   let oldTags = [];
-    
+
                   // get tags
                   for (let t in tags) {
                     newTags.push(tags[t]);
-        
+
                     if (tags[t] != tag.tag)
                       oldTags.push(tags[t]);
                   }
                   newTags.sort();
                   oldTags.sort();
-    
+
                   return removeUserServiceCollectionTitles(oldTags).then(() => {
                     return removePublicServiceCollectionTitles(oldTags).then(() => {
                       return removeAnonymousServiceCollectionTitles(oldTags).then(() => {
@@ -7406,7 +7406,7 @@ exports.createUserServiceTag = functions.firestore.document("users/{userId}/serv
     })
     .catch(error => {
       return Promise.reject(error);
-    });    
+    });
   })
   .catch(error => {
     return Promise.reject(error);
@@ -7507,7 +7507,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7535,7 +7535,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7563,7 +7563,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7599,7 +7599,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7635,7 +7635,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7671,7 +7671,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -7721,7 +7721,7 @@ exports.deleteUserServiceTag = functions.firestore.document("users/{userId}/serv
             // must be more tags than just the one being removed still remaining
             // so remove the old one's and create new ones with the ones remaining
             var tempTags = [];
-  
+
             for (var t in tags) {
               if (tags[t] != tag.tag)
                 tempTags.push(tags[t]);
@@ -7939,7 +7939,7 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
 			});
 		});
   };
-  
+
   var createUserImageService = function () {
 		return new Promise((resolve, reject) => {
 			var serviceRef = admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId);
@@ -7953,7 +7953,7 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
       });
 		});
   };
-  
+
   var updateServiceImage = function () {
     return new Promise((resolve, reject) => {
 			var serviceImageRef = admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).doc(imageId);
@@ -7981,7 +7981,7 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
           .catch(error => {
             callback(error);
           });
-        }, 
+        },
         function (callback){
           copySmallImage().then(() => {
             callback(null, null);
@@ -8078,7 +8078,7 @@ exports.deleteUserServiceImage = functions.firestore.document("users/{userId}/se
       });
     });
   };
-  
+
   var deleteUserImageService = function () {
 		return new Promise((resolve, reject) => {
       var serviceRef = admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId);
@@ -8098,7 +8098,7 @@ exports.deleteUserServiceImage = functions.firestore.document("users/{userId}/se
       });
 		});
 	};
-	
+
 	// repopulate image count
 	return admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select()
 		.get().then(snapshot => {
@@ -8190,7 +8190,7 @@ exports.createUserServiceReview = functions.firestore.document("users/{userId}/s
 
   var createReviewTotals = function () {
     return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(serviceReviewId).set({ 
+      admin.database().ref('totals').child(serviceReviewId).set({
         commentCount: 0
       })
       .then(() => {
@@ -8278,7 +8278,7 @@ exports.updateUserServiceReview = functions.firestore.document('users/{userId}/s
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -8340,7 +8340,7 @@ exports.deleteUserServiceReview = functions.firestore.document("users/{userId}/s
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -8377,7 +8377,7 @@ exports.deleteUserServiceReview = functions.firestore.document("users/{userId}/s
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -8501,7 +8501,7 @@ exports.updateUserServiceReviewComment = functions.firestore.document('users/{us
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -8552,7 +8552,7 @@ exports.deleteUserServiceReviewComment = functions.firestore.document("users/{us
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -8724,7 +8724,7 @@ exports.updateUserServiceRate = functions.firestore.document('users/{userId}/ser
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -8829,7 +8829,7 @@ exports.deleteUserServiceRate = functions.firestore.document("users/{userId}/ser
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9050,7 +9050,7 @@ exports.createUserForumBlock = functions.firestore.document("users/{userId}/foru
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9185,7 +9185,7 @@ exports.createUserForumUserBlock = functions.firestore.document("users/{parentUs
                           });
                         });
                       });
-                
+
                       Promise.all(promises).then(() => {
                         resolve();
                       })
@@ -9201,7 +9201,7 @@ exports.createUserForumUserBlock = functions.firestore.document("users/{parentUs
                 );
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9316,7 +9316,7 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
 
   var createForumTotals = function () {
     return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(forumId).set({ 
+      admin.database().ref('totals').child(forumId).set({
         registrantCount: 0,
         forumCount: 0,
         postCount: 0,
@@ -9338,7 +9338,7 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     return new Promise((resolve, reject) => {
       admin.database().ref(`users/${userId}/forums`).child(forumId).set({
         forumId: forumId
-        // posts: [] <-- we will create this when we need it  
+        // posts: [] <-- we will create this when we need it
       })
       .then(() => {
         resolve();
@@ -9585,7 +9585,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
             });
           });
         });
-  
+
         Promise.all(promises).then(() => {
           resolve();
         })
@@ -9681,7 +9681,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9720,7 +9720,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9849,7 +9849,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -9888,7 +9888,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -10069,7 +10069,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                                       .catch(error => {
                                         callback(error);
                                       });
-                                    }, 
+                                    },
                                     function (callback){
                                       // user or private alerts
                                       var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
@@ -10165,7 +10165,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                                   .catch(error => {
                                     callback(error);
                                   });
-                                }, 
+                                },
                                 function (callback){
                                   // user or private alerts
                                   var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
@@ -10203,13 +10203,13 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                 );
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
             .catch(error => {
               reject(error);
-            });    
+            });
           }
           else resolve();
         })
@@ -10245,7 +10245,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -10289,7 +10289,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removePublicCollectionTitles(tags).then(() => {
@@ -10344,7 +10344,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -10388,7 +10388,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removeAnonymousCollectionTitles(tags).then(() => {
@@ -10651,7 +10651,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -10681,7 +10681,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
@@ -10706,7 +10706,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -10735,7 +10735,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -10764,7 +10764,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -10821,7 +10821,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -10861,7 +10861,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -10916,7 +10916,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -10960,7 +10960,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removePublicCollectionTitles(tags).then(() => {
@@ -11015,7 +11015,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -11059,7 +11059,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
             }
             else callback(null, null);
           });
-        }, 
+        },
         function (callback){
           if (tags.length > 0){
             removeAnonymousCollectionTitles(tags).then(() => {
@@ -11283,8 +11283,8 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                               })
                               .catch(error => {
                                 return Promise.reject(error);
-                              });                  
-                            } 
+                              });
+                            }
                           })
                           .catch(error => {
                             return Promise.reject(error);
@@ -11328,7 +11328,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
       })
       .catch(error => {
         return Promise.reject(error);
-      });  
+      });
     })
     .catch(error => {
       return Promise.reject(error);
@@ -11354,7 +11354,7 @@ exports.createUserForumBreadcrumb = functions.firestore.document("users/{userId}
       admin.firestore().collection(`users/${userId}/forums`).doc(parentForumId).get().then(doc => {
         if (doc.exists)
           forum = doc.data();
-          
+
         resolve();
       }).catch(error => {
         reject(error);
@@ -11506,7 +11506,7 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -11527,7 +11527,7 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
           var getBreadcrumbPath = function () {
             return new Promise((resolve, reject) => {
               var breadcrumbs = [];
-        
+
               // we will call this recursively to go backward up the path or tree
               var getCrumb = function (userIdToGet, forumIdToGet) {
                 return new Promise((resolve, reject) => {
@@ -11539,7 +11539,7 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
                   });
                 });
               }
-            
+
               // recursive function
               var getBreadcrumb = function (userIdToRecurse, forumIdToRecurse) {
                 // predicate to decide parent/child relationship
@@ -11547,7 +11547,7 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
                   if (tempForum){
                     // create crumbs
                     breadcrumbs.push(tempForum);
-            
+
                     // anymore parents?
                     if (tempForum.parentId && tempForum.parentId.length > 0)
                       return getBreadcrumb(tempForum.parentUid, tempForum.parentId); // recurse
@@ -11556,11 +11556,11 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
                   }
                   else return;
                 }
-            
+
                 // get our initial parent then recurse up the tree to the root parent
                 return getCrumb(userIdToRecurse, forumIdToRecurse).then(predicate);
               }
-        
+
               // call the recursive function
               getBreadcrumb(userId, parentForumId).then(result => {
                 resolve(breadcrumbs.reverse());
@@ -11575,17 +11575,17 @@ exports.deleteUserForumBreadcrumbReference = functions.firestore.document("users
             if (breadcrumbs && breadcrumbs.length > 0){
               // just create breadcrumbs in a batch
               var batch = admin.firestore().batch();
-    
+
               for (var i=0; i<breadcrumbs.length; i++){
                 var batchRef = admin.firestore().collection(`users/${userId}/forums/${parentForumId}/breadcrumbs`).doc(breadcrumbs[i].forumId);
-                
+
                 batch.set(batchRef, {
                   forumId: breadcrumbs[i].forumId,
                   uid: breadcrumbs[i].uid,
                   sortOrder: i
                 });
               }
-    
+
               batch.commit().then(() => {
                 resolve();
               })
@@ -11729,7 +11729,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11757,7 +11757,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11785,7 +11785,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11821,7 +11821,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11857,7 +11857,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11893,7 +11893,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -11969,17 +11969,17 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
                 else {
                   let newTags = [];
                   let oldTags = [];
-    
+
                   // get tags
                   for (let t in tags) {
                     newTags.push(tags[t]);
-        
+
                     if (tags[t] != tag.tag)
                       oldTags.push(tags[t]);
                   }
                   newTags.sort();
                   oldTags.sort();
-    
+
                   return removeUserForumCollectionTitles(oldTags).then(() => {
                     return removePublicForumCollectionTitles(oldTags).then(() => {
                       return removeAnonymousForumCollectionTitles(oldTags).then(() => {
@@ -12041,7 +12041,7 @@ exports.createUserForumTag = functions.firestore.document("users/{userId}/forums
     })
     .catch(error => {
       return Promise.reject(error);
-    });    
+    });
   })
   .catch(error => {
     return Promise.reject(error);
@@ -12142,7 +12142,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12170,7 +12170,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12198,7 +12198,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12234,7 +12234,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12270,7 +12270,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12306,7 +12306,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -12356,7 +12356,7 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
             // must be more tags than just the one being removed still remaining
             // so remove the old one's and create new ones with the ones remaining
             var tempTags = [];
-  
+
             for (var t in tags) {
               if (tags[t] != tag.tag)
                 tempTags.push(tags[t]);
@@ -12588,7 +12588,7 @@ exports.createUserForumPost = functions.database.ref("users/{userId}/forums/{for
                                       icon: url.length > 0 ? url : ''
                                     }
                                   };
-                                  
+
                                   // send push notification
                                   admin.messaging().sendToDevice(fcmToken.token, payload).then(() => {
                                     console.log('sent payload ' + JSON.stringify(payload));
@@ -12928,7 +12928,7 @@ exports.createUserForumPostImage = functions.firestore.document("users/{userId}/
       });
 		});
   };
-  
+
   return copyTinyImage().then(() => {
     return copySmallImage().then(() => {
       return copyMediumImage().then(() => {
@@ -12981,7 +12981,7 @@ exports.deleteUserForumPostImage = functions.firestore.document("users/{userId}/
       });
     });
   }
-  
+
   return removeImage(image.tinyUrl).then(() => {
     return removeImage(image.smallUrl).then(() => {
       return removeImage(image.mediumUrl).then(() => {
@@ -13116,7 +13116,7 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
 			});
 		});
   };
-  
+
   var createUserImageForum = function () {
 		return new Promise((resolve, reject) => {
 			var forumRef = admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId);
@@ -13128,7 +13128,7 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
       });
 		});
   };
-  
+
   var updateForumImage = function () {
     return new Promise((resolve, reject) => {
 			var forumImageRef = admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).doc(imageId);
@@ -13156,7 +13156,7 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
           .catch(error => {
             callback(error);
           });
-        }, 
+        },
         function (callback){
           copySmallImage().then(() => {
             callback(null, null);
@@ -13253,7 +13253,7 @@ exports.deleteUserForumImage = functions.firestore.document("users/{userId}/foru
       });
     });
   };
-  
+
   var deleteUserImageForum = function () {
 		return new Promise((resolve, reject) => {
       var forumRef = admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId);
@@ -13273,7 +13273,7 @@ exports.deleteUserForumImage = functions.firestore.document("users/{userId}/foru
       });
 		});
 	};
-	
+
 	// repopulate image count
 	return admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select()
 		.get().then(snapshot => {
@@ -13284,7 +13284,7 @@ exports.deleteUserForumImage = functions.firestore.document("users/{userId}/foru
 					return Promise.resolve();
 			});
 		}
-	).then(() => {    
+	).then(() => {
     return removeImage(image.tinyUrl).then(() => {
       return removeImage(image.smallUrl).then(() => {
         return removeImage(image.mediumUrl).then(() => {
@@ -13336,7 +13336,7 @@ exports.createUserForumRegistrant = functions.firestore.document("users/{userId}
     });
   };
 
-  // store reference to registrant in the users activity 
+  // store reference to registrant in the users activity
   var createRegistrantActivity = function () {
     return new Promise((resolve, reject) => {
       admin.firestore().collection(`users/${userId}/forums`).doc(forumId).get().then(forumDoc => {
@@ -13537,7 +13537,7 @@ exports.updateUserForumRegistrant = functions.firestore.document('users/{userId}
     // check if the default flag is being set
     if (newValue.default == true && previousValue.default == false){
       // find any other services that the user of the registrant is managing in the forum and that has it's default setting set to true
-      // and change it to false.  End users of forums or ones that are various pseudonymns in the same forum or request can only have 
+      // and change it to false.  End users of forums or ones that are various pseudonymns in the same forum or request can only have
       // one default registrant at a time.
       return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).where("uid", "==", newValue.uid).where("default", "==", true)
         .get().then(snapshot => {
@@ -13721,7 +13721,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -13742,7 +13742,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
           var getBreadcrumbPath = function () {
             return new Promise((resolve, reject) => {
               var breadcrumbs = [];
-        
+
               // we will call this recursively to go backward up the path or tree
               var getCrumb = function (userIdToGet, forumIdToGet) {
                 return new Promise((resolve, reject) => {
@@ -13754,7 +13754,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
                   });
                 });
               }
-            
+
               // recursive function
               var getBreadcrumb = function (userIdToRecurse, forumIdToRecurse) {
                 // predicate to decide parent/child relationship
@@ -13762,7 +13762,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
                   if (tempForum && tempForum.indexed == true){
                     // create crumbs
                     breadcrumbs.push(tempForum);
-            
+
                     // anymore parents?
                     if (tempForum.parentId && tempForum.parentId.length > 0)
                       return getBreadcrumb(tempForum.parentUid, tempForum.parentId); // recurse
@@ -13771,11 +13771,11 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
                   }
                   else return;
                 }
-            
+
                 // get our initial parent then recurse up the tree to the root parent
                 return getCrumb(userIdToRecurse, forumIdToRecurse).then(predicate);
               }
-        
+
               // call the recursive function
               getBreadcrumb(userIdCrumb, forumId).then(result => {
                 resolve(breadcrumbs.reverse());
@@ -13790,17 +13790,17 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
             if (breadcrumbs && breadcrumbs.length > 0){
               // just create breadcrumbs in a batch
               var batch = admin.firestore().batch();
-    
+
               for (var i=0; i<breadcrumbs.length; i++){
                 var batchRef = admin.firestore().collection(`users/${userIdCrumb}/forums/${forumId}/breadcrumbs`).doc(breadcrumbs[i].forumId);
-                
+
                 batch.set(batchRef, {
                   forumId: breadcrumbs[i].forumId,
                   uid: breadcrumbs[i].uid,
                   sortOrder: i
                 });
               }
-    
+
               batch.commit().then(() => {
                 resolve();
               })
@@ -13889,7 +13889,7 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
                   });
                 });
               });
-        
+
               Promise.all(promises).then(() => {
                 resolve();
               })
@@ -13910,7 +13910,7 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
           var getBreadcrumbPath = function () {
             return new Promise((resolve, reject) => {
               var breadcrumbs = [];
-        
+
               // we will call this recursively to go backward up the path or tree
               var getCrumb = function (userIdToGet, forumIdToGet) {
                 return new Promise((resolve, reject) => {
@@ -13922,7 +13922,7 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
                   });
                 });
               }
-            
+
               // recursive function
               var getBreadcrumb = function (userIdToRecurse, forumIdToRecurse) {
                 // predicate to decide parent/child relationship
@@ -13930,7 +13930,7 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
                   if (tempForum && tempForum.indexed == true){
                     // create crumbs
                     breadcrumbs.push(tempForum);
-            
+
                     // anymore parents?
                     if (tempForum.parentId && tempForum.parentId.length > 0)
                       return getBreadcrumb(tempForum.parentUid, tempForum.parentId); // recurse
@@ -13939,11 +13939,11 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
                   }
                   else return;
                 }
-            
+
                 // get our initial parent then recurse up the tree to the root parent
                 return getCrumb(userIdToRecurse, forumIdToRecurse).then(predicate);
               }
-        
+
               // call the recursive function
               getBreadcrumb(userIdCrumb, forumId).then(result => {
                 resolve(breadcrumbs.reverse());
@@ -13958,17 +13958,17 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
             if (breadcrumbs && breadcrumbs.length > 0){
               // just create breadcrumbs in a batch
               var batch = admin.firestore().batch();
-    
+
               for (var i=0; i<breadcrumbs.length; i++){
                 var batchRef = admin.firestore().collection(`users/${userIdCrumb}/forums/${forumId}/breadcrumbs`).doc(breadcrumbs[i].forumId);
-                
+
                 batch.set(batchRef, {
                   forumId: breadcrumbs[i].forumId,
                   uid: breadcrumbs[i].uid,
                   sortOrder: i
                 });
               }
-    
+
               batch.commit().then(() => {
                 resolve();
               })
@@ -14054,7 +14054,7 @@ exports.deleteUserForumForum = functions.firestore.document("users/{userId}/foru
               });
             });
           });
-    
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -14135,7 +14135,7 @@ exports.createUserServiceBlock = functions.firestore.document("users/{userId}/se
                 });
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -14270,7 +14270,7 @@ exports.createUserServiceUserBlock = functions.firestore.document("users/{parent
                           });
                         });
                       });
-                
+
                       Promise.all(promises).then(() => {
                         resolve();
                       })
@@ -14286,7 +14286,7 @@ exports.createUserServiceUserBlock = functions.firestore.document("users/{parent
                 );
               });
             });
-      
+
             Promise.all(promises).then(() => {
               resolve();
             })
@@ -14500,7 +14500,7 @@ exports.createTag = functions.firestore.document('tags/{tagId}').onCreate((snap,
 
   var createTagTotals = function () {
     return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(tagId).set({ 
+      admin.database().ref('totals').child(tagId).set({
         forumCount: 0,
         serviceCount: 0,
         notificationCount: 0

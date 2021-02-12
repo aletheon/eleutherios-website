@@ -53,8 +53,8 @@ export class HomeComponent implements OnDestroy, OnInit {
     private userAlertService: UserAlertService,
     private userServiceImageService: UserServiceImageService,
     private userForumImageService: UserForumImageService,
-    private userForumTagService: UserForumTagService,    
-    private userServiceTagService: UserServiceTagService,    
+    private userForumTagService: UserForumTagService,
+    private userServiceTagService: UserServiceTagService,
     private userForumRegistrantService: UserForumRegistrantService,
     private forumService: ForumService,
     private serviceService: ServiceService,
@@ -186,12 +186,12 @@ export class HomeComponent implements OnDestroy, OnInit {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -233,7 +233,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -261,12 +261,12 @@ export class HomeComponent implements OnDestroy, OnInit {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -278,7 +278,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -293,7 +293,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -321,12 +321,12 @@ export class HomeComponent implements OnDestroy, OnInit {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -368,7 +368,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -396,12 +396,12 @@ export class HomeComponent implements OnDestroy, OnInit {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -413,7 +413,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage] = results;
-        
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -428,7 +428,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -456,16 +456,16 @@ export class HomeComponent implements OnDestroy, OnInit {
 
                               if (forumImages[0].smallUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-                      
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     forumImages[0].url = downloadUrl;
                                   else
                                     forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-                      
+
                                   return of(forumImages[0]);
                                 })
                               );
@@ -481,7 +481,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                               return of(null);
                           })
                         );
-                        
+
                         return combineLatest([getForumTags$, getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                           switchMap(results => {
                             const [forumTags, defaultForumImage, defaultRegistrant] = results;
@@ -490,7 +490,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                               forum.forumTags = of(forumTags);
                             else
                               forum.forumTags = of([]);
-                            
+
                             if (defaultForumImage)
                               forum.defaultForumImage = of(defaultForumImage);
                             else {
@@ -516,7 +516,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getForum$]).pipe(
                     switchMap(results => {
                       const [forum] = results;
-                      
+
                       if (forum)
                         alert.forum = of(forum);
                       else {
@@ -538,16 +538,16 @@ export class HomeComponent implements OnDestroy, OnInit {
 
                               if (serviceImages[0].smallUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-                      
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
                                     serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-                      
+
                                   return of(serviceImages[0]);
                                 })
                               );
@@ -555,7 +555,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                             else return of(null);
                           })
                         );
-                        
+
                         return combineLatest([getServiceTags$, getDefaultServiceImage$]).pipe(
                           switchMap(results => {
                             const [serviceTags, defaultServiceImage] = results;
@@ -564,7 +564,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                               service.serviceTags = of(serviceTags);
                             else
                               service.serviceTags = of([]);
-                            
+
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
@@ -584,7 +584,7 @@ export class HomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getService$]).pipe(
                     switchMap(results => {
                       const [service] = results;
-                      
+
                       if (service)
                         alert.service = of(service);
                       else {

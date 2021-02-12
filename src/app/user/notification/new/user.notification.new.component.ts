@@ -62,7 +62,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   public tagCount: Observable<number> = this._tagCount.asObservable();
   public alertCount: Observable<number> = this._alertCount.asObservable();
   public notificationGroup: FormGroup;
-  public numberOfItems: number = 12; 
+  public numberOfItems: number = 12;
   public nextKey: any;
   public prevKeys: any[] = [];
   public types: string[] = ['Service', 'Forum'];
@@ -79,7 +79,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
   public tagSearchCtrl: FormControl;
   public loading: Observable<boolean> = this._loading.asObservable();
   public searchLoading: Observable<boolean> = this._searchLoading.asObservable();
-  
+
   constructor(private auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userNotificationService: UserNotificationService,
@@ -93,7 +93,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
     private forumService: ForumService,
     private serviceService: ServiceService,
     private tagService: TagService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private snackbar: MatSnackBar,
     private router: Router) {
       this.searchTagCtrl = new FormControl();
@@ -102,15 +102,15 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.searchTagCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
-      
+
       // tagSearch mat subscription
       this.matAutoCompleteTags = this.tagSearchCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
@@ -135,7 +135,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             if (count < 5){
               if (this._addingTag.getValue() == false){
                 this._addingTag.next(true);
-  
+
                 this.userNotificationTagService.create(this.notificationGroup.get('uid').value, this.notificationGroup.get('notificationId').value, tag)
                   .then(() => {
                     // delay to prevent user adding multiple tags simultaneously
@@ -200,7 +200,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       }
     }, 1000);
   }
-  
+
   ngOnInit () {
     this._loading.next(true);
     const notification: Notification = {
@@ -217,7 +217,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
       lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
       creationDate: firebase.firestore.FieldValue.serverTimestamp()
     };
-    this.notification = this.userNotificationService.create(this.auth.uid, notification);    
+    this.notification = this.userNotificationService.create(this.auth.uid, notification);
     this.initForm();
   }
 
@@ -241,9 +241,8 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
     this._notificationSubscription = this.notification
       .subscribe(notification => {
         if (notification){
-          this._notificationSubscription.unsubscribe();
           this.notificationGroup.patchValue(notification);
-  
+
           if (notification.title.length == 0)
             that.notificationGroup.get('active').disable();
           else
@@ -299,7 +298,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
               throw error;
             }
           }
-      
+
           // call load
           load().then(() => {
             this._loading.next(false);
@@ -339,12 +338,12 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -412,12 +411,12 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -443,7 +442,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                       service.serviceTags = of(serviceTags);
                     else
                       service.serviceTags = of([]);
-                      
+
                     return of(service);
                   })
                 );
@@ -485,7 +484,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
                   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
-      
+
                 const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
                   // add tag to search list
                   this.tagService.search(newTag.tag).subscribe(tags => {
@@ -555,7 +554,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
         }, 500);
         return;
       }
-  
+
       if (this.notificationGroup.get('type').value == 'Service'){
         if (this.notificationGroup.get('paymentType').value == 'Payment'){
           if (this.notificationGroup.get('startAmount').hasError('pattern') || this.notificationGroup.get('startAmount').hasError('min') || this.notificationGroup.get('startAmount').hasError('max')){
@@ -567,7 +566,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             }, 500);
             return;
           }
-  
+
           if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
             setTimeout(() => {
               for (let i in this.notificationGroup.controls) {
@@ -577,7 +576,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             }, 500);
             return;
           }
-  
+
           if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
             setTimeout(() => {
               for (let i in this.notificationGroup.controls) {
@@ -587,7 +586,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             }, 500);
             return;
           }
-  
+
           if (this.notificationGroup.get('endAmount').hasError('pattern') || this.notificationGroup.get('endAmount').hasError('min') || this.notificationGroup.get('endAmount').hasError('max')){
             setTimeout(() => {
               for (let i in this.notificationGroup.controls) {
@@ -597,7 +596,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             }, 500);
             return;
           }
-  
+
           if (this.notificationGroup.errors?.range){
             setTimeout(() => {
               for (let i in this.notificationGroup.controls) {
@@ -608,7 +607,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
             return;
           }
         }
-      } 
+      }
     }
 
     // refresh search list
@@ -657,7 +656,7 @@ export class UserNotificationNewComponent implements OnInit, OnDestroy, AfterVie
     this.prevKeys.push(_.first(this.searchResultsArray)['creationDate']);
     this.getSearchList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key
