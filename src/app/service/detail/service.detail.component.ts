@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   ClickEvent
 } from 'angular-star-rating';
@@ -71,17 +70,14 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public userForumsCtrl: FormControl;
-  public numberItems: number = 100;  
+  public numberItems: number = 100;
   public id: Observable<string>;
   public returnUserId: Observable<string>;
   public returnType: Observable<string> = of('Forum');
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
   public defaultReview: Observable<any>;
-  public qrCodeUrl: string = '';
-  public elementType = NgxQrcodeElementTypes.URL;
-  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userActivityService: UserActivityService,
@@ -97,7 +93,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     private userForumServiceBlockService: UserForumServiceBlockService,
     private userForumUserBlockService: UserForumUserBlockService,
     private serviceService: ServiceService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private snackbar: MatSnackBar,
@@ -109,7 +105,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   descriptionPanelEvent (state: string) {
     if (state == 'expanded')
       this._descriptionPanelTitle.nativeElement.style.display = "none";
-    else 
+    else
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
@@ -377,7 +373,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           })
           .catch(error => {
             console.error(error);
-          });  
+          });
         })
         .catch(error => {
           console.error(error);
@@ -402,7 +398,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -436,7 +432,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
     if (this._defaultReviewSubscription)
       this._defaultReviewSubscription.unsubscribe();
-  
+
     if (this._totalSubscription)
       this._totalSubscription.unsubscribe();
 
@@ -533,7 +529,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -582,7 +578,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
             // service totals
             that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
               .subscribe(total => {
-                if (total) {                    
+                if (total) {
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -601,7 +597,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                   if (total.reviewCount == 0)
                     that._reviewCount.next(-1);
                   else
-                    that._reviewCount.next(total.reviewCount);                
+                    that._reviewCount.next(total.reviewCount);
                 }
               }
             );
@@ -647,12 +643,12 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
                                       forumImages[0].url = '../../assets/defaultTiny.jpg';
-                      
+
                                     return of(forumImages[0]);
                                   })
                                 );
@@ -669,7 +665,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                                 forum.defaultRegistrant = of(defaultRegistrant);
                               else
                                 forum.defaultRegistrant = of(null);
-                              
+
                               if (defaultForumImage)
                                 forum.defaultForumImage = of(defaultForumImage);
                               else {
@@ -685,11 +681,11 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
                         else return of(null);
                       })
                     );
-  
+
                     return combineLatest([getForum$]).pipe(
                       switchMap(results => {
                         const [forum] = results;
-                        
+
                         if (forum)
                           whereServing.forum = of(forum);
                         else {
@@ -710,21 +706,19 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
             // get default service image
             that.getDefaultServiceImage();
-
-            that.qrCodeUrl = environment.url + "service/detail?serviceId=" + service.serviceId;
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

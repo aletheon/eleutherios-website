@@ -20,7 +20,6 @@ import { FormsModule } from '@angular/forms';
 import { MomentModule } from 'angular2-moment';
 import { NgxAutoScrollModule } from "ngx-auto-scroll";
 import { LinkyModule } from 'angular-linky';
-import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 import { UserForumServiceBlockListComponent } from './block/user.forum.service.block.list.component';
 import { UserForumUserBlockListComponent } from './block/user.forum.user.block.list.component';
@@ -78,7 +77,6 @@ import {
     MomentModule,
     NgxAutoScrollModule,
     LinkyModule,
-    NgxQRCodeModule,
     AppRoutingModule
   ],
   declarations: [

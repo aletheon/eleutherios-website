@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   AnonymousServiceService,
   UserServiceImageService,
@@ -35,22 +34,19 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
-  
+
   public service: Observable<any>;
   public serviceGroup: FormGroup;
   public serviceTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultServiceImage: Observable<any>;
-  public qrCodeUrl: string = '';
-  public elementType = NgxQrcodeElementTypes.URL;
-  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
-  
+
   constructor(private auth: AuthService,
     private route: ActivatedRoute,
     private anonymousServiceService: AnonymousServiceService,
     private userServiceImageService: UserServiceImageService,
     private userServiceTagService: UserServiceTagService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
     private location: Location) {
@@ -76,7 +72,7 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -115,18 +111,18 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
     // redirect user if they are already logged in
     if (this.auth.uid && this.auth.uid.length > 0)
       this.router.navigate(['/']);
-      
+
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
       let serviceId = params['serviceId'];
-  
+
       if (serviceId){
         // redirect user if they are already logged in
         if (this.auth.uid && this.auth.uid.length > 0){
           this.router.navigate(['/service/detail'], { queryParams: { serviceId: serviceId } });
         }
-        
+
         this._initialServiceSubscription = this.anonymousServiceService.getService(serviceId).subscribe(service => {
           this._initialServiceSubscription.unsubscribe();
 
@@ -163,7 +159,7 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -215,21 +211,19 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
 
             // get default service image
             that.getDefaultServiceImage();
-
-            that.qrCodeUrl = environment.url + "anonymous/service/detail?serviceId=" + service.serviceId;
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

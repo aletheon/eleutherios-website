@@ -6,7 +6,6 @@ import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 
 import {
   SiteTotalService,
@@ -57,7 +56,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   private _postCount = new BehaviorSubject(0);
   private _tagCount = new BehaviorSubject(0);
   private _imageCount = new BehaviorSubject(0);
-  
+
   public defaultRegistrant: Observable<any>;
   public forum: Observable<any>;
   public registrantCount: Observable<number> = this._registrantCount.asObservable();
@@ -77,10 +76,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   public loading: Observable<boolean> = this._loading.asObservable();
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
   public defaultForumImage: Observable<any>;
-  public qrCodeUrl: string = '';
-  public elementType = NgxQrcodeElementTypes.URL;
-  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -97,7 +93,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
     private userServiceImageService: UserServiceImageService,
     private userForumTagService: UserForumTagService,
     private forumService: ForumService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
     private location: Location) {
@@ -107,7 +103,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   descriptionPanelEvent (state: string) {
     if (state == 'expanded')
       this._descriptionPanelTitle.nativeElement.style.display = "none";
-    else 
+    else
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
@@ -231,12 +227,12 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };
-  
+
                                       this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.userServicesCtrl.value.uid)
                                         .then(registrant => {
                                           if (registrant == null)
                                             newRegistrant.default = true;
-  
+
                                           this.userForumRegistrantService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, newRegistrant).then(() => {
                                             // do something
                                           })
@@ -406,10 +402,10 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       switchMap(forumImages => {
         if (forumImages && forumImages.length > 0){
           let getDownloadUrl$: Observable<any>;
-  
+
           if (forumImages[0].smallUrl)
             getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-  
+
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
@@ -418,7 +414,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                 forumImages[0].url = downloadUrl;
               else
                 forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-  
+
               return of(forumImages[0]);
             })
           );
@@ -499,7 +495,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       if (forumId){
         this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
           this._initialForumSubscription.unsubscribe();
-          
+
           if (forum){
             this.forum = this.forumService.getForum(forumId);
             this.initForm();
@@ -533,7 +529,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.forumGroup = this.fb.group({
       forumId:                            [''],
       parentId:                           [''],
@@ -601,7 +597,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                     that._tagCount.next(-1);
                   else
                     that._tagCount.next(total.tagCount);
-                    
+
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -635,19 +631,19 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                             switchMap(serviceImages => {
                               if (serviceImages && serviceImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
-  
+
                                 if (serviceImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                        
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       serviceImages[0].url = downloadUrl;
                                     else
                                       serviceImages[0].url = '../../assets/defaultTiny.jpg';
-                        
+
                                     return of(serviceImages[0]);
                                   })
                                 );
@@ -655,11 +651,11 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                               else return of(null);
                             })
                           );
-                          
+
                           return combineLatest([getDefaultServiceImage$]).pipe(
                             switchMap(results => {
                               const [defaultServiceImage] = results;
-                              
+
                               if (defaultServiceImage)
                                 service.defaultServiceImage = of(defaultServiceImage);
                               else {
@@ -679,7 +675,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                     return combineLatest([getService$]).pipe(
                       switchMap(results => {
                         const [service] = results;
-                        
+
                         if (service)
                           registrant.service = of(service);
                         else {
@@ -694,27 +690,25 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
                 else return of([]);
               })
             );
-            
+
             // get the user services
             that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
 
             // get default forum image
             that.getDefaultForumImage();
-
-            that.qrCodeUrl = environment.url + "forum/detail?forumId=" + forum.forumId;
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

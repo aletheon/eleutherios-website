@@ -84,15 +84,6 @@
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create forum">Create forum</a>
             <a [routerLink]="['/login']" [queryParams]='{ serviceId: serviceItem.serviceId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left" matTooltip="Create forum">keyboard_arrow_right</a>
 					</div>
-					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
-						<ngx-qrcode
-							[elementType]="elementType"
-							[errorCorrectionLevel]="correctionLevel"
-							[value]="qrCodeUrl"
-							[cssClass]="bshadow"
-							[width]="150">
-						</ngx-qrcode>
-					</div>
 				</div>
 			</form>
 		</div>

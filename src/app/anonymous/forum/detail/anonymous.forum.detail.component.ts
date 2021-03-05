@@ -4,7 +4,6 @@ import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { NgxQrcodeElementTypes, NgxQrcodeErrorCorrectionLevels } from '@techiediaries/ngx-qrcode';
 import {
   AnonymousForumService,
   UserForumImageService,
@@ -41,16 +40,13 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
   public forumTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
   public defaultForumImage: Observable<any>;
-  public qrCodeUrl: string = '';
-  public elementType = NgxQrcodeElementTypes.URL;
-  public correctionLevel = NgxQrcodeErrorCorrectionLevels.HIGH;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private anonymousForumService: AnonymousForumService,
     private userForumImageService: UserForumImageService,
     private userForumTagService: UserForumTagService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar) {
   }
@@ -74,7 +70,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
@@ -113,7 +109,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     // redirect user if they are already logged in
     if (this.auth.uid && this.auth.uid.length > 0)
       this.router.navigate(['/']);
-      
+
     // get params
     const that = this;
 
@@ -164,7 +160,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.forumGroup = this.fb.group({
       forumId:                            [''],
       parentId:                           [''],
@@ -212,21 +208,19 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
 
             // get default forum image
             that.getDefaultForumImage();
-
-            that.qrCodeUrl = environment.url + "anonymous/forum/detail?forumId=" + forum.forumId;
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{
