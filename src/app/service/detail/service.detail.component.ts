@@ -474,20 +474,11 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       let serviceId = params['serviceId'];
       let forumId = params['forumId'];
       let forumUserId = params['forumUserId'];
-      let notificationId = params['notificationId'];
-      let notificationUserId = params['notificationUserId'];
 
-      if (forumId || notificationId){
-        if (forumId){
-          this.id = of(forumId);
-          this.returnUserId = of(forumUserId);
-          this.returnType = of('Forum');
-        }
-        else {
-          this.id = of(notificationId);
-          this.returnUserId = of(notificationUserId);
-          this.returnType = of('Notification');
-        }
+      if (forumId){
+        this.id = of(forumId);
+        this.returnUserId = of(forumUserId);
+        this.returnType = of('Forum');
       }
 
       if (serviceId){

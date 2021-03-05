@@ -41,7 +41,7 @@ import * as _ from "lodash";
 })
 export class UserForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanel', { static: false }) _descriptionPanel: MatExpansionPanel;
-  @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef; 
+  @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
   private _initialForumSubscription: Subscription;
@@ -77,7 +77,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   public canViewDetail: Observable<boolean> = this._canViewDetail.asObservable();
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
   public defaultForumImage: Observable<any>;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -93,7 +93,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
     private userServiceUserBlockService: UserServiceUserBlockService,
     private userServiceForumBlockService: UserServiceForumBlockService,
     private userForumUserBlockService: UserForumUserBlockService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
     private location: Location) {
@@ -103,7 +103,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   descriptionPanelEvent (state: string) {
     if (state == 'expanded')
       this._descriptionPanelTitle.nativeElement.style.display = "none";
-    else 
+    else
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
@@ -136,12 +136,12 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                                         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                                         creationDate: firebase.firestore.FieldValue.serverTimestamp()
                                       };
-  
+
                                       this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.userServicesCtrl.value.uid)
                                         .then(registrant => {
                                           if (registrant == null)
                                             newRegistrant.default = true;
-  
+
                                           this.userForumRegistrantService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, newRegistrant).then(() => {
                                             // do something
                                           })
@@ -308,7 +308,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
       console.error(error);
     });
   }
-  
+
   changeType () {
     this.userForumService.getForumFromPromise(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value)
       .then(fetchedForum => {
@@ -397,7 +397,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         }
       );
       this.router.navigate(['/']);
-    });    
+    });
   }
 
   getDefaultForumImage () {
@@ -412,7 +412,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
@@ -486,21 +486,14 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
       let forumUserId = params['userId'];
       let serviceId = params['serviceId'];
       let serviceUserId = params['serviceUserId'];
-      let notificationId = params['notificationId'];
-      let notificationUserId = params['notificationUserId'];
       let parentForumId = params['parentForumId'];
       let parentForumUserId = params['forumUserId'];
 
-      if (serviceId || notificationId || parentForumId){
+      if (serviceId || parentForumId){
         if (serviceId){
           this.id = of(serviceId);
           this.returnUserId = of(serviceUserId);
           this.returnType = of('Service');
-        }
-        else if (notificationId) {
-          this.id = of(notificationId);
-          this.returnUserId = of(notificationUserId);
-          this.returnType = of('Notification');
         }
         else if (parentForumId) {
           this.id = of(parentForumId);
@@ -508,7 +501,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
           this.returnType = of('Forum');
         }
       }
-  
+
       this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
         this._initialForumSubscription.unsubscribe();
 
@@ -634,7 +627,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                 }
               );
               this.router.navigate(['/']);
-            }   
+            }
           }
         }
       }
@@ -645,7 +638,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
       if (forum){
         let load = async function(){
           try {
-            // listen when description panel is ready, then open            
+            // listen when description panel is ready, then open
             that._totalSubscription = that.siteTotalService.getTotal(forum.forumId)
               .subscribe(total => {
                 if (total) {
@@ -653,7 +646,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                     that._registrantCount.next(-1);
                   else
                     that._registrantCount.next(total.registrantCount);
-                    
+
                   if (total.forumCount == 0)
                     that._forumCount.next(-1);
                   else
@@ -682,7 +675,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)
                   that.defaultRegistrant = of(registrants[0]);
-                else 
+                else
                   that.defaultRegistrant = of(null);
               }
             );
@@ -702,19 +695,19 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                             switchMap(serviceImages => {
                               if (serviceImages && serviceImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
-  
+
                                 if (serviceImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                        
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       serviceImages[0].url = downloadUrl;
                                     else
                                       serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
+
                                     return of(serviceImages[0]);
                                   })
                                 );
@@ -722,11 +715,11 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                               else return of(null);
                             })
                           );
-                          
+
                           return combineLatest([getDefaultServiceImage$]).pipe(
                             switchMap(results => {
                               const [defaultServiceImage] = results;
-  
+
                               if (defaultServiceImage)
                                 service.defaultServiceImage = of(defaultServiceImage);
                               else {
@@ -742,11 +735,11 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-  
+
                     return combineLatest([getService$]).pipe(
                       switchMap(results => {
                         const [service] = results;
-                        
+
                         if (service)
                           registrant.service = of(service);
                         else {
@@ -761,7 +754,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                 else return of([]);
               })
             );
-            
+
             // get the user services
             that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
 
@@ -773,14 +766,14 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

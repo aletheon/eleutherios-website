@@ -34,7 +34,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
   public tags: Observable<any[]> = of([]);
   public tagsArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userTagService: UserTagService,
@@ -89,28 +89,26 @@ export class UserTagListComponent implements OnInit, OnDestroy {
           let observables = tags.map(tag => {
             if (tag){
               let getTagTotal$ = that.siteTotalService.getTotal(tag.tagId);
-    
+
               return combineLatest([getTagTotal$]).pipe(
                 switchMap(results => {
                   const [tagTotal] = results;
-                  
+
                   if (tagTotal){
                     tag.forumCount = tagTotal.forumCount;
                     tag.serviceCount = tagTotal.serviceCount;
-                    tag.notificationCount = tagTotal.notificationCount;
                   }
                   else {
                     tag.forumCount = 0;
                     tag.serviceCount = 0;
-                    tag.notificationCount = 0;
-                  }    
+                  }
                   return of(tag);
                 })
               );
             }
             else return of(null);
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return tags[i];
@@ -132,7 +130,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
     const tagTotalSubscription = this.siteTotalService.getTotal(tag.tagId)
       .subscribe(total => {
         if (total){
-          if (total.forumCount == 0 && total.serviceCount == 0 && total.notificationCount == 0){
+          if (total.forumCount == 0 && total.serviceCount == 0){
             this.userTagService.delete(this.auth.uid, tag.tagId).then(() =>{
               // do something
             })
@@ -149,18 +147,15 @@ export class UserTagListComponent implements OnInit, OnDestroy {
           }
           else {
             let message = "Unable to delete tag, it is currently used by ";
-  
+
             if (total.forumCount > 0)
               message += `${total.forumCount} forum(s), `;
-            
+
             if (total.serviceCount > 0)
               message += `${total.serviceCount} service(s), `;
-  
-            if (total.notificationCount > 0)
-              message += `${total.notificationCount} notification(s), `;
-  
+
             message = message.substring(0, message.length-2) + '.';
-  
+
             const snackBarRef =this.snackbar.openFromComponent(
               NotificationSnackBar,
               {
@@ -180,7 +175,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.tagsArray)['creationDate']);
     this.getTagList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

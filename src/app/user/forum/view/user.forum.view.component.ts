@@ -19,7 +19,7 @@ import {
   UserForumTagService,
   UserServiceBlockService,
   UserServiceUserBlockService,
-  MessageSharingService,  
+  MessageSharingService,
   Registrant,
   Post,
   ServiceBlock,
@@ -54,7 +54,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
   private _totalSubscription: Subscription;
-  private _userRegistrantsSubscription: Subscription; 
+  private _userRegistrantsSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
   private _postsSubscription: Subscription;
   private _newPostsRef: any;
@@ -66,7 +66,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   private _imageCount = new BehaviorSubject(0);
   private _talkingToServer: boolean = false;
   private _tempForum: any;
-  
+
   public forum: Observable<any>;
   public registrantCount: Observable<number> = this._registrantCount.asObservable();
   public forumCount: Observable<number> = this._forumCount.asObservable();
@@ -158,21 +158,14 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
       let serviceId = params['serviceId'];
       let serviceUserId = params['serviceUserId']
-      let notificationId = params['notificationId'];
-      let notificationUserId = params['notificationUserId'];
       let parentForumId = params['parentForumId'];
       let parentForumUserId = params['forumUserId'];
 
-      if (serviceId || notificationId || parentForumId){
+      if (serviceId || parentForumId){
         if (serviceId){
           this.id = of(serviceId);
           this.returnUserId = of(serviceUserId);
           this.returnType = of('Service');
-        }
-        else if (notificationId) {
-          this.id = of(notificationId);
-          this.returnUserId = of(notificationUserId);
-          this.returnType = of('Notification');
         }
         else if (parentForumId) {
           this.id = of(parentForumId);
@@ -263,7 +256,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
       this._defaultForumImageSubscription.unsubscribe();
 
     this._loading.next(true);
-    
+
     this._forumSubscription = this.forum
       .subscribe(forum => {
         if (forum)
@@ -299,7 +292,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                     that._tagCount.next(-1);
                   else
                     that._tagCount.next(total.tagCount);
-                    
+
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -399,19 +392,19 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       switchMap(forumImages => {
                         if (forumImages && forumImages.length > 0){
                           let getDownloadUrl$: Observable<any>;
-                
+
                           if (forumImages[0].tinyUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-                
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 forumImages[0].url = downloadUrl;
                               else
                                 forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                
+
                               return of(forumImages[0]);
                             })
                           );
@@ -461,19 +454,19 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       switchMap(serviceImages => {
                         if (serviceImages && serviceImages.length > 0){
                           let getDownloadUrl$: Observable<any>;
-                
+
                           if (serviceImages[0].tinyUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -508,7 +501,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                         registrants[i].service = of(result);
                       else
                         registrants[i].service = of(null);
-                        
+
                       return registrants[i];
                     });
                   });
@@ -527,19 +520,19 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       switchMap(serviceImages => {
                         if (serviceImages && serviceImages.length > 0){
                           let getDownloadUrl$: Observable<any>;
-                
+
                           if (serviceImages[0].tinyUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -567,7 +560,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       })
                     );
                   });
-                  
+
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       if (result)
@@ -612,11 +605,11 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 if (registrants && registrants.length > 0) {
                   let observables = registrants.map(registrant => {
                     let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId);
-  
+
                     return combineLatest([getService$]).pipe(
                       switchMap(results => {
                         const [service] = results;
-                        
+
                         if (service)
                           registrant.service = of(service);
                         else {
@@ -656,7 +649,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
         load().then(() => {
           // inform listeners that the view forum page is viewing this forum
           this.messageSharingService.changeViewForumId(this.forumId);
-                    
+
           this._loading.next(false);
           runOnceSubscription.unsubscribe();
         })
@@ -739,7 +732,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
         }
       );
       this.router.navigate(['/']);
-    });    
+    });
   }
 
   getDefaultForumImage () {
@@ -754,7 +747,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
@@ -932,7 +925,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
           this._talkingToServer = false;
         });
       }
-    } 
+    }
   }
 
   changeUserRegistrant (event) {
@@ -950,10 +943,10 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
         lastUpdateDate: event.value.lastUpdateDate,
         creationDate: event.value.creationDate
       }
-  
+
       this._userRegistrantsSubscription.unsubscribe();
       this._defaultRegistrantSubscription.unsubscribe();
-  
+
       this.userForumRegistrantService.update(this.userId, this.forumId, event.value.registrantId, updatedRegistrant)
         .then(() => {
           // populate the users registrants so that they can chose a pseudonym or service to serve as
@@ -962,11 +955,11 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               if (registrants && registrants.length > 0){
                 let observables = registrants.map(registrant => {
                   let getService$ = this.userServiceService.getService(registrant.uid, registrant.serviceId);
-      
+
                   return combineLatest([getService$]).pipe(
                     switchMap(results => {
                       const [service] = results;
-                      
+
                       if (service)
                         registrant.service = of(service);
                       else {
@@ -985,7 +978,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             setTimeout(() => {
               this._talkingToServer = false;
             }, 300);
-            
+
             if (registrants.length > 0){
               // set the default registrant
               registrants.forEach((registrant, i) => {
@@ -1074,7 +1067,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
         }
       ).catch(error => {
         console.log('removePost error ' + error);
-        
+
         setTimeout(() => {
           this._talkingToServer = false;
         }, 300);

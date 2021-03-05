@@ -469,21 +469,14 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       let forumId = params['forumId'];
       let serviceId = params['serviceId'];
       let serviceUserId = params['serviceUserId']
-      let notificationId = params['notificationId'];
-      let notificationUserId = params['notificationUserId'];
       let parentForumId = params['parentForumId'];
       let parentForumUserId = params['forumUserId'];
 
-      if (serviceId || notificationId || parentForumId){
+      if (serviceId || parentForumId){
         if (serviceId){
           this.id = of(serviceId);
           this.returnUserId = of(serviceUserId);
           this.returnType = of('Service');
-        }
-        else if (notificationId) {
-          this.id = of(notificationId);
-          this.returnUserId = of(notificationUserId);
-          this.returnType = of('Notification');
         }
         else if (parentForumId) {
           this.id = of(parentForumId);

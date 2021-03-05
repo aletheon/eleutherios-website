@@ -58,9 +58,9 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   private _rateCount = new BehaviorSubject(0);
   private _reviewCount = new BehaviorSubject(0);
   private _canViewDetail = new BehaviorSubject(false);
-  
+
   public service: Observable<any>;
-  
+
   public forumCount: Observable<number> = this._forumCount.asObservable();
   public tagCount: Observable<number> = this._tagCount.asObservable();
   public imageCount: Observable<number> = this._imageCount.asObservable();
@@ -72,14 +72,14 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   public whereServings: Observable<any[]>;
   public serviceTags: Observable<any[]>;
   public userForumsCtrl: FormControl;
-  public numberItems: number = 100;  
+  public numberItems: number = 100;
   public id: Observable<string>;
   public returnUserId: Observable<string>;
   public returnType: Observable<string> = of('Forum');
   public loading: Observable<boolean> = this._loading.asObservable();
   public canViewDetail: Observable<boolean> = this._canViewDetail.asObservable();
   public defaultServiceImage: Observable<any>;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -95,7 +95,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
     private userForumImageService: UserForumImageService,
     private userWhereServingService: UserWhereServingService,
     private userForumRegistrantService: UserForumRegistrantService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
     private location: Location) {
@@ -105,7 +105,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   descriptionPanelEvent (state: string) {
     if (state == 'expanded')
       this._descriptionPanelTitle.nativeElement.style.display = "none";
-    else 
+    else
       this._descriptionPanelTitle.nativeElement.style.display = "block";
   }
 
@@ -282,7 +282,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
           })
           .catch(error => {
             console.error(error);
-          });  
+          });
         })
         .catch(error => {
           console.error(error);
@@ -398,7 +398,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -429,7 +429,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
 
     if (this._defaultServiceImageSubscription)
       this._defaultServiceImageSubscription.unsubscribe();
-  
+
     if (this._totalSubscription)
       this._totalSubscription.unsubscribe();
 
@@ -470,22 +470,13 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
       let serviceUserId = params['userId'];
       let forumId = params['forumId'];
       let forumUserId = params['forumUserId'];
-      let notificationId = params['notificationId'];
-      let notificationUserId = params['notificationUserId'];
 
-      if (forumId || notificationId){
-        if (forumId){
-          this.id = of(forumId);
-          this.returnUserId = of(forumUserId);
-          this.returnType = of('Forum');
-        }
-        else {
-          this.id = of(notificationId);
-          this.returnUserId = of(notificationUserId);
-          this.returnType = of('Notification');
-        }
+      if (forumId){
+        this.id = of(forumId);
+        this.returnUserId = of(forumUserId);
+        this.returnType = of('Forum');
       }
-  
+
       if (serviceId){
         this._initialServiceSubscription = this.userServiceService.getService(serviceUserId, serviceId)
           .subscribe(service => {
@@ -564,7 +555,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -651,7 +642,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                     that._tagCount.next(-1);
                   else
                     that._tagCount.next(total.tagCount);
-                    
+
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -690,19 +681,19 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                             switchMap(forumImages => {
                               if (forumImages && forumImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
-          
+
                                 if (forumImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-          
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
                                       forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                      
+
                                     return of(forumImages[0]);
                                   })
                                 );
@@ -730,11 +721,11 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                         else return of(null);
                       })
                     );
-  
+
                     return combineLatest([getForum$]).pipe(
                       switchMap(results => {
                         const [forum] = results;
-                        
+
                         if (forum)
                           whereServing.forum = of(forum);
                         else {
@@ -770,14 +761,14 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
 
           if (this._descriptionPanel)
             this._descriptionPanel.open();
-            
+
           runOnceSubscription.unsubscribe();
         })
         .catch((error) =>{

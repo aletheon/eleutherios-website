@@ -53,7 +53,6 @@
 									<ng-container *ngIf="returnType | async as returnTypeItem">
 										<mat-icon *ngIf="returnTypeItem=='Service'" [routerLink]="['/user/service/edit']" [queryParams]='{ userId: returnUserId, serviceId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 										<mat-icon *ngIf="returnTypeItem=='Forum'" [routerLink]="['/user/forum/edit']" [queryParams]='{ userId: returnUserId, forumId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
-										<mat-icon *ngIf="returnTypeItem=='Notification'" [routerLink]="['/user/notification/edit']" [queryParams]='{ userId: returnUserId, notificationId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 										<mat-icon *ngIf="returnTypeItem==''" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 									</ng-container>
 								</ng-template>
@@ -205,7 +204,7 @@
 													</ng-container>
 												</ng-template>
 												<div style="flex:none;margin-right:5px">
-													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>													
+													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 												</div>
 												<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == registrant.uid">

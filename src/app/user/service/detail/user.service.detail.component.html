@@ -79,7 +79,6 @@
 								<ng-template #showreturntype>
 									<ng-container *ngIf="returnType | async as returnTypeItem">
 										<mat-icon *ngIf="returnTypeItem=='Forum'" [routerLink]="['/user/forum/edit']" [queryParams]='{ userId: returnUserId, forumId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
-										<mat-icon *ngIf="returnTypeItem=='Notification'" [routerLink]="['/user/notification/edit']" [queryParams]='{ userId: returnUserId, notificationId: id }' style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 										<mat-icon *ngIf="returnTypeItem==''" (click)="navigateBack()" style="flex:none;font-size:2em;cursor:pointer">keyboard_backspace</mat-icon>
 									</ng-container>
 								</ng-template>

@@ -19,9 +19,6 @@
 						<div style="flex:none;margin-right:5px">
 							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#d9edf7" matTooltip="Services">{{ tag.serviceCount }}</span>
 						</div>
-						<div style="flex:none;margin-right:5px">
-							<span class="btn btn-circle" style="Cursor:text !important; Text-Decoration: None !important;background-color:#f1f1f1" matTooltip="Notifications">{{ tag.notificationCount }}</span>
-						</div>
             <mat-icon onclick="event.stopPropagation()" (click)="delete(tag)" style="flex:none;margin-left:5px;cursor:pointer" matTooltipPosition="before" matTooltip="Delete">delete</mat-icon>
           </div>
 				</ng-container>
@@ -34,7 +31,7 @@
 		</ng-container>
 	</div>
 	<!-- paging -->
-	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 		<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 		<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 	</div>
