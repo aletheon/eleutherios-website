@@ -50,10 +50,8 @@ import { ServiceModule } from './service/service.module';
 // user
 
 import { UserActivityModule } from './user/activity/user.activity.module';
-import { UserAlertModule } from './user/alert/user.alert.module';
 import { UserForumModule } from './user/forum/user.forum.module';
 import { UserImageModule } from './user/image/user.image.module';
-import { UserNotificationModule } from './user/notification/user.notification.module';
 import { UserServiceModule } from './user/service/user.service.module';
 import { UserSettingModule } from './user/setting/user.setting.module';
 import { UserPaymentModule } from './user/payment/user.payment.module';
@@ -114,10 +112,8 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     HelpModule,
     ServiceModule,
     UserActivityModule,
-    UserAlertModule,
     UserForumModule,
     UserImageModule,
-    UserNotificationModule,
     UserServiceModule,
     UserSettingModule,
     UserPaymentModule,

@@ -62,11 +62,7 @@ import { UserForumImageListComponent } from './user/forum/image/user.forum.image
 import { UserForumViewComponent } from './user/forum/view/user.forum.view.component';
 import { UserForumServiceBlockListComponent } from './user/forum/block/user.forum.service.block.list.component';
 import { UserForumUserBlockListComponent } from './user/forum/block/user.forum.user.block.list.component';
-import { UserNotificationNewComponent } from './user/notification/new/user.notification.new.component';
-import { UserNotificationEditComponent } from './user/notification/edit/user.notification.edit.component';
-import { UserNotificationListComponent } from './user/notification/list/user.notification.list.component';
 import { UserTagListComponent } from './user/tag/list/user.tag.list.component';
-import { UserAlertListComponent } from './user/alert/list/user.alert.list.component';
 import { UserSettingEditComponent } from './user/setting/edit/user.setting.edit.component';
 import { UserPaymentNewComponent } from './user/payment/new/user.payment.new.component';
 import { UserPaymentListComponent } from './user/payment/list/user.payment.list.component';
@@ -344,26 +340,6 @@ const routes: Routes = [
   {
     path: 'user/forum/block/user/list',
     component: UserForumUserBlockListComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user/notification/new',
-    component: UserNotificationNewComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user/notification/edit',
-    component: UserNotificationEditComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user/notification/list',
-    component: UserNotificationListComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user/alert/list',
-    component: UserAlertListComponent,
     canActivate: [AuthGuard]
   },
   {
