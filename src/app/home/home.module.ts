@@ -16,7 +16,6 @@ import {
   ServiceService,
   UserServiceService,
   UserForumService,
-  UserAlertService,
   UserImageService
 } from '../shared';
 
@@ -40,7 +39,6 @@ import {
     ServiceService,
     UserServiceService,
     UserForumService,
-    UserAlertService,
     UserImageService,
   ],
   exports: []

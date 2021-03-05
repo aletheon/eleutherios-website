@@ -6,7 +6,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   UserServiceService,
   UserForumService,
-  UserAlertService,
   UserServiceImageService,
   UserForumImageService,
   UserForumTagService,
@@ -50,7 +49,6 @@ export class HomeComponent implements OnDestroy, OnInit {
     public auth: AuthService,
     private userServiceService: UserServiceService,
     private userForumService: UserForumService,
-    private userAlertService: UserAlertService,
     private userServiceImageService: UserServiceImageService,
     private userForumImageService: UserForumImageService,
     private userForumTagService: UserForumTagService,
@@ -60,14 +58,6 @@ export class HomeComponent implements OnDestroy, OnInit {
     private serviceService: ServiceService,
     private snackbar: MatSnackBar,
     private router: Router) {
-  }
-
-  setViewedAlertFlag(alert) {
-    setTimeout(() => {
-      if (alert.viewed == false){
-        this.userAlertService.update(this.auth.uid, alert.alertId, { viewed: true });
-      }
-    }, 2000);
   }
 
   changeForumType (forum) {
@@ -138,10 +128,6 @@ export class HomeComponent implements OnDestroy, OnInit {
         }
       );
     });
-  }
-
-  delete (alert) {
-    this.userAlertService.delete(this.auth.uid, alert.alertId);
   }
 
   deleteForum (forum) {
@@ -438,174 +424,6 @@ export class HomeComponent implements OnDestroy, OnInit {
             else return of([]);
           })
         );
-
-        // alerts
-        that._alertSubscription = that.userAlertService.getAlerts(that.auth.uid, 'All', that.alertsNumberOfItems, '').pipe(
-          switchMap(alerts => { // grab the forum or service
-            if (alerts && alerts.length > 0){
-              let observables = alerts.map(alert => {
-                if (alert.type == 'Forum'){
-                  let getForum$ = that.userForumService.getForum(alert.forumServiceUid, alert.forumServiceId).pipe(
-                    switchMap(forum => {
-                      if (forum) {
-                        let getForumTags$ = that.userServiceTagService.getTags(forum.uid, forum.forumId);
-                        let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                          switchMap(forumImages => {
-                            if (forumImages && forumImages.length > 0){
-                              let getDownloadUrl$: Observable<any>;
-
-                              if (forumImages[0].smallUrl)
-                                getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-
-                              return combineLatest([getDownloadUrl$]).pipe(
-                                switchMap(results => {
-                                  const [downloadUrl] = results;
-
-                                  if (downloadUrl)
-                                    forumImages[0].url = downloadUrl;
-                                  else
-                                    forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-
-                                  return of(forumImages[0]);
-                                })
-                              );
-                            }
-                            else return of(null);
-                          })
-                        );
-                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
-                          switchMap(registrants => {
-                            if (registrants && registrants.length > 0)
-                              return of(registrants[0]);
-                            else
-                              return of(null);
-                          })
-                        );
-
-                        return combineLatest([getForumTags$, getDefaultForumImage$, getDefaultRegistrant$]).pipe(
-                          switchMap(results => {
-                            const [forumTags, defaultForumImage, defaultRegistrant] = results;
-
-                            if (forumTags)
-                              forum.forumTags = of(forumTags);
-                            else
-                              forum.forumTags = of([]);
-
-                            if (defaultForumImage)
-                              forum.defaultForumImage = of(defaultForumImage);
-                            else {
-                              let tempImage = {
-                                url: '../../assets/defaultThumbnail.jpg'
-                              };
-                              forum.defaultForumImage = of(tempImage);
-                            }
-
-                            if (defaultRegistrant)
-                              forum.defaultRegistrant = of(defaultRegistrant);
-                            else
-                              forum.defaultRegistrant = of(null);
-
-                            return of(forum);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
-                  return combineLatest([getForum$]).pipe(
-                    switchMap(results => {
-                      const [forum] = results;
-
-                      if (forum)
-                        alert.forum = of(forum);
-                      else {
-                        alert.forum = of(null);
-                      }
-                      return of(alert);
-                    })
-                  );
-                }
-                else {
-                  let getService$ = that.userServiceService.getService(alert.forumServiceUid, alert.forumServiceId).pipe(
-                    switchMap(service => {
-                      if (service) {
-                        let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
-                        let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                          switchMap(serviceImages => {
-                            if (serviceImages && serviceImages.length > 0){
-                              let getDownloadUrl$: Observable<any>;
-
-                              if (serviceImages[0].smallUrl)
-                                getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
-                              return combineLatest([getDownloadUrl$]).pipe(
-                                switchMap(results => {
-                                  const [downloadUrl] = results;
-
-                                  if (downloadUrl)
-                                    serviceImages[0].url = downloadUrl;
-                                  else
-                                    serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-
-                                  return of(serviceImages[0]);
-                                })
-                              );
-                            }
-                            else return of(null);
-                          })
-                        );
-
-                        return combineLatest([getServiceTags$, getDefaultServiceImage$]).pipe(
-                          switchMap(results => {
-                            const [serviceTags, defaultServiceImage] = results;
-
-                            if (serviceTags)
-                              service.serviceTags = of(serviceTags);
-                            else
-                              service.serviceTags = of([]);
-
-                            if (defaultServiceImage)
-                              service.defaultServiceImage = of(defaultServiceImage);
-                            else {
-                              let tempImage = {
-                                url: '../../assets/defaultThumbnail.jpg'
-                              };
-                              service.defaultServiceImage = of(tempImage);
-                            }
-                            return of(service);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
-                  return combineLatest([getService$]).pipe(
-                    switchMap(results => {
-                      const [service] = results;
-
-                      if (service)
-                        alert.service = of(service);
-                      else {
-                        alert.service = of(null);
-                      }
-                      return of(alert);
-                    })
-                  );
-                }
-              });
-              return zip(...observables);
-            }
-            else return of([]);
-          })
-        )
-        .subscribe(alerts => {
-          if (alerts && alerts.length > 0)
-            that.alerts = of(alerts);
-          else
-            that.alerts = of([]);
-        });
       }
       catch (error) {
         throw error;

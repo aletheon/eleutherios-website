@@ -1,7 +1,6 @@
 // private
 export * from './user.service';
 export * from './user.tag.service';
-export * from './user.alert.service';
 export * from './user.forum.block.service';
 export * from './user.forum.user.block.service';
 export * from './user.forum.service.block.service';
@@ -11,8 +10,6 @@ export * from './user.service.forum.block.service';
 export * from './user.activity.service';
 export * from './user.service.service';
 export * from './user.forum.service';
-export * from './user.notification.service';
-export * from './user.notification.tag.service';
 export * from './user.image.service';
 export * from './user.service.image.service';
 export * from './user.forum.breadcrumb.service';

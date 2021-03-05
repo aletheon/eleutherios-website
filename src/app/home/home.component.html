@@ -24,7 +24,7 @@
                 <a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
               </ng-template>
             </div>
-            <div *ngIf="forum.uid == auth.uid" style="flex:none"> 
+            <div *ngIf="forum.uid == auth.uid" style="flex:none">
               <!-- other button controls -->
               <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
@@ -72,146 +72,9 @@
   </div>
   <!-- alerts -->
   <div class="panel panel-default" style="flex:1;flex-grow:1;overflow-x:hidden;display:flex;flex-direction:column;margin:0px 15px 10px 15px;padding:10px;overflow-y:scroll">
-    <ng-container *ngIf="alerts | async;let alertItems">
-      <ng-container *ngIf="alertItems.length > 0; then showalerts else noalerts"></ng-container>
-      <ng-template #showalerts>
-        <ng-container *ngFor="let alert of alertItems; trackBy: trackAlerts">
-          <ng-container *ngIf="alert.type == 'Forum';then showforum else showservice"></ng-container>
-          <ng-template #showforum>
-            <ng-container *ngIf="alert.forum | async;let forum">
-              <div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;padding:5px;align-items:center;flex-wrap:wrap">
-                <ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>
-                <ng-template #showdefaultforumimage>
-                  <ng-container *ngIf="forum.defaultForumImage | async;let image">
-                    <div style="flex:none;margin-right:10px" (appear)="setViewedAlertFlag(alert)">
-                      <ng-container *ngIf="image.url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-                      <ng-template #showimage>
-                        <img [src]="image.url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
-                      </ng-template>
-                      <ng-template #noimage>
-                        <img [src]="image.url">
-                      </ng-template>
-                    </div>
-                  </ng-container>
-                </ng-template>
-                <div style="flex:1;margin-right:5px">
-                  <ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
-                  <ng-template #showdefaultregistrant>
-                    <p style="word-break: break-all">
-                      <a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-                    </p>
-                  </ng-template>
-                  <ng-template #nodefaultregistrant>
-                    <a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35}} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-                    <a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-                  </ng-template>
-                </div>
-                <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-                  <div style="flex:none;margin-right:5px">
-                    <p style="background-color:rgb(131, 122, 122);border-radius:2px;padding:4px;color:#FFFDD0" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}">{{ forum.creationDate.toDate() | amTimeAgo }}</p>
-                  </div>
-                  <div style="flex:none;margin-right:5px">
-                    <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
-                  </div>
-                  <div style="flex:none;margin-right:5px">
-                    <mat-icon [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
-                  </div>
-                </div>
-              </div>
-              <ng-container *ngIf="forum.forumTags | async;let forumTagItems">
-                <ng-container *ngIf="forumTagItems.length > 0; then showtags"></ng-container>
-                <ng-template #showtags>
-                  <div style="flex:none;display:flex;flex-direction:row">
-                    <ng-container *ngFor="let forumTag of forumTagItems">
-                      <span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
-                    </ng-container>
-                  </div>
-                </ng-template>
-              </ng-container>
-            </ng-container>
-          </ng-template>
-          <ng-template #showservice>
-            <ng-container *ngIf="alert.service | async;let service">
-              <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;padding:5px;align-items:center;flex-wrap:wrap">
-                <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-                <ng-template #showdefaultserviceimage>
-                  <ng-container *ngIf="service.defaultServiceImage | async;let image">
-                    <div style="flex:none;margin-right:10px" (appear)="setViewedAlertFlag(alert)">
-                      <ng-container *ngIf="image.url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
-                      <ng-template #showimage>
-                        <img [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
-                      </ng-template>
-                      <ng-template #noimage>
-                        <img [src]="image.url">
-                      </ng-template>
-                    </div>
-                  </ng-container>
-                </ng-template>
-                <div style="flex:1;margin-right:5px">
-                  <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ service.title }}">{{ service.title | truncate: 35 }} <i *ngIf="service.description.length > 0">{{ service.description | truncate: 80 }}</i></a>
-                  <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ service.title }}">{{ service.title | truncate: 35 }} <i *ngIf="service.description.length > 0">{{ service.description | truncate: 80 }}</i></a>
-                </div>
-                <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-                  <div style="flex:none;margin-right:5px">
-                    <star-rating-control
-                        [rating]="service.rate"
-                        [showHalfStars]="true"
-                        [starType]="'svg'"
-                        [readOnly]="true">
-                      </star-rating-control>
-                  </div>
-                  <div style="flex:none;margin-right:5px">
-                    <div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
-                      {{ service.creationDate.toDate() | amTimeAgo }}
-                    </div>
-                  </div>
-                  <div style="flex:none;margin-right:5px">
-                      <mat-icon onclick="event.stopPropagation()" (click)="delete(alert)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
-                    </div>
-                  <div style="flex:none;margin-right:5px">
-                    <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
-                    <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
-                  </div>
-                  <div style="flex:none">
-                    <mat-icon [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add</mat-icon>
-                  </div>
-                </div>
-              </div>
-              <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
-                <div style="flex:none;display:flex;flex-direction:row">
-                  <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
-                  <ng-template #showtags>
-                    <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
-                      <ng-container *ngFor="let serviceTag of serviceTagItems">
-                        <span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
-                      </ng-container>
-                    </div>
-                  </ng-template>
-                  <ng-container *ngIf="service.paymentType == 'Payment'">
-                    <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
-                    <ng-template #showtagswithpayment>
-                      <div style="flex:none">
-                        <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                      </div>
-                    </ng-template>
-                    <ng-template #showtagswithoutpayment>
-                      <div style="flex:1;text-align:right">
-                        <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-                      </div>
-                    </ng-template>
-                  </ng-container>
-                </div>
-              </ng-container>
-            </ng-container>
-          </ng-template>
-        </ng-container>
-      </ng-template>
-      <ng-template #noalerts>
-        <p style="flex:none;color:#999;font-size:90%">
-          <i>No Alerts</i>
-        </p>
-      </ng-template>
-    </ng-container>
+    <p style="flex:none;color:#999;font-size:90%">
+      <i>Swap this out for something other than alerts</i>
+    </p>
   </div>
   <!-- private forums -->
   <div class="panel panel-default" style="flex:none;flex-grow:0;overflow-x:auto;display:flex;flex-direction:row;margin:0px 15px 10px 15px;padding:10px">
