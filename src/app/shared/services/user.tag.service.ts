@@ -13,19 +13,6 @@ export class UserTagService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public exists (parentUserId: string, tagId: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(tagId);
-
-      tagRef.ref.get().then(doc => {
-        if (doc.exists)
-          resolve(true);
-        else
-          resolve(false);
-      });
-    });
-  }
-
   public getTag (parentUserId: string, tagId: string): Observable<any> {
     return this.afs.collection(`users/${parentUserId}/tags`).doc(tagId).valueChanges();
   }
@@ -35,12 +22,7 @@ export class UserTagService {
       const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(this.afs.createId());
       data.tagId = tagRef.ref.id;
       tagRef.set(data).then(() => {
-        this.tagService.create(data.tagId, data).then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+        resolve();
       })
       .catch((error) => {
         reject(error);
@@ -58,12 +40,7 @@ export class UserTagService {
     return new Promise((resolve, reject) => {
       const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(tagId);
       tagRef.delete().then(() => {
-        this.tagService.delete(tagId).then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+        resolve();
       })
       .catch((error) => {
         reject(error);
@@ -82,7 +59,7 @@ export class UserTagService {
 
   public search (parentUserId: string, searchTerm: any): Observable<any[]> {
     let newSearchTerm: string = '';
-      
+
     if (typeof searchTerm === "string")
       newSearchTerm = searchTerm;
     else if (searchTerm != null)
