@@ -806,47 +806,49 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   serviceTagsSelectionChange (tag: any) {
-    if (this.serviceGroup.get('title').value.length > 0){
-      this.userServiceTagService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, tag.tagId).then(exists => {
-        if (!exists){
-          this.userServiceTagService.getTagCount(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).then(count => {
-            if (count < 5){
-              if (this._addingTag.getValue() == false){
-                this._addingTag.next(true);
+    if (tag){
+      if (this.serviceGroup.get('title').value.length > 0){
+        this.userServiceTagService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, tag.tagId).then(exists => {
+          if (!exists){
+            this.userServiceTagService.getTagCount(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).then(count => {
+              if (count < 5){
+                if (this._addingTag.getValue() == false){
+                  this._addingTag.next(true);
 
-                this.userServiceTagService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, tag)
-                  .then(() => {
-                    // delay to prevent user adding multiple tags simultaneously
-                    setTimeout(() => {
-                      this._addingTag.next(false);
-                    }, 1000);
-                  }
-                )
-                .catch(error => {
-                  const snackBarRef = this.snackbar.openFromComponent(
-                    NotificationSnackBar,
-                    {
-                      duration: 8000,
-                      data: error.message,
-                      panelClass: ['red-snackbar']
+                  this.userServiceTagService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, tag)
+                    .then(() => {
+                      // delay to prevent user adding multiple tags simultaneously
+                      setTimeout(() => {
+                        this._addingTag.next(false);
+                      }, 1000);
                     }
-                  );
-                });
-              }
-            }
-            else {
-              const snackBarRef =this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'This is the alpha version of eleutherios and is limited to only 5 tags each service',
-                  panelClass: ['red-snackbar']
+                  )
+                  .catch(error => {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: error.message,
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+                  });
                 }
-              );
-            }
-          });
-        }
-      });
+              }
+              else {
+                const snackBarRef =this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'This is the alpha version of eleutherios and is limited to only 5 tags each service',
+                    panelClass: ['red-snackbar']
+                  }
+                );
+              }
+            });
+          }
+        });
+      }
     }
   }
 
