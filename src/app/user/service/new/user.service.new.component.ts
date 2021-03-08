@@ -110,7 +110,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     private forumService: ForumService,
     private userTagService: UserTagService,
     private tagService: TagService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private currencyPipe: CurrencyPipe,
     private router: Router,
     private snackbar: MatSnackBar) {
@@ -121,15 +121,15 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       // searchTag mat subscription
       this.matAutoCompleteServiceTags = this.tagServiceCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
-      
+
       // tagSearch mat subscription
       this.matAutoCompleteSearchForumTags = this.tagSearchCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
@@ -211,7 +211,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
       }
     }
-    
+
     this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
       if (!exists){
         image.default = false;
@@ -260,19 +260,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
-  
+
                         if (forumImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-  
+
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -284,7 +284,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
                       const [defaultForumImage, defaultRegistrant] = results;
-                      
+
                       if (defaultForumImage)
                         forum.defaultForumImage = of(defaultForumImage);
                       else {
@@ -305,7 +305,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -334,19 +334,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
-  
+
                         if (forumImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-  
+
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -379,7 +379,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -419,12 +419,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -436,7 +436,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImage, defaultRegistrant] = results;
-                    
+
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
@@ -457,7 +457,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -493,12 +493,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -531,7 +531,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -613,7 +613,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         }
       }
     }
-    
+
     if (this.serviceGroup.get('title').value.length > 0){
       this.userForumServiceBlockService.serviceIsBlocked(forum.uid, forum.forumId, this.serviceGroup.get('serviceId').value)
         .then(serviceBlocked => {
@@ -836,7 +836,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             if (count < 5){
               if (this._addingTag.getValue() == false){
                 this._addingTag.next(true);
-  
+
                 this.userServiceTagService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, tag)
                   .then(() => {
                     // delay to prevent user adding multiple tags simultaneously
@@ -856,7 +856,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   );
                 });
               }
-            } 
+            }
             else {
               const snackBarRef =this.snackbar.openFromComponent(
                 NotificationSnackBar,
@@ -900,19 +900,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
-  
+
                         if (forumImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-  
+
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -938,14 +938,14 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                         forum.defaultRegistrant = of(defaultRegistrant);
                       else
                         forum.defaultRegistrant = of(null);
-                        
+
                       return of(forum);
                     })
                   );
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -974,19 +974,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
-  
+
                         if (forumImages[0].tinyUrl)
                           getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-  
+
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -1019,7 +1019,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -1043,7 +1043,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       }, 500);
       return;
     }
-    
+
     if (this.stripeButtonDisabled == false){
       this.stripeButtonDisabled = true;
 
@@ -1115,7 +1115,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       }
     }, 2500);
   }
-  
+
   ngOnInit () {
     this._loading.next(true);
     this.searchPrivateForums = true;
@@ -1123,7 +1123,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
     const userSubscription = this.auth.user.subscribe(user => {
       userSubscription.unsubscribe();
-      
+
       const service: Service = {
         serviceId: '',
         uid: this.auth.uid,
@@ -1147,7 +1147,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         creationDate: firebase.firestore.FieldValue.serverTimestamp(),
         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
       };
-  
+
       this.service = this.userServiceService.create(this.auth.uid, service);
       this.initForm();
     });
@@ -1155,7 +1155,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                      [''],
       uid:                            [''],
@@ -1231,7 +1231,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             if (serviceForum){
               let userId = serviceForum.uid;
               let forumId = serviceForum.forumId;
-        
+
               // check forum exists
               that._serviceForumSubscription = that.userForumService.getForum(userId, forumId).pipe(
                 switchMap(forum =>{
@@ -1244,19 +1244,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                             switchMap(forumImages => {
                               if (forumImages && forumImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
-          
+
                                 if (forumImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-          
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
                                       forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                      
+
                                     return of(forumImages[0]);
                                   })
                                 );
@@ -1276,7 +1276,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                                   url: '../../../assets/defaultTiny.jpg'
                                 };
                                 forum.defaultForumImage = of(tempImage);
-                              }    
+                              }
                               return of(forum);
                             })
                           );
@@ -1304,12 +1304,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -1369,21 +1369,21 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                         }
                       ));
                     }
-        
+
                     return combineLatest([getDownloadUrl$]).pipe(
                       switchMap(results => {
                         const [downloadUrl] = results;
-                        
+
                         if (downloadUrl)
                           image.url = downloadUrl;
                         else
                           image.url = '../../../assets/defaultThumbnail.jpg';
-          
+
                         return of(image);
                       })
                     );
                   });
-            
+
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       return images[i];
@@ -1400,24 +1400,24 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                 if (serviceImages && serviceImages.length > 0){
                   let observables = serviceImages.map(serviceImage => {
                     let getDownloadUrl$: Observable<any>;
-        
+
                     if (serviceImage.smallUrl)
                       getDownloadUrl$ = from(firebase.storage().ref(serviceImage.smallUrl).getDownloadURL());
-        
+
                     return combineLatest([getDownloadUrl$]).pipe(
                       switchMap(results => {
                         const [downloadUrl] = results;
-                        
+
                         if (downloadUrl)
                           serviceImage.url = downloadUrl;
                         else
                           serviceImage.url = '../../../assets/defaultThumbnail.jpg';
-          
+
                         return of(serviceImage);
                       })
                     );
                   });
-            
+
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       return serviceImages[i];
@@ -1447,19 +1447,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                             switchMap(forumImages => {
                               if (forumImages && forumImages.length > 0){
                                 let getDownloadUrl$: Observable<any>;
-          
+
                                 if (forumImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-          
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       forumImages[0].url = downloadUrl;
                                     else
                                       forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                      
+
                                     return of(forumImages[0]);
                                   })
                                 );
@@ -1492,11 +1492,11 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                         else return of(null);
                       })
                     );
-  
+
                     return combineLatest([getForum$]).pipe(
                       switchMap(results => {
                         const [forum] = results;
-                        
+
                         if (forum)
                           whereServing.forum = of(forum);
                         else {
@@ -1539,19 +1539,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                               switchMap(forumImages => {
                                 if (forumImages && forumImages.length > 0){
                                   let getDownloadUrl$: Observable<any>;
-            
+
                                   if (forumImages[0].tinyUrl)
                                     getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-            
+
                                   return combineLatest([getDownloadUrl$]).pipe(
                                     switchMap(results => {
                                       const [downloadUrl] = results;
-                                      
+
                                       if (downloadUrl)
                                         forumImages[0].url = downloadUrl;
                                       else
                                         forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
+
                                       return of(forumImages[0]);
                                     })
                                   );
@@ -1577,7 +1577,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                                   forum.defaultRegistrant = of(defaultRegistrant);
                                 else
                                   forum.defaultRegistrant = of(null);
-                                  
+
                                 return of(forum);
                               })
                             );
@@ -1614,19 +1614,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                           switchMap(forumImages => {
                             if (forumImages && forumImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
-        
+
                               if (forumImages[0].tinyUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-        
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     forumImages[0].url = downloadUrl;
                                   else
                                     forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                    
+
                                   return of(forumImages[0]);
                                 })
                               );
@@ -1697,19 +1697,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                               switchMap(forumImages => {
                                 if (forumImages && forumImages.length > 0){
                                   let getDownloadUrl$: Observable<any>;
-            
+
                                   if (forumImages[0].tinyUrl)
                                     getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-            
+
                                   return combineLatest([getDownloadUrl$]).pipe(
                                     switchMap(results => {
                                       const [downloadUrl] = results;
-                                      
+
                                       if (downloadUrl)
                                         forumImages[0].url = downloadUrl;
                                       else
                                         forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
+
                                       return of(forumImages[0]);
                                     })
                                   );
@@ -1772,19 +1772,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                           switchMap(forumImages => {
                             if (forumImages && forumImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
-        
+
                               if (forumImages[0].tinyUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-        
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     forumImages[0].url = downloadUrl;
                                   else
                                     forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                    
+
                                   return of(forumImages[0]);
                                 })
                               );
@@ -1833,7 +1833,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -1862,13 +1862,13 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
-      
+
                 const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
                   // add tag to search list
                   this.tagService.search(newTag.tag).subscribe(tags => {
                     this.serviceTagsSelectionChange(tags[0]);
                   });
-                  
+
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
@@ -1920,11 +1920,11 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     if (this.serviceGroup.get('searchPrivateForums').value == true){
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.userForumService.search(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
       );
-      
+
       this._searchForumSubscription = this.searchForumCtrl.valueChanges.pipe(
         tap(searchTerm => {
           this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
@@ -1944,19 +1944,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       switchMap(forumImages => {
                         if (forumImages && forumImages.length > 0){
                           let getDownloadUrl$: Observable<any>;
-    
+
                           if (forumImages[0].tinyUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-    
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 forumImages[0].url = downloadUrl;
                               else
                                 forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                
+
                               return of(forumImages[0]);
                             })
                           );
@@ -1989,7 +1989,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   }
                   else return of(null);
                 });
-          
+
                 return zip(...observables, (...results) => {
                   return results.map((result, i) => {
                     return forums[i];
@@ -2026,12 +2026,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -2039,7 +2039,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     else return of(null);
                   })
                 );
-      
+
                 return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImage, defaultRegistrant] = results;
@@ -2064,7 +2064,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -2078,7 +2078,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
     else {
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.forumService.search(searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
       );
@@ -2102,19 +2102,19 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       switchMap(forumImages => {
                         if (forumImages && forumImages.length > 0){
                           let getDownloadUrl$: Observable<any>;
-    
+
                           if (forumImages[0].tinyUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-    
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 forumImages[0].url = downloadUrl;
                               else
                                 forumImages[0].url = '../../../assets/defaultTiny.jpg';
-                
+
                               return of(forumImages[0]);
                             })
                           );
@@ -2147,7 +2147,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   }
                   else return of(null);
                 });
-          
+
                 return zip(...observables, (...results) => {
                   return results.map((result, i) => {
                     return forums[i];
@@ -2184,12 +2184,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -2197,11 +2197,11 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     else return of(null);
                   })
                 );
-      
+
                 return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImage, defaultRegistrant] = results;
-                    
+
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
@@ -2222,7 +2222,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -2274,7 +2274,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
         rate: this.serviceGroup.get('rate').value,
         paymentType: this.serviceGroup.get('paymentType').value,
-        amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
+        amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0.50 : parseFloat(this.serviceGroup.get('amount').value),
         typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
         currency: this.serviceGroup.get('currency').value,
         paymentId: this.serviceGroup.get('paymentId').value ? this.serviceGroup.get('paymentId').value : '',
@@ -2285,7 +2285,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
         lastUpdateDate: this.serviceGroup.get('lastUpdateDate').value,
         creationDate: this.serviceGroup.get('creationDate').value
       };
-      
+
       this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
         if (window.localStorage.getItem('serviceForum')){
           let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
