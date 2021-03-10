@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables people or businesses to delegate their customer requests to other people or businesses to manage.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables people or businesses to serve one another at scale, through the same customer forum or request.
 
 For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner, could gather the food from their store and charge the customer directly or wait until the goods we're delivered.  The quarantined person, could have the groceries delivered to them by scaling the forum and creating a sub-forum for a delivery service.  The delivery service, could scale the forum again and create another sub-forum, for a healthcare worker to be the person that delivers the food to the quarantined person.
 
