@@ -1,8 +1,22 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables people or businesses to serve one another at scale, through the same customer forum or request.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer request or conversation for Humankind.
 
-For example, if a person is hungry and quarantined at home? They could register with Eleutherios and create a forum for some food.  A grocery store owner could, register as a service and subscribe to the forum and ask the person, what food they wanted?  After listening to their request, the grocery store owner, could gather the food from their store and charge the customer directly or wait until the goods we're delivered.  The quarantined person, could have the groceries delivered to them by scaling the forum and creating a sub-forum for a delivery service.  The delivery service, could scale the forum again and create another sub-forum, for a healthcare worker to be the person that delivers the food to the quarantined person.
+Normally, when a customer creates a request for a product or service? Each of their subsequent requests are instantiated, separately.
+
+```bash
+Forum (Food)
+-- Service (Person or customer)
+-- Service (Grocery store owner)
+Forum (Delivery service)
+-- Service (Person or customer)
+-- Service (Fastpost couriers)
+Forum (Healthcare worker to deliver food)
+-- Service (Fastpost couriers or customer)
+-- Service (Healthcare worker)
+```
+
+Eleutherios, changes this by scaling the customer's request, so that each subsequent request is instantiated, non-separately or as child.
 
 ```bash
 Forum (Food)
@@ -16,7 +30,7 @@ Forum (Food)
 ------------ Service (Healthcare worker)
 ```
 
-In this example, Eleutherios is scaling or managing the forum, customer request or conversation, that services (people or business) are having about food.  Not the service or work, that they are trying to provide or perform concerning food. People or businesses, alternate between playing the role of the customer or the business depending on the nature of their request or the request, that is being asked of them.
+People or businesses, can connect or serve one another at scale by subscribing to the relevant forum, customer request or conversation, that suits them.
 
 #### Features:
 
