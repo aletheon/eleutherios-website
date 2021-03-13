@@ -6,13 +6,13 @@ Normally, when a customer creates a request for a product or service? Each of th
 
 ```bash
 Forum (Food)
--- Service (Person or customer)
+-- Service (Person)
 -- Service (Grocery store owner)
 Forum (Delivery service)
--- Service (Person or customer)
+-- Service (Person)
 -- Service (Fastpost couriers)
 Forum (Healthcare worker to deliver food)
--- Service (Fastpost couriers or customer)
+-- Service (Fastpost couriers)
 -- Service (Healthcare worker)
 ```
 
@@ -20,13 +20,13 @@ Eleutherios, changes this by scaling the customer's request, so that each subseq
 
 ```bash
 Forum (Food)
----- Service (Person or customer)
+---- Service (Person)
 ---- Service (Grocery store owner)
 ---- Forum (Delivery service)
--------- Service (Person or customer)
+-------- Service (Person)
 -------- Service (Fastpost couriers)
 -------- Forum (Healthcare worker to deliver food)
------------- Service (Fastpost couriers or customer)
+------------ Service (Fastpost couriers)
 ------------ Service (Healthcare worker)
 ```
 
