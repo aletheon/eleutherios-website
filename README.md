@@ -30,7 +30,7 @@ Forum (Food)
 ------ Service (Healthcare worker)
 ```
 
-People or businesses, can connect or serve one another at scale by subscribing to the relevant forum, customer request or conversation, that suits them.
+People or businesses, connect or serve one another at scale by subscribing to the relevant forum, customer request or conversation.
 
 #### Features:
 
