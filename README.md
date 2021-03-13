@@ -26,7 +26,7 @@ Forum (Food)
 ---- Service (Person)
 ---- Service (Fastpost couriers)
 ---- Forum (Healthcare worker to deliver food)
---=--- Service (Fastpost couriers)
+------ Service (Fastpost couriers)
 ------ Service (Healthcare worker)
 ```
 
