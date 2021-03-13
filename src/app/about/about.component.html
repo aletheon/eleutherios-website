@@ -20,14 +20,14 @@ Forum (Healthcare worker to deliver food)
 -- Service (Healthcare worker)</pre>
 <p style="margin-bottom:10px">Eleutherios, changes this by scaling the customer's request, so that each subsequent request is instantiated, non-separately or as child.</p>
 <pre>Forum (Food)
+-- Service (Person)
+-- Service (Grocery store owner)
+-- Forum (Delivery service)
 ---- Service (Person)
----- Service (Grocery store owner)
----- Forum (Delivery service)
--------- Service (Person)
--------- Service (Fastpost couriers)
--------- Forum (Healthcare worker to deliver food)
------------- Service (Fastpost couriers)
------------- Service (Healthcare worker)</pre>
+---- Service (Fastpost couriers)
+---- Forum (Healthcare worker to deliver food)
+------ Service (Fastpost couriers)
+------ Service (Healthcare worker)</pre>
     <p style="margin-bottom:5px">People or businesses, can connect or serve one another at scale by subscribing to the relevant forum, customer request or conversation, that suits them.</p>
     <h5>Features:</h5>
     <ul>

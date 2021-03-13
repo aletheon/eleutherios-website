@@ -20,14 +20,14 @@ Eleutherios, changes this by scaling the customer's request, so that each subseq
 
 ```bash
 Forum (Food)
+-- Service (Person)
+-- Service (Grocery store owner)
+-- Forum (Delivery service)
 ---- Service (Person)
----- Service (Grocery store owner)
----- Forum (Delivery service)
--------- Service (Person)
--------- Service (Fastpost couriers)
--------- Forum (Healthcare worker to deliver food)
------------- Service (Fastpost couriers)
------------- Service (Healthcare worker)
+---- Service (Fastpost couriers)
+---- Forum (Healthcare worker to deliver food)
+--=--- Service (Fastpost couriers)
+------ Service (Healthcare worker)
 ```
 
 People or businesses, can connect or serve one another at scale by subscribing to the relevant forum, customer request or conversation, that suits them.
