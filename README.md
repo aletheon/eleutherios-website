@@ -1,22 +1,24 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer request or conversation, among humankind (people or businesses).
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or business-to-business (B2B) marketplace or conversation.
 
-Normally, when a customer creates a request for a product or service? Each of their subsequent requests are instantiated, separately.
+Normally, when a service (person or business), serves another service?  They do it, through a separate forum, customer request or conversation.
 
 ```bash
 Forum (Food)
--- Service (Person)
+-- Service (Person or customer)
 -- Service (Grocery store owner)
+
 Forum (Delivery service)
--- Service (Person)
+-- Service (Person or customer)
 -- Service (Fastpost couriers)
+
 Forum (Healthcare worker to deliver food)
--- Service (Fastpost couriers)
+-- Service (Fastpost couriers or customer)
 -- Service (Healthcare worker)
 ```
 
-Eleutherios, changes this by scaling the customer's request, so that each of the subsequent requests are instantiated, non-separately or as children.
+Eleutherios, changes this behavior, so services serve one another, through a non-separate or common forum, customer request or conversation.
 
 ```bash
 Forum (Food)
@@ -29,8 +31,6 @@ Forum (Food)
 ------ Service (Fastpost couriers)
 ------ Service (Healthcare worker)
 ```
-
-People or businesses, connect or serve one another by subscribing to a global cooperative forum, customer request or conversation.
 
 #### Features:
 
