@@ -20,13 +20,13 @@ Eleutherios, changes this behavior, so that services can serve one another, thro
 
 ```bash
 Forum (Food)
--- Service (Person)
+-- Service (Person or customer)
 -- Service (Grocery store owner)
 -- Forum (Delivery service)
----- Service (Person)
+---- Service (Person or customer)
 ---- Service (Fastpost couriers)
 ---- Forum (Healthcare worker to deliver food)
------- Service (Fastpost couriers)
+------ Service (Fastpost couriers or customer)
 ------ Service (Healthcare worker)
 ```
 
