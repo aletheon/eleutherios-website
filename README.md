@@ -16,7 +16,7 @@ Forum (Healthcare worker to deliver food)
 -- Service (Healthcare worker)
 ```
 
-Eleutherios, changes this by scaling the customer's request, so that each subsequent request is instantiated, non-separately or as child.
+Eleutherios, changes this by scaling the customer's request, so that each of the subsequent requests are instantiated, non-separately or as child.
 
 ```bash
 Forum (Food)
