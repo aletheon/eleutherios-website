@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or business-to-business (B2B) marketplace or conversation.
 
-Normally, when a service (person or business), serves another service?  They do it, through a separate forum, customer request or conversation.
+Normally, when a service (person or business), serves another service?  They do it, through a local or separate forum, customer request or conversation.
 
 ```bash
 Forum (Food)
@@ -18,7 +18,7 @@ Forum (Healthcare worker to deliver food)
 -- Service (Healthcare worker)
 ```
 
-Eleutherios, changes this behavior, so that services can serve one another, through the same or non-separate forum, customer request or conversation.
+Eleutherios, changes this behavior, so that services can serve one another, through a global or non-separate forum, customer request or conversation.
 
 ```bash
 Forum (Food)
