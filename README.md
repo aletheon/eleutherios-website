@@ -18,7 +18,7 @@ Forum (Healthcare worker to deliver food)
 -- Service (Healthcare worker)
 ```
 
-Eleutherios, changes this behavior, so that services can serve one another, through a non-separate or common forum, customer request or conversation.
+Eleutherios, changes this behavior, so that services can serve one another, through the same or non-separate forum, customer request or conversation.
 
 ```bash
 Forum (Food)
