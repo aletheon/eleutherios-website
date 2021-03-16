@@ -8,11 +8,9 @@ Normally, when a service (person or business), serves another service?  They do 
 Forum (Food)
 -- Service (Person or customer)
 -- Service (Grocery store owner)
-
 Forum (Delivery service)
 -- Service (Person or customer)
 -- Service (Fastpost couriers)
-
 Forum (Healthcare worker to deliver food)
 -- Service (Fastpost couriers or customer)
 -- Service (Healthcare worker)
