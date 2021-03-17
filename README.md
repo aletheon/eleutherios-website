@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, amongst humankind (people or businesses)
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, amongst humankind (people or businesses).
 
 Normally, when a service (person or business) subscribes to another service (person or business)?  They do it, through a linear or local forum, customer request or conversation.
 
