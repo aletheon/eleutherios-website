@@ -2272,7 +2272,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         indexed: this.serviceGroup.get('indexed').value != undefined ? this.serviceGroup.get('indexed').value : false,
         rate: this.serviceGroup.get('rate').value,
         paymentType: this.serviceGroup.get('paymentType').value,
-        amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0.50 : parseFloat(this.serviceGroup.get('amount').value),
+        amount: this.serviceGroup.get('paymentType').value == 'Free' ? 0 : parseFloat(this.serviceGroup.get('amount').value),
         typeOfPayment: this.serviceGroup.get('typeOfPayment').value,
         currency: this.serviceGroup.get('currency').value,
         paymentId: this.serviceGroup.get('paymentId').value ? this.serviceGroup.get('paymentId').value : '',
