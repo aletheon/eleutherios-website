@@ -1,8 +1,8 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or conversation, amongst humankind (people or businesses).
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer request or conversation for humankind.
 
-Normally, when a service (person or business) subscribes to another service (person or business)?  They do it, through a linear or local forum, customer request or conversation.
+People or businesses, are use to serving one another on a one-to-one basis or one customer per forum or request.
 
 ```bash
 Forum (Food)
@@ -16,7 +16,7 @@ Forum (Healthcare worker to deliver food)
 -- Service (Healthcare worker)
 ```
 
-Eleutherios, changes this behavior, so that services (people or businesses) can serve one another, through a non-linear or global cooperative forum, customer request or conversation.
+Eleutherios, does the opposite and inverts or scales the forum or customer’s request, so that it operates on a many-to-many basis or many customers per forum or request.
 
 ```bash
 Forum (Food)
@@ -29,6 +29,8 @@ Forum (Food)
 ------ Service (Fastpost couriers or customer)
 ------ Service (Healthcare worker)
 ```
+
+In this example, more than one customer is being served by the forum for food.
 
 #### Features:
 
