@@ -116,6 +116,7 @@
                 <div class="label label-default" matTooltip="{{ receipt.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
                   {{ receipt.creationDate.toDate() | amTimeAgo }}
                 </div>
+                <mat-icon onclick="event.stopPropagation()" (click)="deleteReceipt(receipt)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
                 <mat-icon [routerLink]="['/user/receipt/view']" [queryParams]="{ receiptId: receipt.receiptId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
               </div>
             </div>

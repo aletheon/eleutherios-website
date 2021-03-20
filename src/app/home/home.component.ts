@@ -142,6 +142,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.userServiceService.delete(service.uid, service.serviceId);
   }
 
+  deleteReceipt (receipt) {
+    this.userReceiptService.delete(receipt.uid, receipt.receiptId);
+  }
+
   ngOnDestroy () {
     if (this._alertSubscription)
       this._alertSubscription.unsubscribe();

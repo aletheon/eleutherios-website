@@ -51,6 +51,7 @@
                 <div class="label label-default" matTooltip="{{ payment.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
                   {{ payment.creationDate.toDate() | amTimeAgo }}
                 </div>
+                <mat-icon onclick="event.stopPropagation()" (click)="delete(payment)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
                 <mat-icon [routerLink]="['/user/payment/view']" [queryParams]="{ paymentId: payment.paymentId }" style="flex:none;color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
               </div>
             </div>
@@ -131,7 +132,7 @@
     </ng-container>
   </div>
   <!-- paging -->
-  <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+  <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
     <button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
     <button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
   </div>
