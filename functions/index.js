@@ -133,6 +133,279 @@ function decodeAuthToken(authToken) {
 // export app as stripe API
 exports.stripe = functions.https.onRequest(app);
 
+// listen to stripe webhook events test
+exports.stripeEventsTest = functions.https.onRequest(async (req, res) => {
+  let sig = req.headers["stripe-signature"];
+  let event, intent, metadata;
+
+  try {
+    // Verify webhook signature and extract the event.
+    // See https://stripe.com/docs/webhooks/signatures for more information.
+    event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
+    const eventDB = await admin.database().ref("events").push(event); // Add the event to the database
+
+    console.log('event ' + JSON.stringify(event));
+
+    // switch (event.type) {
+    //   case 'payment_intent.created':
+    //     console.log('payment_intent.created');
+
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+
+    //     // update payment
+    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const createPaymentRef = createPaymentSnapshot.ref;
+    //     const payment = createPaymentSnapshot.data();
+    //     await createPaymentRef.update({ status: 'Pending' });
+
+    //     // create receipt
+    //     const receiptId = uuid.v4().replace(/-/g, '');
+    //     await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(receiptId).set({
+    //       receiptId: receiptId,
+    //       paymentId: payment.paymentId,
+    //       amount: payment.amount,
+    //       currency: payment.currency,
+    //       title: payment.title,
+    //       description: payment.description,
+    //       quantity: payment.quantity,
+    //       status: 'Pending',
+    //       buyerUid: payment.buyerUid,
+    //       buyerServiceId: payment.buyerServiceId,
+    //       sellerUid: payment.sellerUid,
+    //       sellerServiceId: payment.sellerServiceId,
+    //       paymentIntent: intent,
+    //       lastUpdateDate: FieldValue.serverTimestamp(),
+    //       creationDate: FieldValue.serverTimestamp()
+    //     });
+    //     break;
+    //   case 'payment_intent.succeeded':
+    //     console.log('payment_intent.succeeded');
+
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+
+    //     // update payment
+    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const successPaymentRef = successPaymentSnapshot.ref;
+    //     const successPayment = successPaymentSnapshot.data();
+    //     await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+
+    //     // update receipt
+    //     const successReceiptSnapshot = await admin.firestore().collection(`users/${successPayment.sellerUid}/receipts`).doc(successPayment.receiptId).get();
+    //     const successReceiptRef = successReceiptSnapshot.ref;
+    //     await successReceiptRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     break;
+    //   case 'payment_intent.payment_failed':
+    //     console.log('payment_intent.payment_failed');
+
+    //     intent = event.data.object;
+    //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
+
+    //     // update payment
+    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const failPaymentRef = failPaymentSnapshot.ref;
+    //     const failPayment = failPaymentSnapshot.data();
+    //     await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
+
+    //     // update receipt
+    //     const failReceiptSnapshot = await admin.firestore().collection(`users/${failPayment.sellerUid}/receipts`).doc(failPayment.receiptId).get();
+    //     const failReceiptRef = failReceiptSnapshot.ref;
+    //     await failReceiptRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
+    //     break;
+    //   default:
+    //     console.log('got unknown type ' + event.type);
+    // }
+    return res.json({ received: true });
+  }
+  catch (error) {
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+});
+
+// listen to stripe connected webhook events test
+exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) => {
+  let sig = req.headers["stripe-signature"];
+  let event;
+
+  async function updateUserServices(userId, currency) {
+    var snapshot = await admin.firestore().collection(`users/${userId}/services`).get();
+
+    if (snapshot.size > 0){
+      var promises = snapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.update({
+            currency: currency,
+            lastUpdateDate: FieldValue.serverTimestamp()
+          }).then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  }
+
+  try {
+    // Verify webhook signature and extract the event.
+    // See https://stripe.com/docs/webhooks/signatures for more information.
+    event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
+
+    console.log('event ' + JSON.stringify(event));
+
+    const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
+
+    if (event.type == 'account.application.authorized'){
+      console.log('account.application.authorized');
+
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
+
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
+        await userRef.update({ stripeOnboardingStatus: 'Authorized', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+        await updateUserServices(snapshot.docs[0].data().uid, account.default_currency);
+      }
+      return res.json({ received: true });
+    }
+    else if (event.type == 'account.application.deauthorized'){
+      console.log('account.application.deauthorized');
+
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
+
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
+        await userRef.update({ stripeOnboardingStatus: 'Deauthorized', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
+      return res.json({ received: true });
+    }
+    else if (event.type == 'account.updated'){
+      console.log('account.updated');
+
+      var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
+
+      if (snapshot.size > 0){
+        var userRef = snapshot.docs[0].ref;
+        var account = await stripe.accounts.retrieve(event.account);
+        await userRef.update({ stripeOnboardingStatus: account.charges_enabled ? 'Authorized' : 'Pending', stripeCurrency: account.default_currency, lastUpdateDate: FieldValue.serverTimestamp() });
+        await updateUserServices(snapshot.docs[0].data().uid, account.default_currency);
+      }
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.created'){
+      console.log('payment_intent.created');
+
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
+
+      if (paymentSnapshot.exists){
+        // create receipt
+        // Set receiptId and change status to pending to inform user we have received their payment
+        await paymentRef.update({ status: 'Pending', lastUpdateDate: FieldValue.serverTimestamp() });
+        await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).set({
+          receiptId: payment.receiptId,
+          uid: payment.sellerUid,
+          paymentId: payment.paymentId,
+          amount: payment.amount,
+          currency: payment.currency,
+          buyerType: payment.buyerType,
+          buyerPaymentType: payment.buyerPaymentType,
+          buyerTitle: payment.buyerTitle,
+          buyerDescription: payment.buyerDescription,
+          sellerType: payment.sellerType,
+          sellerPaymentType: payment.sellerPaymentType,
+          sellerTitle: payment.sellerTitle,
+          sellerDescription: payment.sellerDescription,
+          quantity: payment.quantity,
+          status: 'Pending',
+          buyerUid: payment.buyerUid,
+          buyerServiceId: payment.buyerServiceId,
+          sellerUid: payment.sellerUid,
+          sellerServiceId: payment.sellerServiceId,
+          paymentIntentId: payment.paymentIntentId,
+          lastUpdateDate: FieldValue.serverTimestamp(),
+          creationDate: FieldValue.serverTimestamp()
+        });
+      }
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.succeeded'){
+      console.log('payment_intent.succeeded');
+
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
+
+      if (paymentSnapshot.exists){
+        // change status to pending to inform user we have received their payment and awaiting their payment
+        await paymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
+        var sellerSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/services`).doc(payment.sellerServiceId).get();
+
+        if (userReceiptSnapshot.exists)
+          await userReceiptSnapshot.ref.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        if (sellerSnapshot.exists){
+          var sellerService = sellerSnapshot.data();
+
+          if (sellerService.typeOfPayment == 'One-off')
+            await sellerSnapshot.ref.update({ paymentId: payment.paymentId, paymentUserId: payment.uid, lastUpdateDate: FieldValue.serverTimestamp() });
+        }
+      }
+      return res.json({ received: true });
+    }
+    else if (event.type == 'payment_intent.payment_failed'){
+      console.log('payment_intent.payment_failed');
+
+      var paymentIntent = event.data.object;
+      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+
+      // customer making this payment
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentRef = paymentSnapshot.ref;
+      var payment = paymentSnapshot.data();
+
+      if (paymentSnapshot.exists){
+        // change status to pending to inform user we have received their payment and awaiting their payment
+        await paymentRef.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
+
+        var userReceiptSnapshot = await admin.firestore().collection(`users/${payment.sellerUid}/receipts`).doc(payment.receiptId).get();
+
+        if (userReceiptSnapshot.exists)
+          await userReceiptSnapshot.ref.update({ status: 'Failed', lastUpdateDate: FieldValue.serverTimestamp() });
+      }
+      return res.json({ received: true });
+    }
+    else {
+      console.log('Unknown event.type ' + event.type);
+      return res.json({ received: true });
+    }
+  } catch (error) {
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+});
+
 // listen to stripe webhook events
 exports.stripeEvents = functions.https.onRequest(async (req, res) => {
   let sig = req.headers["stripe-signature"];
