@@ -112,7 +112,7 @@
                     <span style="padding:5px" class="label label-danger">Failed</span>
                   </ng-container>
                 </div>
-                <span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Receipt Id">{{ receipt.receiptId }}</span>
+                <span style="flex:none;padding:5px;margin-right:5px" class="label label-default" matTooltip="Receipt Id">{{ receipt.receiptId }}</span>
                 <div class="label label-default" matTooltip="{{ receipt.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px;margin-right:5px">
                   {{ receipt.creationDate.toDate() | amTimeAgo }}
                 </div>
