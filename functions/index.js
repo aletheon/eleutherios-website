@@ -370,7 +370,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
           var sellerService = sellerSnapshot.data();
 
           if (sellerService.typeOfPayment == 'One-off')
-            await sellerSnapshot.ref.update({ paymentId: payment.paymentId, paymentUserId: payment.uid, lastUpdateDate: FieldValue.serverTimestamp() });
+            await sellerSnapshot.ref.update({ paymentId: payment.paymentId, paymentUserId: payment.uid, indexed: false, lastUpdateDate: FieldValue.serverTimestamp() });
         }
       }
       return res.json({ received: true });
@@ -643,7 +643,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
           var sellerService = sellerSnapshot.data();
 
           if (sellerService.typeOfPayment == 'One-off')
-            await sellerSnapshot.ref.update({ paymentId: payment.paymentId, paymentUserId: payment.uid, lastUpdateDate: FieldValue.serverTimestamp() });
+            await sellerSnapshot.ref.update({ paymentId: payment.paymentId, paymentUserId: payment.uid, indexed: false, lastUpdateDate: FieldValue.serverTimestamp() });
         }
       }
       return res.json({ received: true });
