@@ -12,6 +12,7 @@ import {
   UserServiceTagService,
   UserForumRegistrantService,
   UserReceiptService,
+  UserPaymentService,
   ForumService,
   ServiceService,
   AppearDirective,
@@ -39,12 +40,14 @@ export class HomeComponent implements OnDestroy, OnInit {
   public privateForums: Observable<any[]>;
   public privateServices: Observable<any[]>;
   public receipts: Observable<any[]>;
+  public payments: Observable<any[]>;
   public alerts: Observable<any[]>;
   public publicForumsNumberOfItems: number = 100;
   public publicServicesNumberOfItems: number = 100;
   public privateForumsNumberOfItems: number = 100;
   public privateServicesNumberOfItems: number = 100;
   public receiptsNumberOfItems: number = 100;
+  public paymentsNumberOfItems: number = 100;
   public alertsNumberOfItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
 
@@ -58,6 +61,7 @@ export class HomeComponent implements OnDestroy, OnInit {
     private userServiceTagService: UserServiceTagService,
     private userForumRegistrantService: UserForumRegistrantService,
     private userReceiptService: UserReceiptService,
+    private userPaymentService: UserPaymentService,
     private forumService: ForumService,
     private serviceService: ServiceService,
     private snackbar: MatSnackBar,
@@ -146,6 +150,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.userReceiptService.delete(receipt.uid, receipt.receiptId);
   }
 
+  deletePayment (payment) {
+    this.userPaymentService.delete(payment.uid, payment.paymentId);
+  }
+
   ngOnDestroy () {
     if (this._alertSubscription)
       this._alertSubscription.unsubscribe();
@@ -155,6 +163,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   trackPublicForums (index, forum) { return forum.forumId; }
   trackPublicServices (index, service) { return service.serviceId; }
   trackReceipts (index, receipt) { return receipt.receiptId; }
+  trackPayments (index, payment) { return payment.paymentId; }
   trackPrivateForums (index, forum) { return forum.forumId; }
 
   ngOnInit () {
@@ -539,6 +548,119 @@ export class HomeComponent implements OnDestroy, OnInit {
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return receipts[i];
+                });
+              });
+            }
+            else return of([]);
+          })
+        );
+
+        // payments
+        that.payments = that.userPaymentService.getPayments(that.auth.uid, that.paymentsNumberOfItems).pipe(
+          switchMap(payments => {
+            if (payments && payments.length > 0){
+              let observables = payments.map(payment => {
+                let getSellerService$ = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
+                let getBuyerService$ = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
+                let getSellerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getBuyerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.buyerUid, payment.buyerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultTiny.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getSellerServiceTags$ = that.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
+
+                return combineLatest([getSellerService$, getBuyerService$, getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [sellerService, buyerService, sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
+
+                    if (sellerDefaultServiceImage)
+                      payment.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultThumbnail.jpg'
+                      };
+                      payment.sellerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (buyerDefaultServiceImage)
+                      payment.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultTiny.jpg'
+                      };
+                      payment.buyerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (sellerServiceTags)
+                      payment.sellerServiceTags = of(sellerServiceTags);
+                    else {
+                      payment.sellerServiceTags = of([]);
+                    }
+
+                    if (sellerService){
+                      payment.sellerType = sellerService.type;
+                      payment.sellerPaymentType = sellerService.paymentType;
+                      payment.sellerTitle = sellerService.title;
+                      payment.sellerDescription = sellerService.description;
+                    }
+
+                    if (buyerService){
+                      payment.buyerType = buyerService.type;
+                      payment.buyerPaymentType = buyerService.paymentType;
+                      payment.buyerTitle = buyerService.title;
+                      payment.buyerDescription = buyerService.description;
+                    }
+                    return of(payment);
+                  })
+                );
+              });
+
+              return zip(...observables, (...results) => {
+                return results.map((result, i) => {
+                  return payments[i];
                 });
               });
             }

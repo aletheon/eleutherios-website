@@ -28,7 +28,7 @@
       <div style="flex:1">
         <!-- registrants -->
         <h5 style="padding:0px">Services(<ng-container *ngIf="registrantCount | async as t"><ng-container [ngSwitch]="t"><ng-container *ngSwitchCase="-1">0</ng-container><ng-container *ngSwitchDefault>{{ t }}</ng-container></ng-container></ng-container>)</h5>
-        <div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
+        <div style="display:flex;flex-direction:row;overflow-x:auto">
           <ng-container *ngIf="registrants | async;let registrantItems">
             <ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants"></ng-container>
             <ng-template #showregistrants>
@@ -36,7 +36,7 @@
                 <ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
                 <ng-template #showservice>
                   <ng-container *ngIf="registrant.service | async;let service">
-                    <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-bottom:5px;flex-wrap:nowrap">
+                    <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
                       <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                       <ng-template #showdefaultserviceimage>
                         <ng-container *ngIf="service.defaultServiceImage | async;let image">
@@ -52,7 +52,7 @@
                       <div style="flex:none">
                         <ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
                         <ng-template #showforumowner>
-                          <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>  
+                          <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
                         </ng-template>
                         <ng-template #shownotforumowner>
                           <ng-container *ngIf="auth.uid == service.uid; then showblockcontrol"></ng-container>
@@ -96,7 +96,7 @@
 										</mat-form-field>
 										<mat-form-field style="flex:none;width:100px">
 											<input
-												matInput	
+												matInput
 												#startAmount
 												formControlName="searchStartAmount"
 												(change)="searchServices()"/>

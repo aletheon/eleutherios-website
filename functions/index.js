@@ -1078,6 +1078,8 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((sn
 	var user = snap.data();
   var userId = context.params.userId;
 
+  // HERE ROB
+
   // collections to delete:
   // deletedAlerts
 

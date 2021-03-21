@@ -203,6 +203,8 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
           if (tempPayment){
             console.log('got payment ' + JSON.stringify(tempPayment));
+            console.log('title ' + this.serviceGroup.get('title').value);
+            console.log('email ' + this._user.email);
 
             this.stripeService.confirmCardPayment(this._paymentIntent.client_secret, {
               payment_method: {
@@ -236,6 +238,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                   this.payment = of(payment);
                 });
 
+                this._paymentIntent = null;
                 this.card.clear();
                 this.userServicesCtrl.reset();
                 this.showSpinner = false;
@@ -325,6 +328,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                       this.payment = of(payment);
                     });
 
+                    this._paymentIntent = null;
                     this.card.clear();
                     this.userServicesCtrl.reset();
                     this.showSpinner = false;
