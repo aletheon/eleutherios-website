@@ -1023,17 +1023,6 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
                 else
                   this.router.navigate(['/service/detail'], { queryParams: { serviceId: requestService.serviceId } });
               }
-              else if (requestService.indexed == false) {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: 'Service does not exist',
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
-              }
               else {
                 this.forum = this.userForumService.create(this.auth.uid, forum);
                 this.initForm();

@@ -44,7 +44,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   private _sellerDefaultServiceImageSubscription: Subscription;
   private _buyerDefaultServiceImageSubscription: Subscription;
   private _buyerServiceTagSubscription: Subscription;
-  
+
   public receiptGroup: FormGroup;
   public receipt: Observable<any>;
   public buyerDefaultServiceImage: Observable<any>;
@@ -67,7 +67,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
     private userServiceUserBlockService: UserServiceUserBlockService,
     private userForumUserBlockService: UserForumUserBlockService,
     private userForumRegistrantService: UserForumRegistrantService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar) {
       this.userForumsCtrl = new FormControl();
@@ -85,7 +85,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
 
     if (this._buyerServiceSubscription)
       this._buyerServiceSubscription.unsubscribe();
-    
+
     if (this._sellerDefaultServiceImageSubscription)
       this._sellerDefaultServiceImageSubscription.unsubscribe();
 
@@ -101,8 +101,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       const sellerServiceSubscription = this.userServiceService.getService(this.receiptGroup.get('buyerUid').value, this.receiptGroup.get('buyerServiceId').value).subscribe(service => {
         sellerServiceSubscription.unsubscribe();
 
-        console.log('service ' + service);
-        
         if (service){
           this.userForumServiceBlockService.serviceIsBlocked(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.serviceId)
             .then(serviceBlocked => {
@@ -284,7 +282,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.receiptGroup = this.fb.group({
       receiptId:                        [''],
       uid:                              [''],
@@ -351,12 +349,12 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -386,12 +384,12 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -424,7 +422,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
