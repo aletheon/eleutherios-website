@@ -23,6 +23,8 @@ import {
   UserForumImageService,
   UserWhereServingService,
   UserForumRegistrantService,
+  UserPaymentService,
+  UserReceiptService,
   Registrant,
   Service,
   NoTitlePipe
@@ -60,7 +62,6 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   private _canViewDetail = new BehaviorSubject(false);
 
   public service: Observable<any>;
-
   public forumCount: Observable<number> = this._forumCount.asObservable();
   public tagCount: Observable<number> = this._tagCount.asObservable();
   public imageCount: Observable<number> = this._imageCount.asObservable();
@@ -95,6 +96,8 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
     private userForumImageService: UserForumImageService,
     private userWhereServingService: UserWhereServingService,
     private userForumRegistrantService: UserForumRegistrantService,
+    private userPaymentService: UserPaymentService,
+    private userReceiptService: UserReceiptService,
     private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
@@ -489,40 +492,23 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
                 this.initForm();
               }
               else {
-                // Redirect to public page if it is public
-                if (service.type == 'Public')
-                  this.router.navigate(['/service/detail'], { queryParams: { serviceId: service.serviceId } });
-
-                if (service.indexed == true){
-                  // check permissions
-                  this.checkPermissions(this.auth.uid, service)
-                    .then(() => {
-                      this.service = this.userServiceService.getService(serviceUserId, serviceId);
-                      this.initForm();
-                    }
-                  ).catch(error => {
-                    const snackBarRef = this.snackbar.openFromComponent(
-                      NotificationSnackBar,
-                      {
-                        duration: 8000,
-                        data: error.message,
-                        panelClass: ['red-snackbar']
-                      }
-                    );
-                    this.router.navigate(['/']);
-                  });
-                }
-                else {
+                // check permissions
+                this.checkPermissions(this.auth.uid, service)
+                  .then(() => {
+                    this.service = this.userServiceService.getService(serviceUserId, serviceId);
+                    this.initForm();
+                  }
+                ).catch(error => {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: 'Service does not exist',
+                      data: error.message,
                       panelClass: ['red-snackbar']
                     }
                   );
                   this.router.navigate(['/']);
-                }
+                });
               }
             }
             else {
@@ -586,39 +572,22 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
           if (service.uid == this.auth.uid)
             this._canViewDetail.next(true);
           else {
-            // Redirect to public page if it is public
-            if (service.type == 'Public')
-              this.router.navigate(['/service/detail'], { queryParams: { serviceId: service.serviceId } });
-
-            if (service.indexed == true){
-              // check permissions
-              this.checkPermissions(this.auth.uid, service)
-                .then(() => {
-                  // do something
-                }
-              ).catch(error => {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: error.message,
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
-              });
-            }
-            else {
+            // check permissions
+            this.checkPermissions(this.auth.uid, service)
+              .then(() => {
+                // do something
+              }
+            ).catch(error => {
               const snackBarRef = this.snackbar.openFromComponent(
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: 'Service does not exist',
+                  data: error.message,
                   panelClass: ['red-snackbar']
                 }
               );
               this.router.navigate(['/']);
-            }
+            });
           }
         }
       }
