@@ -10,7 +10,7 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="paymentGroup" novalidate>
-				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:10px">
+				<div class="alert alert-info" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 					<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 						<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 						<ng-template #showsellerdefaultserviceimage>
@@ -34,7 +34,7 @@
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
-							<!-- other button controls -->							
+							<!-- other button controls -->
 							<div style="flex:none;margin-right:5px">
 								<ng-container *ngIf="paymentGroup.get('status').value == 'Pending'">
 									<span style="padding:5px" class="label label-warning">Pending</span>
