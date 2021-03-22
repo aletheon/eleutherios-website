@@ -10,8 +10,8 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="receiptGroup" novalidate>
-				<div [ngClass]="receiptGroup.get('buyerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
-					<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+				<div [ngClass]="receiptGroup.get('buyerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+					<div style="flex:1;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 						<ng-container *ngIf="buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
 						<ng-template #showbuyerdefaultserviceimage>
 							<ng-container *ngIf="buyerDefaultServiceImage | async;let image">
@@ -53,10 +53,10 @@
 						</div>
 					</div>
 					<ng-container *ngIf="buyerServiceTags | async;let buyerServiceTagItems">
-						<div style="flex:none;display:flex;flex-direction:row;align-items:center">
+						<div style="flex:1;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 							<ng-container *ngIf="buyerServiceTagItems.length > 0; then showtags"></ng-container>
 							<ng-template #showtags>
-								<div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+								<div style="flex:1;display:flex;flex-direction:row">
 									<ng-container *ngFor="let serviceTag of buyerServiceTagItems">
 										<span class="label label-info" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
 									</ng-container>
@@ -64,7 +64,7 @@
 							</ng-template>
 							<ng-container *ngIf="buyerServiceTagItems.length > 0; then showtagswithreceipt else showtagswithoutreceipt"></ng-container>
 							<ng-template #showtagswithreceipt>
-								<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:wrap">
+								<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
 									<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 									<ng-template #showsellerdefaultserviceimage>
 										<ng-container *ngIf="sellerDefaultServiceImage | async;let image">
@@ -89,7 +89,7 @@
 								</div>
 							</ng-template>
 							<ng-template #showtagswithoutreceipt>
-								<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
+								<div style="flex:1;display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
 									<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
 										<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 										<ng-template #showsellerdefaultserviceimage>
@@ -115,7 +115,7 @@
 									</div>
 								</div>
 							</ng-template>
-							<div style="flex:none;padding:5px;color:#1B1B1B">{{ receiptGroup.get('currency').value.toUpperCase() }} {{ receiptGroup.get('amount').value.toFixed(2) }}</div>
+							<div style="flex:none;color:#1B1B1B">{{ receiptGroup.get('currency').value.toUpperCase() }} {{ receiptGroup.get('amount').value.toFixed(2) }}</div>
 						</div>
 					</ng-container>
 				</div>
@@ -123,7 +123,7 @@
 				<ng-container *ngIf="userForums | async;let userForumItems">
 					<ng-container *ngIf="userForumItems.length > 0; then showservices"></ng-container>
 					<ng-template #showservices>
-						<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end">
+						<div style="display:flex;flex-direction:row;justify-content:flex-end">
 							<div style="flex:none">
 								<mat-form-field>
 									<mat-select #select="matSelect" (selectionChange)="addForum()" placeholder="Add to forum" [formControl]="userForumsCtrl" style="margin-top:5px">
@@ -133,7 +133,7 @@
 							</div>
 						</div>
 					</ng-template>
-					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
+					<div style="display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
 						<a [routerLink]="['/user/forum/new']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="flex:none;color:#1B1B1B;margin-right:5px">Create forum</a>
 						<a [routerLink]="['/user/forum/new']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons" matTooltipPosition="left">keyboard_arrow_right</a>
 					</div>
