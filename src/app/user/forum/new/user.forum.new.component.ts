@@ -1008,25 +1008,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
             this._initialServiceSubscription.unsubscribe();
 
             if (requestService){
-              if (requestService.title.length == 0){
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: `Service is missing a title`,
-                    panelClass: ['red-snackbar']
-                  }
-                );
-
-                if (requestService.type == 'Private')
-                  this.router.navigate(['/user/service/detail'], { queryParams: { userId: requestService.uid, serviceId: requestService.serviceId } });
-                else
-                  this.router.navigate(['/service/detail'], { queryParams: { serviceId: requestService.serviceId } });
-              }
-              else {
-                this.forum = this.userForumService.create(this.auth.uid, forum);
-                this.initForm();
-              }
+              this.forum = this.userForumService.create(this.auth.uid, forum);
+              this.initForm();
             }
             else {
               const snackBarRef = this.snackbar.openFromComponent(
@@ -1355,15 +1338,6 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
                 let getDefaultServiceImage$ = of(null);
 
                 getService$ = that.userServiceService.getService(that._requestServiceUserId, serviceId);
-                getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(that._requestServiceUserId, serviceId).pipe(
-                  switchMap(serviceImages => {
-                    if (serviceImages && serviceImages.length > 0)
-                      return of(serviceImages[0]);
-                    else
-                      return of(null);
-                  })
-                );
-
                 getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(that._requestServiceUserId, serviceId).pipe(
                   switchMap(serviceImages => {
                     if (serviceImages && serviceImages.length > 0){

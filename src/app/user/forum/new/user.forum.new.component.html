@@ -33,8 +33,8 @@
 			<ng-container *ngIf="requestService | async;let serviceItem">
 				<ng-container *ngIf="serviceItem; then showrequestservice"></ng-container>
 				<ng-template #showrequestservice>
-					<div class="alert alert-warning" style="display:flex;flex-direction:row;align-items:center;margin-top:10px">
-						<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px">
+					<div class="alert alert-warning" style="display:flex;flex-direction:row;align-items:center;margin:10px 0 0 0;padding:5px">
+						<div [ngClass]="serviceItem.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin:0px;padding:5px">
 							<ng-container *ngIf="serviceItem.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
 							<ng-template #showdefaultserviceimage>
 								<ng-container *ngIf="serviceItem.defaultServiceImage | async;let image">
@@ -81,7 +81,7 @@
 			</div>
 			<div>
 				<mat-form-field style="width:100%">
-					<textarea 
+					<textarea
 						matInput
 						placeholder="Description"
 						formControlName="description"
@@ -250,7 +250,7 @@
 										</mat-form-field>
 										<mat-form-field style="flex:none;width:100px">
 											<input
-												matInput	
+												matInput
 												#startAmount
 												formControlName="searchStartAmount"
 												(change)="searchServices()"/>
