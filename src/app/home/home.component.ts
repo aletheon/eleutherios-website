@@ -34,6 +34,12 @@ import * as _ from "lodash";
 export class HomeComponent implements OnDestroy, OnInit {
   private _loading = new BehaviorSubject(false);
   private _alertSubscription: Subscription;
+  private _publicForumsSubscription: Subscription;
+  private _publicServicesSubscription: Subscription;
+  private _privateForumsSubscription: Subscription;
+  private _privateServicesSubscription: Subscription;
+  private _receiptsSubscription: Subscription;
+  private _paymentsSubscription: Subscription;
 
   public publicForums: Observable<any[]>;
   public publicServices: Observable<any[]>;
@@ -157,6 +163,24 @@ export class HomeComponent implements OnDestroy, OnInit {
   ngOnDestroy () {
     if (this._alertSubscription)
       this._alertSubscription.unsubscribe();
+
+    if (this._publicForumsSubscription)
+      this._publicForumsSubscription.unsubscribe();
+
+    if (this._publicServicesSubscription)
+      this._publicServicesSubscription.unsubscribe();
+
+    if (this._privateForumsSubscription)
+      this._privateForumsSubscription.unsubscribe();
+
+    if (this._privateServicesSubscription)
+      this._privateServicesSubscription.unsubscribe();
+
+    if (this._receiptsSubscription)
+      this._receiptsSubscription.unsubscribe();
+
+    if (this._paymentsSubscription)
+      this._paymentsSubscription.unsubscribe();
   }
 
   trackPrivateServices (index, service) { return service.serviceId; }
@@ -172,12 +196,8 @@ export class HomeComponent implements OnDestroy, OnInit {
     this._loading.next(true);
     let load = async function(){
       try {
-        // here rob add subscriptions and unsubscribe to not get error
-        // users//forums
-
-
         // public forums
-        that.publicForums = that.forumService.getForums(that.publicForumsNumberOfItems, '', [], true, true).pipe(
+        that._publicForumsSubscription = that.forumService.getForums(that.publicForumsNumberOfItems, '', [], true, true).pipe(
           switchMap(forums => {
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
@@ -249,10 +269,12 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(forums => {
+          that.publicForums = of(forums);
+        });
 
         // public services
-        that.publicServices = that.serviceService.getServices(that.publicServicesNumberOfItems, '', [], true, true).pipe(
+        that._publicServicesSubscription = that.serviceService.getServices(that.publicServicesNumberOfItems, '', [], true, true).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -309,10 +331,12 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(services => {
+          that.publicServices = of(services);
+        });
 
         // private forums
-        that.privateForums = that.userForumService.getForums(that.auth.uid, that.privateForumsNumberOfItems, '', [], true, false).pipe(
+        that._privateForumsSubscription = that.userForumService.getForums(that.auth.uid, that.privateForumsNumberOfItems, '', [], true, false).pipe(
           switchMap(forums => {
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
@@ -384,10 +408,12 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(forums => {
+          that.privateForums = of(forums);
+        });
 
         // private services
-        that.privateServices = that.userServiceService.getServices(that.auth.uid, that.privateServicesNumberOfItems, '', [], true, false).pipe(
+        that._privateServicesSubscription = that.userServiceService.getServices(that.auth.uid, that.privateServicesNumberOfItems, '', [], true, false).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -444,10 +470,12 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(services => {
+          that.privateServices = of(services);
+        });
 
         // receipts
-        that.receipts = that.userReceiptService.getReceipts(that.auth.uid, that.receiptsNumberOfItems).pipe(
+        that._receiptsSubscription = that.userReceiptService.getReceipts(that.auth.uid, that.receiptsNumberOfItems).pipe(
           switchMap(receipts => {
             if (receipts && receipts.length > 0){
               let observables = receipts.map(receipt => {
@@ -557,10 +585,12 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(receipts => {
+          that.receipts = of(receipts);
+        });
 
         // payments
-        that.payments = that.userPaymentService.getPayments(that.auth.uid, that.paymentsNumberOfItems).pipe(
+        that._paymentsSubscription = that.userPaymentService.getPayments(that.auth.uid, that.paymentsNumberOfItems).pipe(
           switchMap(payments => {
             if (payments && payments.length > 0){
               let observables = payments.map(payment => {
@@ -670,7 +700,9 @@ export class HomeComponent implements OnDestroy, OnInit {
             }
             else return of([]);
           })
-        );
+        ).subscribe(payments => {
+          that.payments = of(payments);
+        });
       }
       catch (error) {
         throw error;
