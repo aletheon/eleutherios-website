@@ -172,6 +172,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     this._loading.next(true);
     let load = async function(){
       try {
+        // here rob add subscriptions and unsubscribe to not get error
+        // users//forums
+
+
         // public forums
         that.publicForums = that.forumService.getForums(that.publicForumsNumberOfItems, '', [], true, true).pipe(
           switchMap(forums => {
