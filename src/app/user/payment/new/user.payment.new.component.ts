@@ -3,6 +3,7 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import {
   UserService,
   UserPaymentService,
@@ -63,6 +64,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   public numberItems: number = 100;
   public hidePaymentButton: boolean = true;
   public showSpinner: boolean = false;
+  public id: Observable<string>;
+  public returnUserId: Observable<string>;
+  public returnType: Observable<string> = of('Forum');
   public elements: StripeElements;
   public card: StripeCardElement;
   public cardOptions: StripeCardElementOptions = {
@@ -93,6 +97,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
     private userPaymentService: UserPaymentService,
     private stripeService: StripeService,
     private router: Router,
+    private location: Location,
     private snackbar: MatSnackBar) {
       this.userServicesCtrl = new FormControl();
   }
@@ -413,6 +418,15 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       this._sellerUid = params['userId']
       this._sellerServiceId = params['serviceId']
 
+      let forumId = params['forumId'];
+      let forumUserId = params['forumUserId'];
+
+      if (forumId){
+        this.id = of(forumId);
+        this.returnUserId = of(forumUserId);
+        this.returnType = of('Forum');
+      }
+
       this._userServiceSubscription = this.userServiceService.getService(this._sellerUid, this._sellerServiceId)
         .subscribe(service => {
           if (service){
@@ -429,7 +443,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: 'The service has been removed',
+                      data: 'The service is not indexed or available for sale',
                       panelClass: ['red-snackbar']
                     }
                   );
@@ -453,11 +467,11 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 NotificationSnackBar,
                 {
                   duration: 8000,
-                  data: 'Service has been changed to free',
+                  data: 'Service is free',
                   panelClass: ['red-snackbar']
                 }
               );
-              this.router.navigate(['/']);
+              this.router.navigate(['/service/detail'], { queryParams: { serviceId: this._sellerServiceId } });
             }
           }
           else {
@@ -636,5 +650,9 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         });
       }
     });
+  }
+
+  public navigateBack () {
+    this.location.back();
   }
 }

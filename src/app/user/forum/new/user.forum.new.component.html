@@ -366,12 +366,12 @@
 													<ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
 													<ng-template #showtagswithpayment>
 														<div style="flex:none">
-															<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+															<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get('uid').value, forumId: forumGroup.get('forumId').value }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
 														</div>
 													</ng-template>
 													<ng-template #showtagswithoutpayment>
 														<div style="flex:1;text-align:right">
-															<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+															<a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get('uid').value, forumId: forumGroup.get('forumId').value }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
 														</div>
 													</ng-template>
 												</ng-container>
