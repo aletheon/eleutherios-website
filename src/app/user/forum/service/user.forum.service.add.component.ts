@@ -87,11 +87,11 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
   public searchServiceIncludeTagsInSearch: boolean = true;
   public forumId: string;
   public userId: string;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
-    private userActivityService: UserActivityService,    
+    private userActivityService: UserActivityService,
     private userForumRegistrantService: UserForumRegistrantService,
     private userForumServiceBlockService: UserForumServiceBlockService,
     private userServiceForumBlockService: UserServiceForumBlockService,
@@ -114,7 +114,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
       this.matAutoCompleteSearchServiceTags = this.serviceSearchTagCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
@@ -166,7 +166,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                                               panelClass: ['red-snackbar']
                                             }
                                           );
-                                        }); 
+                                        });
                                       }
                                     )
                                     .catch(error => {
@@ -317,7 +317,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
   searchServiceTagsSelectionChange (tag: any) {
     const tagIndex = _.findIndex(this.searchServiceTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     if (tagIndex == -1){
       this.searchServiceTags.push(tag);
       this._tempServiceTags.push(tag.tag);
@@ -341,12 +341,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -359,7 +359,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -380,7 +380,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -408,12 +408,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -426,7 +426,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -447,7 +447,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -706,16 +706,16 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
                                 if (serviceImages[0].tinyUrl)
                                   getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-                        
+
                                 return combineLatest([getDownloadUrl$]).pipe(
                                   switchMap(results => {
                                     const [downloadUrl] = results;
-                                    
+
                                     if (downloadUrl)
                                       serviceImages[0].url = downloadUrl;
                                     else
                                       serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                        
+
                                     return of(serviceImages[0]);
                                   })
                                 );
@@ -723,7 +723,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                               else return of(null);
                             })
                           );
-                          
+
                           return combineLatest([getDefaultServiceImage$]).pipe(
                             switchMap(results => {
                               const [defaultServiceImage] = results;
@@ -747,7 +747,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                     return combineLatest([getService$]).pipe(
                       switchMap(results => {
                         const [service] = results;
-                        
+
                         if (service)
                           registrant.service = of(service);
                         else {
@@ -771,10 +771,74 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 startWith(''),
                 switchMap(searchTerm => that.userServiceService.search(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value))
               );
-              
+
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value);
+                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
+                    switchMap(services => {
+                      if (services && services.length > 0) {
+                        let observables = services.map(service => {
+                          if (service) {
+                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                              switchMap(serviceImages => {
+                                if (serviceImages && serviceImages.length > 0){
+                                  let getDownloadUrl$: Observable<any>;
+
+                                  if (serviceImages[0].tinyUrl)
+                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                                  return combineLatest([getDownloadUrl$]).pipe(
+                                    switchMap(results => {
+                                      const [downloadUrl] = results;
+
+                                      if (downloadUrl)
+                                        serviceImages[0].url = downloadUrl;
+                                      else
+                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+
+                                      return of(serviceImages[0]);
+                                    })
+                                  );
+                                }
+                                else return of(null);
+                              })
+                            );
+                            let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                              switchMap(results => {
+                                const [defaultServiceImage, serviceTags] = results;
+
+                                if (defaultServiceImage)
+                                  service.defaultServiceImage = of(defaultServiceImage);
+                                else {
+                                  let tempImage = {
+                                    url: '../../../assets/defaultTiny.jpg'
+                                  };
+                                  service.defaultServiceImage = of(tempImage);
+                                }
+
+                                if (serviceTags)
+                                  service.serviceTags = of(serviceTags);
+                                else
+                                  service.serviceTags = of([]);
+
+                                return of(service);
+                              })
+                            );
+                          }
+                          else return of(null);
+                        });
+
+                        return zip(...observables, (...results) => {
+                          return results.map((result, i) => {
+                            return services[i];
+                          });
+                        });
+                      }
+                      else return of([]);
+                    })
+                  );
                 })
               ).subscribe();
 
@@ -788,19 +852,19 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                           switchMap(serviceImages => {
                             if (serviceImages && serviceImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
-      
+
                               if (serviceImages[0].tinyUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-      
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
                                     serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                    
+
                                   return of(serviceImages[0]);
                                 })
                               );
@@ -853,7 +917,71 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value);
+                  that.searchServiceResults = that.serviceService.tagSearch(searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
+                    switchMap(services => {
+                      if (services && services.length > 0) {
+                        let observables = services.map(service => {
+                          if (service) {
+                            let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                              switchMap(serviceImages => {
+                                if (serviceImages && serviceImages.length > 0){
+                                  let getDownloadUrl$: Observable<any>;
+
+                                  if (serviceImages[0].tinyUrl)
+                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                                  return combineLatest([getDownloadUrl$]).pipe(
+                                    switchMap(results => {
+                                      const [downloadUrl] = results;
+
+                                      if (downloadUrl)
+                                        serviceImages[0].url = downloadUrl;
+                                      else
+                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+
+                                      return of(serviceImages[0]);
+                                    })
+                                  );
+                                }
+                                else return of(null);
+                              })
+                            );
+                            let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                              switchMap(results => {
+                                const [defaultServiceImage, serviceTags] = results;
+
+                                if (defaultServiceImage)
+                                  service.defaultServiceImage = of(defaultServiceImage);
+                                else {
+                                  let tempImage = {
+                                    url: '../../../assets/defaultTiny.jpg'
+                                  };
+                                  service.defaultServiceImage = of(tempImage);
+                                }
+
+                                if (serviceTags)
+                                  service.serviceTags = of(serviceTags);
+                                else
+                                  service.serviceTags = of([]);
+
+                                return of(service);
+                              })
+                            );
+                          }
+                          else return of(null);
+                        });
+
+                        return zip(...observables, (...results) => {
+                          return results.map((result, i) => {
+                            return services[i];
+                          });
+                        });
+                      }
+                      else return of([]);
+                    })
+                  );
                 })
               ).subscribe();
 
@@ -867,19 +995,19 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                           switchMap(serviceImages => {
                             if (serviceImages && serviceImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
-      
+
                               if (serviceImages[0].tinyUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-      
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
                                     serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                    
+
                                   return of(serviceImages[0]);
                                 })
                               );
@@ -930,7 +1058,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -961,12 +1089,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1000,7 +1128,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -1028,12 +1156,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1046,7 +1174,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                    
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -1060,14 +1188,14 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       service.serviceTags = of(serviceTags);
                     else
                       service.serviceTags = of([]);
-                      
+
                     return of(service);
                   })
                 );
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -1082,7 +1210,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
 
   removeSearchServiceTag (tag) {
     const tagIndex = _.findIndex(this.searchServiceTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     if (tagIndex > -1) {
       this.searchServiceTags.splice(tagIndex, 1);
       this._tempServiceTags.splice(tagIndex, 1);
@@ -1106,12 +1234,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -1124,7 +1252,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -1145,7 +1273,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -1173,12 +1301,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
                               serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(serviceImages[0]);
                           })
                         );
@@ -1191,7 +1319,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                   return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
@@ -1212,7 +1340,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -1244,12 +1372,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1262,7 +1390,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                    
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -1283,7 +1411,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -1311,12 +1439,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1329,7 +1457,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                    
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -1350,7 +1478,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -1375,7 +1503,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
@@ -1406,14 +1534,78 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
     if (this.forumGroup.get('searchPrivateServices').value == true){
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
         )
       );
-      
+
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
+          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+            switchMap(services => {
+              if (services && services.length > 0) {
+                let observables = services.map(service => {
+                  if (service) {
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+
+                          if (serviceImages[0].tinyUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
+                    let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                    return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                      switchMap(results => {
+                        const [defaultServiceImage, serviceTags] = results;
+
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
+                        else {
+                          let tempImage = {
+                            url: '../../../assets/defaultTiny.jpg'
+                          };
+                          service.defaultServiceImage = of(tempImage);
+                        }
+
+                        if (serviceTags)
+                          service.serviceTags = of(serviceTags);
+                        else
+                          service.serviceTags = of([]);
+
+                        return of(service);
+                      })
+                    );
+                  }
+                  else return of(null);
+                });
+
+                return zip(...observables, (...results) => {
+                  return results.map((result, i) => {
+                    return services[i];
+                  });
+                });
+              }
+              else return of([]);
+            })
+          );
         })
       ).subscribe();
 
@@ -1433,12 +1625,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1451,7 +1643,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                    
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -1472,7 +1664,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -1486,14 +1678,78 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
     else {
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.serviceService.search(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
         )
       );
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value);
+          this.searchServiceResults = this.serviceService.tagSearch(searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+            switchMap(services => {
+              if (services && services.length > 0) {
+                let observables = services.map(service => {
+                  if (service) {
+                    let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                      switchMap(serviceImages => {
+                        if (serviceImages && serviceImages.length > 0){
+                          let getDownloadUrl$: Observable<any>;
+
+                          if (serviceImages[0].tinyUrl)
+                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                          return combineLatest([getDownloadUrl$]).pipe(
+                            switchMap(results => {
+                              const [downloadUrl] = results;
+
+                              if (downloadUrl)
+                                serviceImages[0].url = downloadUrl;
+                              else
+                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+
+                              return of(serviceImages[0]);
+                            })
+                          );
+                        }
+                        else return of(null);
+                      })
+                    );
+                    let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                    return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                      switchMap(results => {
+                        const [defaultServiceImage, serviceTags] = results;
+
+                        if (defaultServiceImage)
+                          service.defaultServiceImage = of(defaultServiceImage);
+                        else {
+                          let tempImage = {
+                            url: '../../../assets/defaultTiny.jpg'
+                          };
+                          service.defaultServiceImage = of(tempImage);
+                        }
+
+                        if (serviceTags)
+                          service.serviceTags = of(serviceTags);
+                        else
+                          service.serviceTags = of([]);
+
+                        return of(service);
+                      })
+                    );
+                  }
+                  else return of(null);
+                });
+
+                return zip(...observables, (...results) => {
+                  return results.map((result, i) => {
+                    return services[i];
+                  });
+                });
+              }
+              else return of([]);
+            })
+          );
         })
       ).subscribe();
 
@@ -1513,12 +1769,12 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -1531,7 +1787,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                    
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -1552,7 +1808,7 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
