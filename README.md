@@ -30,7 +30,7 @@ Forum (Food)
 ------ Service (Healthcare worker)
 ```
 
-In this example, more than one customer is being served by the forum for food.
+In this example, there is more than one customer, being served by the forum for food.
 
 #### Features:
 
