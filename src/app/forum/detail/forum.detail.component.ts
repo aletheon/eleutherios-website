@@ -32,7 +32,7 @@ import { environment } from '../../../environments/environment';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, combineLatest, of, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -446,6 +446,9 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -486,9 +489,16 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       }
 
       if (forumId){
-        this._initialForumSubscription = this.forumService.getForum(forumId).subscribe(forum => {
-          this._initialForumSubscription.unsubscribe();
 
+        // ********************************
+        // ********************************
+        // ********************************
+        // HERE ROB this form might be unique to initial subscriptions using take(1)
+        // ********************************
+        // ********************************
+        // ********************************
+
+        this._initialForumSubscription = this.forumService.getForum(forumId).pipe(take(1)).subscribe(forum => {
           if (forum){
             this.forum = this.forumService.getForum(forumId);
             this.initForm();
@@ -600,10 +610,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             );
 
             // get the default registrant that this user is serving as in this forum
-
-            // HERE ROB
-
-
             that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)

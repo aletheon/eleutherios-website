@@ -31,10 +31,12 @@ import * as _ from "lodash";
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnDestroy, OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
-  private _alertSubscription: Subscription;
-  private _userSubscription: Subscription;
+  private _privateForumSubscription: Subscription;
+  private _privateServiceSubscription: Subscription;
+  private _receiptSubscription: Subscription;
+  private _paymentSubscription: Subscription;
 
   public publicForums: Observable<any[]>;
   public publicServices: Observable<any[]>;
@@ -156,11 +158,17 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy () {
-    if (this._userSubscription)
-      this._userSubscription.unsubscribe();
+    if (this._privateForumSubscription)
+      this._privateForumSubscription.unsubscribe();
 
-    if (this._alertSubscription)
-      this._alertSubscription.unsubscribe();
+    if (this._privateServiceSubscription)
+      this._privateServiceSubscription.unsubscribe();
+
+    if (this._receiptSubscription)
+      this._receiptSubscription.unsubscribe();
+
+    if (this._paymentSubscription)
+      this._paymentSubscription.unsubscribe();
   }
 
   trackPrivateServices (index, service) { return service.serviceId; }
@@ -311,295 +319,98 @@ export class HomeComponent implements OnDestroy, OnInit {
           })
         );
 
-        // *****************************************************************
-        // *****************************************************************
-        // *****************************************************************
-        // here rob duplicate this fix throughout site
-        // *****************************************************************
-        // *****************************************************************
-        // *****************************************************************
+        // ********************************
+        // ********************************
+        // ********************************
+        // HERE ROB this form might be unique to user.subscriptions using take(1)
+        // ********************************
+        // ********************************
+        // ********************************
 
-        that._userSubscription = that.auth.user.subscribe(user => {
-          // private forums
-          that.privateForums = that.userForumService.getForums(user.uid, that.privateForumsNumberOfItems, '', [], true, false).pipe(
-            switchMap(forums => {
-              if (forums && forums.length > 0){
-                let observables = forums.map(forum => {
-                  if (forum){
-                    let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                      switchMap(forumImages => {
-                        if (forumImages && forumImages.length > 0){
-                          let getDownloadUrl$: Observable<any>;
-
-                          if (forumImages[0].tinyUrl)
-                            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-
-                          return combineLatest([getDownloadUrl$]).pipe(
-                            switchMap(results => {
-                              const [downloadUrl] = results;
-
-                              if (downloadUrl)
-                                forumImages[0].url = downloadUrl;
-                              else
-                                forumImages[0].url = '../../assets/defaultTiny.jpg';
-
-                              return of(forumImages[0]);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
-
-                    let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
-                      switchMap(registrants => {
-                        if (registrants && registrants.length > 0)
-                          return of(registrants[0]);
-                        else
-                          return of(null);
-                      })
-                    );
-
-                    return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
-                      switchMap(results => {
-                        const [defaultForumImage, defaultRegistrant] = results;
-
-                        if (defaultForumImage)
-                          forum.defaultForumImage = of(defaultForumImage);
-                        else {
-                          let tempImage = {
-                            url: '../../assets/defaultTiny.jpg'
-                          };
-                          forum.defaultForumImage = of(tempImage);
-                        }
-
-                        if (defaultRegistrant)
-                          forum.defaultRegistrant = of(defaultRegistrant);
-                        else
-                          forum.defaultRegistrant = of(null);
-
-                        return of(forum);
-                      })
-                    );
-                  }
-                  else return of(null);
-                });
-
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return forums[i];
-                  });
-                });
-              }
-              else return of([]);
-            })
-          );
-
-          // private services
-          that.privateServices = that.userServiceService.getServices(user.uid, that.privateServicesNumberOfItems, '', [], true, false).pipe(
-            switchMap(services => {
-              if (services && services.length > 0){
-                let observables = services.map(service => {
-                  if (service){
-                    let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
-                      switchMap(serviceImages => {
-                        if (serviceImages && serviceImages.length > 0){
-                          let getDownloadUrl$: Observable<any>;
-
-                          if (serviceImages[0].tinyUrl)
-                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                          return combineLatest([getDownloadUrl$]).pipe(
-                            switchMap(results => {
-                              const [downloadUrl] = results;
-
-                              if (downloadUrl)
-                                serviceImages[0].url = downloadUrl;
-                              else
-                                serviceImages[0].url = '../../assets/defaultTiny.jpg';
-
-                              return of(serviceImages[0]);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
-
-                    return combineLatest([getDefaultServiceImage$]).pipe(
-                      switchMap(results => {
-                        const [defaultServiceImage] = results;
-
-                        if (defaultServiceImage)
-                          service.defaultServiceImage = of(defaultServiceImage);
-                        else {
-                          let tempImage = {
-                            url: '../../assets/defaultTiny.jpg'
-                          };
-                          service.defaultServiceImage = of(tempImage);
-                        }
-                        return of(service);
-                      })
-                    );
-                  }
-                  else return of(null);
-                });
-
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return services[i];
-                  });
-                });
-              }
-              else return of([]);
-            })
-          );
-
-          // receipts
-          that.receipts = that.userReceiptService.getReceipts(user.uid, that.receiptsNumberOfItems).pipe(
-            switchMap(receipts => {
-              if (receipts && receipts.length > 0){
-                let observables = receipts.map(receipt => {
-                  let getBuyerService$ = that.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
-                  let getSellerService$ = that.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
-                  let getBuyerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
-                    switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0){
+        // private forums
+        that._privateForumSubscription = that.userForumService.getForums(that.auth.uid, that.privateForumsNumberOfItems, '', [], true, false).pipe(
+          switchMap(forums => {
+            if (forums && forums.length > 0){
+              let observables = forums.map(forum => {
+                if (forum){
+                  let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                    switchMap(forumImages => {
+                      if (forumImages && forumImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
 
-                        if (serviceImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+                        if (forumImages[0].tinyUrl)
+                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
 
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
 
                             if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
+                              forumImages[0].url = downloadUrl;
                             else
-                              serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
+                              forumImages[0].url = '../../assets/defaultTiny.jpg';
 
-                            return of(serviceImages[0]);
+                            return of(forumImages[0]);
                           })
                         );
                       }
                       else return of(null);
                     })
                   );
-                  let getSellerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
-                    switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
 
-                        if (serviceImages[0].tinyUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-
-                            if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
-                            else
-                              serviceImages[0].url = '../../assets/defaultiny.jpg';
-
-                            return of(serviceImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
+                  let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                    switchMap(registrants => {
+                      if (registrants && registrants.length > 0)
+                        return of(registrants[0]);
+                      else
+                        return of(null);
                     })
                   );
-                  let getBuyerServiceTags$ = that.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
 
-                  return combineLatest([getBuyerService$, getSellerService$, getBuyerDefaultServiceImage$, getSellerDefaultServiceImage$, getBuyerServiceTags$]).pipe(
+                  return combineLatest([getDefaultForumImage$, getDefaultRegistrant$]).pipe(
                     switchMap(results => {
-                      const [buyerService, sellerService, buyerDefaultServiceImage, sellerDefaultServiceImage, buyerServiceTags] = results;
+                      const [defaultForumImage, defaultRegistrant] = results;
 
-                      if (sellerDefaultServiceImage)
-                        receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                      if (defaultForumImage)
+                        forum.defaultForumImage = of(defaultForumImage);
                       else {
                         let tempImage = {
                           url: '../../assets/defaultTiny.jpg'
                         };
-                        receipt.sellerDefaultServiceImage = of(tempImage);
+                        forum.defaultForumImage = of(tempImage);
                       }
 
-                      if (buyerDefaultServiceImage)
-                        receipt.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
-                      else {
-                        let tempImage = {
-                          url: '../../assets/defaultThumbnail.jpg'
-                        };
-                        receipt.buyerDefaultServiceImage = of(tempImage);
-                      }
+                      if (defaultRegistrant)
+                        forum.defaultRegistrant = of(defaultRegistrant);
+                      else
+                        forum.defaultRegistrant = of(null);
 
-                      if (buyerServiceTags)
-                        receipt.buyerServiceTags = of(buyerServiceTags);
-                      else {
-                        receipt.buyerServiceTags = of([]);
-                      }
-
-                      if (buyerService){
-                        receipt.buyerType = buyerService.type;
-                        receipt.buyerPaymentType = buyerService.paymentType;
-                        receipt.buyerTitle = buyerService.title;
-                        receipt.buyerDescription = buyerService.description;
-                      }
-
-                      if (sellerService){
-                        receipt.sellerType = sellerService.type;
-                        receipt.sellerPaymentType = sellerService.paymentType;
-                        receipt.sellerTitle = sellerService.title;
-                        receipt.sellerDescription = sellerService.description;
-                      }
-                      return of(receipt);
+                      return of(forum);
                     })
                   );
+                }
+                else return of(null);
+              });
+
+              return zip(...observables, (...results) => {
+                return results.map((result, i) => {
+                  return forums[i];
                 });
+              });
+            }
+            else return of([]);
+          })
+        ).subscribe(forums => {
+          that.privateForums = of(forums);
+        });
 
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return receipts[i];
-                  });
-                });
-              }
-              else return of([]);
-            })
-          );
-
-          // payments
-          that.payments = that.userPaymentService.getPayments(user.uid, that.paymentsNumberOfItems).pipe(
-            switchMap(payments => {
-              if (payments && payments.length > 0){
-                let observables = payments.map(payment => {
-                  let getSellerService$ = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
-                  let getBuyerService$ = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
-                  let getSellerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
-                    switchMap(serviceImages => {
-                      if (serviceImages && serviceImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
-
-                        if (serviceImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-
-                            if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
-                            else
-                              serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-
-                            return of(serviceImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-                  let getBuyerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.buyerUid, payment.buyerServiceId).pipe(
+        // private services
+        that._privateServiceSubscription = that.userServiceService.getServices(that.auth.uid, that.privateServicesNumberOfItems, '', [], true, false).pipe(
+          switchMap(services => {
+            if (services && services.length > 0){
+              let observables = services.map(service => {
+                if (service){
+                  let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                     switchMap(serviceImages => {
                       if (serviceImages && serviceImages.length > 0){
                         let getDownloadUrl$: Observable<any>;
@@ -623,63 +434,266 @@ export class HomeComponent implements OnDestroy, OnInit {
                       else return of(null);
                     })
                   );
-                  let getSellerServiceTags$ = that.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
 
-                  return combineLatest([getSellerService$, getBuyerService$, getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
+                  return combineLatest([getDefaultServiceImage$]).pipe(
                     switchMap(results => {
-                      const [sellerService, buyerService, sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
+                      const [defaultServiceImage] = results;
 
-                      if (sellerDefaultServiceImage)
-                        payment.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                      if (defaultServiceImage)
+                        service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultThumbnail.jpg'
+                          url: '../../assets/defaultTiny.jpg'
                         };
-                        payment.sellerDefaultServiceImage = of(tempImage);
+                        service.defaultServiceImage = of(tempImage);
                       }
-
-                      if (buyerDefaultServiceImage)
-                        payment.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
-                      else {
-                        let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
-                        };
-                        payment.buyerDefaultServiceImage = of(tempImage);
-                      }
-
-                      if (sellerServiceTags)
-                        payment.sellerServiceTags = of(sellerServiceTags);
-                      else {
-                        payment.sellerServiceTags = of([]);
-                      }
-
-                      if (sellerService){
-                        payment.sellerType = sellerService.type;
-                        payment.sellerPaymentType = sellerService.paymentType;
-                        payment.sellerTitle = sellerService.title;
-                        payment.sellerDescription = sellerService.description;
-                      }
-
-                      if (buyerService){
-                        payment.buyerType = buyerService.type;
-                        payment.buyerPaymentType = buyerService.paymentType;
-                        payment.buyerTitle = buyerService.title;
-                        payment.buyerDescription = buyerService.description;
-                      }
-                      return of(payment);
+                      return of(service);
                     })
                   );
-                });
+                }
+                else return of(null);
+              });
 
-                return zip(...observables, (...results) => {
-                  return results.map((result, i) => {
-                    return payments[i];
-                  });
+              return zip(...observables, (...results) => {
+                return results.map((result, i) => {
+                  return services[i];
                 });
-              }
-              else return of([]);
-            })
-          );
+              });
+            }
+            else return of([]);
+          })
+        ).subscribe(services => {
+          that.privateServices = of(services);
+        });
+
+        // receipts
+        that._receiptSubscription = that.userReceiptService.getReceipts(that.auth.uid, that.receiptsNumberOfItems).pipe(
+          switchMap(receipts => {
+            if (receipts && receipts.length > 0){
+              let observables = receipts.map(receipt => {
+                let getBuyerService$ = that.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
+                let getSellerService$ = that.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
+                let getBuyerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getSellerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(receipt.sellerUid, receipt.sellerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultiny.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getBuyerServiceTags$ = that.userServiceTagService.getTags(receipt.buyerUid, receipt.buyerServiceId);
+
+                return combineLatest([getBuyerService$, getSellerService$, getBuyerDefaultServiceImage$, getSellerDefaultServiceImage$, getBuyerServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [buyerService, sellerService, buyerDefaultServiceImage, sellerDefaultServiceImage, buyerServiceTags] = results;
+
+                    if (sellerDefaultServiceImage)
+                      receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../assets/defaultTiny.jpg'
+                      };
+                      receipt.sellerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (buyerDefaultServiceImage)
+                      receipt.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../assets/defaultThumbnail.jpg'
+                      };
+                      receipt.buyerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (buyerServiceTags)
+                      receipt.buyerServiceTags = of(buyerServiceTags);
+                    else {
+                      receipt.buyerServiceTags = of([]);
+                    }
+
+                    if (buyerService){
+                      receipt.buyerType = buyerService.type;
+                      receipt.buyerPaymentType = buyerService.paymentType;
+                      receipt.buyerTitle = buyerService.title;
+                      receipt.buyerDescription = buyerService.description;
+                    }
+
+                    if (sellerService){
+                      receipt.sellerType = sellerService.type;
+                      receipt.sellerPaymentType = sellerService.paymentType;
+                      receipt.sellerTitle = sellerService.title;
+                      receipt.sellerDescription = sellerService.description;
+                    }
+                    return of(receipt);
+                  })
+                );
+              });
+
+              return zip(...observables, (...results) => {
+                return results.map((result, i) => {
+                  return receipts[i];
+                });
+              });
+            }
+            else return of([]);
+          })
+        ).subscribe(receipts => {
+          that.receipts = of(receipts);
+        });
+
+        // payments
+        that._paymentSubscription = that.userPaymentService.getPayments(that.auth.uid, that.paymentsNumberOfItems).pipe(
+          switchMap(payments => {
+            if (payments && payments.length > 0){
+              let observables = payments.map(payment => {
+                let getSellerService$ = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
+                let getBuyerService$ = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
+                let getSellerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.sellerUid, payment.sellerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getBuyerDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(payment.buyerUid, payment.buyerServiceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
+
+                      if (serviceImages[0].tinyUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            serviceImages[0].url = downloadUrl;
+                          else
+                            serviceImages[0].url = '../../assets/defaultTiny.jpg';
+
+                          return of(serviceImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                let getSellerServiceTags$ = that.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
+
+                return combineLatest([getSellerService$, getBuyerService$, getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [sellerService, buyerService, sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
+
+                    if (sellerDefaultServiceImage)
+                      payment.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultThumbnail.jpg'
+                      };
+                      payment.sellerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (buyerDefaultServiceImage)
+                      payment.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
+                    else {
+                      let tempImage = {
+                        url: '../../../assets/defaultTiny.jpg'
+                      };
+                      payment.buyerDefaultServiceImage = of(tempImage);
+                    }
+
+                    if (sellerServiceTags)
+                      payment.sellerServiceTags = of(sellerServiceTags);
+                    else {
+                      payment.sellerServiceTags = of([]);
+                    }
+
+                    if (sellerService){
+                      payment.sellerType = sellerService.type;
+                      payment.sellerPaymentType = sellerService.paymentType;
+                      payment.sellerTitle = sellerService.title;
+                      payment.sellerDescription = sellerService.description;
+                    }
+
+                    if (buyerService){
+                      payment.buyerType = buyerService.type;
+                      payment.buyerPaymentType = buyerService.paymentType;
+                      payment.buyerTitle = buyerService.title;
+                      payment.buyerDescription = buyerService.description;
+                    }
+                    return of(payment);
+                  })
+                );
+              });
+
+              return zip(...observables, (...results) => {
+                return results.map((result, i) => {
+                  return payments[i];
+                });
+              });
+            }
+            else return of([]);
+          })
+        ).subscribe(payments => {
+          that.payments = of(payments);
         });
       }
       catch (error) {

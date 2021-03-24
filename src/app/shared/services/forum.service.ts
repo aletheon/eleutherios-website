@@ -283,7 +283,7 @@ export class ForumService {
             if (forum.title.length > 0){
               if (excludeForumId !== undefined){
                 if (forum.forumId != excludeForumId)
-                  return true; 
+                  return true;
                 else
                   return false;
               }
@@ -294,7 +294,7 @@ export class ForumService {
           else {
             if (excludeForumId !== undefined){
               if (forum.forumId != excludeForumId)
-                return true; 
+                return true;
               else
                 return false;
             }
