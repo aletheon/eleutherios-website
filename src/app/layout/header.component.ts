@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../core/auth.service';
 import { Router } from '@angular/router';
 import {
@@ -16,7 +16,6 @@ import { Subscription, Observable, of } from 'rxjs';
 })
 export class HeaderComponent implements OnInit {
   private _userTotalSubscription: Subscription;
-  private _userSubscription: Subscription;
   private _forumTotalSubscription: Subscription;
   private _serviceTotalSubscription: Subscription;
 
@@ -44,16 +43,13 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnDestroy () {
-    if (this._userSubscription)
-      this._userSubscription.unsubscribe();
-
     if (this._userTotalSubscription)
       this._userTotalSubscription.unsubscribe();
   }
 
   ngOnInit () {
     // get user totals
-    this._userSubscription = this.auth.user.subscribe(user => {
+    this.auth.user.subscribe(user => {
       if (user){
         // get user total
         this._userTotalSubscription = this.siteTotalService.getTotal(user.uid)
@@ -71,8 +67,8 @@ export class HeaderComponent implements OnInit {
                 serviceNotificationCount: 0,
                 tagCount: 0,
                 alertCount: 0,
-                forumAlertCount: 0, 
-                serviceAlertCount: 0, 
+                forumAlertCount: 0,
+                serviceAlertCount: 0,
                 forumBlockCount: 0,
                 serviceBlockCount: 0,
                 forumUserBlockCount: 0,

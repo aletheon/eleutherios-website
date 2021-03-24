@@ -63,7 +63,7 @@ export class UserForumService {
     return new Promise<boolean>((resolve, reject) => {
       const that = this;
       const forumRef = this.afs.collection(`users/${parentUserId}/forums`);
-  
+
       forumRef.ref.get().then(querySnapshot => {
         if (querySnapshot.size > 0){
           let forumsServingIn: any[] = [];
@@ -80,7 +80,7 @@ export class UserForumService {
                   registrantRef.get().then(querySnapshot => {
                     if (querySnapshot.size > 0)
                       forumsServingIn.push(forum);
-              
+
                     resolve();
                   });
                 });
@@ -123,7 +123,7 @@ export class UserForumService {
       }
       else collectionName = `users/${parentUserId}/forumsnotags`;
     }
-    
+
     if (!key){
       let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate','desc').limit(numberOfItems+1));
       let tempObservable = tempCollection.valueChanges().pipe(

@@ -600,6 +600,10 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             );
 
             // get the default registrant that this user is serving as in this forum
+
+            // HERE ROB
+
+
             that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)

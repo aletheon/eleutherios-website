@@ -29,6 +29,7 @@ import * as _ from "lodash";
 export class ForumImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription = new Subscription;
   private _initialForumSubscription: Subscription;
   private _subscription: Subscription;
   private _forumImagesSubscription: Subscription;
@@ -50,7 +51,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
   public forumImagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
   public defaultRegistrant: any;
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userForumRegistrantService: UserForumRegistrantService,
@@ -58,12 +59,15 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     private userForumTagService: UserForumTagService,
     private forumSerivce: ForumService,
     private fb: FormBuilder,
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private router: Router,
     private snackbar: MatSnackBar) {
     }
 
-  ngOnDestroy () {      
+  ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -99,7 +103,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
       this._initialForumSubscription = this.forumSerivce.getForum(this.forumGroup.get('forumId').value)
         .subscribe(forum => {
           this._initialForumSubscription.unsubscribe();
-          
+
           if (forum){
             this.forum = this.forumSerivce.getForum(this.forumGroup.get('forumId').value);
             this.initForm();
@@ -147,14 +151,16 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
               }
             );
 
-            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
-              .subscribe(registrants => {
-                if (registrants && registrants.length > 0)
-                  that.defaultRegistrant = registrants[0];
-                else
-                  that.defaultRegistrant = of(null);
-              }
-            );
+            that._userSubscription = that.auth.user.subscribe(user => {
+              that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid)
+                .subscribe(registrants => {
+                  if (registrants && registrants.length > 0)
+                    that.defaultRegistrant = registrants[0];
+                  else
+                    that.defaultRegistrant = of(null);
+                }
+              );
+            });
 
             // get default forum image
             that.getDefaultForumImage();
@@ -200,17 +206,17 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
             return combineLatest([getDownloadUrl$]).pipe(
               switchMap(results => {
                 const [downloadUrl] = results;
-                
+
                 if (downloadUrl)
                   forumImage.url = downloadUrl;
                 else
                   forumImage.url = '../../assets/defaultLarge.jpg';
-  
+
                 return of(forumImage);
               })
             );
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return forumImages[i];
@@ -240,7 +246,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
         return combineLatest([getDownloadUrl$]).pipe(
           switchMap(results => {
             const [downloadUrl] = results;
-            
+
             if (downloadUrl)
               forumImages[0].url = downloadUrl;
             else
@@ -267,7 +273,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.forumImagesArray)['creationDate']);
     this.getForumImagesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

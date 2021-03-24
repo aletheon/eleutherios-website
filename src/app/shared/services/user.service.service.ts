@@ -901,7 +901,7 @@ export class UserServiceService {
           });
         })
       );
-      return tempObservable; 
+      return tempObservable;
     }
   }
 
@@ -1031,7 +1031,7 @@ export class UserServiceService {
           });
         })
       );
-      return tempObservable; 
+      return tempObservable;
     }
   }
 }
