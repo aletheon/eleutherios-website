@@ -489,15 +489,6 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
       }
 
       if (forumId){
-
-        // ********************************
-        // ********************************
-        // ********************************
-        // HERE ROB this form might be unique to initial subscriptions using take(1)
-        // ********************************
-        // ********************************
-        // ********************************
-
         this._initialForumSubscription = this.forumService.getForum(forumId).pipe(take(1)).subscribe(forum => {
           if (forum){
             this.forum = this.forumService.getForum(forumId);

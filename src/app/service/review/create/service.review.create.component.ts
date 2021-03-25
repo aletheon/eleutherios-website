@@ -24,7 +24,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -37,6 +37,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   @ViewChild('main', { static: false }) reviewRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceReviewSubscription: Subscription;
@@ -83,6 +84,12 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   trackUserServiceReviews (index, userServiceReview) { return userServiceReview.serviceReviewId; }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -101,7 +108,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this._loading.next(true);
-    
+
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       let parentServiceId = params['parentServiceId'];
@@ -113,10 +120,8 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceId){
-        this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
+        this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
           .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
-
             if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
@@ -177,7 +182,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -198,7 +203,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
       includeTagsInDetailPage:            [''],
       lastUpdateDate:                     [''],
       creationDate:                       ['']
-    }); 
+    });
 
     //  ongoing subscription
     this._serviceSubscription = this.service
@@ -256,7 +261,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
             // service totals
             that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
               .subscribe(total => {
-                if (total) {                    
+                if (total) {
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -270,7 +275,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
                   if (total.reviewCount == 0)
                     that._reviewCount.next(-1);
                   else
-                    that._reviewCount.next(total.reviewCount);                
+                    that._reviewCount.next(total.reviewCount);
                 }
               }
             );
@@ -278,31 +283,33 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
             // get default service image
             that.getDefaultServiceImage();
 
-            // get user services
-            that._userServiceSubscription = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true)
-              .subscribe(userServices => {
-                if (userServices.length > 0) {
-                  // set default user service
-                  if (that._userId.length > 0 && that._serviceId.length > 0) {
-                    userServices.forEach((userService, i) => {
-                      if (userService.uid == that._userId && userService.serviceId == that._serviceId)
-                        that.userServicesCtrl.setValue(userService);
-                    });
+            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
+              // get user services
+              that._userServiceSubscription = that.userServiceService.getServices(user.uid, that.numberItems, '', [], true, true)
+                .subscribe(userServices => {
+                  if (userServices.length > 0) {
+                    // set default user service
+                    if (that._userId.length > 0 && that._serviceId.length > 0) {
+                      userServices.forEach((userService, i) => {
+                        if (userService.uid == that._userId && userService.serviceId == that._serviceId)
+                          that.userServicesCtrl.setValue(userService);
+                      });
+                    }
+                    that.userServices = of(userServices);
                   }
-                  that.userServices = of(userServices);
+                  else that.userServices = of([]);
                 }
-                else that.userServices = of([]);
-              }
-            );
+              );
 
-            // get user reviews for this service
-            that.getUserServiceReviewsList(that.auth.uid);
+              // get user reviews for this service
+              that.getUserServiceReviewsList(user.uid);
+            });
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -328,7 +335,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -356,7 +363,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   private getUserServiceReviewsList (userId: string, key?: any) {
     if (this._userServiceReviewSubscription)
       this._userServiceReviewSubscription.unsubscribe();
-    
+
     this._searchLoading.next(true);
 
     this._userServiceReviewSubscription = this.userServiceReviewService.getAllUserServiceReviews(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, userId, this.numberItems, key).pipe(
@@ -375,16 +382,16 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
 
                           if (serviceImages[0].smallUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-                  
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                  
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -392,7 +399,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-                    
+
                     return combineLatest([getServiceRates$, getDefaultServiceImage$]).pipe(
                       switchMap(results => {
                         const [serviceRates, defaultServiceImage] = results;
@@ -421,7 +428,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
               return combineLatest([getService$]).pipe(
                 switchMap(results => {
                   const [service] = results;
-                  
+
                   if (service)
                     serviceReview.service = of(service);
                   else {
@@ -616,7 +623,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.userServiceReviewsArray)['creationDate']);
     this.getUserServiceReviewsList(this.auth.uid, this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

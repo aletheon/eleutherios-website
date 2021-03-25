@@ -35,7 +35,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -50,6 +50,7 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private _loading = new BehaviorSubject(false);
   private _initialServiceSubscription: Subscription;
+  private _userSubscription = new Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
@@ -424,8 +425,14 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
+
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
 
     if (this._defaultServiceImageSubscription)
       this._defaultServiceImageSubscription.unsubscribe();
@@ -482,10 +489,8 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       if (serviceId){
-        this._initialServiceSubscription = this.serviceService.getService(serviceId)
+        this._initialServiceSubscription = this.serviceService.getService(serviceId).pipe(take(1))
           .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
-
             if (service){
               this.service = this.serviceService.getService(serviceId);
               this.initForm();
@@ -596,104 +601,106 @@ export class ServiceDetailComponent implements OnInit, AfterViewInit, OnDestroy 
             // tags for this service
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-            // which forums this service is serving in
-            that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
-              map(whereServings => {
-                return whereServings.filter(whereServing => {
-                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
-                    return true;
-                  else
-                    return false;
-                }).map(whereServing => {
-                  return { ...whereServing };
-                });
-              }),
-              switchMap(whereServings => {
-                if (whereServings && whereServings.length > 0) {
-                  let observables = whereServings.map(whereServing => {
-                    let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
-                      switchMap(forum => {
-                        if (forum) {
-                          let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
-                            switchMap(registrants => {
-                              if (registrants && registrants.length > 0)
-                                return of(registrants[0]);
-                              else
-                                return of(null);
-                            })
-                          );
-
-                          let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                            switchMap(forumImages => {
-                              if (forumImages && forumImages.length > 0){
-                                let getDownloadUrl$: Observable<any>;
-
-                                if (forumImages[0].tinyUrl)
-                                  getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-
-                                return combineLatest([getDownloadUrl$]).pipe(
-                                  switchMap(results => {
-                                    const [downloadUrl] = results;
-
-                                    if (downloadUrl)
-                                      forumImages[0].url = downloadUrl;
-                                    else
-                                      forumImages[0].url = '../../assets/defaultTiny.jpg';
-
-                                    return of(forumImages[0]);
-                                  })
-                                );
-                              }
-                              else return of(null);
-                            })
-                          );
-
-                          return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
-                            switchMap(results => {
-                              const [defaultRegistrant, defaultForumImage] = results;
-
-                              if (defaultRegistrant)
-                                forum.defaultRegistrant = of(defaultRegistrant);
-                              else
-                                forum.defaultRegistrant = of(null);
-
-                              if (defaultForumImage)
-                                forum.defaultForumImage = of(defaultForumImage);
-                              else {
-                                let tempImage = {
-                                  url: '../../assets/defaultTiny.jpg'
-                                };
-                                forum.defaultForumImage = of(tempImage);
-                              }
-                              return of(forum);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
-
-                    return combineLatest([getForum$]).pipe(
-                      switchMap(results => {
-                        const [forum] = results;
-
-                        if (forum)
-                          whereServing.forum = of(forum);
-                        else {
-                          whereServing.forum = of(null);
-                        }
-                        return of(whereServing);
-                      })
-                    );
+            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
+              // which forums this service is serving in
+              that.whereServings = that.userWhereServingService.getWhereServings(service.uid, service.serviceId).pipe(
+                map(whereServings => {
+                  return whereServings.filter(whereServing => {
+                    if (whereServing.type == 'Public' || user.uid == service.uid || user.uid == whereServing.uid)
+                      return true;
+                    else
+                      return false;
+                  }).map(whereServing => {
+                    return { ...whereServing };
                   });
-                  return zip(...observables);
-                }
-                else return of([]);
-              })
-            );
+                }),
+                switchMap(whereServings => {
+                  if (whereServings && whereServings.length > 0) {
+                    let observables = whereServings.map(whereServing => {
+                      let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
+                        switchMap(forum => {
+                          if (forum) {
+                            let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid).pipe(
+                              switchMap(registrants => {
+                                if (registrants && registrants.length > 0)
+                                  return of(registrants[0]);
+                                else
+                                  return of(null);
+                              })
+                            );
 
-            // forums this user has created so they can request the service serve in their forum(s)
-            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+                            let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                              switchMap(forumImages => {
+                                if (forumImages && forumImages.length > 0){
+                                  let getDownloadUrl$: Observable<any>;
+
+                                  if (forumImages[0].tinyUrl)
+                                    getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
+
+                                  return combineLatest([getDownloadUrl$]).pipe(
+                                    switchMap(results => {
+                                      const [downloadUrl] = results;
+
+                                      if (downloadUrl)
+                                        forumImages[0].url = downloadUrl;
+                                      else
+                                        forumImages[0].url = '../../assets/defaultTiny.jpg';
+
+                                      return of(forumImages[0]);
+                                    })
+                                  );
+                                }
+                                else return of(null);
+                              })
+                            );
+
+                            return combineLatest([getDefaultRegistrant$, getDefaultForumImage$]).pipe(
+                              switchMap(results => {
+                                const [defaultRegistrant, defaultForumImage] = results;
+
+                                if (defaultRegistrant)
+                                  forum.defaultRegistrant = of(defaultRegistrant);
+                                else
+                                  forum.defaultRegistrant = of(null);
+
+                                if (defaultForumImage)
+                                  forum.defaultForumImage = of(defaultForumImage);
+                                else {
+                                  let tempImage = {
+                                    url: '../../assets/defaultTiny.jpg'
+                                  };
+                                  forum.defaultForumImage = of(tempImage);
+                                }
+                                return of(forum);
+                              })
+                            );
+                          }
+                          else return of(null);
+                        })
+                      );
+
+                      return combineLatest([getForum$]).pipe(
+                        switchMap(results => {
+                          const [forum] = results;
+
+                          if (forum)
+                            whereServing.forum = of(forum);
+                          else {
+                            whereServing.forum = of(null);
+                          }
+                          return of(whereServing);
+                        })
+                      );
+                    });
+                    return zip(...observables);
+                  }
+                  else return of([]);
+                })
+              );
+
+              // forums this user has created so they can request the service serve in their forum(s)
+              that.userForums = that.userForumService.getForums(user.uid, that.numberItems, '', [], true, true);
+            });
 
             // get default service image
             that.getDefaultServiceImage();

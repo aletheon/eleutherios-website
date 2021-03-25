@@ -23,7 +23,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -35,6 +35,7 @@ import * as _ from "lodash";
 export class ServiceRateCreateComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _userServiceRateSubscription: Subscription;
@@ -81,6 +82,12 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
   trackUserServiceRates (index, userServiceRate) { return userServiceRate.serviceRateId; }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -96,7 +103,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this._loading.next(true);
-    
+
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       let parentServiceId = params['parentServiceId'];
@@ -106,10 +113,8 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceId){
-        this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
+        this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
           .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
-
             if (service){
               if (service.uid != this.auth.uid){
                 if (service.indexed == true){
@@ -170,7 +175,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -190,7 +195,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
       includeTagsInDetailPage:            [''],
       lastUpdateDate:                     [''],
       creationDate:                       ['']
-    }); 
+    });
 
     //  ongoing subscription
     this._serviceSubscription = this.service
@@ -248,7 +253,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
             // service totals
             that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
               .subscribe(total => {
-                if (total) {                    
+                if (total) {
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -267,7 +272,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
                   if (total.reviewCount == 0)
                     that._reviewCount.next(-1);
                   else
-                    that._reviewCount.next(total.reviewCount);                
+                    that._reviewCount.next(total.reviewCount);
                 }
               }
             );
@@ -275,17 +280,19 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
             // get default service image
             that.getDefaultServiceImage();
 
-            // get user services
-            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
+            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
+              // get user services
+              that.userServices = that.userServiceService.getServices(user.uid, that.numberItems, '', [], true, true);
 
-            // get user rates for this service
-            that.getUserServiceRatesList(that.auth.uid);
+              // get user rates for this service
+              that.getUserServiceRatesList(user.uid);
+            });
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -311,7 +318,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -339,7 +346,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
   private getUserServiceRatesList (userId: string, key?: any) {
     if (this._userServiceRateSubscription)
       this._userServiceRateSubscription.unsubscribe();
-    
+
     this._searchLoading.next(true);
 
     this._userServiceRateSubscription = this.userServiceRateService.getAllUserServiceRates(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, userId, this.numberItems, key).pipe(
@@ -358,16 +365,16 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
 
                           if (serviceImages[0].smallUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-                  
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                  
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -375,7 +382,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-                    
+
                     return combineLatest([getServiceReviews$, getDefaultServiceImage$]).pipe(
                       switchMap(results => {
                         const [serviceReviews, defaultServiceImage] = results;
@@ -404,7 +411,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
               return combineLatest([getService$]).pipe(
                 switchMap(results => {
                   const [service] = results;
-                  
+
                   if (service)
                     serviceRate.service = of(service);
                   else {
@@ -615,7 +622,7 @@ export class ServiceRateCreateComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.userServiceRatesArray)['creationDate']);
     this.getUserServiceRatesList(this.auth.uid, this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

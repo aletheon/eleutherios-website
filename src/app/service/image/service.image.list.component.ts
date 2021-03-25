@@ -17,7 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -29,8 +29,9 @@ import * as _ from "lodash";
 export class ServiceImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription = new Subscription;
   private _initialServiceSubscription: Subscription;
-  private _subscription: Subscription;
+  private _serviceSubscription: Subscription;
   private _serviceImagesSubscription: Subscription;
   private _defaultServiceImageSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -48,7 +49,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
   public defaultServiceImage: Observable<any>;
   public serviceImagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userForumService: UserForumService,
@@ -57,13 +58,19 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
     private serviceService: ServiceService,
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private snackbar: MatSnackBar) {
   }
 
   ngOnDestroy () {
-    if (this._subscription)
-      this._subscription.unsubscribe();
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
+    if (this._serviceSubscription)
+      this._serviceSubscription.unsubscribe();
 
     if (this._serviceImagesSubscription)
       this._serviceImagesSubscription.unsubscribe();
@@ -88,18 +95,17 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
+      let serviceId = params['serviceId'];
       this.serviceGroup.get('serviceId').setValue(params['serviceId']);
 
-      if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('serviceId').value.length > 0){
-        this._initialServiceSubscription = this.serviceService.getService(this.serviceGroup.get('serviceId').value)
+      if (serviceId){
+        this._initialServiceSubscription = this.serviceService.getService(serviceId).pipe(take(1))
           .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
-
             if (service){
               // authenticate
               let canViewDetail: boolean = false;
 
-              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, service.serviceId)
+              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, serviceId)
                 .then(isServing => {
                   if (service.type == 'Public')
                     canViewDetail = true;
@@ -107,9 +113,9 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
                     canViewDetail = true;
                   else if (isServing && isServing == true)
                     canViewDetail = true;
-                    
+
                   if (canViewDetail){
-                    this.service = this.serviceService.getService(this.serviceGroup.get('serviceId').value);
+                    this.service = this.serviceService.getService(serviceId);
                     this.initForm();
                   }
                   else {
@@ -166,8 +172,8 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
-    this._subscription = this.service
+
+    this._serviceSubscription = this.service
       .subscribe(service => {
         if (service){
           this.serviceGroup.patchValue(service);
@@ -177,10 +183,10 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
               this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, service.serviceId)
                 .then(isServing => {
                   let canViewDetail = false;
-  
+
                   if (isServing && isServing == true)
                     canViewDetail = true;
-                    
+
                   if (!canViewDetail){
                     const snackBarRef = this.snackbar.openFromComponent(
                       NotificationSnackBar,
@@ -240,7 +246,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -271,17 +277,17 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
             return combineLatest([getDownloadUrl$]).pipe(
               switchMap(results => {
                 const [downloadUrl] = results;
-                
+
                 if (downloadUrl)
                   serviceImage.url = downloadUrl;
                 else
                   serviceImage.url = '../../assets/defaultLarge.jpg';
-  
+
                 return of(serviceImage);
               })
             );
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return serviceImages[i];
@@ -312,7 +318,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -341,7 +347,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.serviceImagesArray)['creationDate']);
     this.getServiceImagesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

@@ -22,7 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { switchMap, startWith, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -134,7 +134,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._userSubscription = this.auth.user.subscribe(user => {
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
       if (this.searchForumCtrl.value && this.searchForumCtrl.value.length > 0){
         if (!key)
           key = this.searchForumCtrl.value;

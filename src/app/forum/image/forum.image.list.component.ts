@@ -17,7 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -31,7 +31,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
   private _total = new BehaviorSubject(0);
   private _userSubscription = new Subscription;
   private _initialForumSubscription: Subscription;
-  private _subscription: Subscription;
+  private _forumSubscription: Subscription;
   private _forumImagesSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -68,8 +68,11 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
 
-    if (this._subscription)
-      this._subscription.unsubscribe();
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
+    if (this._forumSubscription)
+      this._forumSubscription.unsubscribe();
 
     if (this._defaultRegistrantSubscription)
       this._defaultRegistrantSubscription.unsubscribe();
@@ -97,37 +100,37 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
+      let forumId = params['forumId'];
       this.forumGroup.get('forumId').setValue(params['forumId']);
 
-      // ensure forum exists
-      this._initialForumSubscription = this.forumSerivce.getForum(this.forumGroup.get('forumId').value)
-        .subscribe(forum => {
-          this._initialForumSubscription.unsubscribe();
-
-          if (forum){
-            this.forum = this.forumSerivce.getForum(this.forumGroup.get('forumId').value);
-            this.initForm();
+      if (forumId){
+        this._initialForumSubscription = this.forumSerivce.getForum(forumId).pipe(take(1))
+          .subscribe(forum => {
+            if (forum){
+              this.forum = this.forumSerivce.getForum(forumId);
+              this.initForm();
+            }
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Forum does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            }
           }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Forum does not exist or was recently removed',
-                panelClass: ['red-snackbar']
-              }
-            );
-            this.router.navigate(['/']);
-          }
-        }
-      );
+        );
+      }
     });
   }
 
   private initForm (){
     const that = this;
 
-    this._subscription = this.forum
+    this._forumSubscription = this.forum
       .subscribe(forum => {
         if (forum)
           this.forumGroup.patchValue(forum);
@@ -151,7 +154,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
               }
             );
 
-            that._userSubscription = that.auth.user.subscribe(user => {
+            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
               that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid)
                 .subscribe(registrants => {
                   if (registrants && registrants.length > 0)

@@ -24,7 +24,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -59,7 +59,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
   public searchLoading: Observable<boolean> = this._searchLoading.asObservable();
   public serviceReviews: Observable<any[]> = of([]);
   public serviceReviewsArray: any[] = [];
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -74,6 +74,9 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -91,7 +94,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this._loading.next(true);
-    
+
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       let parentServiceId = params['parentServiceId'];
@@ -101,10 +104,8 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       if (parentServiceId){
-        this._initialServiceSubscription = this.serviceService.getService(parentServiceId)
+        this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
           .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
-
             if (service){
               this.service = this.serviceService.getService(parentServiceId);
               this.initForm();
@@ -139,7 +140,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -159,7 +160,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
       includeTagsInDetailPage:            [''],
       lastUpdateDate:                     [''],
       creationDate:                       ['']
-    });   
+    });
 
     //  ongoing subscription
     this._serviceSubscription = this.service
@@ -188,7 +189,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
             // service totals
             that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
               .subscribe(total => {
-                if (total) {                    
+                if (total) {
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -197,7 +198,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
                   if (total.reviewCount == 0)
                     that._reviewCount.next(-1);
                   else
-                    that._reviewCount.next(total.reviewCount);             
+                    that._reviewCount.next(total.reviewCount);
                 }
               }
             );
@@ -212,7 +213,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -238,7 +239,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -266,7 +267,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
   getServiceReviewsList (key?: any) {
     if (this._serviceReviewSubscription)
       this._serviceReviewSubscription.unsubscribe();
-    
+
     this._searchLoading.next(true);
 
     this._serviceReviewSubscription = this.userServiceReviewService.getAllServiceReviews(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, this.numberItems, key).pipe(
@@ -285,16 +286,16 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
 
                           if (serviceImages[0].smallUrl)
                             getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-                  
+
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                  
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -302,7 +303,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-                    
+
                     return combineLatest([getServiceRates$, getDefaultServiceImage$]).pipe(
                       switchMap(results => {
                         const [serviceRates, defaultServiceImage] = results;
@@ -331,7 +332,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
               return combineLatest([getService$]).pipe(
                 switchMap(results => {
                   const [service] = results;
-                  
+
                   if (service)
                     serviceReview.service = of(service);
                   else {
@@ -444,7 +445,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.serviceReviewsArray)['creationDate']);
     this.getServiceReviewsList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key
