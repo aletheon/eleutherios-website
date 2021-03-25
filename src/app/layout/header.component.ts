@@ -8,6 +8,7 @@ import {
   User
 } from '../shared';
 import { Subscription, Observable, of } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'layout-header',
@@ -49,7 +50,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit () {
     // get user totals
-    this.auth.user.subscribe(user => {
+    this.auth.user.pipe(take(1)).subscribe(user => {
       if (user){
         // get user total
         this._userTotalSubscription = this.siteTotalService.getTotal(user.uid)

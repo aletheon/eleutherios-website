@@ -30,7 +30,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -44,6 +44,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -444,6 +445,12 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -502,9 +509,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         }
       }
 
-      this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).subscribe(forum => {
-        this._initialForumSubscription.unsubscribe();
-
+      this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).pipe(take(1)).subscribe(forum => {
         if (forum){
           if (forum.uid == this.auth.uid){
             this._canViewDetail.next(true);
@@ -670,16 +675,6 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
               }
             );
 
-            // get the default registrant that this user is serving as in this forum
-            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
-              .subscribe(registrants => {
-                if (registrants && registrants.length > 0)
-                  that.defaultRegistrant = of(registrants[0]);
-                else
-                  that.defaultRegistrant = of(null);
-              }
-            );
-
             // get the tags for this forum
             that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
 
@@ -755,8 +750,20 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
               })
             );
 
-            // get the user services
-            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
+            that._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+              // get the default registrant that this user is serving as in this forum
+              that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid)
+                .subscribe(registrants => {
+                  if (registrants && registrants.length > 0)
+                    that.defaultRegistrant = of(registrants[0]);
+                  else
+                    that.defaultRegistrant = of(null);
+                }
+              );
+
+              // get the user services
+              that.userServices = that.userServiceService.getServices(user.uid, that.numberItems, '', [], true, true);
+            });
 
             // get default forum image
             that.getDefaultForumImage();

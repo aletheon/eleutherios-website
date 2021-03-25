@@ -15,7 +15,7 @@ import {
 } from '../../../shared';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -27,8 +27,10 @@ import * as _ from "lodash";
 export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
+  private _userId: string = '';
 
   public numberItems: number = 12;
   public nextKey: any;
@@ -37,7 +39,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   public forumServiceBlocks: Observable<any[]> = of([]);
   public forumServiceBlocksArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userServiceService: UserServiceService,
@@ -51,6 +53,9 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -66,29 +71,31 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
       this.nextKey = null;
       this.prevKeys = [];
 
-      this._totalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-        .subscribe(total => {
-          if (total){
-            if (total.serviceBlockCount == 0)
-              this._total.next(-1);
-            else
-              this._total.next(total.serviceBlockCount);
+      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+        this._userId = user.uid;
+
+        this._totalSubscription = this.siteTotalService.getTotal(this._userId)
+          .subscribe(total => {
+            if (total){
+              if (total.serviceBlockCount == 0)
+                this._total.next(-1);
+              else
+                this._total.next(total.serviceBlockCount);
+            }
+            else this._total.next(-1);
           }
-          else this._total.next(-1);          
-        }
-      );
-      this.getForumServiceBlockList();
+        );
+        this.getForumServiceBlockList();
+      });
     });
   }
 
   getForumServiceBlockList (key?: any) {
     const that = this;
 
-    if (this._subscription) this._subscription.unsubscribe();
-
     this._loading.next(true);
 
-    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this.auth.uid, this.numberItems, key).pipe(
+    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this._userId, this.numberItems, key).pipe(
       switchMap(serviceBlocks => {
         if (serviceBlocks && serviceBlocks.length > 0){
           let observables = serviceBlocks.map(serviceBlock => {
@@ -106,12 +113,12 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                         return combineLatest([getDownloadUrl$]).pipe(
                           switchMap(results => {
                             const [downloadUrl] = results;
-                            
+
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
                               forumImages[0].url = '../../../assets/defaultTiny.jpg';
-              
+
                             return of(forumImages[0]);
                           })
                         );
@@ -127,19 +134,19 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                           switchMap(serviceImages => {
                             if (serviceImages && serviceImages.length > 0){
                               let getDownloadUrl$: Observable<any>;
-    
+
                               if (serviceImages[0].tinyUrl)
                                 getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-    
+
                               return combineLatest([getDownloadUrl$]).pipe(
                                 switchMap(results => {
                                   const [downloadUrl] = results;
-                                  
+
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
                                     serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                    
+
                                   return of(serviceImages[0]);
                                 })
                               );
@@ -147,11 +154,11 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                             else return of(null);
                           })
                         );
-      
+
                         return combineLatest([getDefaultServiceImage$]).pipe(
                           switchMap(results => {
                             const [defaultServiceImage] = results;
-                                            
+
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
@@ -168,7 +175,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this._userId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);
@@ -189,7 +196,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                         };
                         service.defaultForumImage = of(tempImage);
                       }
-        
+
                       if (service)
                         forum.service = of(service);
                       else
@@ -199,7 +206,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                         forum.defaultRegistrant = of(defaultRegistrant);
                       else
                         forum.defaultRegistrant = of(null);
-        
+
                       return of(forum);
                     })
                   );
@@ -211,7 +218,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
             return combineLatest([getForum$]).pipe(
               switchMap(results => {
                 const [forum] = results;
-                
+
                 if (forum)
                   serviceBlock.forum = of(forum);
                 else {
@@ -225,7 +232,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
         }
         else return of([]);
       })
-    )      
+    )
     .subscribe(serviceBlocks => {
       this.forumServiceBlocksArray = _.slice(serviceBlocks, 0, this.numberItems);
       this.forumServiceBlocks = of(this.forumServiceBlocksArray);
@@ -242,7 +249,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.forumServiceBlocksArray)['creationDate']);
     this.getForumServiceBlockList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

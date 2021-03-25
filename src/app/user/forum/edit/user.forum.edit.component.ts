@@ -34,7 +34,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
-import { switchMap, startWith, tap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, startWith, tap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
 
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
@@ -47,6 +47,7 @@ import * as _ from "lodash";
 export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit  {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -60,6 +61,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   private _tempServiceTags: string[] = [];
   private _settingDefaultForumImage: boolean = false;
   private _addingTag = new BehaviorSubject(false);
+  private _userId: string = '';
 
   public forum: Observable<any>;
   public defaultForumImage: Observable<any>;
@@ -137,6 +139,12 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
 
@@ -182,23 +190,27 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      this._initialForumSubscription = this.userForumService.getForum(this.auth.uid, params['forumId']).subscribe(forum => {
-        this._initialForumSubscription.unsubscribe();
+      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+        if (user){
+          this._userId = user.uid;
 
-        if (forum){
-          this.forum = this.userForumService.getForum(this.auth.uid, params['forumId']);
-          this.initForm();
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: 'Forum does not exist or was recently removed',
-              panelClass: ['red-snackbar']
+          this._initialForumSubscription = this.userForumService.getForum(user.uid, params['forumId']).pipe(take(1)).subscribe(forum => {
+            if (forum){
+              this.forum = this.userForumService.getForum(user.uid, params['forumId']);
+              this.initForm();
             }
-          );
-          this.router.navigate(['/user/forum/list']);
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Forum does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            }
+          });
         }
       });
     });
@@ -324,7 +336,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
               that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
 
               // images
-              that.images = that.userImageService.getImages(that.auth.uid, 1000, null, 'desc').pipe(
+              that.images = that.userImageService.getImages(that._userId, 1000, null, 'desc').pipe(
                 switchMap(images => {
                   if (images && images.length > 0){
                     let observables = images.map(image => {
@@ -502,12 +514,12 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
               if (that.forumGroup.get('searchPrivateServices').value == true){
                 that.matAutoCompleteSearchServices = that.searchServiceCtrl.valueChanges.pipe(
                   startWith(''),
-                  switchMap(searchTerm => that.userServiceService.search(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value))
+                  switchMap(searchTerm => that.userServiceService.search(that._userId, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value))
                 );
 
                 that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                   tap(searchTerm => {
-                    that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
+                    that.searchServiceResults = that.userServiceService.tagSearch(that._userId, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
                       switchMap(services => {
                         if (services && services.length > 0) {
                           let observables = services.map(service => {
@@ -576,7 +588,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                 ).subscribe();
 
                 // preload, service search results
-                that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
+                that.searchServiceResults = that.userServiceService.tagSearch(that._userId, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, that.forumGroup.get('searchPaymentType').value, that.forumGroup.get('searchCurrency').value, that.forumGroup.get('searchStartAmount').value, that.forumGroup.get('searchEndAmount').value).pipe(
                   switchMap(services => {
                     if (services && services.length > 0) {
                       let observables = services.map(service => {
@@ -904,7 +916,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this._userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1042,7 +1054,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
 
   searchServices () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this._userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1453,7 +1465,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this._userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1600,13 +1612,13 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
               if (!result){
                 const newTag: Tag = {
                   tagId: '',
-                  uid: this.auth.uid,
+                  uid: this._userId,
                   tag: valueToSearch,
                   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
+                const userTag = this.userTagService.create(this._userId, newTag).then(() => {
                   // add tag to search list
                   this.tagService.search(newTag.tag).subscribe(tags => {
                     this.forumTagsSelectionChange(tags[0]);
@@ -1664,13 +1676,13 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm =>
-          this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
+          this.userServiceService.search(this._userId, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value)
         )
       );
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+          this.searchServiceResults = this.userServiceService.tagSearch(this._userId, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
             switchMap(services => {
               if (services && services.length > 0) {
                 let observables = services.map(service => {
@@ -1738,7 +1750,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         })
       ).subscribe();
 
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this._userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true, this.forumGroup.get('searchPaymentType').value, this.forumGroup.get('searchCurrency').value, this.forumGroup.get('searchStartAmount').value, this.forumGroup.get('searchEndAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1994,7 +2006,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         lastUpdateDate: this.forumGroup.get('lastUpdateDate').value
       };
 
-      this.userForumService.update(this.auth.uid, forum.forumId, forum).then(() => {
+      this.userForumService.update(this._userId, forum.forumId, forum).then(() => {
         const snackBarRef = this.snackbar.openFromComponent(
           NotificationSnackBar,
           {

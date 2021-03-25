@@ -128,9 +128,6 @@ export class ForumListComponent implements OnInit, OnDestroy {
   }
 
   getForumsList (key?: any) {
-    if (this._subscription)
-      this._subscription.unsubscribe();
-
     // loading
     this._loading.next(true);
 
