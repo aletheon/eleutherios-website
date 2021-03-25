@@ -46,6 +46,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionPanelTitle', { static: false }) _descriptionPanelTitle: ElementRef;
 
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -76,6 +77,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   public loading: Observable<boolean> = this._loading.asObservable();
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
   public defaultForumImage: Observable<any>;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -446,6 +448,9 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
   trackUserServices (index, service) { return service.serviceId; }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._initialForumSubscription)
       this._initialForumSubscription.unsubscribe();
 
@@ -468,55 +473,61 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
 
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let forumId = params['forumId'];
-      let serviceId = params['serviceId'];
-      let serviceUserId = params['serviceUserId']
-      let parentForumId = params['parentForumId'];
-      let parentForumUserId = params['forumUserId'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (serviceId || parentForumId){
-        if (serviceId){
-          this.id = of(serviceId);
-          this.returnUserId = of(serviceUserId);
-          this.returnType = of('Service');
-        }
-        else if (parentForumId) {
-          this.id = of(parentForumId);
-          this.returnUserId = of(parentForumUserId);
-          this.returnType = of('Forum');
-        }
-      }
+        this.route.queryParams.subscribe((params: Params) => {
+          let forumId = params['forumId'];
+          let serviceId = params['serviceId'];
+          let serviceUserId = params['serviceUserId']
+          let parentForumId = params['parentForumId'];
+          let parentForumUserId = params['forumUserId'];
 
-      if (forumId){
-        this._initialForumSubscription = this.forumService.getForum(forumId).pipe(take(1)).subscribe(forum => {
-          if (forum){
-            this.forum = this.forumService.getForum(forumId);
-            this.initForm();
+          if (serviceId || parentForumId){
+            if (serviceId){
+              this.id = of(serviceId);
+              this.returnUserId = of(serviceUserId);
+              this.returnType = of('Service');
+            }
+            else if (parentForumId) {
+              this.id = of(parentForumId);
+              this.returnUserId = of(parentForumUserId);
+              this.returnType = of('Forum');
+            }
+          }
+
+          if (forumId){
+            this._initialForumSubscription = this.forumService.getForum(forumId).pipe(take(1)).subscribe(forum => {
+              if (forum){
+                this.forum = this.forumService.getForum(forumId);
+                this.initForm();
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Forum does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
+                  }
+                );
+                this.router.navigate(['/']);
+              }
+            });
           }
           else {
-            const snackBarRef = this.snackbar.openFromComponent(
+            const snackBarRef = that.snackbar.openFromComponent(
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: 'Forum does not exist or was recently removed',
+                data: 'There was no forumId supplied',
                 panelClass: ['red-snackbar']
               }
             );
             this.router.navigate(['/']);
           }
         });
-      }
-      else {
-        const snackBarRef = that.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no forumId supplied',
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
       }
     });
   }
@@ -601,7 +612,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             );
 
             // get the default registrant that this user is serving as in this forum
-            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId)
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)
                   that.defaultRegistrant = of(registrants[0]);
@@ -686,7 +697,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             );
 
             // get the user services
-            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true);
+            that.userServices = that.userServiceService.getServices(that.loggedInUserId, that.numberItems, '', [], true, true);
 
             // get default forum image
             that.getDefaultForumImage();

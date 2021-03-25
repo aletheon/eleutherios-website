@@ -55,7 +55,7 @@
 					</ng-template>
 					<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;margin-bottom:5px">
 						<mat-form-field style="width:100%">
-              <textarea 
+              <textarea
                 matInput
                 #main
                 placeholder="Review"
@@ -106,13 +106,13 @@
 											<ng-container *ngIf="service.serviceRate | async; then showservicerate"></ng-container>
 											<ng-template #showservicerate>
 												<ng-container *ngIf="service.serviceRate | async;let serviceRate">
-													<star-rating-control *ngIf="serviceRate.serviceUid == auth.uid"
+													<star-rating-control *ngIf="serviceRate.serviceUid == loggedInUserId"
 														[rating]="serviceRate.rate"
 														[starType]="'svg'"
 														[readOnly]="false"
 														(starClickChange)="onUpdateRateClick($event, serviceRate)">
 													</star-rating-control>
-													<star-rating-control *ngIf="serviceRate.serviceUid != auth.uid"
+													<star-rating-control *ngIf="serviceRate.serviceUid != loggedInUserId"
 														[rating]="serviceRate.rate"
 														[starType]="'svg'"
 														[readOnly]="true">
@@ -121,9 +121,9 @@
 											</ng-template>
 											<ng-container *ngIf="service.serviceRate | async; else noservicerate"></ng-container>
 											<ng-template #noservicerate>
-												<mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/rate/create']" [queryParams]='{ parentServiceId: userServiceReview.serviceReviewServiceId, userId: userServiceReview.serviceUid, serviceId: userServiceReview.serviceId }' matTooltip="Create rate">add_box</mat-icon>
+												<mat-icon *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/rate/create']" [queryParams]='{ parentServiceId: userServiceReview.serviceReviewServiceId, userId: userServiceReview.serviceUid, serviceId: userServiceReview.serviceId }' matTooltip="Create rate">add_box</mat-icon>
 											</ng-template>
-											<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+											<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 												<mat-icon onclick="event.stopPropagation()" (click)="delete(userServiceReview)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 											</div>
 										</div>
@@ -139,7 +139,7 @@
 					</ng-container>
 				</div>
 				<!-- paging -->
-				<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+				<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 					<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 					<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 				</div>

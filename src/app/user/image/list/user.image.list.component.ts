@@ -20,6 +20,13 @@ import { switchMap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
+
+// continue here rob
+
+
+
+
+
 @Component({
   selector: 'user-image-list',
   templateUrl: './user.image.list.component.html',
@@ -42,7 +49,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   public selectedFiles: FileList;
   public currentUpload: Upload;
   public disableButton: boolean = true;
-  
+
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
     private userImageService: UserImageService,
@@ -104,7 +111,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
           lastUpdateDate: image.lastUpdateDate,
           creationDate: image.creationDate
         };
-  
+
         this.userImageService.update(image.uid, image.imageId, updatedImage).then(() => {
           const snackBarRef = this.snackbar.openFromComponent(
             NotificationSnackBar,
@@ -117,7 +124,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
         })
         .catch(error => {
           console.log('changeImageName error ' + error);
-        }); 
+        });
       }
       else {
         const snackBarRef =this.snackbar.openFromComponent(
@@ -145,7 +152,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
 
     window.localStorage.removeItem('userImageListPrevKeys');
     window.localStorage.removeItem('userImageListNextKey');
-    
+
     // get params
     this.route.queryParams.subscribe((params: Params) => {
       // reset keys
@@ -234,7 +241,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
             return combineLatest([getImageTotal$, getDownloadUrl$]).pipe(
               switchMap(results => {
                 const [imageTotal, downloadUrl] = results;
-                
+
                 if (imageTotal){
                   image.forumCount = imageTotal.forumCount;
                   image.serviceCount = imageTotal.serviceCount;
@@ -242,8 +249,8 @@ export class UserImageListComponent implements OnInit, OnDestroy {
                 else {
                   image.forumCount = 0;
                   image.serviceCount = 0;
-                }    
-                
+                }
+
                 if (downloadUrl)
                   image.url = downloadUrl;
                 else
@@ -253,7 +260,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
               })
             );
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return images[i];
@@ -294,7 +301,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
 
           if (total.forumCount > 0)
             message += `${total.forumCount} forum(s), `;
-          
+
           if (total.serviceCount > 0)
             message += `${total.serviceCount} service(s), `;
 
@@ -320,7 +327,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     window.localStorage.setItem('userImageListNextKey', JSON.stringify(this.nextKey));
     this.getImageList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

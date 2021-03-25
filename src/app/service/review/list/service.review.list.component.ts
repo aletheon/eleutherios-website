@@ -27,6 +27,7 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+import { throwMatDuplicatedDrawerError } from '@angular/material/sidenav';
 
 @Component({
   selector: 'service-review-list',
@@ -36,6 +37,7 @@ import * as _ from "lodash";
 export class ServiceReviewListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _serviceReviewSubscription: Subscription;
@@ -59,6 +61,7 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
   public searchLoading: Observable<boolean> = this._searchLoading.asObservable();
   public serviceReviews: Observable<any[]> = of([]);
   public serviceReviewsArray: any[] = [];
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -74,6 +77,9 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._initialServiceSubscription)
       this._initialServiceSubscription.unsubscribe();
 
@@ -95,45 +101,51 @@ export class ServiceReviewListComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      let parentServiceId = params['parentServiceId'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      // reset keys if the route changes either public/private
-      this.nextKey = null;
-      this.prevKeys = [];
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          let parentServiceId = params['parentServiceId'];
 
-      if (parentServiceId){
-        this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
-          .subscribe(service => {
-            if (service){
-              this.service = this.serviceService.getService(parentServiceId);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
+          // reset keys if the route changes either public/private
+          this.nextKey = null;
+          this.prevKeys = [];
+
+          if (parentServiceId){
+            this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  this.service = this.serviceService.getService(parentServiceId);
+                  this.initForm();
                 }
-              );
-              this.router.navigate(['/']);
-            }
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Service does not exist or was recently removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
+              }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
           }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }

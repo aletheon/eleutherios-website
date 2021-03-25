@@ -17,13 +17,13 @@ import { take } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit {
   private _userTotalSubscription: Subscription;
+  private _userSubscription: Subscription;
   private _forumTotalSubscription: Subscription;
   private _serviceTotalSubscription: Subscription;
 
   public userTotal: Observable<any>;
   public forumTotal: Observable<any>;
   public serviceTotal: Observable<any>;
-  public userId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -34,7 +34,7 @@ export class HeaderComponent implements OnInit {
   }
 
   home () {
-    if (this.userId)
+    if (this.auth.uid)
       this.router.navigate(['/']);
     else
       this.router.navigate(['/anonymous/home']);
@@ -45,18 +45,19 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._userTotalSubscription)
       this._userTotalSubscription.unsubscribe();
   }
 
   ngOnInit () {
     // get user totals
-    this.auth.user.pipe(take(1)).subscribe(user => {
+    this._userSubscription = this.auth.user.subscribe(user => {
       if (user){
-        this.userId = user.uid;
-
         // get user total
-        this._userTotalSubscription = this.siteTotalService.getTotal(this.userId)
+        this._userTotalSubscription = this.siteTotalService.getTotal(user.uid)
           .subscribe(total => {
             if (total)
               this.userTotal = of(total);

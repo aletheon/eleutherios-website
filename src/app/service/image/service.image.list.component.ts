@@ -49,6 +49,7 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
   public defaultServiceImage: Observable<any>;
   public serviceImagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -94,78 +95,84 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
     });
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let serviceId = params['serviceId'];
-      this.serviceGroup.get('serviceId').setValue(params['serviceId']);
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (serviceId){
-        this._initialServiceSubscription = this.serviceService.getService(serviceId).pipe(take(1))
-          .subscribe(service => {
-            if (service){
-              // authenticate
-              let canViewDetail: boolean = false;
+        this.route.queryParams.subscribe((params: Params) => {
+          let serviceId = params['serviceId'];
+          this.serviceGroup.get('serviceId').setValue(params['serviceId']);
 
-              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, serviceId)
-                .then(isServing => {
-                  if (service.type == 'Public')
-                    canViewDetail = true;
-                  else if (service.uid == this.auth.uid)
-                    canViewDetail = true;
-                  else if (isServing && isServing == true)
-                    canViewDetail = true;
+          if (serviceId){
+            this._initialServiceSubscription = this.serviceService.getService(serviceId).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  // authenticate
+                  let canViewDetail: boolean = false;
 
-                  if (canViewDetail){
-                    this.service = this.serviceService.getService(serviceId);
-                    this.initForm();
-                  }
-                  else {
+                  this.userForumService.serviceIsServingInUserForumFromPromise(this.loggedInUserId, serviceId)
+                    .then(isServing => {
+                      if (service.type == 'Public')
+                        canViewDetail = true;
+                      else if (service.uid == this.loggedInUserId)
+                        canViewDetail = true;
+                      else if (isServing && isServing == true)
+                        canViewDetail = true;
+
+                      if (canViewDetail){
+                        this.service = this.serviceService.getService(serviceId);
+                        this.initForm();
+                      }
+                      else {
+                        const snackBarRef = this.snackbar.openFromComponent(
+                          NotificationSnackBar,
+                          {
+                            duration: 8000,
+                            data: `${service.title} is a private service`,
+                            panelClass: ['red-snackbar']
+                          }
+                        );
+                        this.router.navigate(['/']);
+                      }
+                    }
+                  ).catch(error => {
                     const snackBarRef = this.snackbar.openFromComponent(
                       NotificationSnackBar,
                       {
                         duration: 8000,
-                        data: `${service.title} is a private service`,
+                        data: error.message,
                         panelClass: ['red-snackbar']
                       }
                     );
                     this.router.navigate(['/']);
-                  }
+                  });
                 }
-              ).catch(error => {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: error.message,
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
-              });
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Service does not exist or was recently removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
                 }
-              );
-              this.router.navigate(['/']);
-            }
+              }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
           }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }
@@ -179,8 +186,8 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
           this.serviceGroup.patchValue(service);
 
           if (service.type == 'Private'){
-            if (service.uid != this.auth.uid){
-              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, service.serviceId)
+            if (service.uid != this.loggedInUserId){
+              this.userForumService.serviceIsServingInUserForumFromPromise(this.loggedInUserId, service.serviceId)
                 .then(isServing => {
                   let canViewDetail = false;
 

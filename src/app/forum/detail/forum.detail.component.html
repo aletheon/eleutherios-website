@@ -41,7 +41,7 @@
 					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<div style="flex:none;margin-right:5px">
-					<ng-container *ngIf="forumItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
+					<ng-container *ngIf="forumItem.uid == loggedInUserId; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 					<ng-template #showpublicenabledtype>
 						<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
@@ -49,13 +49,13 @@
 						<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-checkbox *ngIf="forumItem.title.length > 0" matTooltip="Index" [checked]="forumItem.indexed" (change)="indexDeindexForum()"></mat-checkbox>
 					<mat-checkbox *ngIf="forumItem.title.length == 0" matTooltip="Index" [checked]="forumItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -129,7 +129,7 @@
 										<ng-container *ngIf="registrant.service | async;let service">
 											<ng-container *ngIf="service; then showservice"></ng-container>
 											<ng-template #showservice>
-												<ng-container *ngIf="forumItem.uid == auth.uid || service.uid == auth.uid">
+												<ng-container *ngIf="forumItem.uid == loggedInUserId || service.uid == loggedInUserId">
 													<div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:nowrap">
 														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 															<ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
@@ -145,11 +145,11 @@
 																<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 															</p>
 														</div>
-														<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == registrant.uid">
-															<ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else showregistrantowner"></ng-container>
+														<ng-container *ngIf="loggedInUserId == forumItem.uid || loggedInUserId == registrant.uid">
+															<ng-container *ngIf="loggedInUserId == forumItem.uid; then showforumowner else showregistrantowner"></ng-container>
 															<ng-template #showforumowner>
 																<div style="flex:none">
-																	<ng-container *ngIf="auth.uid != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
+																	<ng-container *ngIf="loggedInUserId != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
 																	<ng-template #showblockcontrol>
 																		<mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
 																			<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>

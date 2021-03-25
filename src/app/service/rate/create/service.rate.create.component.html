@@ -102,13 +102,13 @@
 										<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 											<!-- other button controls -->
 											<div style="flex:none;margin-right:5px">
-												<star-rating-control *ngIf="userServiceRate.serviceUid == auth.uid"
+												<star-rating-control *ngIf="userServiceRate.serviceUid == loggedInUserId"
 													[rating]="userServiceRate.rate"
 													[starType]="'svg'"
 													[readOnly]="false"
 													(starClickChange)="onUpdateRateClick($event, userServiceRate)">
 												</star-rating-control>
-												<star-rating-control *ngIf="userServiceRate.serviceUid != auth.uid"
+												<star-rating-control *ngIf="userServiceRate.serviceUid != loggedInUserId"
 													[rating]="userServiceRate.rate"
 													[starType]="'svg'"
 													[readOnly]="true">
@@ -116,9 +116,9 @@
 											</div>
 											<ng-container *ngIf="service.serviceReview | async; else noservicereview"></ng-container>
 											<ng-template #noservicereview>
-												<mat-icon *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/review/create']" [queryParams]='{ parentServiceId: userServiceRate.serviceRateServiceId, userId: userServiceRate.serviceUid, serviceId: userServiceRate.serviceId }' matTooltip="Create review">add_box</mat-icon>
+												<mat-icon *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px;cursor:pointer;color:#999" [routerLink]="['/service/review/create']" [queryParams]='{ parentServiceId: userServiceRate.serviceRateServiceId, userId: userServiceRate.serviceUid, serviceId: userServiceRate.serviceId }' matTooltip="Create review">add_box</mat-icon>
 											</ng-template>
-											<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+											<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 												<mat-icon onclick="event.stopPropagation()" (click)="delete(userServiceRate)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 											</div>
 										</div>
@@ -134,7 +134,7 @@
 					</ng-container>
 				</div>
 				<!-- paging -->
-				<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+				<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 					<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 					<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 				</div>

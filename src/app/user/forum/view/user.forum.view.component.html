@@ -25,20 +25,20 @@
 				<div class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon *ngIf="forumItem.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 					<mat-icon *ngIf="forumItem.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forumItem.uid, forumId: forumItem.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete(forumItem)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="forumItem.uid == auth.uid" style="flex:none;margin-right:5px">
+				<div *ngIf="forumItem.uid == loggedInUserId" style="flex:none;margin-right:5px">
 					<mat-checkbox *ngIf="forumItem.title.length > 0" matTooltip="Index" [checked]="forumItem.indexed" (change)="indexDeindexForum(forumItem)"></mat-checkbox>
 					<mat-checkbox *ngIf="forumItem.title.length == 0" matTooltip="Index" [checked]="forumItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -132,7 +132,7 @@
 							<ng-container *ngIf="service; then showservice"></ng-container>
 							<ng-template #showservice>
 								<div style="display:flex;flex-direction:row;align-items:center">
-									<ng-container *ngIf="post.forumUid == auth.uid || post.serviceUid == auth.uid; then editablepost else noeditablepost"></ng-container>
+									<ng-container *ngIf="post.forumUid == loggedInUserId || post.serviceUid == loggedInUserId; then editablepost else noeditablepost"></ng-container>
 									<ng-template #editablepost>
 										<!-- contenteditable="true" [textContent]="post.message" (blur)="changePostMessage(post, $event.target.textContent)" -->
 										<div style="flex:1" [innerHTML]="post.message | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></div>
@@ -140,7 +140,7 @@
 									<ng-template #noeditablepost>
 										<div style="flex:1" [innerHTML]="post.message | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></div>
 									</ng-template>
-									<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == service.uid">
+									<ng-container *ngIf="loggedInUserId == forumItem.uid || loggedInUserId == service.uid">
 										<div style="flex:none">
 											<mat-icon onclick="event.stopPropagation()" (click)="removePost(post)" style="cursor:pointer;color:#999" matTooltip="Remove">close</mat-icon>
 										</div>
@@ -207,11 +207,11 @@
 													<a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 													<a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" style="flex:none;color:#1B1B1B" [queryParams]="{ serviceId: service.serviceId }" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
 												</div>
-												<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == registrant.uid">
-													<ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else showregistrantowner"></ng-container>
+												<ng-container *ngIf="loggedInUserId == forumItem.uid || loggedInUserId == registrant.uid">
+													<ng-container *ngIf="loggedInUserId == forumItem.uid; then showforumowner else showregistrantowner"></ng-container>
 													<ng-template #showforumowner>
 														<div style="flex:none">
-															<ng-container *ngIf="auth.uid != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
+															<ng-container *ngIf="loggedInUserId != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
 															<ng-template #showblockcontrol>
 																<mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
 																	<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
@@ -281,7 +281,7 @@
 										<div style="flex:none;margin-right:5px">
 											<ng-container *ngIf="forumForum.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
 											<ng-template #showpublictype>
-												<ng-container *ngIf="forumForum.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
+												<ng-container *ngIf="forumForum.uid == loggedInUserId; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 												<ng-template #showpublicenabledtype>
 													<mat-icon onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 												</ng-template>
@@ -290,7 +290,7 @@
 												</ng-template>
 											</ng-template>
 											<ng-template #showprivatetype>
-												<ng-container *ngIf="forumForum.uid == auth.uid; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
+												<ng-container *ngIf="forumForum.uid == loggedInUserId; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
 												<ng-template #showprivateenabledtype>
 													<mat-icon onclick="event.stopPropagation()" (click)="changeType(forumForum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 												</ng-template>
@@ -299,7 +299,7 @@
 												</ng-template>
 											</ng-template>
 										</div>
-										<ng-container *ngIf="auth.uid == forumItem.uid || auth.uid == forumForum.uid">
+										<ng-container *ngIf="loggedInUserId == forumItem.uid || loggedInUserId == forumForum.uid">
 											<div style="flex:none">
 												<mat-icon onclick="event.stopPropagation()" (click)="removeForumForum(forumForum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
 											</div>

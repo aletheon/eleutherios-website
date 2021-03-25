@@ -19,7 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { switchMap, startWith, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -31,12 +31,12 @@ import * as _ from "lodash";
 export class ServiceListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
   private _siteTotalSubscription: Subscription;
   private _serviceSearchSubscription: Subscription;
   private _tempSearchTags: string[] = [];
-  private _serviceSearchFirstTimeThrough: boolean = true;
 
   public serviceGroup: FormGroup;
   public searchServiceCtrl: FormControl;
@@ -53,7 +53,8 @@ export class ServiceListComponent implements OnInit, OnDestroy {
   public searchTags: Tag[]= [];
   public total: Observable<number> = this._total.asObservable();
   public includeTagsInSearch: boolean;
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -72,23 +73,16 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.serviceSearchTagCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
-
-      this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
-        startWith('')
-      )
-      .subscribe(searchTerm => {
-        if (this._serviceSearchFirstTimeThrough == false)
-          this.getServicesList(searchTerm);
-        else 
-          this._serviceSearchFirstTimeThrough = false;
-      });
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -136,14 +130,26 @@ export class ServiceListComponent implements OnInit, OnDestroy {
           }
         }
       );
-      this.getServicesList();
+
+      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+        if (user){
+          this.loggedInUserId = user.uid;
+
+          this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
+            startWith('')
+          )
+          .subscribe(searchTerm => {
+            this.getServicesList(searchTerm);
+          });
+        }
+      });
     });
   }
 
   getServicesList (key?: any) {
     if (this._subscription)
       this._subscription.unsubscribe();
-    
+
     // loading
     this._loading.next(true);
 
@@ -167,12 +173,12 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -181,7 +187,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                   })
                 );
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
-      
+
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
@@ -206,7 +212,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -240,12 +246,12 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -255,7 +261,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
                 );
 
                 let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
-      
+
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
@@ -280,7 +286,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -306,7 +312,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
 
   removeSearchTag (tag) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     if (tagIndex > -1) {
       this.searchTags.splice(tagIndex, 1);
       this.searchTags.sort();
@@ -321,7 +327,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
 
   searchTagsSelectionChange (tag: any) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     // tag doesn't exist so add it
     if (tagIndex == -1){
       this.searchTags.push(tag);
@@ -410,7 +416,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
 
     this.getServicesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

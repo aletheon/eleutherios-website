@@ -36,7 +36,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
   public forumUserBlocks: Observable<any[]> = of([]);
   public forumUserBlocksArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  public userId: string = '';
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -62,17 +62,17 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
   trackForumUserBlocks (index, userBlock) { return userBlock.forumUserBlockId; }
 
   ngOnInit () {
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      // reset keys
-      this.nextKey = null;
-      this.prevKeys = [];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-        if (user){
-          this.userId = user.uid;
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          // reset keys
+          this.nextKey = null;
+          this.prevKeys = [];
 
-          this._totalSubscription = this.siteTotalService.getTotal(this.userId)
+          this._totalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
             .subscribe(total => {
               if (total){
                 if (total.forumUserBlockCount == 0)
@@ -84,8 +84,8 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
             }
           );
           this.getForumUserBlockList();
-        }
-      });
+        });
+      }
     });
   }
 
@@ -95,7 +95,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userForumUserBlockService.getForumUserBlocks(this.userId, this.numberItems, key).pipe(
+    this._subscription = this.userForumUserBlockService.getForumUserBlocks(this.loggedInUserId, this.numberItems, key).pipe(
       switchMap(forumUserBlocks => {
         if (forumUserBlocks && forumUserBlocks.length > 0){
           let observables = forumUserBlocks.map(forumUserBlock => {

@@ -35,7 +35,7 @@
 					{{ serviceItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<div style="flex:none">
-					<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
+					<ng-container *ngIf="serviceItem.uid == loggedInUserId; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 					<ng-template #showpublicenabledtype>
 						<mat-icon onclick="event.stopPropagation()" (click)="changeType()" style="cursor:pointer" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
@@ -43,13 +43,13 @@
 						<mat-icon style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
 					</ng-template>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none">
 					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none">
 					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService()"></mat-checkbox>
 					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -102,7 +102,7 @@
 								[readOnly]="true">
 							</star-rating-control>
 						</div>
-						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+						<div *ngIf="serviceGroup.get('uid').value != loggedInUserId" style="flex:none;margin-right:2px">
 							<mat-icon [routerLink]="['/service/rate/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create rate">add_circle_outline</mat-icon>
 						</div>
 						<div style="flex:none;margin-right:5px">
@@ -117,7 +117,7 @@
 								</ng-container>
 							</ng-container>
 						</div>
-						<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+						<div *ngIf="serviceGroup.get('uid').value != loggedInUserId" style="flex:none;margin-right:2px">
 							<mat-icon [routerLink]="['/service/review/create']" [queryParams]="{ parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create review">add_circle_outline</mat-icon>
 						</div>
 						<div style="flex:none;margin-right:5px">
@@ -173,7 +173,7 @@
 										<ng-container *ngIf="whereServing.forum | async;let forum">
 											<ng-container *ngIf="forum; then showforum"></ng-container>
 											<ng-template #showforum>
-												<ng-container *ngIf="forum.uid == auth.uid || forum.type == 'Public'">
+												<ng-container *ngIf="forum.uid == loggedInUserId || forum.type == 'Public'">
 													<div class="alert alert-danger" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:10px 5px 0 0;flex-wrap:nowrap">
 														<div style="flex:none;display:flex;flex-direction:row;align-items:center">
 															<ng-container *ngIf="forum.defaultForumImage | async; then showdefaultforumimage"></ng-container>

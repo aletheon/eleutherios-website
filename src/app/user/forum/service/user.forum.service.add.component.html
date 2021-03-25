@@ -50,12 +50,12 @@
                         <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
                       </p>
                       <div style="flex:none">
-                        <ng-container *ngIf="auth.uid == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
+                        <ng-container *ngIf="loggedInUserId == forumItem.uid; then showforumowner else shownotforumowner"></ng-container>
                         <ng-template #showforumowner>
                           <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
                         </ng-template>
                         <ng-template #shownotforumowner>
-                          <ng-container *ngIf="auth.uid == service.uid; then showblockcontrol"></ng-container>
+                          <ng-container *ngIf="loggedInUserId == service.uid; then showblockcontrol"></ng-container>
                           <ng-template #showblockcontrol>
                             <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
                               <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>

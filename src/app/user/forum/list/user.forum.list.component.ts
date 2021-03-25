@@ -21,7 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { switchMap, startWith, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -33,7 +33,8 @@ import * as _ from "lodash";
 export class UserForumListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
-  private _subscription: Subscription;
+  private _userSubscription: Subscription;
+  private _forumSubscription: Subscription;
   private _siteTotalSubscription: Subscription;
   private _forumSearchSubscription: Subscription;
   private _tempSearchTags: string[] = [];
@@ -51,7 +52,8 @@ export class UserForumListComponent implements OnInit, OnDestroy {
   public searchTags: any[]= [];
   public total: Observable<number> = this._total.asObservable();
   public includeTagsInSearch: boolean;
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -72,22 +74,18 @@ export class UserForumListComponent implements OnInit, OnDestroy {
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.forumSearchTagCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
-
-      this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
-        startWith('')
-      )
-      .subscribe(searchTerm => {
-        this.getForumsList(searchTerm);
-      });
     }
 
   ngOnDestroy () {
-    if (this._subscription)
-      this._subscription.unsubscribe();
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._forumSubscription)
+      this._forumSubscription.unsubscribe();
 
     if (this._siteTotalSubscription)
       this._siteTotalSubscription.unsubscribe();
@@ -108,23 +106,32 @@ export class UserForumListComponent implements OnInit, OnDestroy {
     });
     this.forumGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
 
-    this._siteTotalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-      .subscribe(total => {
-        if (total){
-          if (total.forumCount == 0)
-            this._total.next(-1);
-          else
-            this._total.next(total.forumCount);
-        }
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
+
+        this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
+          startWith('')
+        )
+        .subscribe(searchTerm => {
+          this.getForumsList(searchTerm);
+        });
+
+        this._siteTotalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
+          .subscribe(total => {
+            if (total){
+              if (total.forumCount == 0)
+                this._total.next(-1);
+              else
+                this._total.next(total.forumCount);
+            }
+          }
+        );
       }
-    );
-    this.getForumsList();
+    });
   }
 
   getForumsList (key?: any) {
-    if (this._subscription)
-      this._subscription.unsubscribe();
-
     // loading
     this._loading.next(true);
 
@@ -132,13 +139,13 @@ export class UserForumListComponent implements OnInit, OnDestroy {
       if (!key)
         key = this.searchForumCtrl.value;
 
-      this._subscription = this.userForumService.getForumsSearchTerm(this.auth.uid, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, false).pipe(
+      this._forumSubscription = this.userForumService.getForumsSearchTerm(this.loggedInUserId, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, false).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
                 let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -157,12 +164,12 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -174,7 +181,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                 return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
                     const [defaultForumImage, forumTags, defaultRegistrant] = results;
-      
+
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
@@ -200,7 +207,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -218,13 +225,13 @@ export class UserForumListComponent implements OnInit, OnDestroy {
       });
     }
     else {
-      this._subscription = this.userForumService.getAllForums(this.auth.uid, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, false).pipe(
+      this._forumSubscription = this.userForumService.getAllForums(this.loggedInUserId, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, false).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
                 let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -243,12 +250,12 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
                             forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(forumImages[0]);
                         })
                       );
@@ -257,75 +264,10 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                   })
                 );
 
-                // subscribe to any newly create forum posts
-                let getLastPosts$ = this.userForumPostService.getLastPosts(forum.uid, forum.forumId, 1).pipe(
-                  switchMap(posts => {
-                    if (posts && posts.length > 0){
-                      let observables = posts.map(post => {
-                        if (post){
-                          let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
-                          let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
-                            switchMap(serviceImages => {
-                              if (serviceImages && serviceImages.length > 0){
-                                let getDownloadUrl$: Observable<any>;
-
-                                if (serviceImages[0].tinyUrl)
-                                  getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                                return combineLatest([getDownloadUrl$]).pipe(
-                                  switchMap(results => {
-                                    const [downloadUrl] = results;
-                                    
-                                    if (downloadUrl)
-                                      serviceImages[0].url = downloadUrl;
-                                    else
-                                      serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-                      
-                                    return of(serviceImages[0]);
-                                  })
-                                );
-                              }
-                              else return of(null);
-                            })
-                          );
-
-                          return combineLatest([getService$, getDefaultServiceImage$]).pipe(
-                            switchMap(results => {
-                              const [service, defaultServiceImage] = results;
-
-                              if (service){
-                                if (defaultServiceImage)
-                                  service.defaultServiceImage = of(defaultServiceImage);
-                                else {
-                                  let tempImage = {
-                                    url: '../../../assets/defaultTiny.jpg'
-                                  };
-                                  service.defaultServiceImage = of(tempImage);
-                                }
-                                post.service = of(service);
-                              }
-                              else post.service = of(null);                                    
-                              return of(post);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      });
-                  
-                      return zip(...observables, (...results) => {
-                        return results.map((result, i) => {
-                          return posts[i];
-                        });
-                      });
-                    }
-                    else return of([]);
-                  })
-                );
-
-                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$, getLastPosts$]).pipe(
+                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
                   switchMap(results => {
-                    const [defaultForumImage, forumTags, defaultRegistrant, lastPosts] = results;
-                    
+                    const [defaultForumImage, forumTags, defaultRegistrant] = results;
+
                     if (defaultForumImage)
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
@@ -345,18 +287,13 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                     else
                       forum.defaultRegistrant = of(null);
 
-                    if (lastPosts && lastPosts.length > 0)
-                      forum.post = of(lastPosts[0]);
-                    else
-                      forum.post = of(null);
-
                     return of(forum);
                   })
                 );
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return forums[i];
@@ -365,7 +302,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
           }
           else return of([]);
         })
-      ) 
+      )
       .subscribe(forums => {
         this.forumsArray = _.slice(forums, 0, this.numberOfItems);
         this.forums = of(this.forumsArray);
@@ -382,7 +319,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
 
   removeSearchTag (tag) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     // tag exists so remove it
     if (tagIndex > -1) {
       this.searchTags.splice(tagIndex, 1);
@@ -398,7 +335,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
 
   searchTagsSelectionChange (tag: any) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     // tag doesn't exist so add it
     if (tagIndex == -1){
       this.searchTags.push(tag);
@@ -446,7 +383,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
         }
       );
     });
-  } 
+  }
 
   indexDeindexForum (forum){
     this.userForumService.getForumFromPromise(forum.uid, forum.forumId)
@@ -487,7 +424,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
 
     this.getForumsList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

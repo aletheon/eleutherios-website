@@ -54,6 +54,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
   public searchTags: any[]= [];
   public total: Observable<number> = this._total.asObservable();
   public includeTagsInSearch: boolean;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -80,13 +81,6 @@ export class ForumListComponent implements OnInit, OnDestroy {
           this.tagService.search(searchTerm)
         )
       );
-
-      this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
-        startWith('')
-      )
-      .subscribe(searchTerm => {
-        this.getForumsList(searchTerm);
-      });
     }
 
   ngOnDestroy () {
@@ -125,259 +119,200 @@ export class ForumListComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
+
+        this._forumSearchSubscription = this.searchForumCtrl.valueChanges.pipe(
+          startWith('')
+        )
+        .subscribe(searchTerm => {
+          this.getForumsList(searchTerm);
+        });
+      }
+    });
   }
 
   getForumsList (key?: any) {
     // loading
     this._loading.next(true);
 
-    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-      if (this.searchForumCtrl.value && this.searchForumCtrl.value.length > 0){
-        if (!key)
-          key = this.searchForumCtrl.value;
+    if (this.searchForumCtrl.value && this.searchForumCtrl.value.length > 0){
+      if (!key)
+        key = this.searchForumCtrl.value;
 
-        this._subscription = this.forumService.getForumsSearchTerm(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
-          switchMap(forums => {
-            if (forums && forums.length > 0){
-              let observables = forums.map(forum => {
-                if (forum){
-                  let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid).pipe(
-                    switchMap(registrants => {
-                      if (registrants && registrants.length > 0)
-                        return of(registrants[0]);
-                      else
-                        return of(null);
-                    })
-                  );
-                  let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                    switchMap(forumImages => {
-                      if (forumImages && forumImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
+      this._subscription = this.forumService.getForumsSearchTerm(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+        switchMap(forums => {
+          if (forums && forums.length > 0){
+            let observables = forums.map(forum => {
+              if (forum){
+                let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
+                  switchMap(registrants => {
+                    if (registrants && registrants.length > 0)
+                      return of(registrants[0]);
+                    else
+                      return of(null);
+                  })
+                );
+                let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                  switchMap(forumImages => {
+                    if (forumImages && forumImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-                        if (forumImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+                      if (forumImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
 
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
 
-                            if (downloadUrl)
-                              forumImages[0].url = downloadUrl;
-                            else
-                              forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+                          if (downloadUrl)
+                            forumImages[0].url = downloadUrl;
+                          else
+                            forumImages[0].url = '../../assets/defaultThumbnail.jpg';
 
-                            return of(forumImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
+                          return of(forumImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
 
-                  return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
-                    switchMap(results => {
-                      const [defaultForumImage, forumTags, defaultRegistrant] = results;
+                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
+                  switchMap(results => {
+                    const [defaultForumImage, forumTags, defaultRegistrant] = results;
 
-                      if (defaultForumImage)
-                        forum.defaultForumImage = of(defaultForumImage);
-                      else {
-                        let tempImage = {
-                          url: '../../assets/defaultThumbnail.jpg'
-                        };
-                        forum.defaultForumImage = of(tempImage);
-                      }
+                    if (defaultForumImage)
+                      forum.defaultForumImage = of(defaultForumImage);
+                    else {
+                      let tempImage = {
+                        url: '../../assets/defaultThumbnail.jpg'
+                      };
+                      forum.defaultForumImage = of(tempImage);
+                    }
 
-                      if (forumTags)
-                        forum.forumTags = of(forumTags);
-                      else
-                        forum.forumTags = of([]);
+                    if (forumTags)
+                      forum.forumTags = of(forumTags);
+                    else
+                      forum.forumTags = of([]);
 
-                      if (defaultRegistrant)
-                        forum.defaultRegistrant = of(defaultRegistrant);
-                      else
-                        forum.defaultRegistrant = of(null);
+                    if (defaultRegistrant)
+                      forum.defaultRegistrant = of(defaultRegistrant);
+                    else
+                      forum.defaultRegistrant = of(null);
 
-                      return of(forum);
-                    })
-                  );
-                }
-                else return of(null);
+                    return of(forum);
+                  })
+                );
+              }
+              else return of(null);
+            });
+
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return forums[i];
               });
+            });
+          }
+          else return of([]);
+        })
+      )
+      .subscribe(forums => {
+        this.forumsArray = _.slice(forums, 0, this.numberOfItems);
+        this.forums = of(this.forumsArray);
+        this.nextKey = _.get(forums[this.numberOfItems], 'title');
+        this._loading.next(false);
+      });
+    }
+    else {
+      this._subscription = this.forumService.getAllForums(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+        switchMap(forums => {
+          if (forums && forums.length > 0){
+            let observables = forums.map(forum => {
+              if (forum){
+                let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
+                  switchMap(registrants => {
+                    if (registrants && registrants.length > 0)
+                      return of(registrants[0]);
+                    else
+                      return of(null);
+                  })
+                );
+                let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
+                  switchMap(forumImages => {
+                    if (forumImages && forumImages.length > 0){
+                      let getDownloadUrl$: Observable<any>;
 
-              return zip(...observables, (...results) => {
-                return results.map((result, i) => {
-                  return forums[i];
-                });
+                      if (forumImages[0].smallUrl)
+                        getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
+
+                      return combineLatest([getDownloadUrl$]).pipe(
+                        switchMap(results => {
+                          const [downloadUrl] = results;
+
+                          if (downloadUrl)
+                            forumImages[0].url = downloadUrl;
+                          else
+                            forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+
+                          return of(forumImages[0]);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+
+                return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$]).pipe(
+                  switchMap(results => {
+                    const [defaultForumImage, forumTags, defaultRegistrant] = results;
+
+                    if (defaultForumImage)
+                      forum.defaultForumImage = of(defaultForumImage);
+                    else {
+                      let tempImage = {
+                        url: '../../assets/defaultThumbnail.jpg'
+                      };
+                      forum.defaultForumImage = of(tempImage);
+                    }
+
+                    if (forumTags)
+                      forum.forumTags = of(forumTags);
+                    else
+                      forum.forumTags = of([]);
+
+                    if (defaultRegistrant)
+                      forum.defaultRegistrant = of(defaultRegistrant);
+                    else
+                      forum.defaultRegistrant = of(null);
+
+                    return of(forum);
+                  })
+                );
+              }
+              else return of(null);
+            });
+
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return forums[i];
               });
-            }
-            else return of([]);
-          })
-        )
-        .subscribe(forums => {
-          this.forumsArray = _.slice(forums, 0, this.numberOfItems);
-          this.forums = of(this.forumsArray);
-          this.nextKey = _.get(forums[this.numberOfItems], 'title');
-          this._loading.next(false);
-        });
-      }
-      else {
-        this._subscription = this.forumService.getAllForums(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
-          switchMap(forums => {
-            if (forums && forums.length > 0){
-              let observables = forums.map(forum => {
-                if (forum){
-                  let getForumTags$ = this.userForumTagService.getTags(forum.uid, forum.forumId);
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid).pipe(
-                    switchMap(registrants => {
-                      if (registrants && registrants.length > 0)
-                        return of(registrants[0]);
-                      else
-                        return of(null);
-                    })
-                  );
-                  let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
-                    switchMap(forumImages => {
-                      if (forumImages && forumImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
-
-                        if (forumImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-
-                            if (downloadUrl)
-                              forumImages[0].url = downloadUrl;
-                            else
-                              forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-
-                            return of(forumImages[0]);
-                          })
-                        );
-                      }
-                      else return of(null);
-                    })
-                  );
-
-                  // subscribe to any newly create forum posts
-                  let getLastPosts$ = this.userForumPostService.getLastPosts(forum.uid, forum.forumId, 1).pipe(
-                    switchMap(posts => {
-                      if (posts && posts.length > 0){
-                        let observables = posts.map(post => {
-                          if (post){
-                            let getService$ = this.userServiceService.getService(post.serviceUid, post.serviceId);
-                            let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
-                              switchMap(serviceImages => {
-                                if (serviceImages && serviceImages.length > 0){
-                                  let getDownloadUrl$: Observable<any>;
-
-                                  if (serviceImages[0].tinyUrl)
-                                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
-
-                                  return combineLatest([getDownloadUrl$]).pipe(
-                                    switchMap(results => {
-                                      const [downloadUrl] = results;
-
-                                      if (downloadUrl)
-                                        serviceImages[0].url = downloadUrl;
-                                      else
-                                        serviceImages[0].url = '../../assets/defaultTiny.jpg';
-
-                                      return of(serviceImages[0]);
-                                    })
-                                  );
-                                }
-                                else return of(null);
-                              })
-                            );
-
-                            return combineLatest([getService$, getDefaultServiceImage$]).pipe(
-                              switchMap(results => {
-                                const [service, defaultServiceImage] = results;
-
-                                if (service){
-                                  if (defaultServiceImage)
-                                    service.defaultServiceImage = of(defaultServiceImage);
-                                  else {
-                                    let tempImage = {
-                                      url: '../../assets/defaultTiny.jpg'
-                                    };
-                                    service.defaultServiceImage = of(tempImage);
-                                  }
-                                  post.service = of(service);
-                                }
-                                else post.service = of(null);
-                                return of(post);
-                              })
-                            );
-                          }
-                          else return of(null);
-                        });
-
-                        return zip(...observables, (...results) => {
-                          return results.map((result, i) => {
-                            return posts[i];
-                          });
-                        });
-                      }
-                      else return of([]);
-                    })
-                  );
-
-                  return combineLatest([getDefaultForumImage$, getForumTags$, getDefaultRegistrant$, getLastPosts$]).pipe(
-                    switchMap(results => {
-                      const [defaultForumImage, forumTags, defaultRegistrant, lastPosts] = results;
-
-                      if (defaultForumImage)
-                        forum.defaultForumImage = of(defaultForumImage);
-                      else {
-                        let tempImage = {
-                          url: '../../assets/defaultThumbnail.jpg'
-                        };
-                        forum.defaultForumImage = of(tempImage);
-                      }
-
-                      if (forumTags)
-                        forum.forumTags = of(forumTags);
-                      else
-                        forum.forumTags = of([]);
-
-                      if (defaultRegistrant)
-                        forum.defaultRegistrant = of(defaultRegistrant);
-                      else
-                        forum.defaultRegistrant = of(null);
-
-                      if (lastPosts && lastPosts.length > 0)
-                        forum.post = of(lastPosts[0]);
-                      else
-                        forum.post = of(null);
-
-                      return of(forum);
-                    })
-                  );
-                }
-                else return of(null);
-              });
-
-              return zip(...observables, (...results) => {
-                return results.map((result, i) => {
-                  return forums[i];
-                });
-              });
-            }
-            else return of([]);
-          })
-        )
-        .subscribe(forums => {
-          this.forumsArray = _.slice(forums, 0, this.numberOfItems);
-          this.forums = of(this.forumsArray);
-          this.nextKey = _.get(forums[this.numberOfItems], 'creationDate');
-          this._loading.next(false);
-        });
-      }
-    });
+            });
+          }
+          else return of([]);
+        })
+      )
+      .subscribe(forums => {
+        this.forumsArray = _.slice(forums, 0, this.numberOfItems);
+        this.forums = of(this.forumsArray);
+        this.nextKey = _.get(forums[this.numberOfItems], 'creationDate');
+        this._loading.next(false);
+      });
+    }
   }
 
   includeTagsInSearchClick () {

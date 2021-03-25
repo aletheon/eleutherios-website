@@ -30,11 +30,11 @@
               <div class="label label-default" matTooltip="{{ activity.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ activity.forumCreationDate.toDate() | amTimeAgo }}</div>
             </div>
             <!-- type -->
-            <div *ngIf="activity.uid == userId" style="flex:none;margin-right:5px">
+            <div *ngIf="activity.uid == auth.uid" style="flex:none;margin-right:5px">
               <mat-icon *ngIf="activity.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
               <mat-icon *ngIf="activity.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
             </div>
-            <div *ngIf="activity.uid != userId" style="flex:none;margin-right:5px">
+            <div *ngIf="activity.uid != auth.uid" style="flex:none;margin-right:5px">
               <mat-icon *ngIf="activity.type == 'Public'" style="color:lightgrey" matTooltip="Public">lock_open</mat-icon>
               <mat-icon *ngIf="activity.type == 'Private'" style="color:lightgrey" matTooltip="Private">lock</mat-icon>
             </div>
@@ -45,7 +45,7 @@
             </div>
             <!-- remove activity, block types -->
             <div style="flex:none;padding:0px">
-              <ng-container *ngIf="userId == activity.uid; then showforumowner else showregistrantowner"></ng-container>
+              <ng-container *ngIf="auth.uid == activity.uid; then showforumowner else showregistrantowner"></ng-container>
               <ng-template #showforumowner>
                 <mat-icon onclick="event.stopPropagation()" (click)="removeActivity(activity)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
               </ng-template>

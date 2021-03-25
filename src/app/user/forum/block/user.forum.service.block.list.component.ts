@@ -38,7 +38,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   public forumServiceBlocks: Observable<any[]> = of([]);
   public forumServiceBlocksArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  public userId: string = '';
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -66,16 +66,16 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   trackForumServiceBlocks (index, serviceBlock) { return serviceBlock.serviceBlockId; }
 
   ngOnInit () {
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      this.nextKey = null;
-      this.prevKeys = [];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-        if (user){
-          this.userId = user.uid;
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          this.nextKey = null;
+          this.prevKeys = [];
 
-          this._totalSubscription = this.siteTotalService.getTotal(this.userId)
+          this._totalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
             .subscribe(total => {
               if (total){
                 if (total.serviceBlockCount == 0)
@@ -87,8 +87,8 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
             }
           );
           this.getForumServiceBlockList();
-        }
-      });
+        });
+      }
     });
   }
 
@@ -97,7 +97,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
 
     this._loading.next(true);
 
-    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this.userId, this.numberItems, key).pipe(
+    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this.loggedInUserId, this.numberItems, key).pipe(
       switchMap(serviceBlocks => {
         if (serviceBlocks && serviceBlocks.length > 0){
           let observables = serviceBlocks.map(serviceBlock => {
@@ -177,7 +177,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.userId).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);

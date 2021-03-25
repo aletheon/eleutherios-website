@@ -51,6 +51,7 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
   public forumImagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
   public defaultRegistrant: any;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -99,30 +100,36 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
     });
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let forumId = params['forumId'];
-      this.forumGroup.get('forumId').setValue(params['forumId']);
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (forumId){
-        this._initialForumSubscription = this.forumSerivce.getForum(forumId).pipe(take(1))
-          .subscribe(forum => {
-            if (forum){
-              this.forum = this.forumSerivce.getForum(forumId);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
+        this.route.queryParams.subscribe((params: Params) => {
+          let forumId = params['forumId'];
+          this.forumGroup.get('forumId').setValue(params['forumId']);
+
+          if (forumId){
+            this._initialForumSubscription = this.forumSerivce.getForum(forumId).pipe(take(1))
+              .subscribe(forum => {
+                if (forum){
+                  this.forum = this.forumSerivce.getForum(forumId);
+                  this.initForm();
                 }
-              );
-              this.router.navigate(['/']);
-            }
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Forum does not exist or was recently removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
+              }
+            );
           }
-        );
+        });
       }
     });
   }
@@ -154,16 +161,14 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
               }
             );
 
-            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
-              that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid)
-                .subscribe(registrants => {
-                  if (registrants && registrants.length > 0)
-                    that.defaultRegistrant = registrants[0];
-                  else
-                    that.defaultRegistrant = of(null);
-                }
-              );
-            });
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId)
+              .subscribe(registrants => {
+                if (registrants && registrants.length > 0)
+                  that.defaultRegistrant = registrants[0];
+                else
+                  that.defaultRegistrant = of(null);
+              }
+            );
 
             // get default forum image
             that.getDefaultForumImage();

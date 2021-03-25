@@ -65,6 +65,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   public prevKeys: any[] = [];
   public loading: Observable<boolean> = this._loading.asObservable();
   public searchLoading: Observable<boolean> = this._searchLoading.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -109,73 +110,79 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      let parentServiceId = params['parentServiceId'];
-      this._userId = params['userId'];
-      this._serviceId = params['serviceId'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      // reset keys if the route changes either public/private
-      this.nextKey = null;
-      this.prevKeys = [];
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          let parentServiceId = params['parentServiceId'];
+          this._userId = params['userId'];
+          this._serviceId = params['serviceId'];
 
-      if (parentServiceId){
-        this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
-          .subscribe(service => {
-            if (service){
-              if (service.uid != this.auth.uid){
-                if (service.indexed == true){
-                  this.service = this.serviceService.getService(parentServiceId);
-                  this.initForm();
+          // reset keys if the route changes either public/private
+          this.nextKey = null;
+          this.prevKeys = [];
+
+          if (parentServiceId){
+            this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  if (service.uid != this.loggedInUserId){
+                    if (service.indexed == true){
+                      this.service = this.serviceService.getService(parentServiceId);
+                      this.initForm();
+                    }
+                    else {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: 'Service does not exist',
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                      this.router.navigate(['/']);
+                    }
+                  }
+                  else {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: 'You cannot review your own service',
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+                    this.router.navigate(['/']);
+                  }
                 }
                 else {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: 'Service does not exist',
+                      data: 'Service does not exist or was recently removed',
                       panelClass: ['red-snackbar']
                     }
                   );
                   this.router.navigate(['/']);
                 }
               }
-              else {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: 'You cannot review your own service',
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
+            );
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
               }
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
+            );
+            this.router.navigate(['/']);
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
-          }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }
@@ -211,7 +218,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
         if (service){
           this.serviceGroup.patchValue(service);
 
-          if (service.uid != this.auth.uid){
+          if (service.uid != this.loggedInUserId){
             if (service.indexed == true){
               // do something
             }
@@ -283,27 +290,25 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
             // get default service image
             that.getDefaultServiceImage();
 
-            that._userSubscription = that.auth.user.pipe(take(1)).subscribe(user => {
-              // get user services
-              that._userServiceSubscription = that.userServiceService.getServices(user.uid, that.numberItems, '', [], true, true)
-                .subscribe(userServices => {
-                  if (userServices.length > 0) {
-                    // set default user service
-                    if (that._userId.length > 0 && that._serviceId.length > 0) {
-                      userServices.forEach((userService, i) => {
-                        if (userService.uid == that._userId && userService.serviceId == that._serviceId)
-                          that.userServicesCtrl.setValue(userService);
-                      });
-                    }
-                    that.userServices = of(userServices);
+            // get user services
+            that._userServiceSubscription = that.userServiceService.getServices(that.loggedInUserId, that.numberItems, '', [], true, true)
+              .subscribe(userServices => {
+                if (userServices.length > 0) {
+                  // set default user service
+                  if (that._userId.length > 0 && that._serviceId.length > 0) {
+                    userServices.forEach((userService, i) => {
+                      if (userService.uid == that._userId && userService.serviceId == that._serviceId)
+                        that.userServicesCtrl.setValue(userService);
+                    });
                   }
-                  else that.userServices = of([]);
+                  that.userServices = of(userServices);
                 }
-              );
+                else that.userServices = of([]);
+              }
+            );
 
-              // get user reviews for this service
-              that.getUserServiceReviewsList(user.uid);
-            });
+            // get user reviews for this service
+            that.getUserServiceReviewsList(that.loggedInUserId);
           }
           catch (error) {
             throw error;
@@ -621,12 +626,12 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
 
   onNext () {
     this.prevKeys.push(_.first(this.userServiceReviewsArray)['creationDate']);
-    this.getUserServiceReviewsList(this.auth.uid, this.nextKey);
+    this.getUserServiceReviewsList(this.loggedInUserId, this.nextKey);
   }
 
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key
-    this.getUserServiceReviewsList(this.auth.uid, prevKey);
+    this.getUserServiceReviewsList(this.loggedInUserId, prevKey);
   }
 }

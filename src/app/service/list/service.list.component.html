@@ -22,7 +22,7 @@
 									</mat-form-field>
 									<mat-form-field style="flex:none;width:100px">
 										<input
-											matInput	
+											matInput
 											#startAmount
 											formControlName="startAmount"
 											(change)="getServicesList()"/>
@@ -145,17 +145,17 @@
 									<div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 										{{ service.creationDate.toDate() | amTimeAgo }}
 									</div>
-									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon *ngIf="service.type == 'Private'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeType(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 									</div>
-									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Edit">edit</mat-icon>
 									</div>
-									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon onclick="event.stopPropagation()" (click)="delete(service)" style="color:#1B1B1B;cursor:pointer" matTooltip="Delete">delete</mat-icon>
 									</div>
-									<div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-checkbox *ngIf="service.title.length > 0" matTooltip="Index" [checked]="service.indexed" (change)="indexDeindexService(service)"></mat-checkbox>
 										<mat-checkbox *ngIf="service.title.length == 0" matTooltip="Index" [checked]="service.indexed" disabled="true"></mat-checkbox>
 									</div>
@@ -212,7 +212,7 @@
 			</ng-container>
 		</div>
 		<!-- paging -->
-		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 			<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 			<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 		</div>

@@ -35,7 +35,7 @@ import { NotificationSnackBar } from '../../../shared/components/notification.sn
 import { NgxAutoScroll } from "ngx-auto-scroll";
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -50,6 +50,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
@@ -94,6 +95,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   public id: Observable<string>;
   public returnUserId: Observable<string>;
   public returnType: Observable<string> = of('');
+  public loggedInUserId: string = '';
 
   constructor(private db: AngularFireDatabase,
     public  auth: AuthService,
@@ -121,6 +123,12 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
   ngOnDestroy () {
     this.messageSharingService.changeViewForumId(''); // dis-inform listeners that the view forum page is viewing this forum
+
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
 
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
@@ -152,80 +160,84 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   trackBreadcrumbs (index, breadcrumb) { return breadcrumb.forumId; }
 
   ngOnInit () {
-    this.route.queryParams.subscribe((params: Params) => {
-      this.forumId = params['forumId'];
-      this.userId = params['userId'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      let serviceId = params['serviceId'];
-      let serviceUserId = params['serviceUserId']
-      let parentForumId = params['parentForumId'];
-      let parentForumUserId = params['forumUserId'];
+        this.route.queryParams.subscribe((params: Params) => {
+          this.forumId = params['forumId'];
+          this.userId = params['userId'];
 
-      if (serviceId || parentForumId){
-        if (serviceId){
-          this.id = of(serviceId);
-          this.returnUserId = of(serviceUserId);
-          this.returnType = of('Service');
-        }
-        else if (parentForumId) {
-          this.id = of(parentForumId);
-          this.returnUserId = of(parentForumUserId);
-          this.returnType = of('Forum');
-        }
-      }
+          let serviceId = params['serviceId'];
+          let serviceUserId = params['serviceUserId']
+          let parentForumId = params['parentForumId'];
+          let parentForumUserId = params['forumUserId'];
 
-      this.messageSharingService.changeViewForumId('');
+          if (serviceId || parentForumId){
+            if (serviceId){
+              this.id = of(serviceId);
+              this.returnUserId = of(serviceUserId);
+              this.returnType = of('Service');
+            }
+            else if (parentForumId) {
+              this.id = of(parentForumId);
+              this.returnUserId = of(parentForumUserId);
+              this.returnType = of('Forum');
+            }
+          }
 
-      this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).subscribe(forum => {
-        this._initialForumSubscription.unsubscribe();
+          this.messageSharingService.changeViewForumId('');
 
-        if (forum){
-          this._tempForum = forum;
+          this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).pipe(take(1)).subscribe(forum => {
+            if (forum){
+              this._tempForum = forum;
 
-          // ensure user is serving in the forum before viewing it
-          this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.userId, this.forumId, this.auth.uid)
-            .then(registrant => {
-              if (registrant){
-                this.forum = this.userForumService.getForum(this.userId, this.forumId);
-                this.initForm();
-              }
-              else {
+              // ensure user is serving in the forum before viewing it
+              this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.userId, this.forumId, this.loggedInUserId)
+                .then(registrant => {
+                  if (registrant){
+                    this.forum = this.userForumService.getForum(this.userId, this.forumId);
+                    this.initForm();
+                  }
+                  else {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: `You don't have any services serving in the forum '${forum.title}'`,
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+                    this.router.navigate(['/']);
+                  }
+                }
+              )
+              .catch(error => {
                 const snackBarRef = this.snackbar.openFromComponent(
                   NotificationSnackBar,
                   {
                     duration: 8000,
-                    data: `You don't have any services serving in the forum '${forum.title}'`,
+                    data: error.message,
                     panelClass: ['red-snackbar']
                   }
                 );
                 this.router.navigate(['/']);
-              }
+              });
             }
-          )
-          .catch(error => {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: error.message,
-                panelClass: ['red-snackbar']
-              }
-            );
-            this.router.navigate(['/']);
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Forum does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            }
           });
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: 'Forum does not exist or was recently removed',
-              panelClass: ['red-snackbar']
-            }
-          );
-          this.router.navigate(['/']);
-        }
-      });
+        });
+      }
     });
   }
 
@@ -302,7 +314,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             );
 
             // get default registrant for this user viewing this forum
-            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId)
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)
                   that.defaultRegistrant = registrants[0];
@@ -331,7 +343,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 if (breadcrumbs && breadcrumbs.length > 0) {
                   let observables = breadcrumbs.map(breadcrumb => {
                     let getForum$ = that.userForumService.getForum(breadcrumb.uid, breadcrumb.forumId);
-                    let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(breadcrumb.uid, breadcrumb.forumId, that.auth.uid).pipe(
+                    let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(breadcrumb.uid, breadcrumb.forumId, that.loggedInUserId).pipe(
                       switchMap(registrants => {
                         if (registrants && registrants.length > 0)
                           return of(registrants[0]);
@@ -380,7 +392,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               switchMap(forumForums => {
                 if (forumForums && forumForums.length > 0) {
                   let observables = forumForums.map(forumForum => {
-                    let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forumForum.uid, forumForum.forumId, that.auth.uid).pipe(
+                    let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forumForum.uid, forumForum.forumId, that.loggedInUserId).pipe(
                       switchMap(registrants => {
                         if (registrants && registrants.length > 0)
                           return of(registrants[0]);
@@ -600,7 +612,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             });
 
             // populate the end user registrants so that the end user can chose a pseudonym or service to post as
-            that._userRegistrantsSubscription = that.userForumRegistrantService.getUserRegistrants(forum.uid, forum.forumId, that.auth.uid).pipe(
+            that._userRegistrantsSubscription = that.userForumRegistrantService.getUserRegistrants(forum.uid, forum.forumId, that.loggedInUserId).pipe(
               switchMap(registrants => {
                 if (registrants && registrants.length > 0) {
                   let observables = registrants.map(registrant => {
@@ -950,7 +962,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
       this.userForumRegistrantService.update(this.userId, this.forumId, event.value.registrantId, updatedRegistrant)
         .then(() => {
           // populate the users registrants so that they can chose a pseudonym or service to serve as
-          this._userRegistrantsSubscription = this.userForumRegistrantService.getUserRegistrants(this.userId, this.forumId, this.auth.uid).pipe(
+          this._userRegistrantsSubscription = this.userForumRegistrantService.getUserRegistrants(this.userId, this.forumId, this.loggedInUserId).pipe(
             switchMap(registrants => {
               if (registrants && registrants.length > 0){
                 let observables = registrants.map(registrant => {
@@ -1076,14 +1088,14 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   }
 
   isYou (uid) {
-    if(uid == this.auth.uid)
+    if(uid == this.loggedInUserId)
       return true;
     else
       return false;
   }
 
   isMe (uid) {
-    if(uid == this.auth.uid)
+    if(uid == this.loggedInUserId)
       return false;
     else
       return true;
