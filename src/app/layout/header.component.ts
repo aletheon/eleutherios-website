@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit {
   public userTotal: Observable<any>;
   public forumTotal: Observable<any>;
   public serviceTotal: Observable<any>;
+  public userId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -33,7 +34,7 @@ export class HeaderComponent implements OnInit {
   }
 
   home () {
-    if (this.auth.uid)
+    if (this.userId)
       this.router.navigate(['/']);
     else
       this.router.navigate(['/anonymous/home']);
@@ -52,8 +53,10 @@ export class HeaderComponent implements OnInit {
     // get user totals
     this.auth.user.pipe(take(1)).subscribe(user => {
       if (user){
+        this.userId = user.uid;
+
         // get user total
-        this._userTotalSubscription = this.siteTotalService.getTotal(user.uid)
+        this._userTotalSubscription = this.siteTotalService.getTotal(this.userId)
           .subscribe(total => {
             if (total)
               this.userTotal = of(total);

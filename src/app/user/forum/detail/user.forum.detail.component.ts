@@ -78,6 +78,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
   public canViewDetail: Observable<boolean> = this._canViewDetail.asObservable();
   public blockTypes: string[] = ['Remove', 'Block Service', 'Block User'];
   public defaultForumImage: Observable<any>;
+  public userId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -469,7 +470,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
 
   checkPermissions (forum) {
     return new Promise<void>((resolve, reject) => {
-      this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.auth.uid)
+      this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(forum.uid, forum.forumId, this.userId)
         .then(defaultRegistrant => {
           if (defaultRegistrant)
             this._canViewDetail.next(true);
@@ -511,47 +512,53 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
 
       this._initialForumSubscription = this.userForumService.getForum(forumUserId, forumId).pipe(take(1)).subscribe(forum => {
         if (forum){
-          if (forum.uid == this.auth.uid){
-            this._canViewDetail.next(true);
-            this.forum = this.userForumService.getForum(forumUserId, forumId);
-            this.initForm();
-          }
-          else {
-            // Redirect to public page if it is public
-            if (forum.type == 'Public')
-              this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+          this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+            if (user){
+              this.userId = user.uid;
 
-            if (forum.indexed == true){
-              // check permissions
-              this.checkPermissions(forum)
-                .then(() => {
-                  this.forum = this.userForumService.getForum(forumUserId, forumId);
-                  this.initForm();
+              if (forum.uid == this.userId){
+                this._canViewDetail.next(true);
+                this.forum = this.userForumService.getForum(forumUserId, forumId);
+                this.initForm();
+              }
+              else {
+                // Redirect to public page if it is public
+                if (forum.type == 'Public')
+                  this.router.navigate(['/forum/detail'], { queryParams: { forumId: forum.forumId } });
+
+                if (forum.indexed == true){
+                  // check permissions
+                  this.checkPermissions(forum)
+                    .then(() => {
+                      this.forum = this.userForumService.getForum(forumUserId, forumId);
+                      this.initForm();
+                    }
+                  ).catch(error => {
+                    const snackBarRef = this.snackbar.openFromComponent(
+                      NotificationSnackBar,
+                      {
+                        duration: 8000,
+                        data: error.message,
+                        panelClass: ['red-snackbar']
+                      }
+                    );
+                    this.router.navigate(['/']);
+                  });
                 }
-              ).catch(error => {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: error.message,
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
-              });
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum does not exist 111',
-                  panelClass: ['red-snackbar']
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Forum does not exist 111',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
                 }
-              );
-              this.router.navigate(['/']);
+              }
             }
-          }
+          });
         }
         else {
           const snackBarRef = this.snackbar.openFromComponent(
@@ -597,7 +604,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         if (forum){
           this.forumGroup.patchValue(forum);
 
-          if (forum.uid == this.auth.uid)
+          if (forum.uid == this.userId)
             this._canViewDetail.next(true);
           else {
             // Redirect to public page if it is public
@@ -750,20 +757,18 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
               })
             );
 
-            that._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-              // get the default registrant that this user is serving as in this forum
-              that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, user.uid)
-                .subscribe(registrants => {
-                  if (registrants && registrants.length > 0)
-                    that.defaultRegistrant = of(registrants[0]);
-                  else
-                    that.defaultRegistrant = of(null);
-                }
-              );
+            // get the default registrant that this user is serving as in this forum
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.userId)
+              .subscribe(registrants => {
+                if (registrants && registrants.length > 0)
+                  that.defaultRegistrant = of(registrants[0]);
+                else
+                  that.defaultRegistrant = of(null);
+              }
+            );
 
-              // get the user services
-              that.userServices = that.userServiceService.getServices(user.uid, that.numberItems, '', [], true, true);
-            });
+            // get the user services
+            that.userServices = that.userServiceService.getServices(that.userId, that.numberItems, '', [], true, true);
 
             // get default forum image
             that.getDefaultForumImage();

@@ -28,7 +28,6 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
   private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
-  private _userId: string = '';
 
   public numberItems: number = 12;
   public nextKey: any;
@@ -37,6 +36,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
   public forumUserBlocks: Observable<any[]> = of([]);
   public forumUserBlocksArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
+  public userId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -69,20 +69,22 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-        this._userId = user.uid;
+        if (user){
+          this.userId = user.uid;
 
-        this._totalSubscription = this.siteTotalService.getTotal(this._userId)
-          .subscribe(total => {
-            if (total){
-              if (total.forumUserBlockCount == 0)
-                this._total.next(-1);
-              else
-                this._total.next(total.forumUserBlockCount);
+          this._totalSubscription = this.siteTotalService.getTotal(this.userId)
+            .subscribe(total => {
+              if (total){
+                if (total.forumUserBlockCount == 0)
+                  this._total.next(-1);
+                else
+                  this._total.next(total.forumUserBlockCount);
+              }
+              else this._total.next(-1);
             }
-            else this._total.next(-1);
-          }
-        );
-        this.getForumUserBlockList();
+          );
+          this.getForumUserBlockList();
+        }
       });
     });
   }
@@ -93,7 +95,7 @@ export class UserForumUserBlockListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userForumUserBlockService.getForumUserBlocks(this._userId, this.numberItems, key).pipe(
+    this._subscription = this.userForumUserBlockService.getForumUserBlocks(this.userId, this.numberItems, key).pipe(
       switchMap(forumUserBlocks => {
         if (forumUserBlocks && forumUserBlocks.length > 0){
           let observables = forumUserBlocks.map(forumUserBlock => {

@@ -30,7 +30,6 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
-  private _userId: string = '';
 
   public numberItems: number = 12;
   public nextKey: any;
@@ -39,6 +38,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
   public forumServiceBlocks: Observable<any[]> = of([]);
   public forumServiceBlocksArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
+  public userId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -72,20 +72,22 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
       this.prevKeys = [];
 
       this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
-        this._userId = user.uid;
+        if (user){
+          this.userId = user.uid;
 
-        this._totalSubscription = this.siteTotalService.getTotal(this._userId)
-          .subscribe(total => {
-            if (total){
-              if (total.serviceBlockCount == 0)
-                this._total.next(-1);
-              else
-                this._total.next(total.serviceBlockCount);
+          this._totalSubscription = this.siteTotalService.getTotal(this.userId)
+            .subscribe(total => {
+              if (total){
+                if (total.serviceBlockCount == 0)
+                  this._total.next(-1);
+                else
+                  this._total.next(total.serviceBlockCount);
+              }
+              else this._total.next(-1);
             }
-            else this._total.next(-1);
-          }
-        );
-        this.getForumServiceBlockList();
+          );
+          this.getForumServiceBlockList();
+        }
       });
     });
   }
@@ -95,7 +97,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
 
     this._loading.next(true);
 
-    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this._userId, this.numberItems, key).pipe(
+    this._subscription = this.userServiceBlockService.getUserServiceBlocks(this.userId, this.numberItems, key).pipe(
       switchMap(serviceBlocks => {
         if (serviceBlocks && serviceBlocks.length > 0){
           let observables = serviceBlocks.map(serviceBlock => {
@@ -175,7 +177,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                     })
                   );
 
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this._userId).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.userId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);

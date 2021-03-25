@@ -36,7 +36,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
-import { switchMap, startWith, tap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, startWith, tap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -48,6 +48,7 @@ import * as _ from "lodash";
 export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _parentForumSubscription: Subscription;
   private _forumSubscription: Subscription;
@@ -94,6 +95,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   public parentForumUserId: string;
   public defaultRegistrant: any;
   public defaultForumImage: Observable<any>;
+  public userId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -138,6 +140,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialForumSubscription)
+      this._initialForumSubscription.unsubscribe();
+
     if (this._parentForumSubscription)
       this._parentForumSubscription.unsubscribe();
 
@@ -188,90 +196,96 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
       this.parentForumId = params['forumId'];
       this.parentForumUserId = params['userId'];
 
-      const childForum: Forum = {
-        forumId: '',
-        parentId: this.parentForumId,
-        parentUid: this.parentForumUserId,
-        uid: this.auth.uid,
-        type: 'Private',
-        title: '',
-        title_lowercase: '',
-        description: '',
-        website: '',
-        indexed: false,
-        includeDescriptionInDetailPage: false,
-        includeImagesInDetailPage: false,
-        includeTagsInDetailPage: false,
-        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
-        creationDate: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+        if (user){
+          this.userId = user.uid;
 
-      this._initialForumSubscription = this.userForumService.getForum(this.parentForumUserId, this.parentForumId)
-        .subscribe(forum => {
-          this._initialForumSubscription.unsubscribe();
+          const childForum: Forum = {
+            forumId: '',
+            parentId: this.parentForumId,
+            parentUid: this.parentForumUserId,
+            uid: this.userId,
+            type: 'Private',
+            title: '',
+            title_lowercase: '',
+            description: '',
+            website: '',
+            indexed: false,
+            includeDescriptionInDetailPage: false,
+            includeImagesInDetailPage: false,
+            includeTagsInDetailPage: false,
+            lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+            creationDate: firebase.firestore.FieldValue.serverTimestamp()
+          };
 
-          if (forum){
-            if (forum.title.length > 0){
-              this._tempForum = forum;
+          this._initialForumSubscription = this.userForumService.getForum(this.parentForumUserId, this.parentForumId)
+            .subscribe(forum => {
+              this._initialForumSubscription.unsubscribe();
 
-              if (forum.uid == this.auth.uid){
-                // allow owner to create new forum
-                this.parentForum = this.userForumService.getForum(this.parentForumUserId, this.parentForumId);
-                this.forum = this.userForumService.create(this.auth.uid, childForum);
-                this.initForm();
+              if (forum){
+                if (forum.title.length > 0){
+                  this._tempForum = forum;
+
+                  if (forum.uid == this.userId){
+                    // allow owner to create new forum
+                    this.parentForum = this.userForumService.getForum(this.parentForumUserId, this.parentForumId);
+                    this.forum = this.userForumService.create(this.userId, childForum);
+                    this.initForm();
+                  }
+                  else {
+                    // ensure end user is registered in forum before creating a new one
+                    this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.parentForumUserId, this.parentForumId, this.userId)
+                      .then(registrant => {
+                        if (registrant){
+                          this.parentForum = this.userForumService.getForum(this.parentForumUserId, this.parentForumId);
+                          this.forum = this.userForumService.create(this.userId, childForum);
+                          this.initForm();
+                        }
+                        else {
+                          const snackBarRef = this.snackbar.openFromComponent(
+                            NotificationSnackBar,
+                            {
+                              duration: 8000,
+                              data: `You don't have any services serving in the forum '${forum.title}'`,
+                              panelClass: ['red-snackbar']
+                            }
+                          );
+                          this.router.navigate(['/']);
+                        }
+                      }
+                    )
+                    .catch(error => {
+                      console.error(error);
+                    });
+                  }
+                }
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Forum is missing a title',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
+                }
               }
               else {
-                // ensure end user is registered in forum before creating a new one
-                this.userForumRegistrantService.getDefaultUserRegistrantFromPromise(this.parentForumUserId, this.parentForumId, this.auth.uid)
-                  .then(registrant => {
-                    if (registrant){
-                      this.parentForum = this.userForumService.getForum(this.parentForumUserId, this.parentForumId);
-                      this.forum = this.userForumService.create(this.auth.uid, childForum);
-                      this.initForm();
-                    }
-                    else {
-                      const snackBarRef = this.snackbar.openFromComponent(
-                        NotificationSnackBar,
-                        {
-                          duration: 8000,
-                          data: `You don't have any services serving in the forum '${forum.title}'`,
-                          panelClass: ['red-snackbar']
-                        }
-                      );
-                      this.router.navigate(['/']);
-                    }
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Forum does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
                   }
-                )
-                .catch(error => {
-                  console.error(error);
-                });
+                );
+                this.router.navigate(['/']);
               }
             }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum is missing a title',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
-          }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Forum does not exist or was recently removed',
-                panelClass: ['red-snackbar']
-              }
-            );
-            this.router.navigate(['/']);
-          }
+          );
         }
-      );
+      });
     });
   }
 
@@ -352,7 +366,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               }
             );
 
-            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid)
+            that._defaultRegistrantSubscription = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.userId)
               .subscribe(registrants => {
                 if (registrants && registrants.length > 0)
                   that.defaultRegistrant = registrants[0];
@@ -401,7 +415,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
             that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
 
             // images
-            that.images = that.userImageService.getImages(that.auth.uid, 1000, null, 'desc').pipe(
+            that.images = that.userImageService.getImages(that.userId, 1000, null, 'desc').pipe(
               switchMap(images => {
                 if (images && images.length > 0){
                   let observables = images.map(image => {
@@ -580,13 +594,13 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               that.matAutoCompleteSearchServices = that.searchServiceCtrl.valueChanges.pipe(
                 startWith(''),
                 switchMap(searchTerm =>
-                  that.userServiceService.search(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value)
+                  that.userServiceService.search(that.userId, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value)
                 )
               );
 
               that._searchServiceCtrlSubscription = that.searchServiceCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+                  that.searchServiceResults = that.userServiceService.tagSearch(that.userId, searchTerm, that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
                     switchMap(services => {
                       if (services && services.length > 0){
                         let observables = services.map(service => {
@@ -648,7 +662,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               ).subscribe();
 
               // preload, service search results
-              that.searchServiceResults = that.userServiceService.tagSearch(that.auth.uid, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+              that.searchServiceResults = that.userServiceService.tagSearch(that.userId, '', that._tempServiceTags, that.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
                 switchMap(services => {
                   if (services && services.length > 0){
                     let observables = services.map(service => {
@@ -955,7 +969,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1079,7 +1093,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
 
   searchServiceIncludeTagsInSearchClick () {
     if (this.forumGroup.get('searchPrivateServices').value == true){
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+      this.searchServiceResults = this.userServiceService.tagSearch(this.userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -1215,7 +1229,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         this.userForumServiceBlockService.serviceIsBlocked(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, service.serviceId)
           .then(serviceBlocked => {
             if (!serviceBlocked) {
-              this.userServiceUserBlockService.userIsBlocked(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.auth.uid)
+              this.userServiceUserBlockService.userIsBlocked(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, this.userId)
                 .then(serviceUserBlock => {
                   if (!serviceUserBlock) {
                     this.userServiceForumBlockService.forumIsBlocked(service.uid, service.serviceId, this.forumGroup.get('forumId').value)
@@ -1467,7 +1481,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
       this._tempServiceTags.sort();
 
       if (this.forumGroup.get('searchPrivateServices').value == true){
-        this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        this.searchServiceResults = this.userServiceService.tagSearch(this.userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
           switchMap(services => {
             if (services && services.length > 0){
               let observables = services.map(service => {
@@ -1600,13 +1614,13 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               if (!result){
                 const newTag: Tag = {
                   tagId: '',
-                  uid: this.auth.uid,
+                  uid: this.userId,
                   tag: valueToSearch,
                   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
+                const userTag = this.userTagService.create(this.userId, newTag).then(() => {
                   // add tag to search list
                   this.tagService.search(newTag.tag).subscribe(tags => {
                     this.forumTagsSelectionChange(tags[0]);
@@ -1665,13 +1679,13 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
       this.matAutoCompleteSearchServices = this.searchServiceCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm =>
-          this.userServiceService.search(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
+          this.userServiceService.search(this.userId, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true)
         )
       );
 
       this._searchServiceCtrlSubscription = this.searchServiceCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+          this.searchServiceResults = this.userServiceService.tagSearch(this.userId, searchTerm, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
             switchMap(services => {
               if (services && services.length > 0){
                 let observables = services.map(service => {
@@ -1732,7 +1746,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         })
       ).subscribe();
 
-      this.searchServiceResults = this.userServiceService.tagSearch(this.auth.uid, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true);
+      this.searchServiceResults = this.userServiceService.tagSearch(this.userId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true);
     }
     else {
       // search services
@@ -1907,7 +1921,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   cancel () {
-    this.userForumService.delete(this.auth.uid, this.forumGroup.get('forumId').value).then(()=>{
+    this.userForumService.delete(this.userId, this.forumGroup.get('forumId').value).then(()=>{
       this.router.navigate(['/']);
     });
   }
