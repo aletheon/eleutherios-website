@@ -18,7 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -31,6 +31,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _service: any;
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _subscription: Subscription;
   private _serviceImagesSubscription: Subscription;
@@ -51,7 +52,8 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   public serviceImagesArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
   public serviceUid: string;
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -66,6 +68,12 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -82,7 +90,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
   trackServiceImages (index, serviceImage) { return serviceImage.imageId; }
   trackServiceTags (index, serviceTag) { return serviceTag.tagId; }
 
-  ngOnInit () {      
+  ngOnInit () {
     this.nextKey = null;
     this.prevKeys = [];
     this.serviceGroup = this.fb.group({
@@ -91,88 +99,92 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
     });
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      this.serviceGroup.get('serviceId').setValue(params['serviceId']);
-      this.serviceGroup.get('uid').setValue(params['userId']);
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('uid').value){
-        // ensure service exists
-        this._initialServiceSubscription = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value)
-          .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
+        this.route.queryParams.subscribe((params: Params) => {
+          this.serviceGroup.get('serviceId').setValue(params['serviceId']);
+          this.serviceGroup.get('uid').setValue(params['userId']);
 
-            if (service){
-              // authenticate
-              let canViewDetail: boolean = false;
+          if (this.serviceGroup.get('serviceId').value && this.serviceGroup.get('uid').value){
+            // ensure service exists
+            this._initialServiceSubscription = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  // authenticate
+                  let canViewDetail: boolean = false;
 
-              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, service.serviceId)
-                .then(isServing => {
-                  if (service.type == 'Public')
-                    canViewDetail = true;
-                  else if (service.uid == this.auth.uid)
-                    canViewDetail = true;
-                  else if (isServing && isServing == true)
-                    canViewDetail = true;
-                    
-                  if (canViewDetail){
-                    this.service = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value);
-                    this.initForm();
-                  }
-                  else {
+                  this.userForumService.serviceIsServingInUserForumFromPromise(this.loggedInUserId, service.serviceId)
+                    .then(isServing => {
+                      if (service.type == 'Public')
+                        canViewDetail = true;
+                      else if (service.uid == this.loggedInUserId)
+                        canViewDetail = true;
+                      else if (isServing && isServing == true)
+                        canViewDetail = true;
+
+                      if (canViewDetail){
+                        this.service = this.userServiceService.getService(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value);
+                        this.initForm();
+                      }
+                      else {
+                        const snackBarRef = this.snackbar.openFromComponent(
+                          NotificationSnackBar,
+                          {
+                            duration: 8000,
+                            data: `${service.title} is a private service`,
+                            panelClass: ['red-snackbar']
+                          }
+                        );
+                        this.router.navigate(['/']);
+                      }
+                    }
+                  ).catch(error => {
                     const snackBarRef = this.snackbar.openFromComponent(
                       NotificationSnackBar,
                       {
                         duration: 8000,
-                        data: `${service.title} is a private service`,
+                        data: error.message,
                         panelClass: ['red-snackbar']
                       }
                     );
                     this.router.navigate(['/']);
-                  }
+                  });
                 }
-              ).catch(error => {
-                const snackBarRef = this.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: error.message,
-                    panelClass: ['red-snackbar']
-                  }
-                );
-                this.router.navigate(['/']);
-              });
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
+                else {
+                  const snackBarRef = this.snackbar.openFromComponent(
+                    NotificationSnackBar,
+                    {
+                      duration: 8000,
+                      data: 'Service does not exist or was recently removed',
+                      panelClass: ['red-snackbar']
+                    }
+                  );
+                  this.router.navigate(['/']);
                 }
-              );
-              this.router.navigate(['/']);
-            }
+              }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
           }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }
 
   private initForm () {
     const that = this;
-    
+
     this._subscription = this.service
       .subscribe(service => {
         if (service){
@@ -180,14 +192,14 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
           this.serviceUid = service.uid;
 
           if (service.type == 'Private'){
-            if (service.uid != this.auth.uid){
-              this.userForumService.serviceIsServingInUserForumFromPromise(this.auth.uid, service.serviceId)
+            if (service.uid != this.loggedInUserId){
+              this.userForumService.serviceIsServingInUserForumFromPromise(this.loggedInUserId, service.serviceId)
                 .then(isServing => {
                   let canViewDetail = false;
-  
+
                   if (isServing && isServing == true)
                     canViewDetail = true;
-                    
+
                   if (!canViewDetail){
                     const snackBarRef = this.snackbar.openFromComponent(
                       NotificationSnackBar,
@@ -247,7 +259,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -278,17 +290,17 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
             return combineLatest([getDownloadUrl$]).pipe(
               switchMap(results => {
                 const [downloadUrl] = results;
-                
+
                 if (downloadUrl)
                   serviceImage.url = downloadUrl;
                 else
                   serviceImage.url = '../../../assets/defaultLarge.jpg';
-  
+
                 return of(serviceImage);
               })
             );
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return serviceImages[i];
@@ -319,7 +331,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -348,7 +360,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.serviceImagesArray)['creationDate']);
     this.getServiceImagesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

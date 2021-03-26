@@ -35,7 +35,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
-import { switchMap, startWith, tap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, startWith, tap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -48,6 +48,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   @ViewChild('main', { static: false }) titleRef: ElementRef;
   @ViewChild('amount', { static: false }) amountRef: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -89,6 +90,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public searchPrivateForums: boolean;
   public loading: Observable<boolean> = this._loading.asObservable();
   public stripeButtonDisabled: boolean = false;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -246,12 +248,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       this._tempSearchTags.splice(tagIndex, 1);
 
       if (this.serviceGroup.get('searchPrivateForums').value == true){
-        this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+        this.searchForumResults = this.userForumService.tagSearch(this.loggedInUserId, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
           switchMap(forums => {
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
                 if (forum){
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);
@@ -325,7 +327,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
                 if (forum){
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);
@@ -398,12 +400,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
   searchForumIncludeTagsInSearchClick () {
     if (this.serviceGroup.get('searchPrivateForums').value == true){
-      this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, this.searchForumCtrl.value, this._tempSearchTags, null, this.searchForumIncludeTagsInSearch, true).pipe(
+      this.searchForumResults = this.userForumService.tagSearch(this.loggedInUserId, this.searchForumCtrl.value, this._tempSearchTags, null, this.searchForumIncludeTagsInSearch, true).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -477,7 +479,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -862,12 +864,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       this._tempSearchTags.sort();
 
       if (this.serviceGroup.get('searchPrivateForums').value == true){
-        this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+        this.searchForumResults = this.userForumService.tagSearch(this.loggedInUserId, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
           switchMap(forums => {
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
                 if (forum){
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);
@@ -941,7 +943,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             if (forums && forums.length > 0){
               let observables = forums.map(forum => {
                 if (forum){
-                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                  let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                     switchMap(registrants => {
                       if (registrants && registrants.length > 0)
                         return of(registrants[0]);
@@ -1026,7 +1028,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     if (this.stripeButtonDisabled == false){
       this.stripeButtonDisabled = true;
 
-      this.userService.onboardCustomer(this.auth.uid, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
+      this.userService.onboardCustomer(this.loggedInUserId, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
         window.location.href = data.url;
       })
       .catch(error => {
@@ -1046,6 +1048,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -1092,33 +1100,37 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let onboarding = params['onboarding'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (onboarding)
-        this._onboarding = true;
+        this.route.queryParams.subscribe((params: Params) => {
+          let onboarding = params['onboarding'];
 
-      this._initialServiceSubscription = this.userServiceService.getService(this.auth.uid, params['serviceId']).subscribe(service => {
-        this._initialServiceSubscription.unsubscribe();
+          if (onboarding)
+            this._onboarding = true;
 
-        if (service){
-          this.service = this.userServiceService.getService(this.auth.uid, params['serviceId']);
-          this.searchPrivateForums = true;
-          this.searchForumIncludeTagsInSearch = true;
-          this.initForm();
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: 'Service does not exist or you do not have permission to edit it',
-              panelClass: ['red-snackbar']
+          this._initialServiceSubscription = this.userServiceService.getService(this.loggedInUserId, params['serviceId']).pipe(take(1)).subscribe(service => {
+            if (service){
+              this.service = this.userServiceService.getService(this.loggedInUserId, params['serviceId']);
+              this.searchPrivateForums = true;
+              this.searchForumIncludeTagsInSearch = true;
+              this.initForm();
             }
-          );
-          this.router.navigate(['/service/list', 'private']);
-        }
-      });
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Service does not exist or you do not have permission to edit it',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/service/list', 'private']);
+            }
+          });
+        });
+      }
     });
   }
 
@@ -1321,7 +1333,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
             // images
-            that.images = that.userImageService.getImages(that.auth.uid, 1000, null, 'desc').pipe(
+            that.images = that.userImageService.getImages(that.loggedInUserId, 1000, null, 'desc').pipe(
               switchMap(images => {
                 if (images && images.length > 0){
                   let observables = images.map(image => {
@@ -1432,7 +1444,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     let getForum$ = that.userForumService.getForum(whereServing.uid, whereServing.forumId).pipe(
                       switchMap(forum => {
                         if (forum) {
-                          let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                          let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId).pipe(
                             switchMap(registrants => {
                               if (registrants && registrants.length > 0)
                                 return of(registrants[0]);
@@ -1513,18 +1525,18 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               // searchForum mat subscription
               that.matAutoCompleteSearchForums = that.searchForumCtrl.valueChanges.pipe(
                 startWith(''),
-                switchMap(searchTerm => that.userForumService.search(that.auth.uid, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
+                switchMap(searchTerm => that.userForumService.search(that.loggedInUserId, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
               );
 
               // searchForum other subscriptions
               that._searchForumSubscription = that.searchForumCtrl.valueChanges.pipe(
                 tap(searchTerm => {
-                  that.searchForumResults = that.userForumService.tagSearch(that.auth.uid, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+                  that.searchForumResults = that.userForumService.tagSearch(that.loggedInUserId, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
                     switchMap(forums => {
                       if (forums && forums.length > 0) {
                         let observables = forums.map(forum => {
                           if (forum) {
-                            let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                            let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId).pipe(
                               switchMap(registrants => {
                                 if (registrants && registrants.length > 0)
                                   return of(registrants[0]);
@@ -1595,12 +1607,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                 })
               ).subscribe();
 
-              that.searchForumResults = that.userForumService.tagSearch(that.auth.uid, that.searchForumCtrl.value, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+              that.searchForumResults = that.userForumService.tagSearch(that.loggedInUserId, that.searchForumCtrl.value, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
                 switchMap(forums => {
                   if (forums && forums.length > 0) {
                     let observables = forums.map(forum => {
                       if (forum) {
-                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId).pipe(
                           switchMap(registrants => {
                             if (registrants && registrants.length > 0)
                               return of(registrants[0]);
@@ -1683,7 +1695,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                       if (forums && forums.length > 0) {
                         let observables = forums.map(forum => {
                           if (forum) {
-                            let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                            let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId).pipe(
                               switchMap(registrants => {
                                 if (registrants && registrants.length > 0)
                                   return of(registrants[0]);
@@ -1758,7 +1770,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   if (forums && forums.length > 0) {
                     let observables = forums.map(forum => {
                       if (forum) {
-                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.auth.uid).pipe(
+                        let getDefaultRegistrant$ = that.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, that.loggedInUserId).pipe(
                           switchMap(registrants => {
                             if (registrants && registrants.length > 0)
                               return of(registrants[0]);
@@ -1855,13 +1867,13 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               if (!result){
                 const newTag: Tag = {
                   tagId: '',
-                  uid: this.auth.uid,
+                  uid: this.loggedInUserId,
                   tag: valueToSearch,
                   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                const userTag = this.userTagService.create(this.auth.uid, newTag).then(() => {
+                const userTag = this.userTagService.create(this.loggedInUserId, newTag).then(() => {
                   // add tag to search list
                   this.tagService.search(newTag.tag).subscribe(tags => {
                     this.serviceTagsSelectionChange(tags[0]);
@@ -1919,18 +1931,18 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm =>
-          this.userForumService.search(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
+          this.userForumService.search(this.loggedInUserId, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
       );
 
       this._searchForumSubscription = this.searchForumCtrl.valueChanges.pipe(
         tap(searchTerm => {
-          this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+          this.searchForumResults = this.userForumService.tagSearch(this.loggedInUserId, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
             switchMap(forums => {
               if (forums && forums.length > 0){
                 let observables = forums.map(forum => {
                   if (forum){
-                    let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                    let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                       switchMap(registrants => {
                         if (registrants && registrants.length > 0)
                           return of(registrants[0]);
@@ -2000,12 +2012,12 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         })
       ).subscribe();
 
-      this.searchForumResults = this.userForumService.tagSearch(this.auth.uid, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
+      this.searchForumResults = this.userForumService.tagSearch(this.loggedInUserId, this.searchForumCtrl.value, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -2088,7 +2100,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
               if (forums && forums.length > 0){
                 let observables = forums.map(forum => {
                   if (forum){
-                    let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                    let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                       switchMap(registrants => {
                         if (registrants && registrants.length > 0)
                           return of(registrants[0]);
@@ -2163,7 +2175,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
               if (forum){
-                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.auth.uid).pipe(
+                let getDefaultRegistrant$ = this.userForumRegistrantService.getDefaultUserRegistrant(forum.uid, forum.forumId, this.loggedInUserId).pipe(
                   switchMap(registrants => {
                     if (registrants && registrants.length > 0)
                       return of(registrants[0]);
@@ -2284,7 +2296,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         creationDate: this.serviceGroup.get('creationDate').value
       };
 
-      this.userServiceService.update(this.auth.uid, data.serviceId, data).then(() => {
+      this.userServiceService.update(this.loggedInUserId, data.serviceId, data).then(() => {
         if (window.localStorage.getItem('serviceForum')){
           let serviceForum = JSON.parse(window.localStorage.getItem('serviceForum'));
           window.localStorage.removeItem('serviceForum');

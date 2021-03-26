@@ -75,13 +75,13 @@
                     <ng-template #showservicerate>
                       <ng-container *ngIf="service.serviceRate | async;let serviceRate">
                         <div style="flex:none;margin-right:5px">
-                          <star-rating-control *ngIf="serviceRate.serviceUid == auth.uid"
+                          <star-rating-control *ngIf="serviceRate.serviceUid == loggedInUserId"
                             [rating]="serviceRate.rate"
                             [starType]="'svg'"
                             [readOnly]="false"
                             (starClickChange)="onUpdateRateClick($event, serviceRate)">
                           </star-rating-control>
-                          <star-rating-control *ngIf="serviceRate.serviceUid != auth.uid"
+                          <star-rating-control *ngIf="serviceRate.serviceUid != loggedInUserId"
                             [rating]="serviceRate.rate"
                             [starType]="'svg'"
                             [readOnly]="true">
@@ -90,19 +90,19 @@
                       </ng-container>
                     </ng-template>
                     <ng-template #noservicerate>
-                      <star-rating-control *ngIf="serviceReview.serviceUid == auth.uid"
+                      <star-rating-control *ngIf="serviceReview.serviceUid == loggedInUserId"
                         [rating]="0"
                         [starType]="'svg'"
                         [readOnly]="false"
                         (starClickChange)="onCreateRateClick($event, service)">
                       </star-rating-control>
-                      <star-rating-control *ngIf="serviceReview.serviceUid != auth.uid"
+                      <star-rating-control *ngIf="serviceReview.serviceUid != loggedInUserId"
                         [rating]="0"
                         [starType]="'svg'"
                         [readOnly]="true">
                       </star-rating-control>
                     </ng-template>
-                    <div *ngIf="service.uid == auth.uid" style="flex:none;margin-right:5px">
+                    <div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
                       <mat-icon onclick="event.stopPropagation()" (click)="delete(serviceReview)" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
                     </div>
                   </div>
@@ -118,7 +118,7 @@
         </ng-container>
       </div>
       <!-- paging -->
-      <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+      <div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
         <button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
         <button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
       </div>

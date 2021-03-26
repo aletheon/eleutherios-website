@@ -34,7 +34,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -49,6 +49,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
 
   private _loading = new BehaviorSubject(false);
   private _routeSubscription: any;
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _totalSubscription: Subscription;
@@ -80,6 +81,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   public loading: Observable<boolean> = this._loading.asObservable();
   public canViewDetail: Observable<boolean> = this._canViewDetail.asObservable();
   public defaultServiceImage: Observable<any>;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -427,6 +429,12 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -450,7 +458,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
         .then(isServing => {
           if (service.type == 'Public')
             this._canViewDetail.next(true);
-          else if (service.uid == this.auth.uid)
+          else if (service.uid == this.loggedInUserId)
             this._canViewDetail.next(true);
           else if (isServing && isServing == true)
             this._canViewDetail.next(true);
@@ -468,73 +476,77 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let serviceId = params['serviceId'];
-      let serviceUserId = params['userId'];
-      let forumId = params['forumId'];
-      let forumUserId = params['forumUserId'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (forumId){
-        this.id = of(forumId);
-        this.returnUserId = of(forumUserId);
-        this.returnType = of('Forum');
-      }
+        this.route.queryParams.subscribe((params: Params) => {
+          let serviceId = params['serviceId'];
+          let serviceUserId = params['userId'];
+          let forumId = params['forumId'];
+          let forumUserId = params['forumUserId'];
 
-      if (serviceId){
-        this._initialServiceSubscription = this.userServiceService.getService(serviceUserId, serviceId)
-          .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
+          if (forumId){
+            this.id = of(forumId);
+            this.returnUserId = of(forumUserId);
+            this.returnType = of('Forum');
+          }
 
-            if (service){
-              if (service.uid == this.auth.uid){
-                this._canViewDetail.next(true);
-                this.service = this.userServiceService.getService(serviceUserId, serviceId);
-                this.initForm();
-              }
-              else {
-                // check permissions
-                this.checkPermissions(this.auth.uid, service)
-                  .then(() => {
+          if (serviceId){
+            this._initialServiceSubscription = this.userServiceService.getService(serviceUserId, serviceId).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  if (service.uid == this.loggedInUserId){
+                    this._canViewDetail.next(true);
                     this.service = this.userServiceService.getService(serviceUserId, serviceId);
                     this.initForm();
                   }
-                ).catch(error => {
+                  else {
+                    // check permissions
+                    this.checkPermissions(this.loggedInUserId, service)
+                      .then(() => {
+                        this.service = this.userServiceService.getService(serviceUserId, serviceId);
+                        this.initForm();
+                      }
+                    ).catch(error => {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: error.message,
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                      this.router.navigate(['/']);
+                    });
+                  }
+                }
+                else {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: error.message,
+                      data: 'Service does not exist or was recently removed',
                       panelClass: ['red-snackbar']
                     }
                   );
                   this.router.navigate(['/']);
-                });
-              }
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
                 }
-              );
-              this.router.navigate(['/']);
-            }
+              }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
           }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }
@@ -569,11 +581,11 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
         if (service){
           this.serviceGroup.patchValue(service);
 
-          if (service.uid == this.auth.uid)
+          if (service.uid == this.loggedInUserId)
             this._canViewDetail.next(true);
           else {
             // check permissions
-            this.checkPermissions(this.auth.uid, service)
+            this.checkPermissions(this.loggedInUserId, service)
               .then(() => {
                 // do something
               }
@@ -710,7 +722,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
               }),
               map(whereServings => {
                 return whereServings.filter(whereServing => {
-                  if (whereServing.type == 'Public' || that.auth.uid == service.uid || that.auth.uid == whereServing.uid)
+                  if (whereServing.type == 'Public' || that.loggedInUserId == service.uid || that.loggedInUserId == whereServing.uid)
                     return true;
                   else
                     return false;
@@ -721,7 +733,7 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
             );
 
             // forums this user has created so they can request the service serve in their forum(s)
-            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+            that.userForums = that.userForumService.getForums(that.loggedInUserId, that.numberItems, '', [], true, true);
 
             // get default service image
             that.getDefaultServiceImage();

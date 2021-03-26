@@ -24,7 +24,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -36,6 +36,7 @@ import * as _ from "lodash";
 export class UserServiceRateListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _searchLoading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialServiceSubscription: Subscription;
   private _serviceSubscription: Subscription;
   private _serviceRateSubscription: Subscription;
@@ -63,7 +64,8 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
   public canViewService: Observable<boolean> = this._canViewService.asObservable();
   public serviceRates: Observable<any[]> = of([]);
   public serviceRatesArray: any[] = [];
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -76,9 +78,15 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private snackbar: MatSnackBar,
     private router: Router) {
-    }
+  }
 
-  ngOnDestroy () {    
+  ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
+    if (this._initialServiceSubscription)
+      this._initialServiceSubscription.unsubscribe();
+
     if (this._serviceSubscription)
       this._serviceSubscription.unsubscribe();
 
@@ -115,91 +123,95 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this._loading.next(true);
-    
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      let parentServiceUserId = params['parentServiceUserId'];
-      let parentServiceId = params['parentServiceId'];
 
-      // reset keys if the route changes either public/private
-      this.nextKey = null;
-      this.prevKeys = [];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (parentServiceUserId && parentServiceId){
-        this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
-          .subscribe(service => {
-            this._initialServiceSubscription.unsubscribe();
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          let parentServiceUserId = params['parentServiceUserId'];
+          let parentServiceId = params['parentServiceId'];
 
-            if (service){
-              if (service.uid == this.auth.uid){
-                this._canViewService.next(true);
-                this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);
-                this.initForm();
-              }
-              else {
-                if (service.indexed == true){
-                  // check permissions
-                  this.checkPermissions(this.auth.uid, service)
-                    .then(() => {
-                      this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);
-                      this.initForm();
+          // reset keys if the route changes either public/private
+          this.nextKey = null;
+          this.prevKeys = [];
+
+          if (parentServiceUserId && parentServiceId){
+            this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId).pipe(take(1))
+              .subscribe(service => {
+                if (service){
+                  if (service.uid == this.loggedInUserId){
+                    this._canViewService.next(true);
+                    this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);
+                    this.initForm();
+                  }
+                  else {
+                    if (service.indexed == true){
+                      // check permissions
+                      this.checkPermissions(this.loggedInUserId, service)
+                        .then(() => {
+                          this.service = this.userServiceService.getService(parentServiceUserId, parentServiceId);
+                          this.initForm();
+                        }
+                      ).catch(error => {
+                        const snackBarRef = this.snackbar.openFromComponent(
+                          NotificationSnackBar,
+                          {
+                            duration: 8000,
+                            data: error.message,
+                            panelClass: ['red-snackbar']
+                          }
+                        );
+                        this.router.navigate(['/']);
+                      });
                     }
-                  ).catch(error => {
-                    const snackBarRef = this.snackbar.openFromComponent(
-                      NotificationSnackBar,
-                      {
-                        duration: 8000,
-                        data: error.message,
-                        panelClass: ['red-snackbar']
-                      }
-                    );
-                    this.router.navigate(['/']);
-                  });
+                    else {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: 'Service does not exist',
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                      this.router.navigate(['/']);
+                    }
+                  }
                 }
                 else {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: 'Service does not exist',
+                      data: 'Service does not exist or was recently removed',
                       panelClass: ['red-snackbar']
                     }
                   );
                   this.router.navigate(['/']);
                 }
               }
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
+            );
           }
-        );
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no serviceId supplied',
-            panelClass: ['red-snackbar']
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no serviceId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
           }
-        );
-        this.router.navigate(['/']);
+        });
       }
     });
   }
 
   private initForm () {
     const that = this;
-    
+
     this.serviceGroup = this.fb.group({
       serviceId:                          [''],
       uid:                                [''],
@@ -227,10 +239,10 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
         if (service){
           this.serviceGroup.patchValue(service);
 
-          if (service.uid != this.auth.uid){
+          if (service.uid != this.loggedInUserId){
             if (service.indexed == true){
               // check permissions
-              this.checkPermissions(this.auth.uid, service)
+              this.checkPermissions(this.loggedInUserId, service)
                 .then(() => {
                   // do something
                 }
@@ -281,7 +293,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
             // service totals
             that._totalSubscription = that.siteTotalService.getTotal(service.serviceId)
               .subscribe(total => {
-                if (total) {                    
+                if (total) {
                   if (total.imageCount == 0)
                     that._imageCount.next(-1);
                   else
@@ -300,7 +312,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
                   if (total.reviewCount == 0)
                     that._reviewCount.next(-1);
                   else
-                    that._reviewCount.next(total.reviewCount);                
+                    that._reviewCount.next(total.reviewCount);
                 }
               }
             );
@@ -315,7 +327,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);
@@ -341,7 +353,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
           return combineLatest([getDownloadUrl$]).pipe(
             switchMap(results => {
               const [downloadUrl] = results;
-              
+
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
@@ -369,7 +381,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
   getServiceRatesList (key?: any) {
     if (this._serviceRateSubscription)
       this._serviceRateSubscription.unsubscribe();
-    
+
     this._searchLoading.next(true);
 
     this._serviceRateSubscription = this.userServiceRateService.getAllServiceRates(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, this.numberItems, key).pipe(
@@ -392,12 +404,12 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
                           return combineLatest([getDownloadUrl$]).pipe(
                             switchMap(results => {
                               const [downloadUrl] = results;
-                              
+
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
                                 serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-                
+
                               return of(serviceImages[0]);
                             })
                           );
@@ -405,11 +417,11 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
                         else return of(null);
                       })
                     );
-          
+
                     return combineLatest([getDefaultServiceImage$, getServiceReviews$]).pipe(
                       switchMap(results => {
                         const [defaultServiceImage, serviceReviews] = results;
-          
+
                         if (defaultServiceImage)
                           service.defaultServiceImage = of(defaultServiceImage);
                         else {
@@ -435,7 +447,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
               return combineLatest([getService$]).pipe(
                 switchMap(results => {
                   const [service] = results;
-                  
+
                   if (service)
                     serviceRate.service = of(service);
                   else {
@@ -514,7 +526,7 @@ export class UserServiceRateListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.serviceRatesArray)['creationDate']);
     this.getServiceRatesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

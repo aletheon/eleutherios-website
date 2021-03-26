@@ -17,7 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { switchMap, startWith, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -37,12 +37,12 @@ const rangeValidator: ValidatorFn = (control: FormGroup): ValidationErrors | nul
 export class UserServiceListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
   private _siteTotalSubscription: Subscription;
   private _serviceSearchSubscription: Subscription;
   private _tempSearchTags: string[] = [];
-  private _serviceSearchFirstTimeThrough: boolean = true;
 
   public serviceGroup: FormGroup;
   public searchServiceCtrl: FormControl;
@@ -59,7 +59,8 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
   public searchTags: Tag[]= [];
   public total: Observable<number> = this._total.asObservable();
   public includeTagsInSearch: boolean;
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -76,23 +77,16 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
       // searchTag mat subscription
       this.matAutoCompleteSearchTags = this.serviceSearchTagCtrl.valueChanges.pipe(
         startWith(''),
-        switchMap(searchTerm => 
+        switchMap(searchTerm =>
           this.tagService.search(searchTerm)
         )
       );
-
-      this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
-        startWith('')
-      )
-      .subscribe(searchTerm => {
-        if (this._serviceSearchFirstTimeThrough == false)
-          this.getServicesList(searchTerm);
-        else 
-          this._serviceSearchFirstTimeThrough = false;
-      });
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -109,40 +103,52 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
   trackSearchTags (index, tag) { return tag.tagId; }
   trackServices (index, service) { return service.serviceId; }
 
-  ngOnInit () {      
-    this.nextKey = null;
-    this.prevKeys = [];
-    this.includeTagsInSearch = true;
-    this.serviceGroup = this.fb.group({
-      includeTagsInSearch:  [''],
-      paymentType:          [''],
-      currency:             [''],
-      startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
-      endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
-    });
-    this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
-    this.serviceGroup.get('paymentType').setValue('Any');
-    this.serviceGroup.get('currency').setValue('NZD');
-    this.serviceGroup.get('startAmount').setValue(1);
-    this.serviceGroup.get('endAmount').setValue(10);
+  ngOnInit () {
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-    this._siteTotalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-      .subscribe(total => {
-        if (total){
-          if (total.serviceCount == 0)
-            this._total.next(-1);
-          else
-            this._total.next(total.serviceCount);
-        }
+        this.nextKey = null;
+        this.prevKeys = [];
+        this.includeTagsInSearch = true;
+        this.serviceGroup = this.fb.group({
+          includeTagsInSearch:  [''],
+          paymentType:          [''],
+          currency:             [''],
+          startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+          endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+        });
+        this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
+        this.serviceGroup.get('paymentType').setValue('Any');
+        this.serviceGroup.get('currency').setValue('NZD');
+        this.serviceGroup.get('startAmount').setValue(1);
+        this.serviceGroup.get('endAmount').setValue(10);
+
+        this._siteTotalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
+          .subscribe(total => {
+            if (total){
+              if (total.serviceCount == 0)
+                this._total.next(-1);
+              else
+                this._total.next(total.serviceCount);
+            }
+          }
+        );
+
+        this._serviceSearchSubscription = this.searchServiceCtrl.valueChanges.pipe(
+          startWith('')
+        )
+        .subscribe(searchTerm => {
+          this.getServicesList(searchTerm);
+        });
       }
-    );
-    this.getServicesList();
+    });
   }
 
   public getServicesList (key?: any) {
     if (this._subscription)
       this._subscription.unsubscribe();
-    
+
     // loading
     this._loading.next(true);
 
@@ -150,7 +156,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
       if (!key)
         key = this.searchServiceCtrl.value;
 
-      this._subscription = this.userServiceService.getServicesSearchTerm(this.auth.uid, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
+      this._subscription = this.userServiceService.getServicesSearchTerm(this.loggedInUserId, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -168,12 +174,12 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -181,11 +187,11 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
-      
+
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                            
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -199,14 +205,14 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                       service.serviceTags = of(serviceTags);
                     else
                       service.serviceTags = of([]);
-                      
+
                     return of(service);
                   })
                 );
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -224,7 +230,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
       });
     }
     else {
-      this._subscription = this.userServiceService.getAllServices(this.auth.uid, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
+      this._subscription = this.userServiceService.getAllServices(this.loggedInUserId, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -241,12 +247,12 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                       return combineLatest([getDownloadUrl$]).pipe(
                         switchMap(results => {
                           const [downloadUrl] = results;
-                          
+
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
                             serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-            
+
                           return of(serviceImages[0]);
                         })
                       );
@@ -254,11 +260,11 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                     else return of(null);
                   })
                 );
-      
+
                 return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
                     const [defaultServiceImage, serviceTags] = results;
-                            
+
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
@@ -272,14 +278,14 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
                       service.serviceTags = of(serviceTags);
                     else
                       service.serviceTags = of([]);
-                      
+
                     return of(service);
                   })
                 );
               }
               else return of(null);
             });
-      
+
             return zip(...observables, (...results) => {
               return results.map((result, i) => {
                 return services[i];
@@ -305,7 +311,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
 
   removeSearchTag (tag) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     if (tagIndex > -1) {
       this.searchTags.splice(tagIndex, 1);
       this.searchTags.sort();
@@ -320,7 +326,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
 
   searchTagsSelectionChange (tag: any) {
     const tagIndex = _.findIndex(this.searchTags, function(t) { return t.tagId == tag.tagId; });
-    
+
     // tag doesn't exist so add it
     if (tagIndex == -1){
       this.searchTags.push(tag);
@@ -409,7 +415,7 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
 
     this.getServicesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

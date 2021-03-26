@@ -36,7 +36,7 @@
 		</div>
 	</ng-template>
 	<div style="flex:1">
-		<!-- START OF SERVICE DETAILS SECTION -->	
+		<!-- START OF SERVICE DETAILS SECTION -->
 		<form [formGroup]="serviceGroup" novalidate>
 			<div style="display:flex;flex-direction:row;align-items:center">
 				<ng-container *ngIf="defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
@@ -145,7 +145,7 @@
 			</div>
 			<div>
 				<mat-form-field style="width:100%">
-					<textarea 
+					<textarea
 						matInput
 						placeholder="Description"
 						formControlName="description"
@@ -283,7 +283,7 @@
 													</ng-template>
 												</div>
 												<div style="flex:none">
-													<ng-container *ngIf="auth.uid != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
+													<ng-container *ngIf="loggedInUserId != forum.uid; then showblockcontrol else noblockcontrol"></ng-container>
 													<ng-template #showblockcontrol>
 														<mat-select placeholder="" (selectionChange)="blockForum($event, forum)">
 															<mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>

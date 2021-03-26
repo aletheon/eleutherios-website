@@ -37,7 +37,7 @@
 				<div style="flex:none">
 					<ng-container *ngIf="serviceItem.type == 'Public'; then showpublictype else showprivatetype"></ng-container>
 					<ng-template #showpublictype>
-						<ng-container *ngIf="serviceItem.uid == auth.uid; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
+						<ng-container *ngIf="serviceItem.uid == loggedInUserId; then showpublicenabledtype else showpublicdisabledtype"></ng-container>
 						<ng-template #showpublicenabledtype>
 							<button onclick="event.stopPropagation()" (click)="changeType()" style="border:none;background:none;margin:0;padding:0">
 								<mat-icon matTooltip="Public">lock_open</mat-icon>
@@ -48,7 +48,7 @@
 						</ng-template>
 					</ng-template>
 					<ng-template #showprivatetype>
-						<ng-container *ngIf="serviceItem.uid == auth.uid; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
+						<ng-container *ngIf="serviceItem.uid == loggedInUserId; then showprivateenabledtype else showprivatedisabledtype"></ng-container>
 						<ng-template #showprivateenabledtype>
 							<button onclick="event.stopPropagation()" (click)="changeType()" style="border:none;background:none;margin:0;padding:0">
 								<mat-icon matTooltip="Private">lock</mat-icon>
@@ -59,13 +59,13 @@
 						</ng-template>
 					</ng-template>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none">
 					<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }" style="cursor:pointer" matTooltip="Edit">edit</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none;">
 					<mat-icon onclick="event.stopPropagation()" (click)="delete()" style="cursor:pointer" matTooltip="Delete">delete</mat-icon>
 				</div>
-				<div *ngIf="serviceItem.uid == auth.uid" style="flex:none;">
+				<div *ngIf="serviceItem.uid == loggedInUserId" style="flex:none;">
 					<mat-checkbox *ngIf="serviceItem.title.length > 0" matTooltip="Index" [checked]="serviceItem.indexed" (change)="indexDeindexService()"></mat-checkbox>
 					<mat-checkbox *ngIf="serviceItem.title.length == 0" matTooltip="Index" [checked]="serviceItem.indexed" disabled="true"></mat-checkbox>
 				</div>
@@ -126,7 +126,7 @@
 									[readOnly]="true">
 								</star-rating-control>
 							</div>
-							<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+							<div *ngIf="serviceGroup.get('uid').value != loggedInUserId" style="flex:none;margin-right:2px">
 								<mat-icon [routerLink]="['/user/service/rate/create']" [queryParams]="{ parentServiceUserId: serviceItem.uid, parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create rate">add_circle_outline</mat-icon>
 							</div>
 							<div style="flex:none;margin-right:5px">
@@ -141,7 +141,7 @@
 									</ng-container>
 								</ng-container>
 							</div>
-							<div *ngIf="serviceGroup.get('uid').value != auth.uid" style="flex:none;margin-right:2px">
+							<div *ngIf="serviceGroup.get('uid').value != loggedInUserId" style="flex:none;margin-right:2px">
 								<mat-icon [routerLink]="['/user/service/review/create']" [queryParams]="{ parentServiceUserId: serviceItem.uid, parentServiceId: serviceItem.serviceId }" style="cursor:pointer;color:#999" matTooltip="Create review">add_circle_outline</mat-icon>
 							</div>
 							<div style="flex:none;margin-right:5px">
@@ -227,7 +227,7 @@
 							</div>
 						</div>
 						<!-- user forums -->
-						<ng-container *ngIf="serviceGroup.get('uid').value == auth.uid || serviceGroup.get('type').value == 'Public'">
+						<ng-container *ngIf="serviceGroup.get('uid').value == loggedInUserId || serviceGroup.get('type').value == 'Public'">
 							<ng-container *ngIf="userForums | async;let userForumItems">
 								<ng-container *ngIf="userForumItems.length > 0; then showservices"></ng-container>
 								<ng-template #showservices>
