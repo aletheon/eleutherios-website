@@ -38,7 +38,17 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, map, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
-import { throwMatDuplicatedDrawerError } from '@angular/material/sidenav';
+
+
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+// 1) HERE ROB ENABLE END USERS WHO HAVE PAID FOR THIS SERVICE TO VIEW IT INCLUDING IMAGES ON IMAGE LIST PAGE
+// 2) DELETE END USER
+// ************************************************************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+
 
 @Component({
   selector: 'service-detail',

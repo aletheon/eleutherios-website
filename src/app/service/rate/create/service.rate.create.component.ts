@@ -26,7 +26,6 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
-import { throwMatDuplicatedDrawerError } from '@angular/material/sidenav';
 
 @Component({
   selector: 'service-rate-create',
