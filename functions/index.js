@@ -1360,13 +1360,13 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
 
     await deleteForums();
     await deleteServices();
-    await deleteCustomer();
-    await deletePayments();
-    await deleteReceipts();
     await forumBlocks();
     await forumUserBlocks();
     await serviceBlocks();
     await serviceUserBlocks();
+    await deletePayments();
+    await deleteReceipts();
+    await deleteCustomer();
     await deleteImages();
     await deleteTags();
     await removeUserTotals();
@@ -1955,20 +1955,34 @@ exports.deleteUserTag = functions.firestore.document("users/{userId}/tags/{tagId
 
   var removePublicTag = function () {
     return new Promise((resolve, reject) => {
-      var tagRef = admin.firestore().collection('tags').doc(tagId);
-      tagRef.get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
+      admin.database().ref("totals").child(tagId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists()){
+          let total = totalSnapshot.val();
+
+          // do not remove the tag if it is being used by other forums or services
+          if (total.forumCount == 0 && total.serviceCount == 0){
+            var tagRef = admin.firestore().collection('tags').doc(tagId);
+            tagRef.get().then(doc => {
+              if (doc.exists){
+                doc.ref.delete().then(() => {
+                  resolve();
+                })
+                .catch(error => {
+                  reject(error);
+                });
+              }
+              else resolve();
+            })
+            .catch(error => {
+              reject(error);
+            });
+          }
+          else {
+            console.log(`Cannot remove tag it is being used by forumCount: ${total.forumCount} serviceCount: ${total.serviceCount}`);
             resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
+          }
         }
         else resolve();
-      })
-      .catch(error => {
-        reject(error);
       });
     });
   };
