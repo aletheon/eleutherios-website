@@ -1074,81 +1074,306 @@ exports.createUser = functions.firestore.document("users/{userId}").onCreate((sn
 // ********************************************************************************
 // deleteUser
 // ********************************************************************************
-exports.deleteUser = functions.firestore.document("users/{userId}").onDelete((snap, context) => {
+exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(async (snap, context) => {
 	var user = snap.data();
   var userId = context.params.userId;
 
-  // HERE ROB
-
   // collections to delete:
-  // deletedAlerts
+  // users/{userId}/payments/{paymentId}
+  // users/{userId}/receipts/{receiptId}
+  // users/{userId}/images/{imageId}
+  // users/{userId}/tags/{tagId}
+  // users/{userId}/services/{serviceId}
+  // users/{userId}/forumblocks/{forumBlockId}
+  // users/{parentUserId}/forumuserblocks/{forumUserBlockId}
+  // users/{userId}/forums/{forumId}
+  // users/{userId}/serviceblocks/{serviceBlockId}
+  // users/{parentUserId}/serviceuserblocks/{serviceUserBlockId}
 
-	var removeUserTotals = function () {
-		return new Promise((resolve, reject) => {
-			admin.database().ref('totals').child(userId).remove(() => {
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
+  var removeUserTotals = async function () {
+    return await admin.database().ref('totals').child(userId).remove();
   };
 
-  var deleteCustomer = function () {
-    return new Promise((resolve, reject) => {
-      if (user.stripeCustomerId){
-        stripe.customers.del(user.stripeCustomerId).then(response => {
-          // https://stripe.com/docs/api/customers/delete
-          // {
-          //   "id": "cus_IGWncbQ978qiJc",
-          //   "object": "customer",
-          //   "deleted": true
-          // }
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-      else resolve();
-    });
+  var deleteCustomer = async function () {
+    if (user.stripeCustomerId)
+      await stripe.customers.del(user.stripeCustomerId);
+
+    return;
   };
 
-	return admin.firestore().collection('users').select()
-		.get().then(snapshot => {
-			return admin.database().ref("totals").child('user').once("value", totalSnapshot => {
-				if (totalSnapshot.exists())
-					return admin.database().ref("totals").child('user').update({ count: snapshot.size });
-				else
-					return Promise.resolve();
-			});
-		})
-    .then(() => {
-      // ********************************************************************************
-      // ********************************************************************************
-      // ********************************************************************************
-      // ********************************************************************************
-      // have to remove all of the end users records
-      // ********************************************************************************
-      // ********************************************************************************
-      // ********************************************************************************
-      // ********************************************************************************
-      return removeUserTotals().then(() => {
-        return deleteCustomer().then(() => {
-          return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
+  var deletePayments = async function () {
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).get();
+
+    if (paymentSnapshot.size > 0){
+      var promises = paymentSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
         });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
       })
       .catch(error => {
-        return Promise.reject(error);
+        throw error;
       });
-    })
-    .catch(error => {
-      return Promise.reject(error);
     }
-  );
+    else return;
+  };
+
+  var deleteReceipts = async function () {
+    const receiptSnapshot = await admin.firestore().collection(`users/${userId}/receipts`).get();
+
+    if (receiptSnapshot.size > 0){
+      var promises = receiptSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var deleteImages = async function () {
+    const imageSnapshot = await admin.firestore().collection(`users/${userId}/images`).get();
+
+    if (imageSnapshot.size > 0){
+      var promises = imageSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var deleteTags = async function () {
+    const tagSnapshot = await admin.firestore().collection(`users/${userId}/tags`).get();
+
+    if (tagSnapshot.size > 0){
+      var promises = tagSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var deleteServices = async function () {
+    const serviceSnapshot = await admin.firestore().collection(`users/${userId}/services`).get();
+
+    if (serviceSnapshot.size > 0){
+      var promises = serviceSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var deleteForums = async function () {
+    const forumSnapshot = await admin.firestore().collection(`users/${userId}/forums`).get();
+
+    if (forumSnapshot.size > 0){
+      var promises = forumSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var forumBlocks = async function () {
+    const forumBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumblocks`).get();
+
+    if (forumBlockSnapshot.size > 0){
+      var promises = forumBlockSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var forumUserBlocks = async function () {
+    const forumUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumuserblocks`).get();
+
+    if (forumUserBlockSnapshot.size > 0){
+      var promises = forumUserBlockSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var serviceBlocks = async function () {
+    const serviceBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceblocks`).get();
+
+    if (serviceBlockSnapshot.size > 0){
+      var promises = serviceBlockSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  var serviceUserBlocks = async function () {
+    const serviceUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceuserblocks`).get();
+
+    if (serviceUserBlockSnapshot.size > 0){
+      var promises = serviceUserBlockSnapshot.docs.map(doc => {
+        return new Promise((resolve, reject) => {
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        });
+      });
+
+      Promise.all(promises).then(() => {
+        return;
+      })
+      .catch(error => {
+        throw error;
+      });
+    }
+    else return;
+  };
+
+  try {
+    const userSnapshot = await admin.firestore().collection('users').select().get();
+    const totalSnapshot = await admin.database().ref("totals").child('user').once("value");
+
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child('user').update({ count: userSnapshot.size });
+
+    await deleteForums();
+    await deleteServices();
+    await deleteCustomer();
+    await deletePayments();
+    await deleteReceipts();
+    await forumBlocks();
+    await forumUserBlocks();
+    await serviceBlocks();
+    await serviceUserBlocks();
+    await deleteImages();
+    await deleteTags();
+    await removeUserTotals();
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
