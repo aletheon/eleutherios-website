@@ -104,25 +104,25 @@ export class UserServiceListComponent implements OnInit, OnDestroy {
   trackServices (index, service) { return service.serviceId; }
 
   ngOnInit () {
+    this.nextKey = null;
+    this.prevKeys = [];
+    this.includeTagsInSearch = true;
+    this.serviceGroup = this.fb.group({
+      includeTagsInSearch:  [''],
+      paymentType:          [''],
+      currency:             [''],
+      startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+    });
+    this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
+    this.serviceGroup.get('paymentType').setValue('Any');
+    this.serviceGroup.get('currency').setValue('NZD');
+    this.serviceGroup.get('startAmount').setValue(1);
+    this.serviceGroup.get('endAmount').setValue(10);
+
     this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
       if (user){
         this.loggedInUserId = user.uid;
-
-        this.nextKey = null;
-        this.prevKeys = [];
-        this.includeTagsInSearch = true;
-        this.serviceGroup = this.fb.group({
-          includeTagsInSearch:  [''],
-          paymentType:          [''],
-          currency:             [''],
-          startAmount:          ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
-          endAmount:            ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
-        });
-        this.serviceGroup.get('includeTagsInSearch').setValue(this.includeTagsInSearch);
-        this.serviceGroup.get('paymentType').setValue('Any');
-        this.serviceGroup.get('currency').setValue('NZD');
-        this.serviceGroup.get('startAmount').setValue(1);
-        this.serviceGroup.get('endAmount').setValue(10);
 
         this._siteTotalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
           .subscribe(total => {
