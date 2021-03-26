@@ -27,7 +27,7 @@ import {
 } from '@stripe/stripe-js';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -86,6 +86,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   public elementsOptions: StripeElementsOptions = {
     locale: 'en',
   };
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -414,79 +415,84 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      this._sellerUid = params['userId']
-      this._sellerServiceId = params['serviceId']
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this._user = user;
+        this.loggedInUserId = user.uid;
 
-      let forumId = params['forumId'];
-      let forumUserId = params['forumUserId'];
+        this.route.queryParams.subscribe((params: Params) => {
+          this._sellerUid = params['userId']
+          this._sellerServiceId = params['serviceId']
 
-      if (forumId){
-        this.id = of(forumId);
-        this.returnUserId = of(forumUserId);
-        this.returnType = of('Forum');
-      }
+          let forumId = params['forumId'];
+          let forumUserId = params['forumUserId'];
 
-      this._userServiceSubscription = this.userServiceService.getService(this._sellerUid, this._sellerServiceId)
-        .subscribe(service => {
-          if (service){
-            this._userServiceSubscription.unsubscribe();
+          if (forumId){
+            this.id = of(forumId);
+            this.returnUserId = of(forumUserId);
+            this.returnType = of('Forum');
+          }
 
-            if (service.paymentType == 'Payment'){
-              if (service.indexed == true && service.paymentId.length == 0){
-                this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
-                this.initForm();
-              }
-              else {
-                if (service.indexed == false){
-                  const snackBarRef = this.snackbar.openFromComponent(
-                    NotificationSnackBar,
-                    {
-                      duration: 8000,
-                      data: 'The service is not indexed or available for sale',
-                      panelClass: ['red-snackbar']
+          this._userServiceSubscription = this.userServiceService.getService(this._sellerUid, this._sellerServiceId).pipe(take(1))
+            .subscribe(service => {
+              if (service){
+                if (service.paymentType == 'Payment'){
+                  if (service.indexed == true && service.paymentId.length == 0){
+                    this.sellerService = this.userServiceService.getService(this._sellerUid, this._sellerServiceId);
+                    this.initForm();
+                  }
+                  else {
+                    if (service.indexed == false){
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: 'The service is not indexed or available for sale',
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                      this.router.navigate(['/']);
                     }
-                  );
-                  this.router.navigate(['/']);
+                    else {
+                      const snackBarRef = this.snackbar.openFromComponent(
+                        NotificationSnackBar,
+                        {
+                          duration: 8000,
+                          data: 'The service has already been sold',
+                          panelClass: ['red-snackbar']
+                        }
+                      );
+                      this.router.navigate(['/']);
+                    }
+                  }
                 }
                 else {
                   const snackBarRef = this.snackbar.openFromComponent(
                     NotificationSnackBar,
                     {
                       duration: 8000,
-                      data: 'The service has already been sold',
+                      data: 'Service is free',
                       panelClass: ['red-snackbar']
                     }
                   );
-                  this.router.navigate(['/']);
+                  this.router.navigate(['/service/detail'], { queryParams: { serviceId: this._sellerServiceId } });
                 }
               }
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service is free',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/service/detail'], { queryParams: { serviceId: this._sellerServiceId } });
-            }
-          }
-          else {
-            const snackBarRef = this.snackbar.openFromComponent(
-              NotificationSnackBar,
-              {
-                duration: 8000,
-                data: 'Service does not exist or was recently removed',
-                panelClass: ['red-snackbar']
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Service does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
+                  }
+                );
+                this.router.navigate(['/']);
               }
-            );
-            this.router.navigate(['/']);
-          }
-        }
-      );
+            }
+          );
+        });
+      }
     });
   }
 
@@ -563,12 +569,6 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       }
     );
 
-    // get user
-    that._userSubscription = this.auth.user.subscribe(user => {
-      if (user)
-        this._user = user;
-    });
-
     // run once subscription
     const runOnceSubscription = this.sellerService.subscribe(service => {
       if (service){
@@ -614,7 +614,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
             // get end user services
-            that.userServices = that.userServiceService.getServices(that.auth.uid, that.numberItems, '', [], true, true).pipe(
+            that.userServices = that.userServiceService.getServices(that.loggedInUserId, that.numberItems, '', [], true, true).pipe(
               map(userServices => {
                 return userServices.filter(userService => {
                   if (userService.indexed == true)

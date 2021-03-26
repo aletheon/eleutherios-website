@@ -13,7 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -24,6 +24,7 @@ import * as _ from "lodash";
 })
 export class UserImageViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _imageId: string;
   private _image: Observable<any>;
@@ -32,15 +33,19 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
   public nextKeyQuerystring: Observable<any>;
   public prevKeyQuerystring: Observable<any>;
   public loading: Observable<boolean> = this._loading.asObservable();
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private userImageService: UserImageService,
     private router: Router,
     private snackbar: MatSnackBar) {
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
   }
@@ -80,54 +85,60 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      let nextKey = params['nextKey'];
-      let prevKey = params['prevKey'];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      if (nextKey)
-        this.nextKeyQuerystring = of(nextKey);
+        this.route.queryParams.subscribe((params: Params) => {
+          let nextKey = params['nextKey'];
+          let prevKey = params['prevKey'];
 
-      if (prevKey)
-        this.prevKeyQuerystring = of(prevKey);
+          if (nextKey)
+            this.nextKeyQuerystring = of(nextKey);
 
-      if (params['imageId'] && params['imageId'].length > 0){
-        this._imageId = params['imageId'];
-        this._image = this.userImageService.getImage(this.auth.uid, this._imageId).pipe(
-          switchMap(image => {
-            if (image){
-              let getDownloadUrl$: Observable<any>;
+          if (prevKey)
+            this.prevKeyQuerystring = of(prevKey);
 
-              if (image.largeUrl)
-                getDownloadUrl$ = from(firebase.storage().ref(image.largeUrl).getDownloadURL());
+          if (params['imageId'] && params['imageId'].length > 0){
+            this._imageId = params['imageId'];
+            this._image = this.userImageService.getImage(this.loggedInUserId, this._imageId).pipe(
+              switchMap(image => {
+                if (image){
+                  let getDownloadUrl$: Observable<any>;
 
-              return combineLatest([getDownloadUrl$]).pipe(
-                switchMap(results => {
-                  const [downloadUrl] = results;
-                  
-                  if (downloadUrl)
-                    image.url = downloadUrl;
-                  else
-                    image.url = '../../../assets/defaultLarge.jpg';
-    
-                  return of(image);
-                })
-              );
-            }
-            else return of(null);
-          })
-        );
-        this.initForm();
-      }
-      else {
-        const snackBarRef = this.snackbar.openFromComponent(
-          NotificationSnackBar,
-          {
-            duration: 8000,
-            data: 'There was no imageId provided',
-            panelClass: ['red-snackbar']
+                  if (image.largeUrl)
+                    getDownloadUrl$ = from(firebase.storage().ref(image.largeUrl).getDownloadURL());
+
+                  return combineLatest([getDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [downloadUrl] = results;
+
+                      if (downloadUrl)
+                        image.url = downloadUrl;
+                      else
+                        image.url = '../../../assets/defaultLarge.jpg';
+
+                      return of(image);
+                    })
+                  );
+                }
+                else return of(null);
+              })
+            );
+            this.initForm();
           }
-        );
-        this.router.navigate(['/']);
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no imageId provided',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
+        });
       }
     });
   }
@@ -147,7 +158,7 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         }
         else {
-          if (image.uid != this.auth.uid){
+          if (image.uid != this.loggedInUserId){
             const snackBarRef = this.snackbar.openFromComponent(
               NotificationSnackBar,
               {

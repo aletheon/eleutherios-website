@@ -25,7 +25,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -37,6 +37,7 @@ import * as _ from "lodash";
 })
 export class UserPaymentViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialPaymentSubscription: Subscription;
   private _paymentSubscription: Subscription;
   private _sellerServiceSubscription: Subscription;
@@ -44,7 +45,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   private _buyerDefaultServiceImageSubscription: Subscription;
   private _sellerDefaultServiceImageSubscription: Subscription;
   private _sellerServiceTagSubscription: Subscription;
-  
+
   public paymentGroup: FormGroup;
   public payment: Observable<any>;
   public buyerDefaultServiceImage: Observable<any>;
@@ -54,6 +55,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   public userForumsCtrl: FormControl;
   public numberItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -74,6 +76,9 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._initialPaymentSubscription)
       this._initialPaymentSubscription.unsubscribe();
 
@@ -100,7 +105,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
     if (this.userForumsCtrl.value.title.length > 0){
       const sellerServiceSubscription = this.userServiceService.getService(this.paymentGroup.get('sellerUid').value, this.paymentGroup.get('sellerServiceId').value).subscribe(service => {
         sellerServiceSubscription.unsubscribe();
-        
+
         if (service){
           this.userForumServiceBlockService.serviceIsBlocked(this.userForumsCtrl.value.uid, this.userForumsCtrl.value.forumId, service.serviceId)
             .then(serviceBlocked => {
@@ -257,32 +262,38 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      this._initialPaymentSubscription = this.userPaymentService.getPayment(this.auth.uid, params['paymentId']).subscribe(payment => {
-        this._initialPaymentSubscription.unsubscribe();
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-        if (payment){
-          this.payment = this.userPaymentService.getPayment(this.auth.uid, params['paymentId']);
-          this.initForm();
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: 'Payment does not exist or was recently removed',
-              panelClass: ['red-snackbar']
+        this.route.queryParams.subscribe((params: Params) => {
+          this._initialPaymentSubscription = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']).subscribe(payment => {
+            this._initialPaymentSubscription.unsubscribe();
+
+            if (payment){
+              this.payment = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']);
+              this.initForm();
             }
-          );
-          this.router.navigate(['/']);
-        }
-      });
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Payment does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            }
+          });
+        });
+      }
     });
   }
 
   private initForm () {
     const that = this;
-    
+
     this.paymentGroup = this.fb.group({
       paymentId:                        [''],
       uid:                              [''],
@@ -349,12 +360,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -384,12 +395,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -416,13 +427,13 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
             });
 
             // forums this user has created so they can request the service serve in their forum(s)
-            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+            that.userForums = that.userForumService.getForums(that.loggedInUserId, that.numberItems, '', [], true, true);
           }
           catch (error) {
             throw error;
           }
         }
-    
+
         // call load
         load().then(() => {
           this._loading.next(false);

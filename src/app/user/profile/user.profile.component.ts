@@ -17,7 +17,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -27,15 +27,15 @@ import * as firebase from 'firebase/app';
 })
 export class UserProfileComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
-  private _initialUserSubscription: Subscription;
   private _userSubscription: Subscription;
-  
+
   public user: Observable<any>;
   public publicForums: Observable<any[]>;
   public publicServices: Observable<any[]>;
   public publicForumsNumberOfItems: number = 100;
   public publicServicesNumberOfItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -51,9 +51,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
-    if (this._initialUserSubscription)
-      this._initialUserSubscription.unsubscribe();
-
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
   }
@@ -95,11 +92,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     let username = this.router.url.substring(this.router.url.lastIndexOf('/') + 1);
 
     if (username && username.length > 0){
-      this._initialUserSubscription = this.userService.getUserByUsername(username).subscribe(user => {
-        this._initialUserSubscription.unsubscribe();
-  
+      this._userSubscription = this.userService.getUserByUsername(username).pipe(take(1)).subscribe(user => {
         if (user){
-          this.user = this.userService.getUserByUsername(username);
+          this.loggedInUserId = user.uid;
+          this.user = this.userService.getUser(this.loggedInUserId);
           this.initForm();
         }
         else {
@@ -131,13 +127,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private initForm () {
     const that = this;
 
-    //  ongoing subscription
-    this._initialUserSubscription = this.user.subscribe(user => {
-      if (user){
-        // do something
-      }
-    });
-
     // run once subscription
     const runOnceSubscription = this.user.subscribe(user => {
       if (user){
@@ -160,12 +149,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                             return combineLatest([getDownloadUrl$]).pipe(
                               switchMap(results => {
                                 const [downloadUrl] = results;
-                                
+
                                 if (downloadUrl)
                                   forumImages[0].url = downloadUrl;
                                 else
                                   forumImages[0].url = '../../assets/defaultThumbnail.jpg';
-                  
+
                                 return of(forumImages[0]);
                               })
                             );
@@ -178,7 +167,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                       return combineLatest([getDefaultForumImage$, getForumTags$]).pipe(
                         switchMap(results => {
                           const [defaultForumImage, forumTags] = results;
-            
+
                           if (defaultForumImage)
                             forum.defaultForumImage = of(defaultForumImage);
                           else {
@@ -192,14 +181,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                             forum.forumTags = of(forumTags);
                           else
                             forum.forumTags = of([]);
-                            
+
                           return of(forum);
                         })
                       );
                     }
                     else return of(null);
                   });
-            
+
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
                       return forums[i];
@@ -227,12 +216,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                             return combineLatest([getDownloadUrl$]).pipe(
                               switchMap(results => {
                                 const [downloadUrl] = results;
-                                
+
                                 if (downloadUrl)
                                   serviceImages[0].url = downloadUrl;
                                 else
                                   serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
-                  
+
                                 return of(serviceImages[0]);
                               })
                             );
@@ -245,7 +234,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                       return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                         switchMap(results => {
                           const [defaultServiceImage, serviceTags] = results;
-                          
+
                           if (defaultServiceImage)
                             service.defaultServiceImage = of(defaultServiceImage);
                           else {
@@ -266,7 +255,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                     }
                     else return of(null);
                   });
-            
+
                   return zip(...observables, (...results: any[]) => {
                     return results.map((result, i) => {
                       return services[i];
@@ -274,7 +263,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                   });
                 }
                 else return of([]);
-              }) 
+              })
             );
           }
           catch (error) {

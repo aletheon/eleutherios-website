@@ -13,7 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as _ from "lodash";
 
 @Component({
@@ -24,6 +24,7 @@ import * as _ from "lodash";
 export class UserTagListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
 
@@ -34,6 +35,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
   public tags: Observable<any[]> = of([]);
   public tagsArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -44,6 +46,9 @@ export class UserTagListComponent implements OnInit, OnDestroy {
     }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -54,24 +59,30 @@ export class UserTagListComponent implements OnInit, OnDestroy {
   trackTags (index, tag) { return tag.tagId; }
 
   ngOnInit () {
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      // reset keys if the route changes either public/private
-      this.nextKey = null;
-      this.prevKeys = [];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      // get total
-      this._totalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-        .subscribe(total => {
-          if (total){
-            if (total.tagCount == 0)
-              this._total.next(-1);
-            else
-              this._total.next(total.tagCount);
-          }
-        }
-      );
-      this.getTagList();
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          // reset keys if the route changes either public/private
+          this.nextKey = null;
+          this.prevKeys = [];
+
+          // get total
+          this._totalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
+            .subscribe(total => {
+              if (total){
+                if (total.tagCount == 0)
+                  this._total.next(-1);
+                else
+                  this._total.next(total.tagCount);
+              }
+            }
+          );
+          this.getTagList();
+        });
+      }
     });
   }
 
@@ -83,7 +94,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userTagService.getTags(this.auth.uid, this.numberItems, key).pipe(
+    this._subscription = this.userTagService.getTags(this.loggedInUserId, this.numberItems, key).pipe(
       switchMap(tags => {
         if (tags && tags.length > 0){
           let observables = tags.map(tag => {
@@ -131,7 +142,7 @@ export class UserTagListComponent implements OnInit, OnDestroy {
       .subscribe(total => {
         if (total){
           if (total.forumCount == 0 && total.serviceCount == 0){
-            this.userTagService.delete(this.auth.uid, tag.tagId).then(() =>{
+            this.userTagService.delete(this.loggedInUserId, tag.tagId).then(() =>{
               // do something
             })
             .catch(error =>{

@@ -27,23 +27,21 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
   @ViewChild('usernameRef', { static: false }) usernameRef: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _userSubscription: Subscription;
-  
+
   public userGroup: FormGroup;
   public loading: Observable<boolean> = this._loading.asObservable();
   public userNameAlreadyExists: boolean = false;
   public url: string = environment.url;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private userService: UserService,
     private pushMessageService: PushMessageService,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private snackbar: MatSnackBar,
     private router: Router) {
   }
-
-  // 1) give end users ability to change username
-  // 2) clean up subscriptions so they are unsubscribed from properly
 
   pushNotificationSave () {
     const that = this;
@@ -99,7 +97,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
   checkPushNotificationPermission () {
     if (this.userGroup.get('receivePushNotifications').value == true)
-      this.pushMessageService.getPermission(this.auth.uid);
+      this.pushMessageService.getPermission(this.loggedInUserId);
   }
 
   delete () {
@@ -125,7 +123,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
 
   private initForm () {
     const that = this;
-    
+
     this.userGroup = this.fb.group({
       uid:                              [''],
       email:                            [''],
@@ -144,6 +142,7 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
     //  ongoing subscription
     this._userSubscription = this.auth.user.subscribe(user => {
       if (user){
+        this.loggedInUserId = user.uid;
         this.userGroup.patchValue(user);
 
         if (user.receivePushNotifications == false){
@@ -157,15 +156,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
           this.userGroup.get('receiveForumPostNotifications').enable();
         }
       }
+      this._loading.next(false);
     });
-
-    // run once subscription
-    const runOnceSubscription = this.auth.user
-      .subscribe(user => {
-        this._loading.next(false);
-        runOnceSubscription.unsubscribe();
-      }
-    );
   }
 
   saveChanges () {
@@ -227,8 +219,8 @@ export class UserSettingEditComponent implements OnInit, OnDestroy {
           lastUpdateDate: that.userGroup.get('lastUpdateDate').value,
           creationDate: that.userGroup.get('creationDate').value
         }
-      
-        that.userService.update(that.auth.uid, data).then(() => {
+
+        that.userService.update(that.loggedInUserId, data).then(() => {
           const snackBarRef = that.snackbar.openFromComponent(
             NotificationSnackBar,
             {

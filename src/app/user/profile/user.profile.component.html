@@ -22,8 +22,8 @@
 										<div style="flex:none;margin-right:10px">
 											<ng-container *ngIf="image.url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 											<ng-template #showimage>
-												<img *ngIf="auth.uid" [src]="image.url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
-												<img *ngIf="!auth.uid" [src]="image.url" [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+												<img *ngIf="loggedInUserId" [src]="image.url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+												<img *ngIf="!loggedInUserId" [src]="image.url" [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
 											</ng-template>
 											<ng-template #noimage>
 												<img [src]="image.url">
@@ -32,39 +32,39 @@
 									</ng-container>
 								</ng-template>
 								<div style="flex:1;margin-right:5px">
-									<a *ngIf="auth.uid" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-									<a *ngIf="!auth.uid" [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+									<a *ngIf="loggedInUserId" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+									<a *ngIf="!loggedInUserId" [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
 								</div>
 								<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 									<!-- other button controls -->
 									<div class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 										{{ forum.creationDate.toDate() | amTimeAgo }}
 									</div>
-									<div *ngIf="auth.uid && forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && forum.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon *ngIf="forum.type == 'Public'" onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 										<mat-icon *ngIf="forum.type == 'Private'" onclick="event.stopPropagation()" (click)="changeForumType(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && forum.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/forum/edit']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="Edit">edit</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && forum.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Delete">delete</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && forum.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && forum.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-checkbox *ngIf="forum.title.length > 0" matTooltip="Index" [checked]="forum.indexed" (change)="indexDeindexForum(forum)"></mat-checkbox>
 										<mat-checkbox *ngIf="forum.title.length == 0" matTooltip="Index" [checked]="forum.indexed" disabled="true"></mat-checkbox>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="auth.uid" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>										
+										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="auth.uid" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
+										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/user/forum/service/add']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
 									</div>
 									<div style="flex:none">
-										<mat-icon *ngIf="auth.uid" onclick="event.stopPropagation()" (click)="createNewService(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
+										<mat-icon *ngIf="loggedInUserId" onclick="event.stopPropagation()" (click)="createNewService(forum)" style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>
@@ -102,8 +102,8 @@
 										<div style="flex:none;margin-right:10px">
 											<ng-container *ngIf="image.url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 											<ng-template #showimage>
-												<img *ngIf="auth.uid" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
-												<img *ngIf="!auth.uid" [src]="image.url" [routerLink]="['/anonymous/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
+												<img *ngIf="loggedInUserId" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
+												<img *ngIf="!loggedInUserId" [src]="image.url" [routerLink]="['/anonymous/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">
 											</ng-template>
 											<ng-template #noimage>
 												<img [src]="image.url">
@@ -113,8 +113,8 @@
 								</ng-template>
 								<div style="flex:1;margin-right:5px">
 									<p style="word-break: break-all">
-										<a *ngIf="auth.uid" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
-										<a *ngIf="!auth.uid" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
+										<a *ngIf="loggedInUserId" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
+										<a *ngIf="!loggedInUserId" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
 									</p>
 								</div>
 								<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
@@ -130,31 +130,31 @@
 									<div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 										{{ service.creationDate.toDate() | amTimeAgo }}
 									</div>
-									<div *ngIf="auth.uid && service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon *ngIf="service.type == 'Public'" onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="color:#1B1B1B" matTooltip="Public">lock_open</mat-icon>
 										<mat-icon *ngIf="service.type == 'Private'" onclick="event.stopPropagation()" (click)="changeServiceType(service)" style="color:#1B1B1B" matTooltip="Private">lock</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon [routerLink]="['/user/service/edit']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Edit">edit</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="color:#1B1B1B;cursor:pointer" matTooltip="Delete">delete</mat-icon>
 									</div>
-									<div *ngIf="auth.uid && service.uid == auth.uid" style="flex:none;margin-right:5px">
+									<div *ngIf="loggedInUserId && service.uid == loggedInUserId" style="flex:none;margin-right:5px">
 										<mat-checkbox *ngIf="service.title.length > 0" matTooltip="Index" [checked]="service.indexed" (change)="indexDeindexService(service)"></mat-checkbox>
 										<mat-checkbox *ngIf="service.title.length == 0" matTooltip="Index" [checked]="service.indexed" disabled="true"></mat-checkbox>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="auth.uid" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
 									</div>
 									<div style="flex:none;margin-right:5px">
-										<mat-icon *ngIf="auth.uid" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
+										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
 									</div>
 									<div style="flex:none">
-										<mat-icon *ngIf="auth.uid" [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
-										<mat-icon *ngIf="!auth.uid" [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
+										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>
@@ -175,8 +175,8 @@
 												<div class="label label-danger" *ngIf="service.paymentId && service.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
 													Sold
 												</div>
-												<a *ngIf="auth.uid" [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-												<a *ngIf="!auth.uid" [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+												<a *ngIf="loggedInUserId" [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+												<a *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
 											</div>
 										</ng-template>
 										<ng-template #showtagswithoutpayment>
@@ -184,8 +184,8 @@
 												<div class="label label-danger" *ngIf="service.paymentId && service.paymentId.length > 0" style="flex:none;padding:5px;margin-right:5px">
 													Sold
 												</div>
-												<a *ngIf="auth.uid" [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
-												<a *ngIf="!auth.uid" [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+												<a *ngIf="loggedInUserId" [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+												<a *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
 											</div>
 										</ng-template>
 									</ng-container>

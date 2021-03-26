@@ -15,7 +15,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -27,6 +27,7 @@ import * as _ from "lodash";
 export class UserPaymentListComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
   private _siteTotalSubscription: Subscription;
@@ -38,7 +39,8 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   public payments: Observable<any[]> = of([]);
   public paymentsArray: any[] = [];
   public total: Observable<number> = this._total.asObservable();
-  
+  public loggedInUserId: string = '';
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -51,6 +53,9 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -64,33 +69,39 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   trackPayments (index, payment) { return payment.paymentId; }
 
   ngOnInit () {
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      // reset keys if the route changes either public/private
-      this.nextKey = null;
-      this.prevKeys = [];
-      this._siteTotalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-        .subscribe(total => {
-          if (total){
-            if (total.paymentCount == 0)
-              this._total.next(-1);
-            else
-              this._total.next(total.paymentCount);
-          }
-        }
-      );
-      this.getPaymentsList();
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
+
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          // reset keys if the route changes either public/private
+          this.nextKey = null;
+          this.prevKeys = [];
+          this._siteTotalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
+            .subscribe(total => {
+              if (total){
+                if (total.paymentCount == 0)
+                  this._total.next(-1);
+                else
+                  this._total.next(total.paymentCount);
+              }
+            }
+          );
+          this.getPaymentsList();
+        });
+      }
     });
   }
 
   getPaymentsList (key?: any) {
     if (this._subscription)
       this._subscription.unsubscribe();
-    
+
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userPaymentService.getPayments(this.auth.uid, this.numberItems, key).pipe(
+    this._subscription = this.userPaymentService.getPayments(this.loggedInUserId, this.numberItems, key).pipe(
       switchMap(payments => {
         if (payments && payments.length > 0){
           let observables = payments.map(payment => {
@@ -107,12 +118,12 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -131,12 +142,12 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
                   return combineLatest([getDownloadUrl$]).pipe(
                     switchMap(results => {
                       const [downloadUrl] = results;
-                      
+
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
                         serviceImages[0].url = '../../../assets/defaultTiny.jpg';
-        
+
                       return of(serviceImages[0]);
                     })
                   );
@@ -145,7 +156,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
               })
             );
             let getSellerServiceTags$ = this.userServiceTagService.getTags(payment.sellerUid, payment.sellerServiceId);
-  
+
             return combineLatest([getSellerService$, getBuyerService$, getSellerDefaultServiceImage$, getBuyerDefaultServiceImage$, getSellerServiceTags$]).pipe(
               switchMap(results => {
                 const [sellerService, buyerService, sellerDefaultServiceImage, buyerDefaultServiceImage, sellerServiceTags] = results;
@@ -191,7 +202,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
               })
             );
           });
-    
+
           return zip(...observables, (...results) => {
             return results.map((result, i) => {
               return payments[i];
@@ -217,7 +228,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.paymentsArray)['creationDate']);
     this.getPaymentsList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

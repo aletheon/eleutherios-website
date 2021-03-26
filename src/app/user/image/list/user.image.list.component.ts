@@ -16,16 +16,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, timer, defer, throwError } from 'rxjs';
-import { switchMap, retryWhen, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
-
-
-// continue here rob
-
-
-
-
 
 @Component({
   selector: 'user-image-list',
@@ -36,6 +29,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   @ViewChild('uploadFile', { static: false }) uploadFile: ElementRef;
   private _loading = new BehaviorSubject(false);
   private _total = new BehaviorSubject(0);
+  private _userSubscription: Subscription;
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
 
@@ -49,6 +43,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   public selectedFiles: FileList;
   public currentUpload: Upload;
   public disableButton: boolean = true;
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -76,7 +71,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     this.disableButton = true;
     let file = this.selectedFiles.item(0);
     this.currentUpload = new Upload(file);
-    this.userImageService.create(this.auth.uid, this.currentUpload);
+    this.userImageService.create(this.loggedInUserId, this.currentUpload);
   }
 
   clearUpload () {
@@ -86,6 +81,9 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._subscription)
       this._subscription.unsubscribe();
 
@@ -153,34 +151,40 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     window.localStorage.removeItem('userImageListPrevKeys');
     window.localStorage.removeItem('userImageListNextKey');
 
-    // get params
-    this.route.queryParams.subscribe((params: Params) => {
-      // reset keys
-      this.nextKey = null;
-      this.prevKeys = [];
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-      this._totalSubscription = this.siteTotalService.getTotal(this.auth.uid)
-        .subscribe(total => {
-          if (total){
-            if (total.imageCount == 0)
-              this._total.next(-1);
+        // get params
+        this.route.queryParams.subscribe((params: Params) => {
+          // reset keys
+          this.nextKey = null;
+          this.prevKeys = [];
+
+          this._totalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
+            .subscribe(total => {
+              if (total){
+                if (total.imageCount == 0)
+                  this._total.next(-1);
+                else
+                  this._total.next(total.imageCount);
+              }
+            }
+          );
+
+          // restore prevKeys if user came from image view page
+          if (previousRouteUrl.length > 0 && previousRouteUrl.indexOf('/user/image/view') == 0){
+            if (prevKeys.length > 0)
+              this.prevKeys = prevKeys;
+
+            if (nextKey)
+              this.getImageList(new firebase.firestore.Timestamp(nextKey.seconds, nextKey.nanoseconds));
             else
-              this._total.next(total.imageCount);
+              this.getImageList();
           }
-        }
-      );
-
-      // restore prevKeys if user came from image view page
-      if (previousRouteUrl.length > 0 && previousRouteUrl.indexOf('/user/image/view') == 0){
-        if (prevKeys.length > 0)
-          this.prevKeys = prevKeys;
-
-        if (nextKey)
-          this.getImageList(new firebase.firestore.Timestamp(nextKey.seconds, nextKey.nanoseconds));
-        else
-          this.getImageList();
+          else this.getImageList();
+        });
       }
-      else this.getImageList();
     });
   }
 
@@ -192,7 +196,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     // loading
     this._loading.next(true);
 
-    this._subscription = this.userImageService.getImages(this.auth.uid, this.numberItems, key, 'desc').pipe(
+    this._subscription = this.userImageService.getImages(this.loggedInUserId, this.numberItems, key, 'desc').pipe(
       switchMap(images => {
         if (images && images.length > 0){
           let observables = images.map(image => {
@@ -282,7 +286,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     const imageTotalSubscription = this.siteTotalService.getTotal(image.imageId)
       .subscribe(total => {
         if (total.forumCount == 0 && total.serviceCount == 0){
-          this.userImageService.delete(this.auth.uid, image.imageId).then(() =>{
+          this.userImageService.delete(this.loggedInUserId, image.imageId).then(() =>{
             // do something
           })
           .catch(error =>{

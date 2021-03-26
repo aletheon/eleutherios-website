@@ -25,7 +25,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
 import { Observable, Subscription, BehaviorSubject, of, zip, combineLatest, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -37,6 +37,7 @@ import * as _ from "lodash";
 })
 export class UserReceiptViewComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
+  private _userSubscription: Subscription;
   private _initialReceiptSubscription: Subscription;
   private _receiptSubscription: Subscription;
   private _sellerServiceSubscription: Subscription;
@@ -54,6 +55,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   public userForumsCtrl: FormControl;
   public numberItems: number = 100;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public loggedInUserId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -74,6 +76,9 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this._userSubscription)
+      this._userSubscription.unsubscribe();
+
     if (this._initialReceiptSubscription)
       this._initialReceiptSubscription.unsubscribe();
 
@@ -257,26 +262,32 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this._loading.next(true);
 
-    this.route.queryParams.subscribe((params: Params) => {
-      this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.auth.uid, params['receiptId']).subscribe(receipt => {
-        this._initialReceiptSubscription.unsubscribe();
+    this._userSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+      if (user){
+        this.loggedInUserId = user.uid;
 
-        if (receipt){
-          this.receipt = this.userReceiptService.getReceipt(this.auth.uid, params['receiptId']);
-          this.initForm();
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: 'Receipt does not exist or was recently removed',
-              panelClass: ['red-snackbar']
+        this.route.queryParams.subscribe((params: Params) => {
+          this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).subscribe(receipt => {
+            this._initialReceiptSubscription.unsubscribe();
+
+            if (receipt){
+              this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']);
+              this.initForm();
             }
-          );
-          this.router.navigate(['/']);
-        }
-      });
+            else {
+              const snackBarRef = this.snackbar.openFromComponent(
+                NotificationSnackBar,
+                {
+                  duration: 8000,
+                  data: 'Receipt does not exist or was recently removed',
+                  panelClass: ['red-snackbar']
+                }
+              );
+              this.router.navigate(['/']);
+            }
+          });
+        });
+      }
     });
   }
 
@@ -416,7 +427,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
             });
 
             // forums this user has created so they can request the service serve in their forum(s)
-            that.userForums = that.userForumService.getForums(that.auth.uid, that.numberItems, '', [], true, true);
+            that.userForums = that.userForumService.getForums(that.loggedInUserId, that.numberItems, '', [], true, true);
           }
           catch (error) {
             throw error;
