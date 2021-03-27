@@ -18,6 +18,7 @@ import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, from
 import { switchMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
+import { DefaultFlexOffsetDirective } from '@angular/flex-layout';
 
 @Component({
   selector: 'user-receipt-list',
@@ -185,11 +186,24 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.buyerServiceTags = of([]);
                 }
 
+                // *****************************************************************************
+                // *****************************************************************************
+                // *****************************************************************************
+                // here rob have to account for service being deleted, same with blocks, forums etc
+                // *****************************************************************************
+                // *****************************************************************************
+                // *****************************************************************************
+
                 if (buyerService){
                   receipt.buyerType = buyerService.type;
                   receipt.buyerPaymentType = buyerService.paymentType;
                   receipt.buyerTitle = buyerService.title;
                   receipt.buyerDescription = buyerService.description;
+                }
+                else {
+                  receipt.buyerPaymentType = "No service";
+                  receipt.buyerTitle = "No service";
+                  receipt.buyerDescription = "";
                 }
 
                 if (sellerService){
@@ -197,6 +211,11 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.sellerPaymentType = sellerService.paymentType;
                   receipt.sellerTitle = sellerService.title;
                   receipt.sellerDescription = sellerService.description;
+                }
+                else {
+                  receipt.sellerPaymentType = "No service";
+                  receipt.sellerTitle = "No service";
+                  receipt.sellerDescription = "";
                 }
                 return of(receipt);
               })

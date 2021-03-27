@@ -28,6 +28,7 @@ import * as firebase from 'firebase/app';
 export class UserProfileComponent implements OnInit, OnDestroy {
   private _loading = new BehaviorSubject(false);
   private _userSubscription: Subscription;
+  private _usernameSubscription: Subscription;
 
   public user: Observable<any>;
   public publicForums: Observable<any[]>;
@@ -53,6 +54,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy () {
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
+
+    if (this._usernameSubscription)
+      this._usernameSubscription.unsubscribe();
   }
 
   trackPublicForums (index, forum) { return forum.forumId; }
@@ -86,17 +90,21 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     // do something
   }
 
-  ngOnInit () {
+  async ngOnInit () {
     this._loading.next(true);
 
     let username = this.router.url.substring(this.router.url.lastIndexOf('/') + 1);
 
     if (username && username.length > 0){
-      this._userSubscription = this.userService.getUserByUsername(username).pipe(take(1)).subscribe(user => {
+      this._usernameSubscription = this.userService.getUserByUsername(username).pipe(take(1)).subscribe(user => {
         if (user){
-          this.loggedInUserId = user.uid;
-          this.user = this.userService.getUser(this.loggedInUserId);
-          this.initForm();
+          this._usernameSubscription = this.auth.user.pipe(take(1)).subscribe(user => {
+            if (user)
+              this.loggedInUserId = user.uid;
+
+            this.user = this.userService.getUserByUsername(username);
+            this.initForm();
+          });
         }
         else {
           const snackBarRef = this.snackbar.openFromComponent(
