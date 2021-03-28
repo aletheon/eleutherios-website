@@ -338,6 +338,12 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
                 that.receiptGroup.get('buyerTitle').setValue(service.title);
                 that.receiptGroup.get('buyerDescription').setValue(service.description);
               }
+              else {
+                that.receiptGroup.get('buyerType').setValue("No service");
+                that.receiptGroup.get('buyerPaymentType').setValue("No service");
+                that.receiptGroup.get('buyerTitle').setValue("No service");
+                that.receiptGroup.get('buyerDescription').setValue("");
+              }
             });
 
             that._sellerServiceSubscription = that.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId).subscribe(service => {
@@ -346,6 +352,12 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
                 that.receiptGroup.get('sellerPaymentType').setValue(service.paymentType);
                 that.receiptGroup.get('sellerTitle').setValue(service.title);
                 that.receiptGroup.get('sellerDescription').setValue(service.description);
+              }
+              else {
+                that.receiptGroup.get('sellerType').setValue("No service");
+                that.receiptGroup.get('sellerPaymentType').setValue("No service");
+                that.receiptGroup.get('sellerTitle').setValue("No service");
+                that.receiptGroup.get('sellerDescription').setValue("");
               }
             });
 

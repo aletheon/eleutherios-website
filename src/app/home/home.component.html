@@ -77,7 +77,7 @@
         <ng-container *ngIf="receiptItems.length > 0; then showreceipts else noreceipts"></ng-container>
         <ng-template #showreceipts>
           <ng-container *ngFor="let receipt of receiptItems; trackBy: trackReceipts">
-            <div [ngClass]="receipt.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+            <div [ngClass]="receipt.buyerPaymentType == 'Free' ? 'alert alert-success' : receipt.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <ng-container *ngIf="receipt.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                 <ng-template #showbuyerdefaultserviceimage>
@@ -131,7 +131,7 @@
                   </ng-template>
                   <ng-container *ngIf="buyerServiceTagItems.length > 0; then showtagswithreceipt else showtagswithoutreceipt"></ng-container>
                   <ng-template #showtagswithreceipt>
-                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                       <ng-container *ngIf="receipt.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                       <ng-template #showsellerdefaultserviceimage>
                         <ng-container *ngIf="receipt.sellerDefaultServiceImage | async;let image">
@@ -155,7 +155,7 @@
                   </ng-template>
                   <ng-template #showtagswithoutreceipt>
                     <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-                      <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                      <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                         <ng-container *ngIf="receipt.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                         <ng-template #showsellerdefaultserviceimage>
                           <ng-container *ngIf="receipt.sellerDefaultServiceImage | async;let image">
@@ -197,7 +197,7 @@
         <ng-container *ngIf="paymentItems.length > 0; then showpayments else nopayments"></ng-container>
         <ng-template #showpayments>
           <ng-container *ngFor="let payment of paymentItems; trackBy: trackPayments">
-            <div [ngClass]="payment.sellerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+            <div [ngClass]="payment.sellerPaymentType == 'Free' ? 'alert alert-success' : payment.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <ng-container *ngIf="payment.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                 <ng-template #showsellerdefaultserviceimage>
@@ -251,7 +251,7 @@
                   </ng-template>
                   <ng-container *ngIf="sellerServiceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
                   <ng-template #showtagswithpayment>
-                    <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                    <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : payment.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                       <ng-container *ngIf="payment.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                       <ng-template #showbuyerdefaultserviceimage>
                         <ng-container *ngIf="payment.buyerDefaultServiceImage | async;let image">
@@ -275,7 +275,7 @@
                   </ng-template>
                   <ng-template #showtagswithoutpayment>
                     <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-                      <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                      <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : payment.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                         <ng-container *ngIf="payment.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                         <ng-template #showbuyerdefaultserviceimage>
                           <ng-container *ngIf="payment.buyerDefaultServiceImage | async;let image">

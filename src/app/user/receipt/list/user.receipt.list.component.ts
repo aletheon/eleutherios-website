@@ -201,6 +201,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.buyerDescription = buyerService.description;
                 }
                 else {
+                  receipt.buyerType = "No service";
                   receipt.buyerPaymentType = "No service";
                   receipt.buyerTitle = "No service";
                   receipt.buyerDescription = "";
@@ -213,6 +214,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.sellerDescription = sellerService.description;
                 }
                 else {
+                  receipt.sellerType = "No service";
                   receipt.sellerPaymentType = "No service";
                   receipt.sellerTitle = "No service";
                   receipt.sellerDescription = "";

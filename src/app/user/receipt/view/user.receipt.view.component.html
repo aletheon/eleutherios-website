@@ -10,7 +10,7 @@
 		<div style="flex:1">
 			<!-- START OF USER DETAILS SECTION -->
 			<form [formGroup]="receiptGroup" novalidate>
-				<div [ngClass]="receiptGroup.get('buyerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+				<div [ngClass]="receiptGroup.get('buyerPaymentType').value == 'Free' ? 'alert alert-success' : receiptGroup.get('buyerPaymentType').value == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
 					<div style="flex:1;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 						<ng-container *ngIf="buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
 						<ng-template #showbuyerdefaultserviceimage>
@@ -20,6 +20,7 @@
 									<ng-template #showimage>
 										<img *ngIf="receiptGroup.get('buyerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="cursor:pointer">
 										<img *ngIf="receiptGroup.get('buyerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('buyerServiceId').value }" style="cursor:pointer">
+                    <img *ngIf="receiptGroup.get('buyerType').value == 'No service'" [src]="image.url">
 									</ng-template>
 									<ng-template #noimage>
 										<img [src]="image.url">
@@ -29,8 +30,9 @@
 						</ng-template>
 						<div style="flex:1;margin-right:5px">
 							<p style="word-break: break-all">
-								<a *ngIf="receiptGroup.get('buyerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('buyerTitle').value }}{{ receiptGroup.get('buyerDescription').value.length > 0 ? (' - ' + receiptGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('buyerTitle').value | noTitle | truncate: 35 }} <i *ngIf="receiptGroup.get('buyerDescription').value.length > 0">- {{ receiptGroup.get('buyerDescription').value | truncate: 80 }}</i></a>
-								<a *ngIf="receiptGroup.get('buyerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('buyerTitle').value }}{{ receiptGroup.get('buyerDescription').value.length > 0 ? (' - ' + receiptGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('buyerTitle').value | noTitle | truncate: 35 }} <i *ngIf="receiptGroup.get('buyerDescription').value.length > 0">- {{ receiptGroup.get('buyerDescription').value | truncate: 80 }}</i></a>
+                <a *ngIf="receiptGroup.get('buyerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('buyerTitle').value }}{{ receiptGroup.get('buyerDescription').value.length > 0 ? (' - ' + receiptGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('buyerTitle').value | noTitle | truncate: 35 }} <i *ngIf="receiptGroup.get('buyerDescription').value.length > 0">- {{ receiptGroup.get('buyerDescription').value | truncate: 80 }}</i></a>
+                <a *ngIf="receiptGroup.get('buyerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('buyerTitle').value }}{{ receiptGroup.get('buyerDescription').value.length > 0 ? (' - ' + receiptGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('buyerTitle').value | noTitle | truncate: 35 }} <i *ngIf="receiptGroup.get('buyerDescription').value.length > 0">- {{ receiptGroup.get('buyerDescription').value | truncate: 80 }}</i></a>
+                <a *ngIf="receiptGroup.get('buyerType').value == 'No service'" style="color:#1B1B1B">{{ receiptGroup.get('buyerTitle').value }}</a>
 							</p>
 						</div>
 						<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
@@ -64,7 +66,7 @@
 							</ng-template>
 							<ng-container *ngIf="buyerServiceTagItems.length > 0; then showtagswithreceipt else showtagswithoutreceipt"></ng-container>
 							<ng-template #showtagswithreceipt>
-								<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+								<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : receiptGroup.get('sellerPaymentType').value == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
 									<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 									<ng-template #showsellerdefaultserviceimage>
 										<ng-container *ngIf="sellerDefaultServiceImage | async;let image">
@@ -73,6 +75,7 @@
 												<ng-template #showimage>
 													<img *ngIf="receiptGroup.get('sellerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
 													<img *ngIf="receiptGroup.get('sellerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
+                          <img *ngIf="receiptGroup.get('sellerType').value == 'No service'" [src]="image.url">
 												</ng-template>
 												<ng-template #noimage>
 													<img [src]="image.url">
@@ -84,13 +87,14 @@
 										<p style="word-break: break-all">
 											<a *ngIf="receiptGroup.get('sellerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('sellerTitle').value }}{{ receiptGroup.get('sellerDescription').value.length > 0 ? (' - ' + receiptGroup.get('sellerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('sellerTitle').value | noTitle | truncate: 35 }}</a>
 											<a *ngIf="receiptGroup.get('sellerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('sellerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('sellerTitle').value }}{{ receiptGroup.get('sellerDescription').value.length > 0 ? (' - ' + receiptGroup.get('sellerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('sellerTitle').value | noTitle | truncate: 35 }}</a>
+                      <a *ngIf="receiptGroup.get('sellerType').value == 'No service'" style="color:#1B1B1B">{{ receiptGroup.get('sellerTitle').value }}</a>
 										</p>
 									</div>
 								</div>
 							</ng-template>
 							<ng-template #showtagswithoutreceipt>
 								<div style="flex:1;display:flex;flex-direction:row;align-items:center;justify-content:flex-end">
-									<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+									<div [ngClass]="receiptGroup.get('sellerPaymentType').value == 'Free' ? 'alert alert-success' : receiptGroup.get('sellerPaymentType').value == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
 										<ng-container *ngIf="sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
 										<ng-template #showsellerdefaultserviceimage>
 											<ng-container *ngIf="sellerDefaultServiceImage | async;let image">
@@ -99,6 +103,7 @@
 													<ng-template #showimage>
 														<img *ngIf="receiptGroup.get('sellerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
 														<img *ngIf="receiptGroup.get('sellerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
+                            <img *ngIf="receiptGroup.get('sellerType').value == 'No service'" [src]="image.url">
 													</ng-template>
 													<ng-template #noimage>
 														<img [src]="image.url">
@@ -110,6 +115,7 @@
 											<p style="word-break: break-all">
 												<a *ngIf="receiptGroup.get('sellerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('sellerTitle').value }}{{ receiptGroup.get('sellerDescription').value.length > 0 ? (' - ' + receiptGroup.get('sellerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('sellerTitle').value | noTitle | truncate: 35 }}</a>
 												<a *ngIf="receiptGroup.get('sellerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receiptGroup.get('sellerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ receiptGroup.get('sellerTitle').value }}{{ receiptGroup.get('sellerDescription').value.length > 0 ? (' - ' + receiptGroup.get('sellerDescription').value | truncate: 80) : '' }}">{{ receiptGroup.get('sellerTitle').value | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="receiptGroup.get('sellerType').value == 'No service'" style="color:#1B1B1B">{{ receiptGroup.get('sellerTitle').value }}</a>
 											</p>
 										</div>
 									</div>

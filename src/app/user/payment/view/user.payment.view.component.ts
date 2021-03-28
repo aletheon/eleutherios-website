@@ -338,6 +338,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                 that.paymentGroup.get('sellerTitle').setValue(service.title);
                 that.paymentGroup.get('sellerDescription').setValue(service.description);
               }
+              else {
+                that.paymentGroup.get('sellerType').setValue("No service");
+                that.paymentGroup.get('sellerPaymentType').setValue("No service");
+                that.paymentGroup.get('sellerTitle').setValue("No service");
+                that.paymentGroup.get('sellerDescription').setValue("");
+              }
             });
 
             that._buyerServiceSubscription = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId).subscribe(service => {
@@ -346,6 +352,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                 that.paymentGroup.get('buyerPaymentType').setValue(service.paymentType);
                 that.paymentGroup.get('buyerTitle').setValue(service.title);
                 that.paymentGroup.get('buyerDescription').setValue(service.description);
+              }
+              else {
+                that.paymentGroup.get('buyerType').setValue("No service");
+                that.paymentGroup.get('buyerPaymentType').setValue("No service");
+                that.paymentGroup.get('buyerTitle').setValue("No service");
+                that.paymentGroup.get('buyerDescription').setValue("");
               }
             });
 

@@ -11,7 +11,7 @@
       <ng-container *ngIf="paymentItems.length > 0; then showpayments else nopayments"></ng-container>
       <ng-template #showpayments>
         <ng-container *ngFor="let payment of paymentItems; trackBy: trackPayments">
-          <div [ngClass]="payment.sellerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+          <div [ngClass]="payment.sellerPaymentType == 'Free' ? 'alert alert-success' : payment.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
             <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="payment.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
               <ng-template #showsellerdefaultserviceimage>
@@ -19,7 +19,9 @@
                   <div style="flex:none;margin-right:10px">
                     <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                     <ng-template #showimage>
-                      <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }' style="cursor:pointer">
+                      <img *ngIf="payment.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }' style="cursor:pointer">
+                      <img *ngIf="payment.sellerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: payment.sellerServiceId }' style="cursor:pointer">
+                      <img *ngIf="payment.sellerType == 'No service'" [src]="image.url">
                     </ng-template>
                     <ng-template #noimage>
                       <img [src]="image.url">
@@ -29,7 +31,8 @@
               </ng-template>
               <div style="flex:1;margin-right:5px">
                 <p style="word-break: break-all">
-                  <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
+                  <a *ngIf="payment.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
+                  <a *ngIf="payment.sellerPaymentType == 'No service'" style="color:#1B1B1B">{{ payment.sellerTitle }}</a>
                 </p>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
@@ -65,14 +68,16 @@
                 </ng-template>
                 <ng-container *ngIf="sellerServiceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
                 <ng-template #showtagswithpayment>
-                  <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                  <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : payment.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                     <ng-container *ngIf="payment.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                     <ng-template #showbuyerdefaultserviceimage>
                       <ng-container *ngIf="payment.buyerDefaultServiceImage | async;let image">
                         <div style="flex:none;margin-right:10px">
                           <ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
                           <ng-template #showimage>
-                            <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }' style="cursor:pointer">
+                            <img *ngIf="payment.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="cursor:pointer">
+                            <img *ngIf="payment.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="cursor:pointer">
+                            <img *ngIf="payment.buyerType == 'No service'" [src]="image.url">
                           </ng-template>
                           <ng-template #noimage>
                             <img [src]="image.url">
@@ -82,21 +87,25 @@
                     </ng-template>
                     <div style="flex:1;margin-right:5px">
                       <p style="word-break: break-all">
-                        <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="payment.buyerType == 'No service'" style="color:#1B1B1B">{{ payment.buyerTitle }}</a>
                       </p>
                     </div>
                   </div>
                 </ng-template>
                 <ng-template #showtagswithoutpayment>
                   <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-                    <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                    <div [ngClass]="payment.buyerPaymentType == 'Free' ? 'alert alert-success' : payment.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                       <ng-container *ngIf="payment.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
                       <ng-template #showbuyerdefaultserviceimage>
                         <ng-container *ngIf="payment.buyerDefaultServiceImage | async;let image">
                           <div style="flex:none;margin-right:10px">
                             <ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
                             <ng-template #showimage>
-                              <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }' style="cursor:pointer">
+                              <img *ngIf="payment.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="cursor:pointer">
+                              <img *ngIf="payment.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="cursor:pointer">
+                              <img *ngIf="payment.buyerType == 'No service'" [src]="image.url">
                             </ng-template>
                             <ng-template #noimage>
                               <img [src]="image.url">
@@ -106,7 +115,9 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="payment.buyerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="payment.buyerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="payment.buyerType == 'No service'" style="color:#1B1B1B">{{ payment.buyerTitle }}</a>
                         </p>
                       </div>
                     </div>

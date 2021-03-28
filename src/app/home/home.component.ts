@@ -559,12 +559,22 @@ export class HomeComponent implements OnInit, OnDestroy {
                           receipt.buyerTitle = buyerService.title;
                           receipt.buyerDescription = buyerService.description;
                         }
+                        else {
+                          receipt.buyerPaymentType = "No service";
+                          receipt.buyerTitle = "No service";
+                          receipt.buyerDescription = "";
+                        }
 
                         if (sellerService){
                           receipt.sellerType = sellerService.type;
                           receipt.sellerPaymentType = sellerService.paymentType;
                           receipt.sellerTitle = sellerService.title;
                           receipt.sellerDescription = sellerService.description;
+                        }
+                        else {
+                          receipt.sellerPaymentType = "No service";
+                          receipt.sellerTitle = "No service";
+                          receipt.sellerDescription = "";
                         }
                         return of(receipt);
                       })
@@ -674,12 +684,22 @@ export class HomeComponent implements OnInit, OnDestroy {
                           payment.sellerTitle = sellerService.title;
                           payment.sellerDescription = sellerService.description;
                         }
+                        else {
+                          payment.sellerPaymentType = "No service";
+                          payment.sellerTitle = "No service";
+                          payment.sellerDescription = "";
+                        }
 
                         if (buyerService){
                           payment.buyerType = buyerService.type;
                           payment.buyerPaymentType = buyerService.paymentType;
                           payment.buyerTitle = buyerService.title;
                           payment.buyerDescription = buyerService.description;
+                        }
+                        else {
+                          payment.buyerPaymentType = "No service";
+                          payment.buyerTitle = "No service";
+                          payment.buyerDescription = "";
                         }
                         return of(payment);
                       })

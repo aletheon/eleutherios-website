@@ -19,7 +19,9 @@
                   <div style="flex:none;margin-right:10px">
                     <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                     <ng-template #showimage>
-                      <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId, receiptUserId: receipt.sellerUid, receiptId: receipt.receiptId }' style="cursor:pointer">
+                      <img *ngIf="receipt.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, receipt: payment.buyerServiceId }' style="cursor:pointer">
+                      <img *ngIf="receipt.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receipt.buyerServiceId }' style="cursor:pointer">
+                      <img *ngIf="receipt.buyerType == 'No service'" [src]="image.url">
                     </ng-template>
                     <ng-template #noimage>
                       <img [src]="image.url">
@@ -29,7 +31,8 @@
               </ng-template>
               <div style="flex:1;margin-right:5px">
                 <p style="word-break: break-all">
-                  <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId, receiptUserId: receipt.sellerUid, receiptId: receipt.receiptId }" style="color:#1B1B1B" matTooltip="{{ receipt.buyerTitle }}{{ receipt.buyerDescription.length > 0 ? (' - ' + receipt.buyerDescription | truncate: 80) : '' }}">{{ receipt.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.buyerDescription.length > 0">- {{ receipt.buyerDescription | truncate: 80 }}</i></a>
+                  <a *ngIf="receipt.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
+                  <a *ngIf="receipt.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
                 </p>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
@@ -72,7 +75,9 @@
                         <div style="flex:none;margin-right:10px">
                           <ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
                           <ng-template #showimage>
-                            <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId, paymentUserId: receipt.buyerUid, paymentId: receipt.paymentId }' style="cursor:pointer">
+                            <img *ngIf="receipt.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="cursor:pointer">
+                            <img *ngIf="receipt.sellerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="cursor:pointer">
+                            <img *ngIf="receipt.sellerType == 'No service'" [src]="image.url">
                           </ng-template>
                           <ng-template #noimage>
                             <img [src]="image.url">
@@ -82,21 +87,25 @@
                     </ng-template>
                     <div style="flex:1;margin-right:5px">
                       <p style="word-break: break-all">
-                        <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId, paymentUserId: receipt.buyerUid, paymentId: receipt.paymentId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                        <a *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
                       </p>
                     </div>
                   </div>
                 </ng-template>
                 <ng-template #showtagswithoutreceipt>
                   <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                       <ng-container *ngIf="receipt.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                       <ng-template #showsellerdefaultserviceimage>
                         <ng-container *ngIf="receipt.sellerDefaultServiceImage | async;let image">
                           <div style="flex:none;margin-right:10px">
                             <ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
                             <ng-template #showimage>
-                              <img [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId, paymentUserId: receipt.buyerUid, paymentId: receipt.paymentId }' style="cursor:pointer">
+                              <img *ngIf="receipt.sellerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="cursor:pointer">
+                              <img *ngIf="receipt.sellerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="cursor:pointer">
+                              <img *ngIf="receipt.sellerType == 'No service'" [src]="image.url">
                             </ng-template>
                             <ng-template #noimage>
                               <img [src]="image.url">
@@ -106,7 +115,9 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId, paymentUserId: receipt.buyerUid, paymentId: receipt.paymentId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
                         </p>
                       </div>
                     </div>
