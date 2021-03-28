@@ -19,7 +19,7 @@
                   <div style="flex:none;margin-right:10px">
                     <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                     <ng-template #showimage>
-                      <img *ngIf="receipt.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, receipt: payment.buyerServiceId }' style="cursor:pointer">
+                      <img *ngIf="receipt.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, receipt: receipt.buyerServiceId }' style="cursor:pointer">
                       <img *ngIf="receipt.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receipt.buyerServiceId }' style="cursor:pointer">
                       <img *ngIf="receipt.buyerType == 'No service'" [src]="image.url">
                     </ng-template>
