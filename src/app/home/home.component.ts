@@ -560,6 +560,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                           receipt.buyerDescription = buyerService.description;
                         }
                         else {
+                          receipt.buyerType = "No service";
                           receipt.buyerPaymentType = "No service";
                           receipt.buyerTitle = "No service";
                           receipt.buyerDescription = "";
@@ -572,6 +573,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                           receipt.sellerDescription = sellerService.description;
                         }
                         else {
+                          receipt.sellerType = "No service";
                           receipt.sellerPaymentType = "No service";
                           receipt.sellerTitle = "No service";
                           receipt.sellerDescription = "";
@@ -685,6 +687,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                           payment.sellerDescription = sellerService.description;
                         }
                         else {
+                          payment.sellerType = "No service";
                           payment.sellerPaymentType = "No service";
                           payment.sellerTitle = "No service";
                           payment.sellerDescription = "";
@@ -697,6 +700,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                           payment.buyerDescription = buyerService.description;
                         }
                         else {
+                          payment.buyerType = "No service";
                           payment.buyerPaymentType = "No service";
                           payment.buyerTitle = "No service";
                           payment.buyerDescription = "";

@@ -11,7 +11,7 @@
       <ng-container *ngIf="receiptItems.length > 0; then showreceipts else noreceipts"></ng-container>
       <ng-template #showreceipts>
         <ng-container *ngFor="let receipt of receiptItems; trackBy: trackReceipts">
-          <div [ngClass]="receipt.buyerPaymentType == 'Free' ? 'alert alert-success' : receipt.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+          <div [ngClass]="receipt.buyerPaymentType == 'Free' ? 'alert alert-success' : receipt.buyerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-warning'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
             <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
               <ng-container *ngIf="receipt.buyerDefaultServiceImage | async; then showbuyerdefaultserviceimage"></ng-container>
               <ng-template #showbuyerdefaultserviceimage>
@@ -19,7 +19,7 @@
                   <div style="flex:none;margin-right:10px">
                     <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                     <ng-template #showimage>
-                      <img *ngIf="receipt.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, receipt: receipt.buyerServiceId }' style="cursor:pointer">
+                      <img *ngIf="receipt.buyerType == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId }' style="cursor:pointer">
                       <img *ngIf="receipt.buyerType == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: receipt.buyerServiceId }' style="cursor:pointer">
                       <img *ngIf="receipt.buyerType == 'No service'" [src]="image.url">
                     </ng-template>
@@ -31,8 +31,8 @@
               </ng-template>
               <div style="flex:1;margin-right:5px">
                 <p style="word-break: break-all">
-                  <a *ngIf="receipt.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.sellerDescription.length > 0">- {{ receipt.sellerDescription | truncate: 80 }}</i></a>
-                  <a *ngIf="receipt.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
+                  <a *ngIf="receipt.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.buyerTitle }}{{ receipt.buyerDescription.length > 0 ? (' - ' + receipt.buyerDescription | truncate: 80) : '' }}">{{ receipt.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.buyerDescription.length > 0">- {{ receipt.buyerDescription | truncate: 80 }}</i></a>
+                  <span *ngIf="receipt.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.buyerTitle }}</span>
                 </p>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
@@ -68,7 +68,7 @@
                 </ng-template>
                 <ng-container *ngIf="buyerServiceTagItems.length > 0; then showtagswithreceipt else showtagswithoutreceipt"></ng-container>
                 <ng-template #showtagswithreceipt>
-                  <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                  <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-warning'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                     <ng-container *ngIf="receipt.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                     <ng-template #showsellerdefaultserviceimage>
                       <ng-container *ngIf="receipt.sellerDefaultServiceImage | async;let image">
@@ -89,14 +89,14 @@
                       <p style="word-break: break-all">
                         <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                         <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
-                        <a *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
+                        <span *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</span>
                       </p>
                     </div>
                   </div>
                 </ng-template>
                 <ng-template #showtagswithoutreceipt>
                   <div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end">
-                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-secondary'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
+                    <div [ngClass]="receipt.sellerPaymentType == 'Free' ? 'alert alert-success' : receipt.sellerPaymentType == 'Payment' ? 'alert alert-info' : 'alert alert-warning'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 0 0;flex-wrap:wrap">
                       <ng-container *ngIf="receipt.sellerDefaultServiceImage | async; then showsellerdefaultserviceimage"></ng-container>
                       <ng-template #showsellerdefaultserviceimage>
                         <ng-container *ngIf="receipt.sellerDefaultServiceImage | async;let image">
@@ -117,7 +117,7 @@
                         <p style="word-break: break-all">
                           <a *ngIf="receipt.sellerType == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                           <a *ngIf="receipt.sellerType == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
-                          <a *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</a>
+                          <span *ngIf="receipt.sellerType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</span>
                         </p>
                       </div>
                     </div>

@@ -245,6 +245,16 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
             }
           );
         }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'Service does not exist or was removed',
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
       });
     }
     else {
@@ -267,9 +277,7 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).subscribe(receipt => {
-            this._initialReceiptSubscription.unsubscribe();
-
+          this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).pipe(take(1)).subscribe(receipt => {
             if (receipt){
               this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']);
               this.initForm();
@@ -322,7 +330,20 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
     //  ongoing subscription
     this._receiptSubscription = this.receipt.subscribe(receipt => {
       if (receipt){
-        this.receiptGroup.patchValue(receipt);
+        that.receiptGroup.get('paymentId').setValue(receipt.paymentId);
+        that.receiptGroup.get('uid').setValue(receipt.uid);
+        that.receiptGroup.get('receiptId').setValue(receipt.receiptId);
+        that.receiptGroup.get('amount').setValue(receipt.amount);
+        that.receiptGroup.get('currency').setValue(receipt.currency);
+        that.receiptGroup.get('quantity').setValue(receipt.quantity);
+        that.receiptGroup.get('status').setValue(receipt.status);
+        that.receiptGroup.get('buyerUid').setValue(receipt.buyerUid);
+        that.receiptGroup.get('buyerServiceId').setValue(receipt.buyerServiceId);
+        that.receiptGroup.get('sellerUid').setValue(receipt.sellerUid);
+        that.receiptGroup.get('sellerServiceId').setValue(receipt.sellerServiceId);
+        that.receiptGroup.get('paymentIntentId').setValue(receipt.paymentIntentId);
+        that.receiptGroup.get('lastUpdateDate').setValue(receipt.lastUpdateDate);
+        that.receiptGroup.get('creationDate').setValue(receipt.creationDate);
       }
     });
 

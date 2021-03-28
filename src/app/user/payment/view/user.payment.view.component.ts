@@ -245,6 +245,16 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
             }
           );
         }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: 'Service does not exist or was removed',
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
       });
     }
     else {
@@ -267,9 +277,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this._initialPaymentSubscription = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']).subscribe(payment => {
-            this._initialPaymentSubscription.unsubscribe();
-
+          this._initialPaymentSubscription = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']).pipe(take(1)).subscribe(payment => {
             if (payment){
               this.payment = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']);
               this.initForm();
@@ -322,7 +330,20 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
     //  ongoing subscription
     this._paymentSubscription = this.payment.subscribe(payment => {
       if (payment){
-        this.paymentGroup.patchValue(payment);
+        that.paymentGroup.get('paymentId').setValue(payment.paymentId);
+        that.paymentGroup.get('uid').setValue(payment.uid);
+        that.paymentGroup.get('receiptId').setValue(payment.receiptId);
+        that.paymentGroup.get('amount').setValue(payment.amount);
+        that.paymentGroup.get('currency').setValue(payment.currency);
+        that.paymentGroup.get('quantity').setValue(payment.quantity);
+        that.paymentGroup.get('status').setValue(payment.status);
+        that.paymentGroup.get('buyerUid').setValue(payment.buyerUid);
+        that.paymentGroup.get('buyerServiceId').setValue(payment.buyerServiceId);
+        that.paymentGroup.get('sellerUid').setValue(payment.sellerUid);
+        that.paymentGroup.get('sellerServiceId').setValue(payment.sellerServiceId);
+        that.paymentGroup.get('paymentIntentId').setValue(payment.paymentIntentId);
+        that.paymentGroup.get('lastUpdateDate').setValue(payment.lastUpdateDate);
+        that.paymentGroup.get('creationDate').setValue(payment.creationDate);
       }
     });
 
@@ -331,12 +352,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
       if (payment){
         let load = async function(){
           try {
-            that._sellerServiceSubscription = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).subscribe(service => {
-              if (service){
-                that.paymentGroup.get('sellerType').setValue(service.type);
-                that.paymentGroup.get('sellerPaymentType').setValue(service.paymentType);
-                that.paymentGroup.get('sellerTitle').setValue(service.title);
-                that.paymentGroup.get('sellerDescription').setValue(service.description);
+            that._sellerServiceSubscription = that.userServiceService.getService(payment.sellerUid, payment.sellerServiceId).subscribe(sellerService => {
+              if (sellerService){
+                that.paymentGroup.get('sellerType').setValue(sellerService.type);
+                that.paymentGroup.get('sellerPaymentType').setValue(sellerService.paymentType);
+                that.paymentGroup.get('sellerTitle').setValue(sellerService.title);
+                that.paymentGroup.get('sellerDescription').setValue(sellerService.description);
               }
               else {
                 that.paymentGroup.get('sellerType').setValue("No service");
@@ -346,12 +367,12 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
               }
             });
 
-            that._buyerServiceSubscription = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId).subscribe(service => {
-              if (service){
-                that.paymentGroup.get('buyerType').setValue(service.type);
-                that.paymentGroup.get('buyerPaymentType').setValue(service.paymentType);
-                that.paymentGroup.get('buyerTitle').setValue(service.title);
-                that.paymentGroup.get('buyerDescription').setValue(service.description);
+            that._buyerServiceSubscription = that.userServiceService.getService(payment.buyerUid, payment.buyerServiceId).subscribe(buyerService => {
+              if (buyerService){
+                that.paymentGroup.get('buyerType').setValue(buyerService.type);
+                that.paymentGroup.get('buyerPaymentType').setValue(buyerService.paymentType);
+                that.paymentGroup.get('buyerTitle').setValue(buyerService.title);
+                that.paymentGroup.get('buyerDescription').setValue(buyerService.description);
               }
               else {
                 that.paymentGroup.get('buyerType').setValue("No service");
