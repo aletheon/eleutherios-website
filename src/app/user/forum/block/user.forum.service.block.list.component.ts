@@ -119,7 +119,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                             if (downloadUrl)
                               forumImages[0].url = downloadUrl;
                             else
-                              forumImages[0].url = '../../../assets/defaultTiny.jpg';
+                              forumImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                             return of(forumImages[0]);
                           })
@@ -147,7 +147,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
-                                    serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                    serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                   return of(serviceImages[0]);
                                 })
@@ -165,7 +165,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                url: '../../../assets/defaultTiny.jpg'
+                                url: '../../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -194,7 +194,7 @@ export class UserForumServiceBlockListComponent implements OnInit, OnDestroy {
                         service.defaultForumImage = of(defaultForumImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
+                          url: '../../../../assets/defaultTiny.jpg'
                         };
                         service.defaultForumImage = of(tempImage);
                       }
