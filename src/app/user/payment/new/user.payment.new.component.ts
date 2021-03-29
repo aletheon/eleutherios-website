@@ -206,7 +206,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
       if (this._paymentIntent){
         console.log('got a payment intent ' + this._paymentIntent.id);
 
-        this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
+        this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.buyerUserId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
           if (tempPayment){
             console.log('got payment ' + JSON.stringify(tempPayment));
             console.log('title ' + this.serviceGroup.get('title').value);
@@ -240,7 +240,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
 
                 // subscribe to the payment
-                this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+                this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.buyerUserId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
                   this.payment = of(payment);
                 });
 
@@ -298,7 +298,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
           if (result){
             this._paymentIntent = result.data;
 
-            this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
+            this.userPaymentService.getPaymentFromPromise(this._paymentIntent.metadata.buyerUserId, this._paymentIntent.metadata.paymentId).then(tempPayment => {
               if (tempPayment){
                 console.log('got a payment ' + JSON.stringify(tempPayment));
 
@@ -330,7 +330,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                     console.log('result.paymentIntent ' + JSON.stringify(result.paymentIntent));
 
                     // subscribe to the payment
-                    this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.userId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
+                    this._paymentSubscription = this.userPaymentService.getPayment(this._paymentIntent.metadata.buyerUserId, this._paymentIntent.metadata.paymentId).subscribe(payment => {
                       this.payment = of(payment);
                     });
 

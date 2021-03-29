@@ -154,7 +154,7 @@ exports.stripeEventsTest = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const createPaymentRef = createPaymentSnapshot.ref;
     //     const payment = createPaymentSnapshot.data();
     //     await createPaymentRef.update({ status: 'Pending' });
@@ -186,7 +186,7 @@ exports.stripeEventsTest = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const successPaymentRef = successPaymentSnapshot.ref;
     //     const successPayment = successPaymentSnapshot.data();
     //     await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
@@ -203,7 +203,7 @@ exports.stripeEventsTest = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const failPaymentRef = failPaymentSnapshot.ref;
     //     const failPayment = failPaymentSnapshot.data();
     //     await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
@@ -310,7 +310,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -344,7 +344,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -374,7 +374,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -419,7 +419,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const createPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const createPaymentRef = createPaymentSnapshot.ref;
     //     const payment = createPaymentSnapshot.data();
     //     await createPaymentRef.update({ status: 'Pending' });
@@ -451,7 +451,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const successPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const successPaymentRef = successPaymentSnapshot.ref;
     //     const successPayment = successPaymentSnapshot.data();
     //     await successPaymentRef.update({ status: 'Success', lastUpdateDate: FieldValue.serverTimestamp() });
@@ -468,7 +468,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     //     metadata = intent.metadata; // { userId: userId, paymentId: paymentId }
 
     //     // update payment
-    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+    //     const failPaymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
     //     const failPaymentRef = failPaymentSnapshot.ref;
     //     const failPayment = failPaymentSnapshot.data();
     //     await failPaymentRef.update({ status: 'Fail', lastUpdateDate: FieldValue.serverTimestamp() });
@@ -575,7 +575,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -609,7 +609,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -639,7 +639,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
 
       // customer making this payment
-      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.userId}/payments`).doc(metadata.paymentId).get();
+      var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
       var paymentRef = paymentSnapshot.ref;
       var payment = paymentSnapshot.data();
 
@@ -719,7 +719,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       amount: newPayment.amount*100,
       currency: newPayment.currency,
       payment_method_types: ["card"],
-      metadata: { userId: newPayment.uid, paymentId: newPayment.paymentId }
+      metadata: { buyerUserId: newPayment.uid, buyerServiceId: newPayment.buyerServiceId, receiptId: newPayment.receiptId, paymentId: newPayment.paymentId }
     }, {
       stripeAccount: seller.stripeAccountId,
     });
