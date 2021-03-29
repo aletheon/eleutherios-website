@@ -40,8 +40,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
   private _userSubscription: Subscription;
   private _initialReceiptSubscription: Subscription;
   private _receiptSubscription: Subscription;
-  private _sellerServiceSubscription: Subscription;
-  private _buyerServiceSubscription: Subscription;
   private _sellerDefaultServiceImageSubscription: Subscription;
   private _buyerDefaultServiceImageSubscription: Subscription;
   private _buyerServiceTagSubscription: Subscription;
@@ -84,12 +82,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
 
     if (this._receiptSubscription)
       this._receiptSubscription.unsubscribe();
-
-    if (this._sellerServiceSubscription)
-      this._sellerServiceSubscription.unsubscribe();
-
-    if (this._buyerServiceSubscription)
-      this._buyerServiceSubscription.unsubscribe();
 
     if (this._sellerDefaultServiceImageSubscription)
       this._sellerDefaultServiceImageSubscription.unsubscribe();
@@ -279,7 +271,48 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
         this.route.queryParams.subscribe((params: Params) => {
           this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).pipe(take(1)).subscribe(receipt => {
             if (receipt){
-              this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']);
+              this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).pipe(
+                switchMap(receipt => {
+                  if (receipt){
+                    let getBuyerService$ = this.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
+                    let getSellerService$ = this.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
+
+                    return combineLatest([getBuyerService$, getSellerService$]).pipe(
+                      switchMap(results => {
+                        const [buyerService, sellerService] = results;
+
+                        if (buyerService){
+                          receipt.buyerType = buyerService.type;
+                          receipt.buyerPaymentType = buyerService.paymentType;
+                          receipt.buyerTitle = buyerService.title;
+                          receipt.buyerDescription = buyerService.description;
+                        }
+                        else {
+                          receipt.buyerType = 'No service';
+                          receipt.buyerPaymentType = 'No service';
+                          receipt.buyerTitle = 'No service';
+                          receipt.buyerDescription = '';
+                        }
+
+                        if (sellerService){
+                          receipt.sellerType = sellerService.type;
+                          receipt.sellerPaymentType = sellerService.paymentType;
+                          receipt.sellerTitle = sellerService.title;
+                          receipt.sellerDescription = sellerService.description;
+                        }
+                        else {
+                          receipt.sellerType = 'No service';
+                          receipt.sellerPaymentType = 'No service';
+                          receipt.sellerTitle = 'No service';
+                          receipt.sellerDescription = '';
+                        }
+                        return of(receipt);
+                      })
+                    );
+                  }
+                  else return of(null);
+                })
+              );
               this.initForm();
             }
             else {
@@ -328,22 +361,9 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
     });
 
     //  ongoing subscription
-    this._receiptSubscription = this.receipt.subscribe(receipt => {
+    this._receiptSubscription = this.receipt.pipe().subscribe(receipt => {
       if (receipt){
-        that.receiptGroup.get('paymentId').setValue(receipt.paymentId);
-        that.receiptGroup.get('uid').setValue(receipt.uid);
-        that.receiptGroup.get('receiptId').setValue(receipt.receiptId);
-        that.receiptGroup.get('amount').setValue(receipt.amount);
-        that.receiptGroup.get('currency').setValue(receipt.currency);
-        that.receiptGroup.get('quantity').setValue(receipt.quantity);
-        that.receiptGroup.get('status').setValue(receipt.status);
-        that.receiptGroup.get('buyerUid').setValue(receipt.buyerUid);
-        that.receiptGroup.get('buyerServiceId').setValue(receipt.buyerServiceId);
-        that.receiptGroup.get('sellerUid').setValue(receipt.sellerUid);
-        that.receiptGroup.get('sellerServiceId').setValue(receipt.sellerServiceId);
-        that.receiptGroup.get('paymentIntentId').setValue(receipt.paymentIntentId);
-        that.receiptGroup.get('lastUpdateDate').setValue(receipt.lastUpdateDate);
-        that.receiptGroup.get('creationDate').setValue(receipt.creationDate);
+        that.receiptGroup.patchValue(receipt);
       }
     });
 
@@ -352,36 +372,6 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       if (receipt){
         let load = async function(){
           try {
-            that._buyerServiceSubscription = that.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId).subscribe(service => {
-              if (service){
-                that.receiptGroup.get('buyerType').setValue(service.type);
-                that.receiptGroup.get('buyerPaymentType').setValue(service.paymentType);
-                that.receiptGroup.get('buyerTitle').setValue(service.title);
-                that.receiptGroup.get('buyerDescription').setValue(service.description);
-              }
-              else {
-                that.receiptGroup.get('buyerType').setValue("No service");
-                that.receiptGroup.get('buyerPaymentType').setValue("No service");
-                that.receiptGroup.get('buyerTitle').setValue("No service");
-                that.receiptGroup.get('buyerDescription').setValue("");
-              }
-            });
-
-            that._sellerServiceSubscription = that.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId).subscribe(service => {
-              if (service){
-                that.receiptGroup.get('sellerType').setValue(service.type);
-                that.receiptGroup.get('sellerPaymentType').setValue(service.paymentType);
-                that.receiptGroup.get('sellerTitle').setValue(service.title);
-                that.receiptGroup.get('sellerDescription').setValue(service.description);
-              }
-              else {
-                that.receiptGroup.get('sellerType').setValue("No service");
-                that.receiptGroup.get('sellerPaymentType').setValue("No service");
-                that.receiptGroup.get('sellerTitle').setValue("No service");
-                that.receiptGroup.get('sellerDescription').setValue("");
-              }
-            });
-
             that._buyerDefaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(receipt.buyerUid, receipt.buyerServiceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){

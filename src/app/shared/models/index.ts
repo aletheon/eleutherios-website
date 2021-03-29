@@ -27,3 +27,4 @@ export * from './service.rate.model';
 export * from './service.review.comment.model';
 export * from './service.review.model';
 export * from './payment.model';
+export * from './receipt.model';
