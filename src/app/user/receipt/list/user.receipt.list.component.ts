@@ -186,35 +186,23 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.buyerServiceTags = of([]);
                 }
 
-                // *****************************************************************************
-                // *****************************************************************************
-                // *****************************************************************************
-                // here rob have to account for service being deleted, same with blocks, forums etc
-                // *****************************************************************************
-                // *****************************************************************************
-                // *****************************************************************************
-
                 if (buyerService){
-                  receipt.buyerType = buyerService.type;
                   receipt.buyerPaymentType = buyerService.paymentType;
                   receipt.buyerTitle = buyerService.title;
                   receipt.buyerDescription = buyerService.description;
                 }
                 else {
-                  receipt.buyerType = "No service";
                   receipt.buyerPaymentType = "No service";
                   receipt.buyerTitle = "No service";
                   receipt.buyerDescription = "";
                 }
 
                 if (sellerService){
-                  receipt.sellerType = sellerService.type;
                   receipt.sellerPaymentType = sellerService.paymentType;
                   receipt.sellerTitle = sellerService.title;
                   receipt.sellerDescription = sellerService.description;
                 }
                 else {
-                  receipt.sellerType = "No service";
                   receipt.sellerPaymentType = "No service";
                   receipt.sellerTitle = "No service";
                   receipt.sellerDescription = "";

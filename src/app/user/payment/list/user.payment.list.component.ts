@@ -186,26 +186,22 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
                 }
 
                 if (sellerService){
-                  payment.sellerType = sellerService.type;
                   payment.sellerPaymentType = sellerService.paymentType;
                   payment.sellerTitle = sellerService.title;
                   payment.sellerDescription = sellerService.description;
                 }
                 else {
-                  payment.sellerType = "No service";
                   payment.sellerPaymentType = "No service";
                   payment.sellerTitle = "No service";
                   payment.sellerDescription = "";
                 }
 
                 if (buyerService){
-                  payment.buyerType = buyerService.type;
                   payment.buyerPaymentType = buyerService.paymentType;
                   payment.buyerTitle = buyerService.title;
                   payment.buyerDescription = buyerService.description;
                 }
                 else {
-                  payment.buyerType = "No service";
                   payment.buyerPaymentType = "No service";
                   payment.buyerTitle = "No service";
                   payment.buyerDescription = "";

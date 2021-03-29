@@ -18,9 +18,8 @@
 								<div style="flex:none;margin-right:10px">
 									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 									<ng-template #showimage>
-										<img *ngIf="paymentGroup.get('sellerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('sellerUid').value, serviceId: paymentGroup.get('sellerServiceId').value }" style="cursor:pointer">
-										<img *ngIf="paymentGroup.get('sellerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentGroup.get('sellerServiceId').value }" style="cursor:pointer">
-                    <img *ngIf="paymentGroup.get('sellerType').value == 'No service'" [src]="image.url">
+										<img *ngIf="paymentGroup.get('sellerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('sellerUid').value, serviceId: paymentGroup.get('sellerServiceId').value }" style="cursor:pointer">
+                    <img *ngIf="paymentGroup.get('sellerPaymentType').value == 'No service'" [src]="image.url">
 									</ng-template>
 									<ng-template #noimage>
 										<img [src]="image.url">
@@ -72,9 +71,8 @@
 											<div style="flex:none;margin-right:10px">
 												<ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
 												<ng-template #showimage>
-													<img *ngIf="paymentGroup.get('buyerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
-													<img *ngIf="paymentGroup.get('buyerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
-                          <img *ngIf="paymentGroup.get('buyerType').value == 'No service'" [src]="image.url">
+													<img *ngIf="paymentGroup.get('buyerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
+                          <img *ngIf="paymentGroup.get('buyerPaymentType').value == 'No service'" [src]="image.url">
 												</ng-template>
 												<ng-template #noimage>
 													<img [src]="image.url">
@@ -84,9 +82,8 @@
 									</ng-template>
 									<div style="flex:1;margin-right:5px">
 										<p style="word-break: break-all">
-											<a *ngIf="paymentGroup.get('buyerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value | noTitle | truncate: 35 }}</a>
-											<a *ngIf="paymentGroup.get('buyerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value| noTitle | truncate: 35 }}</a>
-                      <span *ngIf="paymentGroup.get('buyerType').value == 'No service'" style="color:#1B1B1B">{{ paymentGroup.get('buyerTitle').value }}</span>
+											<a *ngIf="paymentGroup.get('buyerPaymentType').value != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value | noTitle | truncate: 35 }}</a>
+                      <span *ngIf="paymentGroup.get('buyerPaymentType').value == 'No service'" style="color:#1B1B1B">{{ paymentGroup.get('buyerTitle').value }}</span>
 										</p>
 									</div>
 								</div>
@@ -100,9 +97,8 @@
 												<div style="flex:none;margin-right:10px">
 													<ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
 													<ng-template #showimage>
-														<img *ngIf="paymentGroup.get('buyerType').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
-														<img *ngIf="paymentGroup.get('buyerType').value == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
-                            <img *ngIf="paymentGroup.get('buyerType').value == 'No service'" [src]="image.url">
+														<img *ngIf="paymentGroup.get('buyerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="cursor:pointer">
+                            <img *ngIf="paymentGroup.get('buyerPaymentType').value == 'No service'" [src]="image.url">
 													</ng-template>
 													<ng-template #noimage>
 														<img [src]="image.url">
@@ -112,9 +108,8 @@
 										</ng-template>
 										<div style="flex:1;margin-right:5px">
 											<p style="word-break: break-all">
-												<a *ngIf="paymentGroup.get('buyerType').value == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value | noTitle | truncate: 35 }}</a>
-												<a *ngIf="paymentGroup.get('buyerType').value == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value | noTitle | truncate: 35 }}</a>
-                        <span *ngIf="paymentGroup.get('buyerType').value == 'No service'" style="color:#1B1B1B">{{ paymentGroup.get('buyerTitle').value }}</span>
+												<a *ngIf="paymentGroup.get('buyerPaymentType').value != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: paymentGroup.get('buyerUid').value, serviceId: paymentGroup.get('buyerServiceId').value }" style="color:#1B1B1B" matTooltip="{{ paymentGroup.get('buyerTitle').value }}{{ paymentGroup.get('buyerDescription').value.length > 0 ? (' - ' + paymentGroup.get('buyerDescription').value | truncate: 80) : '' }}">{{ paymentGroup.get('buyerTitle').value | noTitle | truncate: 35 }}</a>
+                        <span *ngIf="paymentGroup.get('buyerPaymentType').value == 'No service'" style="color:#1B1B1B">{{ paymentGroup.get('buyerTitle').value }}</span>
 											</p>
 										</div>
 									</div>

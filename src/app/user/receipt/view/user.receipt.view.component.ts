@@ -282,26 +282,22 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
                         const [buyerService, sellerService] = results;
 
                         if (buyerService){
-                          receipt.buyerType = buyerService.type;
                           receipt.buyerPaymentType = buyerService.paymentType;
                           receipt.buyerTitle = buyerService.title;
                           receipt.buyerDescription = buyerService.description;
                         }
                         else {
-                          receipt.buyerType = 'No service';
                           receipt.buyerPaymentType = 'No service';
                           receipt.buyerTitle = 'No service';
                           receipt.buyerDescription = '';
                         }
 
                         if (sellerService){
-                          receipt.sellerType = sellerService.type;
                           receipt.sellerPaymentType = sellerService.paymentType;
                           receipt.sellerTitle = sellerService.title;
                           receipt.sellerDescription = sellerService.description;
                         }
                         else {
-                          receipt.sellerType = 'No service';
                           receipt.sellerPaymentType = 'No service';
                           receipt.sellerTitle = 'No service';
                           receipt.sellerDescription = '';
@@ -341,11 +337,9 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
       paymentId:                        [''],
       amount:                           [''],
       currency:                         [''],
-      buyerType:                        [''],
       buyerPaymentType:                 [''],
       buyerTitle:                       [''],
       buyerDescription:                 [''],
-      sellerType:                       [''],
       sellerPaymentType:                [''],
       sellerTitle:                      [''],
       sellerDescription:                [''],
