@@ -8,6 +8,8 @@ export interface Image {
   mediumUrl: string,
   largeUrl: string,
   default: boolean, // indicates whether this image is the default
-  lastUpdateDate: object, 
-  creationDate: object 
+  lastUpdateDate: object,
+  creationDate: object
 }
+
+// fix imaging problem rob

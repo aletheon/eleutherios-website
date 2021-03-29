@@ -216,8 +216,12 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
     this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
       if (!exists){
-        image.default = false;
-        this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image);
+        this.userImageService.getImage(image.uid, image.imageId).pipe(take(1)).subscribe(fetchedImage => {
+          if (fetchedImage){
+            fetchedImage.default = false;
+            this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage);
+          }
+        });
       }
       else console.log('image already exists in service');
     });
