@@ -307,7 +307,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       console.log('payment_intent.created');
 
       var paymentIntent = event.data.object;
-      var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
+      var metadata = paymentIntent.metadata;
 
       // customer making this payment
       var paymentSnapshot = await admin.firestore().collection(`users/${metadata.buyerUserId}/payments`).doc(metadata.paymentId).get();
@@ -328,8 +328,10 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
           status: 'Pending',
           buyerUid: payment.buyerUid,
           buyerServiceId: payment.buyerServiceId,
+          buyerEmail: payment.buyerEmail,
           sellerUid: payment.sellerUid,
           sellerServiceId: payment.sellerServiceId,
+          sellerEmail: payment.sellerEmail,
           paymentIntentId: payment.paymentIntentId,
           lastUpdateDate: FieldValue.serverTimestamp(),
           creationDate: FieldValue.serverTimestamp()
@@ -593,8 +595,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
           status: 'Pending',
           buyerUid: payment.buyerUid,
           buyerServiceId: payment.buyerServiceId,
+          buyerEmail: payment.buyerEmail,
           sellerUid: payment.sellerUid,
           sellerServiceId: payment.sellerServiceId,
+          sellerEmail: payment.sellerEmail,
           paymentIntentId: payment.paymentIntentId,
           lastUpdateDate: FieldValue.serverTimestamp(),
           creationDate: FieldValue.serverTimestamp()
@@ -676,7 +680,9 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const sellerSnapshot = await admin.firestore().collection('users').doc(sellerUid).get();
     const seller = sellerSnapshot.data();
 
-    console.log('seller ' + JSON.stringify(seller));
+    // get buyer
+    const buyerSnapshot = await admin.firestore().collection('users').doc(buyerUid).get();
+    const buyer = buyerSnapshot.data();
 
     // get buyer service
     const buyerServiceSnapshot = await admin.firestore().collection(`users/${buyerUid}/services`).doc(buyerServiceId).get();
@@ -700,8 +706,10 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       status: '',
       buyerUid: buyerUid,
       buyerServiceId: buyerServiceId,
+      buyerEmail: buyer.email,
       sellerUid: sellerUid,
       sellerServiceId: sellerServiceId,
+      sellerEmail: seller.email,
       paymentIntentId: '',
       creationDate: FieldValue.serverTimestamp(),
       lastUpdateDate: FieldValue.serverTimestamp()
@@ -719,7 +727,15 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
       amount: newPayment.amount*100,
       currency: newPayment.currency,
       payment_method_types: ["card"],
-      metadata: { buyerUserId: newPayment.uid, buyerServiceId: newPayment.buyerServiceId, receiptId: newPayment.receiptId, paymentId: newPayment.paymentId }
+      metadata: {
+        buyerUserId: newPayment.buyerUid,
+        buyerServiceId: newPayment.buyerServiceId,
+        buyerEmail: newPayment.buyerEmail,
+        sellerUserId: newPayment.sellerUid,
+        sellerServiceId: newPayment.sellerServiceId,
+        sellerEmail: newPayment.sellerEmail,
+        receiptId: newPayment.receiptId,
+        paymentId: newPayment.paymentId }
     }, {
       stripeAccount: seller.stripeAccountId,
     });
