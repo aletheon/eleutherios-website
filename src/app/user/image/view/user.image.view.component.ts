@@ -116,7 +116,7 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
                       if (downloadUrl)
                         image.url = downloadUrl;
                       else
-                        image.url = '../../../assets/defaultLarge.jpg';
+                        image.url = '../../../../assets/defaultLarge.jpg';
 
                       return of(image);
                     })

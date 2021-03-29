@@ -7,7 +7,7 @@
 				<ng-template #showdefaultforumimage>
 					<ng-container *ngIf="defaultForumImage | async;let image">
 						<div style="flex:none;margin-right:5px">
-							<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 							<ng-template #showimage>
 								<img [src]="image.url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
 							</ng-template>

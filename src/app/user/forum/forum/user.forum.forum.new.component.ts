@@ -389,7 +389,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       if (downloadUrl)
                         forumImages[0].url = downloadUrl;
                       else
-                        forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                        forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
                       return of(forumImages[0]);
                     })
@@ -403,7 +403,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                 that.defaultForumImage = of(forumImage);
               else {
                 let tempImage = {
-                  url: '../../../assets/defaultThumbnail.jpg'
+                  url: '../../../../assets/defaultThumbnail.jpg'
                 };
                 that.defaultForumImage = of(tempImage);
               }
@@ -465,7 +465,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         if (downloadUrl)
                           image.url = downloadUrl;
                         else
-                          image.url = '../../../assets/defaultThumbnail.jpg';
+                          image.url = '../../../../assets/defaultThumbnail.jpg';
 
                         return of(image);
                       })
@@ -499,7 +499,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         if (downloadUrl)
                           forumImage.url = downloadUrl;
                         else
-                          forumImage.url = '../../../assets/defaultThumbnail.jpg';
+                          forumImage.url = '../../../../assets/defaultThumbnail.jpg';
 
                         return of(forumImage);
                       })
@@ -539,7 +539,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                     if (downloadUrl)
                                       serviceImages[0].url = downloadUrl;
                                     else
-                                      serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                      serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                     return of(serviceImages[0]);
                                   })
@@ -557,7 +557,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                 service.defaultServiceImage = of(defaultServiceImage);
                               else {
                                 let tempImage = {
-                                  url: '../../../assets/defaultTiny.jpg'
+                                  url: '../../../../assets/defaultTiny.jpg'
                                 };
                                 service.defaultServiceImage = of(tempImage);
                               }
@@ -618,7 +618,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                       if (downloadUrl)
                                         serviceImages[0].url = downloadUrl;
                                       else
-                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                        serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                       return of(serviceImages[0]);
                                     })
@@ -636,7 +636,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   service.defaultServiceImage = of(defaultServiceImage);
                                 else {
                                   let tempImage = {
-                                    url: '../../../assets/defaultTiny.jpg'
+                                    url: '../../../../assets/defaultTiny.jpg'
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
@@ -680,7 +680,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
-                                    serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                    serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                   return of(serviceImages[0]);
                                 })
@@ -698,7 +698,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                url: '../../../assets/defaultTiny.jpg'
+                                url: '../../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -749,7 +749,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                       if (downloadUrl)
                                         serviceImages[0].url = downloadUrl;
                                       else
-                                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                        serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                       return of(serviceImages[0]);
                                     })
@@ -767,7 +767,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   service.defaultServiceImage = of(defaultServiceImage);
                                 else {
                                   let tempImage = {
-                                    url: '../../../assets/defaultTiny.jpg'
+                                    url: '../../../../assets/defaultTiny.jpg'
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
@@ -811,7 +811,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   if (downloadUrl)
                                     serviceImages[0].url = downloadUrl;
                                   else
-                                    serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                    serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                   return of(serviceImages[0]);
                                 })
@@ -829,7 +829,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               service.defaultServiceImage = of(defaultServiceImage);
                             else {
                               let tempImage = {
-                                url: '../../../assets/defaultTiny.jpg'
+                                url: '../../../../assets/defaultTiny.jpg'
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
@@ -987,7 +987,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                              serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                             return of(serviceImages[0]);
                           })
@@ -1005,7 +1005,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
+                          url: '../../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -1047,7 +1047,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                              serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                             return of(serviceImages[0]);
                           })
@@ -1065,7 +1065,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
+                          url: '../../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -1111,7 +1111,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
-                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                            serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                           return of(serviceImages[0]);
                         })
@@ -1129,7 +1129,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        url: '../../../assets/defaultTiny.jpg'
+                        url: '../../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -1171,7 +1171,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           if (downloadUrl)
                             serviceImages[0].url = downloadUrl;
                           else
-                            serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                            serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                           return of(serviceImages[0]);
                         })
@@ -1189,7 +1189,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       service.defaultServiceImage = of(defaultServiceImage);
                     else {
                       let tempImage = {
-                        url: '../../../assets/defaultTiny.jpg'
+                        url: '../../../../assets/defaultTiny.jpg'
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
@@ -1499,7 +1499,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                              serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                             return of(serviceImages[0]);
                           })
@@ -1517,7 +1517,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
+                          url: '../../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -1559,7 +1559,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             if (downloadUrl)
                               serviceImages[0].url = downloadUrl;
                             else
-                              serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                              serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                             return of(serviceImages[0]);
                           })
@@ -1577,7 +1577,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultTiny.jpg'
+                          url: '../../../../assets/defaultTiny.jpg'
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -1703,7 +1703,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
-                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                               return of(serviceImages[0]);
                             })
@@ -1721,7 +1721,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            url: '../../../assets/defaultTiny.jpg'
+                            url: '../../../../assets/defaultTiny.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }
@@ -1777,7 +1777,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
-                                serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                               return of(serviceImages[0]);
                             })
@@ -1795,7 +1795,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            url: '../../../assets/defaultTiny.jpg'
+                            url: '../../../../assets/defaultTiny.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }

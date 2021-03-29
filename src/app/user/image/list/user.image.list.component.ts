@@ -258,7 +258,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
                 if (downloadUrl)
                   image.url = downloadUrl;
                 else
-                  image.url = '../../../assets/defaultThumbnail.jpg';
+                  image.url = '../../../../assets/defaultThumbnail.jpg';
 
                 return of(image);
               })

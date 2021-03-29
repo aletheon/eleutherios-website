@@ -16,7 +16,7 @@
 						<ng-template #showbuyerdefaultserviceimage>
 							<ng-container *ngIf="buyerDefaultServiceImage | async;let image">
 								<div style="flex:none;margin-right:10px">
-									<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+									<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 									<ng-template #showimage>
 										<img *ngIf="receiptGroup.get('buyerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('buyerUid').value, serviceId: receiptGroup.get('buyerServiceId').value }" style="cursor:pointer">
                     <img *ngIf="receiptGroup.get('buyerPaymentType').value == 'No service'" [src]="image.url">
@@ -69,7 +69,7 @@
 									<ng-template #showsellerdefaultserviceimage>
 										<ng-container *ngIf="sellerDefaultServiceImage | async;let image">
 											<div style="flex:none;margin-right:10px">
-												<ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+												<ng-container *ngIf="image.url == '../../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
 												<ng-template #showimage>
 													<img *ngIf="receiptGroup.get('sellerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
                           <img *ngIf="receiptGroup.get('sellerPaymentType').value == 'No service'" [src]="image.url">
@@ -95,7 +95,7 @@
 										<ng-template #showsellerdefaultserviceimage>
 											<ng-container *ngIf="sellerDefaultServiceImage | async;let image">
 												<div style="flex:none;margin-right:10px">
-													<ng-container *ngIf="image.url == '../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+													<ng-container *ngIf="image.url == '../../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
 													<ng-template #showimage>
 														<img *ngIf="receiptGroup.get('sellerPaymentType').value != 'No service'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receiptGroup.get('sellerUid').value, serviceId: receiptGroup.get('sellerServiceId').value }" style="cursor:pointer">
                             <img *ngIf="receiptGroup.get('sellerPaymentType').value == 'No service'" [src]="image.url">

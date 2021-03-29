@@ -418,7 +418,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
               if (downloadUrl)
                 forumImages[0].url = downloadUrl;
               else
-                forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
               return of(forumImages[0]);
             })
@@ -432,7 +432,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
         this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
-          url: '../../../assets/defaultThumbnail.jpg'
+          url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }
@@ -708,7 +708,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                                     if (downloadUrl)
                                       serviceImages[0].url = downloadUrl;
                                     else
-                                      serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                                      serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                                     return of(serviceImages[0]);
                                   })
@@ -726,7 +726,7 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                                 service.defaultServiceImage = of(defaultServiceImage);
                               else {
                                 let tempImage = {
-                                  url: '../../../assets/defaultTiny.jpg'
+                                  url: '../../../../assets/defaultTiny.jpg'
                                 };
                                 service.defaultServiceImage = of(tempImage);
                               }

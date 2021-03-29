@@ -381,7 +381,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
-                        serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                        serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
                       return of(serviceImages[0]);
                     })
@@ -395,7 +395,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                 that.sellerDefaultServiceImage = of(serviceImage);
               else {
                 let tempImage = {
-                  url: '../../../assets/defaultThumbnail.jpg'
+                  url: '../../../../assets/defaultThumbnail.jpg'
                 };
                 that.sellerDefaultServiceImage = of(tempImage);
               }
@@ -416,7 +416,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
-                        serviceImages[0].url = '../../../assets/defaultTiny.jpg';
+                        serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
                       return of(serviceImages[0]);
                     })
@@ -430,7 +430,7 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
                 that.buyerDefaultServiceImage = of(serviceImage);
               else {
                 let tempImage = {
-                  url: '../../../assets/defaultTiny.jpg'
+                  url: '../../../../assets/defaultTiny.jpg'
                 };
                 that.buyerDefaultServiceImage = of(tempImage);
               }

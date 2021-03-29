@@ -396,7 +396,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
-                serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
+                serviceImages[0].url = '../../../../../assets/defaultThumbnail.jpg';
 
               return of(serviceImages[0]);
             })
@@ -410,7 +410,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
         this.defaultServiceImage = of(serviceImage);
       else {
         let tempImage = {
-          url: '../../../../assets/defaultThumbnail.jpg'
+          url: '../../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultServiceImage = of(tempImage);
       }
@@ -447,7 +447,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
                               if (downloadUrl)
                                 serviceImages[0].url = downloadUrl;
                               else
-                                serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                                serviceImages[0].url = '../../../../../assets/defaultThumbnail.jpg';
 
                               return of(serviceImages[0]);
                             })
@@ -470,7 +470,7 @@ export class UserServiceReviewCreateComponent implements OnInit, OnDestroy {
                           service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            url: '../../../assets/defaultThumbnail.jpg'
+                            url: '../../../../../assets/defaultThumbnail.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }

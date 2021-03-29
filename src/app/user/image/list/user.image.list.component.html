@@ -36,7 +36,7 @@
 				<ng-container *ngFor="let image of imageItems; trackBy: trackImages">
 					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
 						<div style="flex:none;margin-right:10px">
-							<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 								<ng-template #showimage>
 									<img [src]="image.url" [routerLink]="['/user/image/view']" [queryParams]="{ userId: image.uid, imageId: image.imageId }" style="cursor:pointer">
 								</ng-template>
@@ -63,7 +63,7 @@
 		</ng-container>
 	</div>
 	<!-- paging -->
-	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+	<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 		<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 		<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 	</div>

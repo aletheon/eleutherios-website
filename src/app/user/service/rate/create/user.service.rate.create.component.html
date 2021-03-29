@@ -8,7 +8,7 @@
           <ng-template #showdefaultserviceimage>
             <ng-container *ngIf="defaultServiceImage | async;let image">
               <div style="flex:none;margin-right:10px">
-                <ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                <ng-container *ngIf="image.url == '../../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 								<ng-template #showimage>
 									<img *ngIf="serviceGroup.get('type').value == 'Private'" [src]="image.url" [routerLink]="['/user/service/image/list']" [queryParams]="{ userId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
 									<img *ngIf="serviceGroup.get('type').value == 'Public'" [src]="image.url" [routerLink]="['/service/image/list']" [queryParams]="{ serviceId: serviceGroup.get('serviceId').value }" style="cursor:pointer">
@@ -74,7 +74,7 @@
 										<ng-template #showdefaultserviceimage>
 											<ng-container *ngIf="service.defaultServiceImage | async;let image">
 												<div style="flex:none;margin-right:10px">
-													<ng-container *ngIf="image.url == '../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+													<ng-container *ngIf="image.url == '../../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 													<ng-template #showimage>
 														<img *ngIf="service.type == 'Private'" [src]="image.url" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId }' style="cursor:pointer">
 														<img *ngIf="service.type == 'Public'" [src]="image.url" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer">

@@ -161,7 +161,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                                 if (downloadUrl)
                                   forumImages[0].url = downloadUrl;
                                 else
-                                  forumImages[0].url = '../../assets/defaultThumbnail.jpg';
+                                  forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
 
                                 return of(forumImages[0]);
                               })
@@ -180,7 +180,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                             forum.defaultForumImage = of(defaultForumImage);
                           else {
                             let tempImage = {
-                              url: '../../assets/defaultThumbnail.jpg'
+                              url: '../../../assets/defaultThumbnail.jpg'
                             };
                             forum.defaultForumImage = of(tempImage);
                           }
@@ -228,7 +228,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                                 if (downloadUrl)
                                   serviceImages[0].url = downloadUrl;
                                 else
-                                  serviceImages[0].url = '../../assets/defaultThumbnail.jpg';
+                                  serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
 
                                 return of(serviceImages[0]);
                               })
@@ -247,7 +247,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                             service.defaultServiceImage = of(defaultServiceImage);
                           else {
                             let tempImage = {
-                              url: '../../assets/defaultThumbnail.jpg',
+                              url: '../../../assets/defaultThumbnail.jpg',
                             };
                             service.defaultServiceImage = of(tempImage);
                           }

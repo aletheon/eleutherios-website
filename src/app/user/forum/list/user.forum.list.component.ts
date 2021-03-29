@@ -168,7 +168,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
-                            forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                            forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
                           return of(forumImages[0]);
                         })
@@ -186,7 +186,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
                       let tempImage = {
-                        url: '../../../assets/defaultThumbnail.jpg'
+                        url: '../../../../assets/defaultThumbnail.jpg'
                       };
                       forum.defaultForumImage = of(tempImage);
                     }
@@ -254,7 +254,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                           if (downloadUrl)
                             forumImages[0].url = downloadUrl;
                           else
-                            forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                            forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
                           return of(forumImages[0]);
                         })
@@ -272,7 +272,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
                       let tempImage = {
-                        url: '../../../assets/defaultThumbnail.jpg'
+                        url: '../../../../assets/defaultThumbnail.jpg'
                       };
                       forum.defaultForumImage = of(tempImage);
                     }

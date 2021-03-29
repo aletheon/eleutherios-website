@@ -294,7 +294,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
                 if (downloadUrl)
                   serviceImage.url = downloadUrl;
                 else
-                  serviceImage.url = '../../../assets/defaultLarge.jpg';
+                  serviceImage.url = '../../../../assets/defaultLarge.jpg';
 
                 return of(serviceImage);
               })
@@ -335,7 +335,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
               if (downloadUrl)
                 serviceImages[0].url = downloadUrl;
               else
-                serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
               return of(serviceImages[0]);
             })
@@ -349,7 +349,7 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
         this.defaultServiceImage = of(serviceImage);
       else {
         let tempImage = {
-          url: '../../../assets/defaultThumbnail.jpg'
+          url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultServiceImage = of(tempImage);
       }

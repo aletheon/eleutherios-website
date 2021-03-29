@@ -123,7 +123,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
-                        serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
+                        serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
 
                       return of(serviceImages[0]);
                     })
@@ -147,7 +147,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                       if (downloadUrl)
                         serviceImages[0].url = downloadUrl;
                       else
-                        serviceImages[0].url = '../../../assets/defaultiny.jpg';
+                        serviceImages[0].url = '../../../../assets/defaultiny.jpg';
 
                       return of(serviceImages[0]);
                     })
@@ -166,7 +166,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.sellerDefaultServiceImage = of(sellerDefaultServiceImage);
                 else {
                   let tempImage = {
-                    url: '../../../assets/defaultTiny.jpg'
+                    url: '../../../../assets/defaultTiny.jpg'
                   };
                   receipt.sellerDefaultServiceImage = of(tempImage);
                 }
@@ -175,7 +175,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
                   receipt.buyerDefaultServiceImage = of(buyerDefaultServiceImage);
                 else {
                   let tempImage = {
-                    url: '../../../assets/defaultThumbnail.jpg'
+                    url: '../../../../assets/defaultThumbnail.jpg'
                   };
                   receipt.buyerDefaultServiceImage = of(tempImage);
                 }
