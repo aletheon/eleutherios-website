@@ -2849,683 +2849,358 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
 // ********************************************************************************
 // deleteUserService
 // ********************************************************************************
-exports.deleteUserService = functions.firestore.document("users/{userId}/services/{serviceId}").onDelete((snap, context) => {
+exports.deleteUserService = functions.firestore.document("users/{userId}/services/{serviceId}").onDelete(async (snap, context) => {
 	var service = snap.data();
 	var userId = context.params.userId;
   var serviceId = context.params.serviceId;
 
-  var removeServiceTotals = function () {
-    return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(serviceId).remove(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeUserService = function (tags) {
-    return new Promise((resolve, reject) => {
-      if (tags && tags.length > 0){
-        removeUserCollectionTitles(tags).then(() => {
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-      else {
-        removeUserServiceNoTags().then(() => {
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-    });
-  };
-
-  var removeServiceImages = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeServiceTags = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/tags`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeWhereServings = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/whereservings`)
-        .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(whereServingDoc => {
-              return new Promise((resolve, reject) => {
-                var whereServing = whereServingDoc.data();
-                var removeRegistrant = function(){
-                  return new Promise((resolve, reject) => {
-                    admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/registrants`).where("serviceId", "==", serviceId).get().then(registrantSnapshot => {
-                      if (registrantSnapshot.size > 0){
-                        var promises = registrantSnapshot.docs.map(registrantDoc => {
-                          return new Promise((resolve, reject) => {
-                            var registrant = registrantDoc.data();
-
-                            registrantDoc.ref.delete().then(() => {
-                              // remove all posts associated to this registrant
-                              admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/posts`).where("registrantId", "==", registrant.registrantId).get().then(postSnapshot => {
-                                if (postSnapshot.size > 0){
-                                  var promises = postSnapshot.docs.map(postDoc => {
-                                    return new Promise((resolve, reject) => {
-                                      // delete from the firebase db
-                                      var userForumPostRef = admin.database().ref(`users/${whereServing.uid}/forums/${whereServing.forumId}/posts/${postDoc.data().postId}`);
-                                      userForumPostRef.remove().then(() => {
-                                        resolve();
-                                      })
-                                      .catch(error => {
-                                        reject(error);
-                                      });
-                                    });
-                                  });
-
-                                  Promise.all(promises).then(() => {
-                                    resolve();
-                                  })
-                                  .catch(error => {
-                                    reject(error);
-                                  });
-                                }
-                                else resolve();
-                              })
-                              .catch(error => {
-                                reject(error);
-                              });
-                            })
-                            .catch(error => {
-                              reject(error);
-                            });
-                          });
-                        });
-
-                        Promise.all(promises).then(() => {
-                          resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        });
-                      }
-                      else resolve();
-                    })
-                    .catch(error => {
-                      reject(error);
-                    });
-                  });
-                };
-
-                // remove the registrant
-                removeRegistrant().then(() => {
-                  // remove whereServing
-                  whereServingDoc.ref.delete().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        }
-      );
-    });
-  };
-
-  var removeUserCollectionTitles = function (tags){
-    return new Promise((resolve, reject) => {
-      if (tags.length > 0){
-        tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-          var promises = collectionTitles.map(collectionTitle => {
-            return new Promise((resolve, reject) => {
-              var serviceRef = admin.firestore().collection(`users/${userId}/servicescollection/${collectionTitle}/services`).doc(serviceId);
-              serviceRef.get().then(doc => {
-                if (doc.exists){
-                  doc.ref.delete().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                }
-                else resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      }
-      else resolve();
-    });
-  };
-
-  var removeUserServiceNoTags = function () {
-    return new Promise((resolve, reject) => {
-      var serviceRef = admin.firestore().collection(`users/${userId}/servicesnotags`).doc(serviceId);
-      serviceRef.get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      });
-    });
-  };
-
-  var removePublicService = function (tags) {
-    return new Promise((resolve, reject) => {
-      var removePublicCollectionTitles = function (tags){
-        return new Promise((resolve, reject) => {
-          if (tags.length > 0){
-            tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-              var promises = collectionTitles.map(collectionTitle => {
-                return new Promise((resolve, reject) => {
-                  var serviceRef = admin.firestore().collection(`servicescollection/${collectionTitle}/services`).doc(serviceId);
-                  serviceRef.get().then(doc => {
-                    if (doc.exists){
-                      doc.ref.delete().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                });
-              });
-
-              Promise.all(promises).then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          }
-          else resolve();
-        });
-      };
-
-      var removePublicServiceNoTags = function () {
-        return new Promise((resolve, reject) => {
-          var serviceRef = admin.firestore().collection('servicesnotags').doc(serviceId);
-          serviceRef.get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            }
-            else resolve();
-          });
-        });
-      };
-
-      async.parallel([
-        // remove service
-        function (callback) {
-          admin.firestore().collection('services').doc(serviceId).get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                callback(null, null);
-              })
-              .catch(error => {
-                callback(error);
-              });
-            }
-            else callback(null, null);
-          });
-        },
-        function (callback){
-          if (tags.length > 0){
-            removePublicCollectionTitles(tags).then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-          else {
-            removePublicServiceNoTags().then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve();
-          else
-            reject(error);
-        }
-      );
-    });
-  };
-
-  var removeAnonymousService = function (tags) {
-    return new Promise((resolve, reject) => {
-      var removeAnonymousCollectionTitles = function (tags){
-        return new Promise((resolve, reject) => {
-          if (tags.length > 0){
-            tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-              var promises = collectionTitles.map(collectionTitle => {
-                return new Promise((resolve, reject) => {
-                  var serviceRef = admin.firestore().collection(`anonymousservicescollection/${collectionTitle}/services`).doc(serviceId);
-                  serviceRef.get().then(doc => {
-                    if (doc.exists){
-                      doc.ref.delete().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                });
-              });
-
-              Promise.all(promises).then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          }
-          else resolve();
-        });
-      };
-
-      var removeAnonymousServiceNoTags = function () {
-        return new Promise((resolve, reject) => {
-          var serviceRef = admin.firestore().collection('anonymousservicesnotags').doc(serviceId);
-          serviceRef.get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            }
-            else resolve();
-          });
-        });
-      };
-
-      async.parallel([
-        // remove service
-        function (callback) {
-          admin.firestore().collection('anonymousservices').doc(serviceId).get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                callback(null, null);
-              })
-              .catch(error => {
-                callback(error);
-              });
-            }
-            else callback(null, null);
-          });
-        },
-        function (callback){
-          if (tags.length > 0){
-            removeAnonymousCollectionTitles(tags).then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-          else {
-            removeAnonymousServiceNoTags().then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve();
-          else
-            reject(error);
-        }
-      );
-    });
-  };
-
-  // users/${userId}/services/${serviceId}/forumblocks
-  var removeForumBlocks = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/forumblocks`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(doc => {
-							return new Promise((resolve, reject) => {
-								doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
-  // users/${userId}/services/${serviceId}/userblocks
-  var removeUserBlocks = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/userblocks`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(doc => {
-							return new Promise((resolve, reject) => {
-								doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
-  var removeServiceRates = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/servicerates`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeServiceReviews = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/servicereviews`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var getTags = function (){
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/services/${serviceId}/tags`).get().then(snapshot => {
-        var tags = [];
-
-        if (snapshot.size > 0){
-          snapshot.docs.forEach(doc => {
-            tags.push(doc.data().tag);
-          });
-          tags.sort();
-        }
-        resolve(tags);
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  return admin.firestore().collection(`users/${userId}/services`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ serviceCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
+  var removeServiceTotals = async function () {
+    try {
+      return await admin.database().ref('totals').child(serviceId).remove();
+    } catch (error) {
+      throw error;
     }
-  ).then(() => {
-    return getTags().then(tags => {
-      return removeServiceRates().then(() => {
-        return removeServiceReviews().then(() => {
-          return removeServiceImages().then(() => {
-            return removeWhereServings().then(() => {
-              return removeUserService(tags).then(() => {
-                return removeServiceTags().then(() => {
-                  return removeForumBlocks().then(() => {
-                    return removeUserBlocks().then(() => {
-                      if (service.type == 'Public'){
-                        return removePublicService(tags).then(() => {
-                          return removeAnonymousService(tags).then(() => {
-                            return removeServiceTotals().then(() => {
-                              return Promise.resolve();
-                            })
-                            .catch(error => {
-                              return Promise.reject(error);
-                            });
-                          })
-                          .catch(error => {
-                            return Promise.reject(error);
-                          });
-                        })
-                        .catch(error => {
-                          return Promise.reject(error);
-                        });
-                      }
-                      else {
-                        return removeServiceTotals().then(() => {
-                          return Promise.resolve();
-                        })
-                        .catch(error => {
-                          return Promise.reject(error);
-                        });
-                      }
-                    })
-                    .catch(error => {
-                      return Promise.reject(error);
-                    });
-                  })
-                  .catch(error => {
-                    return Promise.reject(error);
-                  });
-                })
-                .catch(error => {
-                  return Promise.reject(error);
-                });
-              })
-              .catch(error => {
-                return Promise.reject(error);
-              });
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+  };
+
+  var removeUserService = async function (tags) {
+    try {
+      if (tags && tags.length > 0)
+        return await removeUserCollectionTitles(tags);
+      else {
+        return await removeUserServiceNoTags();
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserServiceNoTags = async function () {
+    try {
+      var serviceSnapshot = await admin.firestore().collection(`users/${userId}/servicesnotags`).doc(serviceId).get();
+      var serviceRef = serviceSnapshot.ref;
+
+      if (serviceSnapshot.exists)
+        await serviceRef.delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserCollectionTitles = async function (tags) {
+    try {
+      let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+      if (collectionTitles.length > 0){
+        return await Promise.all(
+          collectionTitles.map(async collectionTitle => {
+            const serviceSnapshot = await admin.firestore().collection(`users/${userId}/servicescollection/${collectionTitle}/services`).doc(serviceId).get();
+            const serviceRef = serviceSnapshot.ref;
+
+            if (serviceSnapshot.exists())
+              await serviceRef.delete();
+
+            return;
           })
-          .catch(error => {
-            return Promise.reject(error);
-          });
-        })
-        .catch(error => {
-          return Promise.reject(error);
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeServiceImages = async function () {
+    try {
+      const serviceImageSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).get();
+
+      if (serviceImageSnapshot.size > 0){
+        return await Promise.all(
+          serviceImageSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeServiceTags = async function () {
+    try {
+      const serviceTagSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/tags`).get();
+
+      if (serviceTagSnapshot.size > 0){
+        return await Promise.all(
+          serviceTagSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeWhereServings = async function () {
+    try {
+      const whereServingSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/whereservings`).get();
+
+      if (whereServingSnapshot.size > 0){
+        return await Promise.all(
+          whereServingSnapshot.docs.map(async whereServingDoc => {
+            var whereServing = whereServingDoc.data();
+            var removeRegistrant = async function () {
+              try {
+                var registrantSnapshot = await admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/registrants`).where("serviceId", "==", serviceId).get();
+                var registrantRef = registrantSnapshot.docs[0].ref;
+                var registrant = registrantSnapshot.docs[0].data();
+
+                if (registrantSnapshot.size > 0)
+                  await registrantRef.delete();
+
+                // remove posts associated with this registrant
+                const postSnapshot = await admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/posts`).where("registrantId", "==", registrant.registrantId).get();
+
+                if (postSnapshot.size > 0){
+                  return await Promise.all(
+                    postSnapshot.docs.map(async postDoc => {
+                      var userForumPostRef = admin.database().ref(`users/${whereServing.uid}/forums/${whereServing.forumId}/posts/${postDoc.data().postId}`);
+                      return userForumPostRef.remove();
+                    })
+                  );
+                }
+                else return;
+              } catch (error) {
+                throw error;
+              }
+            };
+            await removeRegistrant();
+            return await whereServingDoc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removePublicService = async function (tags) {
+    try {
+      var removePublicCollectionTitles = async function (tags) {
+        try {
+          let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+          if (collectionTitles.length > 0){
+            return await Promise.all(
+              collectionTitles.map(async collectionTitle => {
+                const serviceSnapshot = await admin.firestore().collection(`servicescollection/${collectionTitle}/services`).doc(serviceId).get();
+                const serviceRef = serviceSnapshot.ref;
+
+                if (serviceSnapshot.exists())
+                  await serviceRef.delete();
+
+                return;
+              })
+            );
+          }
+          else return;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      var removePublicServiceNoTags = async function () {
+        const serviceSnapshot = await admin.firestore().collection('servicesnotags').doc(serviceId).get();
+        const serviceRef = serviceSnapshot.ref;
+
+        if (serviceSnapshot.exists)
+          await serviceRef.delete();
+
+        return;
+      };
+
+      const serviceSnapshot = await admin.firestore().collection('services').doc(serviceId).get();
+      const serviceRef = serviceSnapshot.ref;
+
+      if (serviceSnapshot.exists)
+        await serviceRef.delete();
+
+      if (tags.length > 0)
+        return await removePublicCollectionTitles(tags);
+      else
+        return await removePublicServiceNoTags();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeAnonymousService = async function (tags) {
+    try {
+      var removeAnonymousCollectionTitles = async function (tags) {
+        try {
+          let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+          if (collectionTitles.length > 0){
+            return await Promise.all(
+              collectionTitles.map(async collectionTitle => {
+                const serviceSnapshot = await admin.firestore().collection(`anonymousservicescollection/${collectionTitle}/services`).doc(serviceId).get();
+                const serviceRef = serviceSnapshot.ref;
+
+                if (serviceSnapshot.exists())
+                  await serviceRef.delete();
+
+                return;
+              })
+            );
+          }
+          else return;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      var removeAnonymousServiceNoTags = async function () {
+        const serviceSnapshot = await admin.firestore().collection('anonymousservicesnotags').doc(serviceId).get();
+        const serviceRef = serviceSnapshot.ref;
+
+        if (serviceSnapshot.exists)
+          await serviceRef.delete();
+
+        return;
+      };
+
+      const serviceSnapshot = await admin.firestore().collection('anonymousservices').doc(serviceId).get();
+      const serviceRef = serviceSnapshot.ref;
+
+      if (serviceSnapshot.exists)
+        await serviceRef.delete();
+
+      if (tags.length > 0)
+        return await removeAnonymousCollectionTitles(tags);
+      else
+        return await removeAnonymousServiceNoTags();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeForumBlocks = async function () {
+    try {
+      const forumBlockSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/forumblocks`).get();
+
+      if (forumBlockSnapshot.size > 0){
+        return await Promise.all(
+          forumBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserBlocks = async function () {
+    try {
+      const userBlockSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/userblocks`).get();
+
+      if (userBlockSnapshot.size > 0){
+        return await Promise.all(
+          userBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeServiceRates = async function () {
+    try {
+      const serviceRateSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/servicerates`).get();
+
+      if (serviceRateSnapshot.size > 0){
+        return await Promise.all(
+          serviceRateSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeServiceReviews = async function () {
+    try {
+      const serviceReviewSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/servicereviews`).get();
+
+      if (serviceReviewSnapshot.size > 0){
+        return await Promise.all(
+          serviceReviewSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var getTags = async function (){
+    try {
+      const serviceTagSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/tags`).get();
+      var tags = [];
+
+      if (serviceTagSnapshot.size > 0){
+        serviceTagSnapshot.docs.forEach(doc => {
+          tags.push(doc.data().tag);
         });
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
-  })
-  .catch(error => {
+        tags.sort();
+      }
+      return tags;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  try {
+    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/services`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
+
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(userId).update({ serviceCount: paymentSnapshot.size });
+
+    let tags = await getTags();
+
+    await removeServiceRates();
+    await removeServiceReviews();
+    await removeServiceImages();
+    await removeWhereServings();
+    await removeUserService(tags);
+    await removeServiceTags();
+    await removeForumBlocks();
+    await removeUserBlocks();
+
+    if (service.type == 'Public'){
+      await removePublicService(tags);
+      await removeAnonymousService(tags);
+    }
+    return await removeServiceTotals();
+  }
+  catch (error) {
     return Promise.reject(error);
-  });
+  }
 });
 
 // ********************************************************************************
