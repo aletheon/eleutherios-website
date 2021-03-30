@@ -3175,11 +3175,11 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
   };
 
   try {
-    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/services`).select().get();
+    const serviceSnapshot = await admin.firestore().collection(`users/${userId}/services`).select().get();
     const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
 
     if (totalSnapshot.exists())
-      await admin.database().ref("totals").child(userId).update({ serviceCount: paymentSnapshot.size });
+      await admin.database().ref("totals").child(userId).update({ serviceCount: serviceSnapshot.size });
 
     let tags = await getTags();
 
@@ -6343,721 +6343,391 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
 // ********************************************************************************
 // deleteUserForum
 // ********************************************************************************
-exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{forumId}").onDelete((snap, context) => {
+exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{forumId}").onDelete(async (snap, context) => {
   var forum = snap.data();
   var forumId = context.params.forumId;
   var userId = context.params.userId;
 
-  var removeForumTotals = function () {
-    return new Promise((resolve, reject) => {
-      admin.database().ref('totals').child(forumId).remove(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
+  var removeForumTotals = async function () {
+    try {
+      return await admin.database().ref('totals').child(forumId).remove();
+    } catch (error) {
+      throw error;
+    }
   };
 
   // this routine also removes
   // this posts associated to this forum
-  var removeForumRT = function () {
-    return new Promise((resolve, reject) => {
-      admin.database().ref(`users/${userId}/forums`).child(forumId).remove(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeUserForum = function (tags) {
-    return new Promise((resolve, reject) => {
-      if (tags && tags.length > 0){
-        removeUserCollectionTitles(tags).then(() => {
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-      else {
-        removeUserNoTags().then(() => {
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-    });
-  };
-
-  var removeParentForum = function () {
-    return new Promise((resolve, reject) => {
-      if ((forum.parentId && forum.parentId.length > 0) && (forum.parentUid && forum.parentUid.length > 0)){
-        admin.firestore().collection(`users/${forum.parentUid}/forums/${forum.parentId}/forums`).doc(forumId).get().then(doc => {
-          if (doc.exists){
-            doc.ref.delete().then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-      else resolve();
-    });
-  };
-
-  var removeUserForumImages = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeUserForumTags = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/tags`).get().then(snapshot => {
-        if (snapshot.size > 0){
-          var promises = snapshot.docs.map(doc => {
-            return new Promise((resolve, reject) => {
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var removeUserForumForums = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/forums`)
-        .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        }
-      );
-    });
-  };
-
-  var removeUserForumBreadcrumbs = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/breadcrumbs`)
-        .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        }
-      );
-    });
-  };
-
-  var removeUserForumBreadcrumbReferences = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/breadcrumbReferences`)
-        .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        }
-      );
-    });
-  };
-
-  var removeUserForumRegistrants = function () {
-    return new Promise((resolve, reject) => {
-      // fetch all
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
-        .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(registrantDoc => {
-              return new Promise((resolve, reject) => {
-                var registrant = registrantDoc.data();
-                var removeActivity = function(){
-                  return new Promise((resolve, reject) => {
-                    admin.firestore().collection(`users/${registrant.uid}/activities`).doc(forumId).get().then(activityDoc => {
-                      if (activityDoc.exists){
-                        activityDoc.ref.delete().then(() => {
-                          resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        });
-                      }
-                      else resolve();
-                    })
-                    .catch(error => {
-                      reject(error);
-                    });
-                  });
-                };
-
-                // remove activity
-                removeActivity().then(() => {
-                  // remove registrant
-                  registrantDoc.ref.delete().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        }
-      );
-    });
-  };
-
-  var removeUserCollectionTitles = function (tags) {
-    return new Promise((resolve, reject) => {
-      if (tags.length > 0){
-        tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-          var promises = collectionTitles.map(collectionTitle => {
-            return new Promise((resolve, reject) => {
-              var forumRef = admin.firestore().collection(`users/${userId}/forumscollection/${collectionTitle}/forums`).doc(forumId);
-              forumRef.get().then(doc => {
-                if (doc.exists){
-                  doc.ref.delete().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                }
-                else resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          });
-
-          Promise.all(promises).then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      }
-      else resolve();
-    });
-  };
-
-  var removeUserNoTags = function () {
-    return new Promise((resolve, reject) => {
-      var forumRef = admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId);
-      forumRef.get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      });
-    });
-  };
-
-  var removePublicForum = function (tags) {
-    return new Promise((resolve, reject) => {
-      var removePublicCollectionTitles = function (tags){
-        return new Promise((resolve, reject) => {
-          if (tags.length > 0){
-            tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-              var promises = collectionTitles.map(collectionTitle => {
-                return new Promise((resolve, reject) => {
-                  var forumRef = admin.firestore().collection(`forumscollection/${collectionTitle}/forums`).doc(forumId);
-                  forumRef.get().then(doc => {
-                    if (doc.exists){
-                      doc.ref.delete().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                });
-              });
-
-              Promise.all(promises).then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          }
-          else resolve();
-        });
-      };
-
-      var removePublicForumNoTags = function () {
-        return new Promise((resolve, reject) => {
-          var forumRef = admin.firestore().collection('forumsnotags').doc(forumId);
-          forumRef.get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            }
-            else resolve();
-          });
-        });
-      };
-
-      async.parallel([
-        // remove forum
-        function (callback) {
-          admin.firestore().collection('forums').doc(forumId).get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                callback(null, null);
-              })
-              .catch(error => {
-                callback(error);
-              });
-            }
-            else callback(null, null);
-          });
-        },
-        function (callback){
-          if (tags.length > 0){
-            removePublicCollectionTitles(tags).then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-          else {
-            removePublicForumNoTags().then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve();
-          else
-            reject(error);
-        }
-      );
-    });
-  };
-
-  var removeAnonymousForum = function (tags) {
-    return new Promise((resolve, reject) => {
-      var removeAnonymousCollectionTitles = function (tags){
-        return new Promise((resolve, reject) => {
-          if (tags.length > 0){
-            tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-              var promises = collectionTitles.map(collectionTitle => {
-                return new Promise((resolve, reject) => {
-                  var forumRef = admin.firestore().collection(`anonymousforumscollection/${collectionTitle}/forums`).doc(forumId);
-                  forumRef.get().then(doc => {
-                    if (doc.exists){
-                      doc.ref.delete().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                });
-              });
-
-              Promise.all(promises).then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            });
-          }
-          else resolve();
-        });
-      };
-
-      var removeAnonymousForumNoTags = function () {
-        return new Promise((resolve, reject) => {
-          var forumRef = admin.firestore().collection('anonymousforumsnotags').doc(forumId);
-          forumRef.get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                resolve();
-              })
-              .catch(error => {
-                reject(error);
-              });
-            }
-            else resolve();
-          });
-        });
-      };
-
-      async.parallel([
-        // remove forum
-        function (callback) {
-          admin.firestore().collection('anonymousforums').doc(forumId).get().then(doc => {
-            if (doc.exists){
-              doc.ref.delete().then(() => {
-                callback(null, null);
-              })
-              .catch(error => {
-                callback(error);
-              });
-            }
-            else callback(null, null);
-          });
-        },
-        function (callback){
-          if (tags.length > 0){
-            removeAnonymousCollectionTitles(tags).then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-          else {
-            removeAnonymousForumNoTags().then(() => {
-              callback(null, null);
-            })
-            .catch(error => {
-              callback(error);
-            });
-          }
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve();
-          else
-            reject(error);
-        }
-      );
-    });
-  };
-
-  // users/${userId}/forums/${forumId}/serviceblocks
-  var removeServiceBlocks = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/serviceblocks`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(doc => {
-							return new Promise((resolve, reject) => {
-								doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
-  // users/${userId}/forums/${forumId}/userblocks
-  var removeUserBlocks = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/userblocks`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(doc => {
-							return new Promise((resolve, reject) => {
-								doc.ref.delete().then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
-  var getTags = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums/${forumId}/tags`).get().then(snapshot => {
-        var tags = [];
-
-        if (snapshot.size > 0){
-          snapshot.docs.forEach(doc => {
-            tags.push(doc.data().tag);
-          });
-          tags.sort();
-        }
-        resolve(tags);
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  return admin.firestore().collection(`users/${userId}/forums`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ forumCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
+  var removeForumRT = async function () {
+    try {
+      await admin.database().ref(`users/${userId}/forums`).child(forumId).remove();
+      return;
+    } catch (error) {
+      throw error;
     }
-  ).then(() => {
-    return getTags().then(tags => {
-      return removeForumRT().then(() => {
-        return removeUserForumImages().then(() => {
-          return removeParentForum().then(() => {
-            return removeUserForumForums().then(() => {
-              return removeUserForumRegistrants().then(() => {
-                return removeUserForumTags().then(() => {
-                  return removeUserForum(tags).then(() => {
-                    return removeUserForumBreadcrumbs().then(() => {
-                      return removeUserForumBreadcrumbReferences().then(() => {
-                        return removeServiceBlocks().then(() => {
-                          return removeUserBlocks().then(() => {
-                            if (forum.type == 'Public'){
-                              return removePublicForum(tags).then(() => {
-                                return removeAnonymousForum(tags).then(() => {
-                                  return removeForumTotals().then(() => {
-                                    return Promise.resolve();
-                                  })
-                                  .catch(error => {
-                                    return Promise.reject(error);
-                                  });
-                                })
-                                .catch(error => {
-                                  return Promise.reject(error);
-                                });
-                              })
-                              .catch(error => {
-                                return Promise.reject(error);
-                              });
-                            }
-                            else {
-                              return removeForumTotals().then(() => {
-                                return Promise.resolve();
-                              })
-                              .catch(error => {
-                                return Promise.reject(error);
-                              });
-                            }
-                          })
-                          .catch(error => {
-                            return Promise.reject(error);
-                          });
-                        })
-                        .catch(error => {
-                          return Promise.reject(error);
-                        });
-                      })
-                      .catch(error => {
-                        return Promise.reject(error);
-                      });
-                    })
-                    .catch(error => {
-                      return Promise.reject(error);
-                    });
-                  })
-                  .catch(error => {
-                    return Promise.reject(error);
-                  });
-                })
-                .catch(error => {
-                  return Promise.reject(error);
-                });
-              })
-              .catch(error => {
-                return Promise.reject(error);
-              });
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+  };
+
+  var removeUserForum = async function (tags) {
+    try {
+      if (tags && tags.length > 0)
+        return await removeUserCollectionTitles(tags);
+      else {
+        return await removeUserForumNoTags();
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeParentForum = async function () {
+    try {
+      if ((forum.parentId && forum.parentId.length > 0) && (forum.parentUid && forum.parentUid.length > 0)){
+        var forumForumSnapshot = await admin.firestore().collection(`users/${forum.parentUid}/forums/${forum.parentId}/forums`).doc(forumId).get();
+        var forumForumRef = forumForumSnapshot.ref;
+
+        if (forumForumSnapshot.exists)
+          await forumForumRef.delete();
+
+        return;
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeForumImages = async function () {
+    try {
+      const forumImageSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).get();
+
+      if (forumImageSnapshot.size > 0){
+        return await Promise.all(
+          forumImageSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            return Promise.reject(error);
-          });
-        })
-        .catch(error => {
-          return Promise.reject(error);
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeForumTags = async function () {
+    try {
+      const forumTagSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/tags`).get();
+
+      if (forumTagSnapshot.size > 0){
+        return await Promise.all(
+          forumTagSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeForumForums = async function () {
+    try {
+      const forumForumSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/forums`).get();
+
+      if (forumForumSnapshot.size > 0){
+        return await Promise.all(
+          forumForumSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserForumBreadcrumbs = async function () {
+    try {
+      const forumBreadcrumbSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/breadcrumbs`).get();
+
+      if (forumBreadcrumbSnapshot.size > 0){
+        return await Promise.all(
+          forumBreadcrumbSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserForumBreadcrumbReferences = async function () {
+    try {
+      const forumBreadcrumbReferenceSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/breadcrumbReferences`).get();
+
+      if (forumBreadcrumbReferenceSnapshot.size > 0){
+        return await Promise.all(
+          forumBreadcrumbReferenceSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserForumRegistrants = async function () {
+    try {
+      const registrantSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).get();
+
+      if (registrantSnapshot.size > 0){
+        return await Promise.all(
+          registrantSnapshot.docs.map(async registrantDoc => {
+            var registrant = registrantDoc.data();
+            var removeActivity = async function(){
+              const activitySnapshot = await admin.firestore().collection(`users/${registrant.uid}/activities`).doc(forumId).get();
+              const activityRef = activitySnapshot.ref;
+
+              if (activitySnapshot.exists)
+                await activityRef.delete();
+
+              return;
+            };
+
+            await removeActivity();
+            return await registrantDoc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserCollectionTitles = async function (tags) {
+    try {
+      let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+      if (collectionTitles.length > 0){
+        return await Promise.all(
+          collectionTitles.map(async collectionTitle => {
+            const forumSnapshot = await admin.firestore().collection(`users/${userId}/forumscollection/${collectionTitle}/forums`).doc(forumId).get();
+            const forumRef = forumSnapshot.ref;
+
+            if (forumSnapshot.exists())
+              await forumRef.delete();
+
+            return;
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserForumNoTags = async function () {
+    try {
+      var forumSnapshot = await admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId).get();
+      var forumRef = forumSnapshot.ref;
+
+      if (forumSnapshot.exists)
+        await forumRef.delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removePublicForum = async function (tags) {
+    try {
+      var removePublicCollectionTitles = async function (tags) {
+        try {
+          let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+          if (collectionTitles.length > 0){
+            return await Promise.all(
+              collectionTitles.map(async collectionTitle => {
+                const forumSnapshot = await admin.firestore().collection(`forumscollection/${collectionTitle}/forums`).doc(forumId).get();
+                const forumRef = forumSnapshot.ref;
+
+                if (forumSnapshot.exists())
+                  await forumRef.delete();
+
+                return;
+              })
+            );
+          }
+          else return;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      var removePublicForumNoTags = async function () {
+        const forumSnapshot = await admin.firestore().collection('forumsnotags').doc(forumId).get();
+        const forumRef = forumSnapshot.ref;
+
+        if (forumSnapshot.exists)
+          await forumRef.delete();
+
+        return;
+      };
+
+      const forumSnapshot = await admin.firestore().collection('forums').doc(forumId).get();
+      const forumRef = forumSnapshot.ref;
+
+      if (forumSnapshot.exists)
+        await forumRef.delete();
+
+      if (tags.length > 0)
+        return await removePublicCollectionTitles(tags);
+      else
+        return await removePublicForumNoTags();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeAnonymousForum = async function (tags) {
+    try {
+      var removeAnonymousCollectionTitles = async function (tags) {
+        try {
+          let collectionTitles = await tagUtil.getCollectionTitlesFromTags(tags);
+
+          if (collectionTitles.length > 0){
+            return await Promise.all(
+              collectionTitles.map(async collectionTitle => {
+                const forumSnapshot = await admin.firestore().collection(`anonymousforumscollection/${collectionTitle}/forums`).doc(forumId).get();
+                const forumRef = forumSnapshot.ref;
+
+                if (forumSnapshot.exists())
+                  await forumRef.delete();
+
+                return;
+              })
+            );
+          }
+          else return;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      var removeAnonymousForumNoTags = async function () {
+        const forumSnapshot = await admin.firestore().collection('anonymousforumsnotags').doc(forumId).get();
+        const forumRef = forumSnapshot.ref;
+
+        if (forumSnapshot.exists)
+          await forumRef.delete();
+
+        return;
+      };
+
+      const forumSnapshot = await admin.firestore().collection('anonymousforums').doc(forumId).get();
+      const forumRef = forumSnapshot.ref;
+
+      if (forumSnapshot.exists)
+        await forumRef.delete();
+
+      if (tags.length > 0)
+        return await removeAnonymousCollectionTitles(tags);
+      else
+        return await removeAnonymousForumNoTags();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeServiceBlocks = async function () {
+    try {
+      const serviceBlockSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/serviceblocks`).get();
+
+      if (serviceBlockSnapshot.size > 0){
+        return await Promise.all(
+          serviceBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeUserBlocks = async function () {
+    try {
+      const userBlockSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/userblocks`).get();
+
+      if (userBlockSnapshot.size > 0){
+        return await Promise.all(
+          userBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var getTags = async function (){
+    try {
+      const forumTagSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/tags`).get();
+      var tags = [];
+
+      if (forumTagSnapshot.size > 0){
+        forumTagSnapshot.docs.forEach(doc => {
+          tags.push(doc.data().tag);
         });
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
-  })
-  .catch(error => {
+        tags.sort();
+      }
+      return tags;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  try {
+    const forumSnapshot = await admin.firestore().collection(`users/${userId}/forums`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(userId).once("value");
+
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(userId).update({ forumCount: forumSnapshot.size });
+
+    let tags = await getTags();
+
+    await removeForumRT();
+    await removeForumImages();
+    await removeParentForum();
+    await removeForumForums();
+    await removeUserForumRegistrants();
+    await removeForumTags();
+    await removeUserForum(tags);
+    await removeUserForumBreadcrumbs();
+    await removeUserForumBreadcrumbReferences();
+    await removeServiceBlocks();
+    await removeUserBlocks();
+
+    if (forum.type == 'Public'){
+      await removePublicForum(tags);
+      await removeAnonymousForum(tags);
+    }
+    return await removeForumTotals();
+  }
+  catch (error) {
     return Promise.reject(error);
-  });
+  }
 });
 
 // ********************************************************************************
