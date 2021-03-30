@@ -9,7 +9,7 @@
 			<span style="flex:none" [innerHTML]="userItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 		</div>
 		<ng-container *ngIf="publicForums | async;let publicForumItems">
-			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
+			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums"></ng-container>
 			<ng-template #showpublicforums>
 				<h5 style="flex:none;margin-bottom:5px">Forums</h5>
 				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
@@ -82,14 +82,9 @@
 					</ng-container>
 				</div>
 			</ng-template>
-			<ng-template #nopublicforums>
-				<h5 style="flex:none;color:#999;font-size:90%;margin-bottom:0px">
-					<i>No Forums</i>
-				</h5>
-			</ng-template>
 		</ng-container>
 		<ng-container *ngIf="publicServices | async;let publicServiceItems">
-			<ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else nopublicservices"></ng-container>
+			<ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices"></ng-container>
 			<ng-template #showpublicservices>
 				<h5 style="flex:none;margin-bottom:5px">Services</h5>
 				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
@@ -194,11 +189,6 @@
 						</div>
 					</ng-container>
 				</div>
-			</ng-template>
-			<ng-template #nopublicservices>
-				<h5 style="flex:none;color:#999;font-size:90%;margin-bottom:0px">
-					<i>No Services</i>
-				</h5>
 			</ng-template>
 		</ng-container>
 	</ng-container>
