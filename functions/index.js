@@ -1106,12 +1106,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).get();
 
       if (paymentSnapshot.size > 0){
-        let payments = await Promise.all(
+        return await Promise.all(
           paymentSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1124,12 +1123,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const receiptSnapshot = await admin.firestore().collection(`users/${userId}/receipts`).get();
 
       if (receiptSnapshot.size > 0){
-        let receipts = await Promise.all(
+        return await Promise.all(
           receiptSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1142,12 +1140,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const imageSnapshot = await admin.firestore().collection(`users/${userId}/images`).get();
 
       if (imageSnapshot.size > 0){
-        let images = await Promise.all(
+        return await Promise.all(
           imageSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1160,12 +1157,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const tagSnapshot = await admin.firestore().collection(`users/${userId}/tags`).get();
 
       if (tagSnapshot.size > 0){
-        let tags = await Promise.all(
+        return await Promise.all(
           tagSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1178,12 +1174,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const serviceSnapshot = await admin.firestore().collection(`users/${userId}/services`).get();
 
       if (serviceSnapshot.size > 0){
-        let services = await Promise.all(
+        return await Promise.all(
           serviceSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1196,12 +1191,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const forumSnapshot = await admin.firestore().collection(`users/${userId}/forums`).get();
 
       if (forumSnapshot.size > 0){
-        let forums = await Promise.all(
+        return await Promise.all(
           forumSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1214,12 +1208,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const forumBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumblocks`).get();
 
       if (forumBlockSnapshot.size > 0){
-        let forumBlocks = await Promise.all(
+        return await Promise.all(
           forumBlockSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1232,12 +1225,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const forumUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumuserblocks`).get();
 
       if (forumUserBlockSnapshot.size > 0){
-        let forumUserBlocks = await Promise.all(
+        return await Promise.all(
           forumUserBlockSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1250,12 +1242,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const serviceBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceblocks`).get();
 
       if (serviceBlockSnapshot.size > 0){
-        let serviceBlocks = await Promise.all(
+        return await Promise.all(
           serviceBlockSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
@@ -1268,12 +1259,11 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
       const serviceUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceuserblocks`).get();
 
       if (serviceUserBlockSnapshot.size > 0){
-        let serviceUserBlocks = await Promise.all(
+        return await Promise.all(
           serviceUserBlockSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
-        return;
       }
       else return;
     } catch (error) {
