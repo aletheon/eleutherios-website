@@ -209,8 +209,12 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
     else {
       this.userForumImageService.exists(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, image.imageId).then(exists => {
         if (!exists){
-          image.default = false;
-          this.userForumImageService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, image);
+          this.userImageService.getImage(image.uid, image.imageId).pipe(take(1)).subscribe(fetchedImage => {
+            if (fetchedImage){
+              fetchedImage.default = false;
+              this.userForumImageService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, fetchedImage);
+            }
+          });
         }
         else console.log('image already exists in forum');
       });
