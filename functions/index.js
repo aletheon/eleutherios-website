@@ -1083,264 +1083,202 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
   // users/{parentUserId}/serviceuserblocks/{serviceUserBlockId}
 
   var removeUserTotals = async function () {
-    return await admin.database().ref('totals').child(userId).remove();
+    try {
+      return await admin.database().ref('totals').child(userId).remove();
+    } catch (error) {
+      throw error;
+    }
   };
 
   var deleteCustomer = async function () {
-    if (user.stripeCustomerId)
-      await stripe.customers.del(user.stripeCustomerId);
+    try {
+      if (user.stripeCustomerId)
+        await stripe.customers.del(user.stripeCustomerId);
 
-    return;
+      return;
+    } catch (error) {
+      throw error;
+    }
   };
 
   var deletePayments = async function () {
-    const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).get();
+    try {
+      const paymentSnapshot = await admin.firestore().collection(`users/${userId}/payments`).get();
 
-    if (paymentSnapshot.size > 0){
-      var promises = paymentSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (paymentSnapshot.size > 0){
+        let payments = await Promise.all(
+          paymentSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var deleteReceipts = async function () {
-    const receiptSnapshot = await admin.firestore().collection(`users/${userId}/receipts`).get();
+    try {
+      const receiptSnapshot = await admin.firestore().collection(`users/${userId}/receipts`).get();
 
-    if (receiptSnapshot.size > 0){
-      var promises = receiptSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (receiptSnapshot.size > 0){
+        let receipts = await Promise.all(
+          receiptSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var deleteImages = async function () {
-    const imageSnapshot = await admin.firestore().collection(`users/${userId}/images`).get();
+    try {
+      const imageSnapshot = await admin.firestore().collection(`users/${userId}/images`).get();
 
-    if (imageSnapshot.size > 0){
-      var promises = imageSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (imageSnapshot.size > 0){
+        let images = await Promise.all(
+          imageSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var deleteTags = async function () {
-    const tagSnapshot = await admin.firestore().collection(`users/${userId}/tags`).get();
+    try {
+      const tagSnapshot = await admin.firestore().collection(`users/${userId}/tags`).get();
 
-    if (tagSnapshot.size > 0){
-      var promises = tagSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (tagSnapshot.size > 0){
+        let tags = await Promise.all(
+          tagSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var deleteServices = async function () {
-    const serviceSnapshot = await admin.firestore().collection(`users/${userId}/services`).get();
+    try {
+      const serviceSnapshot = await admin.firestore().collection(`users/${userId}/services`).get();
 
-    if (serviceSnapshot.size > 0){
-      var promises = serviceSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (serviceSnapshot.size > 0){
+        let services = await Promise.all(
+          serviceSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var deleteForums = async function () {
-    const forumSnapshot = await admin.firestore().collection(`users/${userId}/forums`).get();
+    try {
+      const forumSnapshot = await admin.firestore().collection(`users/${userId}/forums`).get();
 
-    if (forumSnapshot.size > 0){
-      var promises = forumSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (forumSnapshot.size > 0){
+        let forums = await Promise.all(
+          forumSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var forumBlocks = async function () {
-    const forumBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumblocks`).get();
+    try {
+      const forumBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumblocks`).get();
 
-    if (forumBlockSnapshot.size > 0){
-      var promises = forumBlockSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (forumBlockSnapshot.size > 0){
+        let forumBlocks = await Promise.all(
+          forumBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var forumUserBlocks = async function () {
-    const forumUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumuserblocks`).get();
+    try {
+      const forumUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/forumuserblocks`).get();
 
-    if (forumUserBlockSnapshot.size > 0){
-      var promises = forumUserBlockSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (forumUserBlockSnapshot.size > 0){
+        let forumUserBlocks = await Promise.all(
+          forumUserBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var serviceBlocks = async function () {
-    const serviceBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceblocks`).get();
+    try {
+      const serviceBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceblocks`).get();
 
-    if (serviceBlockSnapshot.size > 0){
-      var promises = serviceBlockSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (serviceBlockSnapshot.size > 0){
+        let serviceBlocks = await Promise.all(
+          serviceBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   var serviceUserBlocks = async function () {
-    const serviceUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceuserblocks`).get();
+    try {
+      const serviceUserBlockSnapshot = await admin.firestore().collection(`users/${userId}/serviceuserblocks`).get();
 
-    if (serviceUserBlockSnapshot.size > 0){
-      var promises = serviceUserBlockSnapshot.docs.map(doc => {
-        return new Promise((resolve, reject) => {
-          doc.ref.delete().then(() => {
-            resolve();
+      if (serviceUserBlockSnapshot.size > 0){
+        let serviceUserBlocks = await Promise.all(
+          serviceUserBlockSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
           })
-          .catch(error => {
-            reject(error);
-          });
-        });
-      });
-
-      Promise.all(promises).then(() => {
+        );
         return;
-      })
-      .catch(error => {
-        throw error;
-      });
+      }
+      else return;
+    } catch (error) {
+      throw error;
     }
-    else return;
   };
 
   try {
@@ -1361,7 +1299,7 @@ exports.deleteUser = functions.firestore.document("users/{userId}").onDelete(asy
     await deleteCustomer();
     await deleteImages();
     await deleteTags();
-    await removeUserTotals();
+    return await removeUserTotals();
   }
   catch (error) {
     return Promise.reject(error);
@@ -4666,88 +4604,62 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
 // ********************************************************************************
 // deleteUserServiceImage
 // ********************************************************************************
-exports.deleteUserServiceImage = functions.firestore.document("users/{userId}/services/{serviceId}/images/{imageId}").onDelete((snap, context) => {
+exports.deleteUserServiceImage = functions.firestore.document("users/{userId}/services/{serviceId}/images/{imageId}").onDelete(async (snap, context) => {
 	var image = snap.data();
 	var userId = context.params.userId;
   var serviceId = context.params.serviceId;
   var imageId = context.params.imageId;
   var bucket = admin.storage().bucket();
 
-  var removeImage = function (path){
-    return new Promise((resolve, reject) => {
-      bucket.file(path).exists().then(exists => {
-        if (exists){
-          bucket.file(path).delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
+  var removeImage = async function (path) {
+    try {
+      const bucketExists = await bucket.file(path).exists();
+
+      if (bucketExists)
+        await bucket.file(path).delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var deleteUserImageService = function () {
-		return new Promise((resolve, reject) => {
-      var serviceRef = admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId);
-      serviceRef.get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-		});
+  var deleteUserImageService = async function () {
+    try {
+      var serviceSnapshot = await admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId).get();
+      var serviceRef = serviceSnapshot.ref;
+
+      if (serviceSnapshot.exists)
+        await serviceRef.delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
 	};
 
-	// repopulate image count
-	return admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select()
-		.get().then(snapshot => {
-			return admin.database().ref("totals").child(serviceId).once("value", totalSnapshot => {
-				if (totalSnapshot.exists())
-					return admin.database().ref("totals").child(serviceId).update({ imageCount: snapshot.size });
-				else
-					return Promise.resolve();
-			});
-		}
-	).then(() => {
-    return removeImage(image.tinyUrl).then(() => {
-      return removeImage(image.smallUrl).then(() => {
-        return removeImage(image.mediumUrl).then(() => {
-          return removeImage(image.largeUrl).then(() => {
-            return deleteUserImageService().then(() => {
-              return Promise.resolve();
-            }).catch(error => {
-              return Promise.reject(error);
-            });
-          }).catch(error => {
-            return Promise.reject(error);
-          });
-        }).catch(error => {
-          return Promise.reject(error);
-        });
-      }).catch(error => {
-        return Promise.reject(error);
-      });
-    }).catch(error => {
-      return Promise.reject(error);
-    });
-	})
-	.catch(error => {
-		return Promise.reject(error);
-	});
+  try {
+    // repopulate image count
+    const imageSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(serviceId).once("value");
+
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(serviceId).update({ imageCount: imageSnapshot.size });
+
+    let urlsToRemove = [image.tinyUrl, image.smallUrl, image.mediumUrl, image.largeUrl];
+
+    await Promise.all(
+      urlsToRemove.map(async url => {
+        return removeImage(url);
+      })
+    );
+
+    // remove images reference to this service
+    return await deleteUserImageService();
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
@@ -9475,88 +9387,62 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
 // ********************************************************************************
 // deleteUserForumImage
 // ********************************************************************************
-exports.deleteUserForumImage = functions.firestore.document("users/{userId}/forums/{forumId}/images/{imageId}").onDelete((snap, context) => {
-	var image = snap.data();
+exports.deleteUserForumImage = functions.firestore.document("users/{userId}/forums/{forumId}/images/{imageId}").onDelete(async (snap, context) => {
+  var image = snap.data();
 	var userId = context.params.userId;
   var forumId = context.params.forumId;
   var imageId = context.params.imageId;
   var bucket = admin.storage().bucket();
 
-  var removeImage = function (path){
-    return new Promise((resolve, reject) => {
-      bucket.file(path).exists().then(exists => {
-        if (exists){
-          bucket.file(path).delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
+  var removeImage = async function (path) {
+    try {
+      const bucketExists = await bucket.file(path).exists();
+
+      if (bucketExists)
+        await bucket.file(path).delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var deleteUserImageForum = function () {
-		return new Promise((resolve, reject) => {
-      var forumRef = admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId);
-      forumRef.get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-		});
+  var deleteUserImageForum = async function () {
+    try {
+      var forumSnapshot = await admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId).get();
+      var forumRef = forumSnapshot.ref;
+
+      if (forumSnapshot.exists)
+        await forumRef.delete();
+
+      return;
+    } catch (error) {
+      throw error;
+    }
 	};
 
-	// repopulate image count
-	return admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select()
-		.get().then(snapshot => {
-			return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-				if (totalSnapshot.exists())
-					return admin.database().ref("totals").child(forumId).update({ imageCount: snapshot.size });
-				else
-					return Promise.resolve();
-			});
-		}
-	).then(() => {
-    return removeImage(image.tinyUrl).then(() => {
-      return removeImage(image.smallUrl).then(() => {
-        return removeImage(image.mediumUrl).then(() => {
-          return removeImage(image.largeUrl).then(() => {
-            return deleteUserImageForum().then(() => {
-              return Promise.resolve();
-            }).catch(error => {
-              return Promise.reject(error);
-            });
-          }).catch(error => {
-            return Promise.reject(error);
-          });
-        }).catch(error => {
-          return Promise.reject(error);
-        });
-      }).catch(error => {
-        return Promise.reject(error);
-      });
-    }).catch(error => {
-      return Promise.reject(error);
-    });
-	})
-	.catch(error => {
-		return Promise.reject(error);
-	});
+  try {
+    // repopulate image count
+    const imageSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(forumId).once("value");
+
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(forumId).update({ imageCount: imageSnapshot.size });
+
+    let urlsToRemove = [image.tinyUrl, image.smallUrl, image.mediumUrl, image.largeUrl];
+
+    await Promise.all(
+      urlsToRemove.map(async url => {
+        return removeImage(url);
+      })
+    );
+
+    // remove images reference to this forum
+    return await deleteUserImageForum();
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
