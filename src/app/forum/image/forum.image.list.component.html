@@ -20,17 +20,16 @@
 			</div>
 			<div style="flex:1">
 				<div style="display:flex;flex-direction:row;margin-bottom:10px">
-					<ng-container *ngIf="forumTags | async;let forumTagItems">
-						<ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
-							<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-start;overflow-x:auto;margin-bottom:10px">
-								<div style="flex:none;display:flex;flex-direction:row;margin-right:5px;padding:3px;background-color:rgb(250, 155, 152);border:1px solid #ac2c2c;align-items:center"
-									*ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
-									<p style="margin:0 3px 0 3px">{{ forumTag.tag }}</p>
-								</div>
-							</div>
-						</ng-container>
-						<ng-template #noforumtags></ng-template>
-					</ng-container>
+          <ng-container *ngIf="forumTags | async;let forumTagItems">
+            <ng-container *ngIf="forumTagItems.length > 0; else noforumtags">
+              <div style="flex:none;display:flex;flex-direction:row">
+                <ng-container *ngFor="let forumTag of forumTagItems; trackBy: trackForumTags">
+                  <span class="label label-danger" style="flex:none;margin-right:5px;padding:5px">{{ forumTag.tag }}</span>
+                </ng-container>
+              </div>
+            </ng-container>
+            <ng-template #noforumtags></ng-template>
+          </ng-container>
 				</div>
 				<ng-container *ngIf="forumImages | async;let forumImageItems">
 					<ng-container *ngIf="forumImageItems.length > 0; then showforumimages else noforumimages"></ng-container>
