@@ -9092,7 +9092,7 @@ exports.deleteUserImageForum = functions.firestore.document("users/{userId}/imag
 // ********************************************************************************
 // createUserForumImage
 // ********************************************************************************
-exports.createUserForumImage = functions.firestore.document("users/{userId}/forums/{forumId}/images/{imageId}").onCreate((snap, context) => {
+exports.createUserForumImage = functions.firestore.document("users/{userId}/forums/{forumId}/images/{imageId}").onCreate(async (snap, context) => {
   var image = snap.data();
   var forumImageRef = snap.ref;
 	var userId = context.params.userId;
