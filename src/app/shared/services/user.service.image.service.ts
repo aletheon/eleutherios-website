@@ -27,10 +27,7 @@ export class UserServiceImageService {
   public create (parentUserId: string, serviceId: string, data: any) {
     const userServiceImageRef = this.afs.collection(`users/${parentUserId}/services/${serviceId}/images`).doc(data.imageId);
 
-    // *************************************************************************
-    // We should be using the serviceImage object creationDate
-    // Instead of overwriting it with the creationDate of the image object.
-    // *************************************************************************
+    // Overwrite existing image creationDate with new serviceImage creationDate.
     data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
 
     userServiceImageRef.set(data);
@@ -100,7 +97,7 @@ export class UserServiceImageService {
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })

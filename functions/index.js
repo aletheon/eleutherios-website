@@ -4409,8 +4409,9 @@ exports.deleteUserImageService = functions.firestore.document("users/{userId}/im
 // ********************************************************************************
 // createUserServiceImage
 // ********************************************************************************
-exports.createUserServiceImage = functions.firestore.document("users/{userId}/services/{serviceId}/images/{imageId}").onCreate((snap, context) => {
+exports.createUserServiceImage = functions.firestore.document("users/{userId}/services/{serviceId}/images/{imageId}").onCreate(async (snap, context) => {
 	var image = snap.data();
+  var serviceImageRef = snap.ref;
 	var userId = context.params.userId;
 	var serviceId = context.params.serviceId;
 	var imageId = context.params.imageId;
@@ -4425,170 +4426,66 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
 	var mediumLocation = `gs://${bucket.name}/${mediumImageStorageFilePath}`;
 	var largeLocation = `gs://${bucket.name}/${largeImageStorageFilePath}`;
 
-	var copyTinyImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.tinyUrl);
+  var copyImage = async function (url, location){
+    try {
+      var file = bucket.file(url);
+      return await file.copy(location);
+    } catch (error) {
+      throw error;
+    }
+  }
 
-			file.copy(tinyLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.tinyUrl} to ${tinyLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copySmallImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.smallUrl);
-
-			file.copy(smallLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.smallUrl} to ${smallLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copyMediumImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.mediumUrl);
-
-			file.copy(mediumLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.mediumUrl} to ${mediumLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copyLargeImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.largeUrl);
-
-			file.copy(largeLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.largeUrl} to ${largeLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
+  var createUserImageService = async function () {
+    try {
+      var serviceSnapshot = await admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId).get();
+      var serviceRef = serviceSnapshot.ref;
+      return await serviceRef.set({ serviceId: serviceId });
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var createUserImageService = function () {
-		return new Promise((resolve, reject) => {
-			var serviceRef = admin.firestore().collection(`users/${userId}/images/${imageId}/services`).doc(serviceId);
-      serviceRef.set({ serviceId: serviceId }).then(() => {
-        console.log(`set users/${userId}/images/${imageId}/services`);
-        resolve();
-      })
-      .catch(error => {
-        console.log(`got error ` + error);
-        reject(error);
-      });
-		});
-  };
-
-  var updateServiceImage = function () {
-    return new Promise((resolve, reject) => {
-			var serviceImageRef = admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).doc(imageId);
-      serviceImageRef.update({
+  var updateServiceImage = async function () {
+    try {
+      return await serviceImageRef.update({
         tinyUrl: tinyImageStorageFilePath,
         smallUrl: smallImageStorageFilePath,
         mediumUrl: mediumImageStorageFilePath,
         largeUrl: largeImageStorageFilePath
-      }).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
       });
-		});
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var copyImages = function () {
-    return new Promise((resolve, reject) => {
-      async.parallel([
-        function (callback) {
-          copyTinyImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copySmallImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copyMediumImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copyLargeImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve()
-          else
-            reject(error);
-        }
-      );
-    });
-  };
+  try {
+    // repopulate image count
+    const imageSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(serviceId).once("value");
 
-	// repopulate image count
-	return admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select()
-		.get().then(snapshot => {
-			return admin.database().ref("totals").child(serviceId).once("value", totalSnapshot => {
-				if (totalSnapshot.exists())
-					return admin.database().ref("totals").child(serviceId).update({ imageCount: snapshot.size });
-				else
-					return Promise.resolve();
-			});
-		}
-	).then(() => {
-    return copyImages().then(() => {
-      return createUserImageService().then(() => {
-        return updateServiceImage().then(() => {
-          return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(serviceId).update({ imageCount: imageSnapshot.size });
+
+    let urlsToCreate = [
+      { url: image.tinyUrl, location: tinyLocation },
+      { url: image.smallUrl, location: smallLocation },
+      { url: image.mediumUrl, location: mediumLocation },
+      { url: image.largeUrl, location: largeLocation }
+    ];
+
+    await Promise.all(
+      urlsToCreate.map(async obj => {
+        return copyImage(obj.url, obj.location);
       })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
-	})
-	.catch(error => {
-		return Promise.reject(error);
-	});
+    );
+
+    // create image reference to this service
+    await createUserImageService();
+    return await updateServiceImage();
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
@@ -9196,11 +9093,13 @@ exports.deleteUserImageForum = functions.firestore.document("users/{userId}/imag
 // createUserForumImage
 // ********************************************************************************
 exports.createUserForumImage = functions.firestore.document("users/{userId}/forums/{forumId}/images/{imageId}").onCreate((snap, context) => {
-	var image = snap.data();
+  var image = snap.data();
+  var forumImageRef = snap.ref;
 	var userId = context.params.userId;
 	var forumId = context.params.forumId;
 	var imageId = context.params.imageId;
-	var bucket = admin.storage().bucket();
+  var bucket = admin.storage().bucket();
+
 	var tinyImageStorageFilePath = `users/${userId}/forums/${forumId}/images/tiny_${imageId}.jpg`;
 	var smallImageStorageFilePath = `users/${userId}/forums/${forumId}/images/thumb_${imageId}.jpg`;
 	var mediumImageStorageFilePath = `users/${userId}/forums/${forumId}/images/medium_${imageId}.jpg`;
@@ -9210,168 +9109,66 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
 	var mediumLocation = `gs://${bucket.name}/${mediumImageStorageFilePath}`;
 	var largeLocation = `gs://${bucket.name}/${largeImageStorageFilePath}`;
 
-	var copyTinyImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.tinyUrl);
+  var copyImage = async function (url, location){
+    try {
+      var file = bucket.file(url);
+      return await file.copy(location);
+    } catch (error) {
+      throw error;
+    }
+  }
 
-			file.copy(tinyLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.tinyUrl} to ${tinyLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copySmallImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.smallUrl);
-
-			file.copy(smallLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.smallUrl} to ${smallLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copyMediumImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.mediumUrl);
-
-			file.copy(mediumLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.mediumUrl} to ${mediumLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
-	};
-
-	var copyLargeImage = function () {
-		return new Promise((resolve, reject) => {
-			var file = bucket.file(image.largeUrl);
-
-			file.copy(largeLocation).then((destinationFile, apiResponse) => {
-				console.log(`copied ${image.largeUrl} to ${largeLocation}`);
-				resolve();
-			})
-			.catch(error => {
-				reject(error);
-			});
-		});
+  var createUserImageForum = async function () {
+    try {
+      var forumSnapshot = await admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId).get();
+      var forumRef = forumSnapshot.ref;
+      return await forumRef.set({ forumId: forumId });
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var createUserImageForum = function () {
-		return new Promise((resolve, reject) => {
-			var forumRef = admin.firestore().collection(`users/${userId}/images/${imageId}/forums`).doc(forumId);
-      forumRef.set({ forumId: forumId }).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-		});
-  };
-
-  var updateForumImage = function () {
-    return new Promise((resolve, reject) => {
-			var forumImageRef = admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).doc(imageId);
-      forumImageRef.update({
+  var updateForumImage = async function () {
+    try {
+      return await forumImageRef.update({
         tinyUrl: tinyImageStorageFilePath,
         smallUrl: smallImageStorageFilePath,
         mediumUrl: mediumImageStorageFilePath,
         largeUrl: largeImageStorageFilePath
-      }).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
       });
-		});
+    } catch (error) {
+      throw error;
+    }
   };
 
-  var copyImages = function () {
-    return new Promise((resolve, reject) => {
-      async.parallel([
-        function (callback) {
-          copyTinyImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copySmallImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copyMediumImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        },
-        function (callback){
-          copyLargeImage().then(() => {
-            callback(null, null);
-          })
-          .catch(error => {
-            callback(error);
-          });
-        }],
-        // optional callback
-        function (error, results) {
-          if (!error)
-            resolve()
-          else
-            reject(error);
-        }
-      );
-    });
-  };
+  try {
+    // repopulate image count
+    const imageSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select().get();
+    const totalSnapshot = await admin.database().ref("totals").child(forumId).once("value");
 
-	// repopulate image count
-	return admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select()
-		.get().then(snapshot => {
-			return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-				if (totalSnapshot.exists())
-					return admin.database().ref("totals").child(forumId).update({ imageCount: snapshot.size });
-				else
-					return Promise.resolve();
-			});
-		}
-	).then(() => {
-    return copyImages().then(() => {
-      return createUserImageForum().then(() => {
-        return updateForumImage().then(() => {
-          return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
+    if (totalSnapshot.exists())
+      await admin.database().ref("totals").child(forumId).update({ imageCount: imageSnapshot.size });
+
+    let urlsToCreate = [
+      { url: image.tinyUrl, location: tinyLocation },
+      { url: image.smallUrl, location: smallLocation },
+      { url: image.mediumUrl, location: mediumLocation },
+      { url: image.largeUrl, location: largeLocation }
+    ];
+
+    await Promise.all(
+      urlsToCreate.map(async obj => {
+        return copyImage(obj.url, obj.location);
       })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
-	})
-	.catch(error => {
-		return Promise.reject(error);
-	});
+    );
+
+    // create image reference to this forum
+    await createUserImageForum();
+    return await updateForumImage();
+  }
+  catch (error) {
+    return Promise.reject(error);
+  }
 });
 
 // ********************************************************************************
