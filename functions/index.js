@@ -2898,7 +2898,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
             const serviceSnapshot = await admin.firestore().collection(`users/${userId}/servicescollection/${collectionTitle}/services`).doc(serviceId).get();
             const serviceRef = serviceSnapshot.ref;
 
-            if (serviceSnapshot.exists())
+            if (serviceSnapshot.exists)
               await serviceRef.delete();
 
             return;
@@ -3001,7 +3001,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                 const serviceSnapshot = await admin.firestore().collection(`servicescollection/${collectionTitle}/services`).doc(serviceId).get();
                 const serviceRef = serviceSnapshot.ref;
 
-                if (serviceSnapshot.exists())
+                if (serviceSnapshot.exists)
                   await serviceRef.delete();
 
                 return;
@@ -3051,7 +3051,7 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                 const serviceSnapshot = await admin.firestore().collection(`anonymousservicescollection/${collectionTitle}/services`).doc(serviceId).get();
                 const serviceRef = serviceSnapshot.ref;
 
-                if (serviceSnapshot.exists())
+                if (serviceSnapshot.exists)
                   await serviceRef.delete();
 
                 return;
@@ -6520,7 +6520,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
             const forumSnapshot = await admin.firestore().collection(`users/${userId}/forumscollection/${collectionTitle}/forums`).doc(forumId).get();
             const forumRef = forumSnapshot.ref;
 
-            if (forumSnapshot.exists())
+            if (forumSnapshot.exists)
               await forumRef.delete();
 
             return;
@@ -6559,7 +6559,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 const forumSnapshot = await admin.firestore().collection(`forumscollection/${collectionTitle}/forums`).doc(forumId).get();
                 const forumRef = forumSnapshot.ref;
 
-                if (forumSnapshot.exists())
+                if (forumSnapshot.exists)
                   await forumRef.delete();
 
                 return;
@@ -6609,7 +6609,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                 const forumSnapshot = await admin.firestore().collection(`anonymousforumscollection/${collectionTitle}/forums`).doc(forumId).get();
                 const forumRef = forumSnapshot.ref;
 
-                if (forumSnapshot.exists())
+                if (forumSnapshot.exists)
                   await forumRef.delete();
 
                 return;
