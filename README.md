@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer request or conversation, among humankind.
 
-People or businesses are use to serving one another on a one-to-one basis or one customer per forum or request.
+People or businesses are use to serving one another on a one-to-one basis or one customer, per forum or request.
 
 ```bash
 Forum (Food)
