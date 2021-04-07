@@ -24,10 +24,6 @@
                 <a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
               </ng-template>
             </div>
-            <div *ngIf="forum.uid == loggedInUserId" style="flex:none">
-              <!-- other button controls -->
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteForum(forum)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
-            </div>
           </div>
         </ng-container>
       </ng-template>
@@ -55,10 +51,6 @@
             </ng-template>
             <div style="flex:1;margin-right:5px">
               <a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
-            </div>
-            <div *ngIf="service.uid == loggedInUserId" style="flex:none">
-              <!-- other button controls -->
-              <mat-icon onclick="event.stopPropagation()" (click)="deleteService(service)" style="cursor:pointer;flex:none;color:#1B1B1B" matTooltip="Delete">close</mat-icon>
             </div>
           </div>
         </ng-container>
@@ -177,9 +169,6 @@
                         </ng-template>
                         <div style="flex:1;margin-right:5px">
                           <p style="word-break: break-all">
-                            <!-- here rob do this throughout -->
-
-
                             <a *ngIf="receipt.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                             <span *ngIf="receipt.sellerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</span>
                           </p>
