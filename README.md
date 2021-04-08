@@ -5,29 +5,32 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer
 People or businesses are use to serving one another on a one-to-one basis or one customer, per forum or request.
 
 ```bash
-Forum (Food)
--- Service (Person or customer)
--- Service (Grocery store owner)
-Forum (Delivery service)
--- Service (Grocery store owner or customer)
--- Service (Fastpost couriers)
-Forum (Healthcare worker to deliver food)
--- Service (Fastpost couriers or customer)
--- Service (Healthcare worker)
+Forum (Ancient fossils uncovered)
+-- Service (City council or customer)
+-- Service (Journalist or business)
+Forum (Tribal claims)
+-- Service (City council or customer)
+-- Service (Local tribe or business)
+Forum (Removal of fossils)
+-- Service (City council or customer)
+-- Service (National museum or business)
 ```
 
 Eleutherios, does the opposite and inverts or scales the forum or customer’s request, so that it operates on a many-to-many basis or many customers per forum or request.
 
 ```bash
-Forum (Food)
--- Service (Person or customer)
--- Service (Grocery store owner)
--- Forum (Delivery service)
----- Service (Grocery store owner or customer)
----- Service (Fastpost couriers)
----- Forum (Healthcare worker to deliver food)
------- Service (Fastpost couriers or customer)
------- Service (Healthcare worker)
+Forum (Ancient fossils uncovered)
+-- Service (City council or customer)
+-- Service (Journalist or business)
+-- Service (Local tribe or business)
+-- Service (National museum or business)
+-- Forum (Local tribe claims)
+---- Service (Local tribe or customer)
+---- Service (Local tribe elder or business)
+---- Service (Local tribe secretary or business)
+-- Forum (Removal of fossils)
+---- Service (National museum or customer)
+---- Service (Paleontologist or business)
 ```
 
 In this example, there is more than one customer, being served by the forum for food.
