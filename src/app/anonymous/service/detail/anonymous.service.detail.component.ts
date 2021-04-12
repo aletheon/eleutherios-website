@@ -216,7 +216,7 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       if (service){
         let load = async function(){
           try {
-            that.title.setTitle(service.title);
+            // that.title.setTitle(service.title);
             that.meta.updateTag({ property: 'og:title', content: service.title });
             that.meta.updateTag({ property: 'og:description', content: service.description });
             that.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/service/detail?serviceId=${service.serviceId}` });
