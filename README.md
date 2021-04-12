@@ -1,39 +1,46 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, customer request or conversation, among humankind.
+Eleutherios (https://eleutherios.org.nz) provides a global cooperative forum or prior unity circumstance for humankind (human or non-human) to serve one another.
 
-People or businesses are use to serving one another on a one-to-one basis or one customer, per forum or request.
+Eleutherios operates like a computer network, where servers subscribe to the network in order to make requests to other servers on the network.  Eleutherios does the same thing, except the server is a person or business, and the request is a forum, customer or conversation.
 
-```bash
-Forum (Ancient fossils uncovered)
--- Service (City council or customer)
--- Service (Journalist or business)
-Forum (Tribal claims)
--- Service (City council or customer)
--- Service (Local tribe or business)
-Forum (Removal of fossils)
--- Service (City council or customer)
--- Service (National museum or business)
-```
-
-Eleutherios, does the opposite and inverts or scales the forum or customer’s request, so that it operates on a many-to-many basis or many customers per forum or request.
+People or business are use to serving one another on a local level or one business, per forum or request.
 
 ```bash
-Forum (Ancient fossils uncovered)
--- Service (City council or customer)
--- Service (Journalist or business)
--- Service (Local tribe or business)
--- Service (National museum or business)
--- Forum (Local tribe claims)
----- Service (Local tribe or customer)
----- Service (Local tribe elder or business)
----- Service (Local tribe secretary or business)
--- Forum (Removal of fossils)
----- Service (National museum or customer)
----- Service (Paleontologist or business)
+Forum (bread x 3)
+-- Service (Carpenter or customer)
+-- Service (Baker or business)
+
+Forum (10kg flour)
+-- Service (Baker or customer)
+-- Service (Flour miller or business)
+
+Forum (1kg beef)
+-- Service (Butcher or customer)
+-- Service (Abattoir or business)
 ```
 
-In this example, there is more than one customer, being served by the forum for food.
+In this example, there is only one business managing each forum or request.  A baker is managing the carpenters request for bread.  A flour miller is managing the bakers request for flour and an abattoir is managing a butchers request for beef.
+
+Eleutherios, changes this behavior, by inverting or scaling the forum or request, so that more than one business can manage it.
+
+```bash
+Forum (Food for family)
+-- Service (Carpenter or customer)
+-- Service (Baker or business)
+-- Service (Butcher or business)
+-- Forum (bread x 3)
+---- Service (Carpenter or customer)
+---- Service (Baker or business)
+---- Forum (10kg flour)
+------ Service (Baker or customer)
+------ Service (Flour miller or business)
+-- Forum (1kg beef)
+---- Service (Butcher or customer)
+---- Service (Abattoir or business)
+```
+
+Now, there are two businesses (baker, butcher) managing the carpenters request for food.  They can take the responsibility for managing the bread and beef, that the carpenter wants.  This type of request is circular or a network, and can be scaled indefinitely, inviting other services to serve as they are needed.
 
 #### Features:
 
