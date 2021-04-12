@@ -8,11 +8,9 @@ People or business are use to serving one another on a local level or one busine
 Forum (bread x 3)
 -- Service (Carpenter or customer)
 -- Service (Baker or business)
-
 Forum (10kg flour)
 -- Service (Baker or customer)
 -- Service (Flour miller or business)
-
 Forum (1kg beef)
 -- Service (Butcher or customer)
 -- Service (Abattoir or business)
