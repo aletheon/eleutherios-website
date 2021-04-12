@@ -6,6 +6,8 @@ import {
   UserService,
   AnonymousForumService,
   AnonymousServiceService,
+  UserForumService,
+  UserServiceService,
   UserForumImageService,
   UserServiceImageService,
   UserForumTagService,
@@ -42,6 +44,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private anonymousForumService: AnonymousForumService,
     private anonymousServiceService: AnonymousServiceService,
+    private userForumService: UserForumService,
+    private userServiceService: UserServiceService,
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
     private userForumTagService: UserForumTagService,
@@ -63,31 +67,148 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   trackPublicServices (index, service) { return service.serviceId; }
 
   changeForumType (forum) {
-    // do something
+    this.userForumService.getForumFromPromise(forum.uid, forum.forumId)
+      .then(fetchedForum => {
+        if (fetchedForum){
+          if (fetchedForum.type == 'Public')
+            fetchedForum.type = 'Private';
+          else
+            fetchedForum.type = 'Public';
+
+          this.userForumService.update(fetchedForum.uid, fetchedForum.forumId, fetchedForum);
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: `Forum with forumId ${forum.forumId} does not exist or was removed`,
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+      }
+    )
+    .catch(error => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: error.message,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   changeServiceType (service) {
-    // do something
+    this.userServiceService.getServiceFromPromise(service.uid, service.serviceId)
+      .then(fetchedService => {
+        if (fetchedService){
+          if (fetchedService.type == 'Public')
+            fetchedService.type = 'Private';
+          else
+            fetchedService.type = 'Public';
+
+          this.userServiceService.update(fetchedService.uid, fetchedService.serviceId, fetchedService);
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: `Service with serviceId ${service.serviceId} does not exist or was removed`,
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+      }
+    )
+    .catch(error => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: error.message,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   deleteForum (forum) {
-    // do something
+    this.userForumService.delete(forum.uid, forum.forumId);
   }
 
   deleteService (service) {
-    // do something
+    this.userServiceService.delete(service.uid, service.serviceId);
   }
 
-  createNewService (forum){
-    // do something
+  createNewService(forum) {
+    window.localStorage.setItem('serviceForum', JSON.stringify(forum));
+    this.router.navigate(['/user/service/new']);
   }
 
   indexDeindexForum (forum){
-    // do something
+    this.userForumService.getForumFromPromise(forum.uid, forum.forumId)
+      .then(fetchedForum => {
+        if (fetchedForum){
+          fetchedForum.indexed = !fetchedForum.indexed;
+          this.userForumService.update(fetchedForum.uid, fetchedForum.forumId, fetchedForum);
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: `Forum with forumId ${forum.forumId} does not exist or was removed`,
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+      }
+    )
+    .catch(error => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: error.message,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   indexDeindexService (service){
-    // do something
+    this.userServiceService.getServiceFromPromise(service.uid, service.serviceId)
+      .then(fetchedService => {
+        if (fetchedService){
+          fetchedService.indexed = !fetchedService.indexed;
+          this.userServiceService.update(fetchedService.uid, fetchedService.serviceId, fetchedService);
+        }
+        else {
+          const snackBarRef = this.snackbar.openFromComponent(
+            NotificationSnackBar,
+            {
+              duration: 8000,
+              data: `Service with serviceId ${service.serviceId} does not exist or was removed`,
+              panelClass: ['red-snackbar']
+            }
+          );
+        }
+      }
+    )
+    .catch(error => {
+      const snackBarRef = this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: error.message,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   async ngOnInit () {
