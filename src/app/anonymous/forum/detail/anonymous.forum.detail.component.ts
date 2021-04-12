@@ -211,7 +211,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
       if (forum){
         let load = async function(){
           try {
-            // this.title.setTitle(forum.title);
+            this.title.setTitle(forum.title);
             that.meta.updateTag({ property: 'og:title', content: forum.title });
             that.meta.updateTag({ property: 'og:description', content: forum.description });
             that.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/forum/detail?forumId=${forum.forumId}` });
