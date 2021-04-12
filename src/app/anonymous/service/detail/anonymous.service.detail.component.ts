@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -14,6 +15,7 @@ import {
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
+import { environment } from '../../../../environments/environment'
 
 import { Observable, Subscription, BehaviorSubject, of, combineLatest, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -48,6 +50,8 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
     private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
+    private title: Title,
+    private meta: Meta,
     private location: Location) {
   }
 
@@ -85,13 +89,18 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       })
     )
     .subscribe(serviceImage => {
-      if (serviceImage)
+      if (serviceImage){
         this.defaultServiceImage = of(serviceImage);
+        this.meta.updateTag({ property: 'og:image', content: serviceImage.url });
+      }
       else {
         let tempImage = {
           url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultServiceImage = of(tempImage);
+        this.meta.updateTag({ property: 'og:image', content: `${environment.url}assets/defaultLarge.jpg` });
+        this.meta.updateTag({ property: 'og:image:width', content: '249' });
+        this.meta.updateTag({ property: 'og:image:height', content: '174' });
       }
     });
   }
@@ -205,6 +214,11 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       if (service){
         let load = async function(){
           try {
+            // this.title.setTitle(service.title);
+            this.meta.updateTag({ property: 'og:title', content: service.title });
+            this.meta.updateTag({ property: 'og:description', content: service.description });
+            this.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/forum/detail?forumId=${service.forumId}` });
+
             // tags for this service
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
