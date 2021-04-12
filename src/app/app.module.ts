@@ -122,7 +122,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     UserProfileModule,
     StarRatingModule.forRoot(),
     FacebookModule.forRoot(),
-    NgxStripeModule.forRoot(environment.stripeTestKey)
+    NgxStripeModule.forRoot(environment.stripeLiveKey)
   ],
   providers: [AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
   bootstrap: [AppComponent],

@@ -10,7 +10,6 @@ import {
   UserForumTagService,
   NoTitlePipe
 } from '../../../shared';
-import { environment } from '../../../../environments/environment';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';

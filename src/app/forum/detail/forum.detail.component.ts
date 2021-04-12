@@ -27,7 +27,6 @@ import {
   ServiceUserBlock,
   NoTitlePipe
 } from '../../shared';
-import { environment } from '../../../environments/environment';
 
 import { NotificationSnackBar } from '../../shared/components/notification.snackbar.component';
 
