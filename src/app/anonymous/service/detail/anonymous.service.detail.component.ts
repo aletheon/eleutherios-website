@@ -215,9 +215,9 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
         let load = async function(){
           try {
             // this.title.setTitle(service.title);
-            this.meta.updateTag({ property: 'og:title', content: service.title });
-            this.meta.updateTag({ property: 'og:description', content: service.description });
-            this.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/forum/detail?forumId=${service.forumId}` });
+            that.meta.updateTag({ property: 'og:title', content: service.title });
+            that.meta.updateTag({ property: 'og:description', content: service.description });
+            that.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/forum/detail?forumId=${service.forumId}` });
 
             // tags for this service
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
