@@ -33,6 +33,7 @@ import {
 import { CurrencyPipe } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
+import { environment } from '../../../../environments/environment';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
 import { switchMap, startWith, tap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
@@ -1032,7 +1033,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
     if (this.stripeButtonDisabled == false){
       this.stripeButtonDisabled = true;
 
-      this.userService.onboardCustomer(this.loggedInUserId, `http://localhost:4200/user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
+      this.userService.onboardCustomer(this.loggedInUserId, `${environment.url}user/service/edit?serviceId=${this.serviceGroup.get('serviceId').value}&onboarding=true`).then(data => {
         window.location.href = data.url;
       })
       .catch(error => {
