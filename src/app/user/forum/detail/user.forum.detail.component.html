@@ -218,13 +218,13 @@
 								</div>
 							</ng-template>
 							<div style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;margin-bottom:5px">
-								<a [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px">Create new service</a>
+								<a [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="Create service">Create service</a>
 								<a [routerLink]="['/user/forum/service/new']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons">keyboard_arrow_right</a>
 							</div>
 							<ng-container *ngIf="defaultRegistrant | async; then showothercontrols else noothercontrols"></ng-container>
 							<ng-template #showothercontrols>
 								<div *ngIf="forumItem.type == 'Private'" style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
-									<a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px">View forum</a>
+									<a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;margin-right:5px" matTooltip="View forum">View forum</a>
 									<a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="flex:none;color:#1B1B1B;text-decoration:none" class="material-icons">keyboard_arrow_right</a>
 								</div>
 								<div *ngIf="forumItem.type == 'Public'" style="flex:none;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">

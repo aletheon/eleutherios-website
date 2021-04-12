@@ -9,7 +9,7 @@
 			<span style="flex:none" [innerHTML]="userItem.website | linky: { newWindow: true, className: 'viewPageLinkyClass' }"></span>
 		</div>
 		<ng-container *ngIf="publicForums | async;let publicForumItems">
-			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums"></ng-container>
+			<ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else shownopublicforums"></ng-container>
 			<ng-template #showpublicforums>
 				<h5 style="flex:none;margin-bottom:5px">Forums</h5>
 				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
@@ -82,9 +82,14 @@
 					</ng-container>
 				</div>
 			</ng-template>
+      <ng-template #shownopublicforums>
+        <p style="flex:none;color:#999;font-size:90%">
+          <i>No Forums</i>
+        </p>
+      </ng-template>
 		</ng-container>
 		<ng-container *ngIf="publicServices | async;let publicServiceItems">
-			<ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices"></ng-container>
+			<ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else shownopublicservices"></ng-container>
 			<ng-template #showpublicservices>
 				<h5 style="flex:none;margin-bottom:5px">Services</h5>
 				<div style="flex:none;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto">
@@ -149,7 +154,7 @@
 									</div>
 									<div style="flex:none">
 										<mat-icon *ngIf="loggedInUserId" [routerLink]="['/user/forum/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Create forum">add_circle</mat-icon>
-										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
+										<mat-icon *ngIf="!loggedInUserId" [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add_circle</mat-icon>
 									</div>
 								</div>
 							</div>
@@ -190,6 +195,11 @@
 					</ng-container>
 				</div>
 			</ng-template>
+      <ng-template #shownopublicservices>
+        <p style="flex:none;color:#999;font-size:90%">
+          <i>No Services</i>
+        </p>
+      </ng-template>
 		</ng-container>
 	</ng-container>
 </div>
