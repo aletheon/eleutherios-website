@@ -92,6 +92,8 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       if (serviceImage){
         this.defaultServiceImage = of(serviceImage);
         this.meta.updateTag({ property: 'og:image', content: serviceImage.url });
+        this.meta.updateTag({ property: 'og:image:width', content: '64' });
+        this.meta.updateTag({ property: 'og:image:height', content: '64' });
       }
       else {
         let tempImage = {

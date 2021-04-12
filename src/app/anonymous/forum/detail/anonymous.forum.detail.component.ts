@@ -90,6 +90,8 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
       if (forumImage){
         this.defaultForumImage = of(forumImage);
         this.meta.updateTag({ property: 'og:image', content: forumImage.url });
+        this.meta.updateTag({ property: 'og:image:width', content: '64' });
+        this.meta.updateTag({ property: 'og:image:height', content: '64' });
       }
       else {
         let tempImage = {
