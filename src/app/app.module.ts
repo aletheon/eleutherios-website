@@ -1,4 +1,4 @@
-import { BrowserModule, Title, Meta } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -124,7 +124,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     FacebookModule.forRoot(),
     NgxStripeModule.forRoot(environment.stripeLiveKey)
   ],
-  providers: [Title, Meta, AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
+  providers: [AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
   bootstrap: [AppComponent],
   entryComponents: [NotificationSnackBar, UserActivityOpenComponent, UserActivityClosedComponent]
 })

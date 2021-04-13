@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -49,9 +48,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     private userForumTagService: UserForumTagService,
     private fb: FormBuilder,
     private router: Router,
-    private snackbar: MatSnackBar,
-    private title: Title,
-    private meta: Meta) {
+    private snackbar: MatSnackBar) {
   }
 
   descriptionPanelEvent (state: string) {
@@ -87,20 +84,13 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
       })
     )
     .subscribe(forumImage => {
-      if (forumImage){
+      if (forumImage)
         this.defaultForumImage = of(forumImage);
-        this.meta.updateTag({ property: 'og:image', content: forumImage.url });
-        this.meta.updateTag({ property: 'og:image:width', content: '64' });
-        this.meta.updateTag({ property: 'og:image:height', content: '64' });
-      }
       else {
         let tempImage = {
           url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
-        this.meta.updateTag({ property: 'og:image', content: `${environment.url}assets/defaultLarge.jpg` });
-        this.meta.updateTag({ property: 'og:image:width', content: '249' });
-        this.meta.updateTag({ property: 'og:image:height', content: '174' });
       }
     });
   }
@@ -213,11 +203,6 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
       if (forum){
         let load = async function(){
           try {
-            // that.title.setTitle(forum.title);
-            that.meta.updateTag({ property: 'og:title', content: forum.title });
-            that.meta.updateTag({ property: 'og:description', content: forum.description });
-            that.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/forum/detail?forumId=${forum.forumId}` });
-
             // get the tags for this forum
             that.forumTags = that.userForumTagService.getTags(forum.uid, forum.forumId);
 

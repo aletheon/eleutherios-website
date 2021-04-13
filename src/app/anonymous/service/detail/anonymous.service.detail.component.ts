@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -50,8 +49,6 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
     private fb: FormBuilder,
     private router: Router,
     private snackbar: MatSnackBar,
-    private title: Title,
-    private meta: Meta,
     private location: Location) {
   }
 
@@ -89,20 +86,13 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       })
     )
     .subscribe(serviceImage => {
-      if (serviceImage){
+      if (serviceImage)
         this.defaultServiceImage = of(serviceImage);
-        this.meta.updateTag({ property: 'og:image', content: serviceImage.url });
-        this.meta.updateTag({ property: 'og:image:width', content: '64' });
-        this.meta.updateTag({ property: 'og:image:height', content: '64' });
-      }
       else {
         let tempImage = {
           url: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultServiceImage = of(tempImage);
-        this.meta.updateTag({ property: 'og:image', content: `${environment.url}assets/defaultLarge.jpg` });
-        this.meta.updateTag({ property: 'og:image:width', content: '249' });
-        this.meta.updateTag({ property: 'og:image:height', content: '174' });
       }
     });
   }
@@ -216,11 +206,6 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
       if (service){
         let load = async function(){
           try {
-            // that.title.setTitle(service.title);
-            that.meta.updateTag({ property: 'og:title', content: service.title });
-            that.meta.updateTag({ property: 'og:description', content: service.description });
-            that.meta.updateTag({ property: 'og:url', content: `${environment.url}anonymous/service/detail?serviceId=${service.serviceId}` });
-
             // tags for this service
             that.serviceTags = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
