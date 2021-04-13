@@ -27,7 +27,6 @@
 **/.angular-cli.json
 **/.editorconfig
 **/tsconfig.json
-**/package-lock.json
 **/angular.json
 **/bs-config.e2e.json
 **/bs-config.json
