@@ -46,7 +46,7 @@ Now, there are two businesses (baker, butcher) simultaneously managing the carpe
 * Tags for filtering forums or services (search)
 * Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
 * Service ratings/reviews (trust)
-* Payments (resilience)
+* B2B Payments (resilience)
 * Shared process or manifest (redundancy)
 * AI (automation)
 
