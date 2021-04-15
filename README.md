@@ -50,7 +50,7 @@ Now, there are two businesses (baker, butcher) managing the carpenters request f
 * Shared process or manifest (redundancy)
 * AI (automation)
 
-Eleutherios is built with a real-time pub/sub, node.js, nosql (Firestore) backend and an HTML/CSS (Angular) frontend.
+Eleutherios is built with Node.js, Firestore and Angular.
 
 # Installation and Setup
 
