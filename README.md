@@ -38,7 +38,7 @@ Forum (Food for family)
 ---- Service (Abattoir or business)
 ```
 
-Now, there are two businesses (baker, butcher) simultaneously managing the carpenters request for food.  They are taking the responsibility for managing the bread and beef.  This type of forum or request is circular or a network, and can scale indefinitely, inviting other services to serve, when they are required.
+Now, there are two businesses (baker, butcher) simultaneously managing the carpenters request for food.  They are taking the responsibility for managing the bread and beef or aggregating the conversation, inviting other services to serve, when they are required.
 
 #### Features:
 
