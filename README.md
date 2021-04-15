@@ -20,7 +20,7 @@ Forum (1kg beef)
 
 In this example, there is only one business managing each forum or request.  A baker is managing the carpenters request for bread.  A flour miller is managing the bakers request for flour and an abattoir is managing a butchers request for beef.
 
-Eleutherios, changes this behavior, by inverting or scaling the forum or request, so that more than one business can manage it.
+Eleutherios, changes this behavior, by inverting or scaling the forum or request, so that more than one business, can manage it.
 
 ```bash
 Forum (Food for family)
