@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -51,7 +50,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
-  private _newPostId = new BehaviorSubject('');
   private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _forumSubscription: Subscription;
@@ -60,7 +58,8 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   private _userRegistrantsSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
   private _postsSubscription: Subscription;
-  private _newPostSubscription: Subscription;
+  private _newPostsRef: any;
+  private _newPostsCallback: any;
   private _registrantCount = new BehaviorSubject(0);
   private _forumCount = new BehaviorSubject(0);
   private _postCount = new BehaviorSubject(0);
@@ -85,7 +84,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   public messages: Observable<any[]>;
   public forumTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
-  public newPostId: Observable<string> = this._newPostId.asObservable();
   public newMessageCtrl: FormControl;
   public userRegistrantsCtrl: FormControl;
   public selectedUserRegistrant: any;
@@ -116,7 +114,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     private userServiceBlockService: UserServiceBlockService,
     private userServiceUserBlockService: UserServiceUserBlockService,
     private messageSharingService: MessageSharingService,
-    private afs: AngularFirestore,
     private location: Location,
     private router: Router,
     private snackbar: MatSnackBar) {
@@ -145,14 +142,14 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     if (this._userRegistrantsSubscription)
       this._userRegistrantsSubscription.unsubscribe();
 
-    if (this._newPostSubscription)
-      this._newPostSubscription.unsubscribe();
-
     if (this._postsSubscription)
       this._postsSubscription.unsubscribe();
 
     if (this._defaultForumImageSubscription)
       this._defaultForumImageSubscription.unsubscribe();
+
+    if (this._newPostsRef && this._newPostsCallback)
+      this._newPostsRef.off('child_added', this._newPostsCallback);
   }
 
   trackPosts (index, post) { return post.postId; }
@@ -261,11 +258,11 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     if (this._userRegistrantsSubscription)
       this._userRegistrantsSubscription.unsubscribe();
 
-    if (this._newPostSubscription)
-      this._newPostSubscription.unsubscribe();
-
     if (this._postsSubscription)
       this._postsSubscription.unsubscribe();
+
+    if (this._newPostsRef && this._newPostsCallback)
+      this._newPostsRef.off('child_added', this._newPostsCallback);
 
     if (this._defaultForumImageSubscription)
       this._defaultForumImageSubscription.unsubscribe();
@@ -525,25 +522,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               })
             );
 
-
-            // listen for new post and play alert sound
-            that._newPostSubscription = that.newPostId.subscribe(postId => {
-              if (postId){
-                console.log(`that._tempForum.uid = ${that._tempForum.uid}`);
-                console.log(`that._tempForum.forumId = ${that._tempForum.forumId}`);
-                console.log(`postId = ${postId}`);
-
-                const subscription = that.userForumPostService.getPost(that._tempForum.uid, that._tempForum.forumId, postId).subscribe(post => {
-                  subscription.unsubscribe();
-                  console.log(post.postId);
-
-                  that.audioSound.nativeElement.pause();
-                  that.audioSound.nativeElement.currentTime = 0;
-                  that.audioSound.nativeElement.play()
-                });
-              }
-            });
-
             // forum posts
             that._postsSubscription = that.userForumPostService.getPosts(forum.uid, forum.forumId).pipe(
               switchMap(posts => {
@@ -601,7 +579,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                         posts[i].service = of(result);
                       else
                         posts[i].service = of(null);
-
                       return posts[i];
                     });
                   });
@@ -614,6 +591,24 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 that.posts = of(_.orderBy(posts, ['creationDate'], ['asc']));
               else
                 that.posts = of([]);
+            });
+
+            // listen for new posts added to the forum and sound an alert to the end user
+            that._newPostsRef = that.db.database.ref(`users/${forum.uid}/forums/${forum.forumId}/posts`);
+
+            // get a unique timestamp from the server and listen from this moment onwards
+            const startKey = that._newPostsRef.push().key;
+
+            // listen for when a new post has been added to the posts collection
+            // then play a sound alerting the end user
+            that._newPostsCallback = that._newPostsRef.orderByKey().startAt(startKey).on('child_added', (snap) => {
+              let nopromise = {
+                catch : new Function()
+              };
+
+              that.audioSound.nativeElement.pause();
+              that.audioSound.nativeElement.currentTime = 0;
+              (that.audioSound.nativeElement.play() || nopromise).catch(() => {});
             });
 
             // populate the end user registrants so that the end user can chose a pseudonym or service to post as
@@ -800,7 +795,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
           if (isServing) {
             if (this.newMessageCtrl.value.length > 0){
               let post: Post = {
-                postId: this.afs.createId(),
+                postId: '',
                 forumId: this.forumId,
                 forumUid: this.userId,
                 registrantId: this.defaultSelectedRegistrant.registrantId,
@@ -809,11 +804,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 imageId: '',
                 imageUid: '',
                 message: this.newMessageCtrl.value,
-                lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
-                creationDate: firebase.firestore.FieldValue.serverTimestamp()
+                lastUpdateDate: firebase.database.ServerValue.TIMESTAMP,
+                creationDate: firebase.database.ServerValue.TIMESTAMP
               };
-
-              this._newPostId.next(post.postId);
 
               // empty message
               that.newMessageCtrl.setValue('');

@@ -5419,6 +5419,23 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
+  // because something is playing up with firestore deleting posts
+  // so use RT db instead to store them, create the forum first
+  var createForumRT = function () {
+    return new Promise((resolve, reject) => {
+      admin.database().ref(`users/${userId}/forums`).child(forumId).set({
+        forumId: forumId
+        // posts: [] <-- we will create this when we need it
+      })
+      .then(() => {
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
+
   var addToUserForumNoTags = function () {
     return new Promise((resolve, reject) => {
       var forumRef = admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId);
@@ -5490,13 +5507,18 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     }
   ).then(() => {
     return createForumTotals().then(() => {
-      return addToUserForumNoTags().then(() => {
-        if (forum.indexed == true && forum.type == 'Public'){
-          return createPublicForum().then(() => {
-            return createAnonymousForum().then(() => {
-              return addToPublicForumNoTags().then(() => {
-                return addToAnonymousForumNoTags().then(() => {
-                  return Promise.resolve();
+      return createForumRT().then(() => {
+        return addToUserForumNoTags().then(() => {
+          if (forum.indexed == true && forum.type == 'Public'){
+            return createPublicForum().then(() => {
+              return createAnonymousForum().then(() => {
+                return addToPublicForumNoTags().then(() => {
+                  return addToAnonymousForumNoTags().then(() => {
+                    return Promise.resolve();
+                  })
+                  .catch(error => {
+                    return Promise.reject(error);
+                  });
                 })
                 .catch(error => {
                   return Promise.reject(error);
@@ -5509,12 +5531,12 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
             .catch(error => {
               return Promise.reject(error);
             });
-          })
-          .catch(error => {
-            return Promise.reject(error);
-          });
-        }
-        else return Promise.resolve();
+          }
+          else return Promise.resolve();
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
       })
       .catch(error => {
         return Promise.reject(error);
@@ -6334,6 +6356,17 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
     }
   };
 
+  // this routine also removes
+  // this posts associated to this forum
+  var removeForumRT = async function () {
+    try {
+      await admin.database().ref(`users/${userId}/forums`).child(forumId).remove();
+      return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   var removeUserForum = async function (tags) {
     try {
       if (tags && tags.length > 0)
@@ -6674,6 +6707,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
 
     let tags = await getTags();
 
+    await removeForumRT();
     await removeForumImages();
     await removeParentForum();
     await removeForumForums();
@@ -7816,13 +7850,16 @@ exports.deleteUserForumTag = functions.firestore.document("users/{userId}/forums
 });
 
 // ********************************************************************************
-// createUserForumPost
+// createUserForumPost - Real time DB
 // ********************************************************************************
-exports.createUserForumPost = functions.firestore.document("users/{userId}/forums/{forumId}/posts/{postId}").onCreate((snap, context) => {
-  var post = snap.data();
+exports.createUserForumPost = functions.database.ref("users/{userId}/forums/{forumId}/posts/{postId}").onCreate((snap, context) => {
+  var post = snap.val();
   var userId = context.params.userId;
   var forumId = context.params.forumId;
   var postId = context.params.postId;
+  var bucket = admin.storage().bucket();
+
+  post.postId = postId;
 
   var createImagePostReference = function (){
     return new Promise((resolve, reject) => {
@@ -8023,16 +8060,9 @@ exports.createUserForumPost = functions.firestore.document("users/{userId}/forum
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${forumId}/posts`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(forumId).update({ postCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
-    }
-  ).then(() => {
+  return admin.database().ref(`users/${userId}/forums/${forumId}/posts`).once('value').then(snapshot => {
+    return admin.database().ref("totals").child(forumId).update({ postCount: snapshot.numChildren() });
+  }).then(() => {
     if (post.imageId && post.imageId.length > 0){
       return createImagePostReference().then(() => {
         return updateRegistrantActivityLastUpdateDate().then(() => {
@@ -8068,10 +8098,10 @@ exports.createUserForumPost = functions.firestore.document("users/{userId}/forum
 });
 
 // ********************************************************************************
-// deleteUserForumPost
+// deleteUserForumPost - Real time DB
 // ********************************************************************************
-exports.deleteUserForumPost = functions.firestore.document("users/{userId}/forums/{forumId}/posts/{postId}").onDelete((snap, context) => {
-  var post = snap.data();
+exports.deleteUserForumPost = functions.database.ref("users/{userId}/forums/{forumId}/posts/{postId}").onDelete((snap, context) => {
+  var post = snap.val();
   var userId = context.params.userId;
   var forumId = context.params.forumId;
   var postId = context.params.postId;
@@ -8095,16 +8125,10 @@ exports.deleteUserForumPost = functions.firestore.document("users/{userId}/forum
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${forumId}/posts`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(forumId).update({ postCount: snapshot.size });
-        else
-          return Promise.resolve();
-      });
-    }
-  ).then(() => {
+  return admin.database().ref(`users/${userId}/forums/${forumId}/posts`).once('value').then(snapshot => {
+    return admin.database().ref("totals").child(forumId).update({ postCount: snapshot.numChildren() });
+  })
+  .then(() => {
     if (post.imageId && post.imageId.length > 0){
       return removeImagePostReference().then(() => {
         return Promise.resolve();
@@ -8114,6 +8138,9 @@ exports.deleteUserForumPost = functions.firestore.document("users/{userId}/forum
       });
     }
     else return Promise.resolve();
+  })
+  .catch(error => {
+    return Promise.reject(error);
   });
 });
 

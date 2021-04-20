@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireDatabase } from '@angular/fire/database';
 
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs';
@@ -7,56 +8,62 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class UserForumPostService {
-  constructor(private afs: AngularFirestore) { }
+  constructor(private afs: AngularFirestore,
+    private db: AngularFireDatabase) { }
+
+  documentToDomainObject = _ => {
+    const object = _.payload.val();
+    object.postId = _.key;
+    return object;
+  }
 
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public getPost (parentUserId: string, forumId: string, postId: string): Observable<any> {
-    return this.afs.collection(`users/${parentUserId}/forums/${forumId}/posts`).doc(postId).valueChanges();
-  }
-
-  public getPostFromPromise (parentUserId: string, forumId: string, postId: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const postRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/posts`).doc(postId);
-
-      postRef.ref.get().then(doc => {
-        if (doc.exists)
-          resolve(doc.data());
-        else
-          resolve(null);
-      });
-    });
-  }
-
   public create(parentUserId: string, forumId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      const postRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/posts`).doc(data.postId);
-      postRef.set(data).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
+      let posts = this.db.list(`users/${parentUserId}/forums/${forumId}/posts`);
+
+      posts.push(data)
+        .then(snap => {
+          resolve();
+        }
+      );
     });
   }
 
   public update(parentUserId: string, forumId: string, postId: string, data: any){
-    const postRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/posts`).doc(postId);
+    let postRef = this.db.object(`users/${parentUserId}/forums/${forumId}/posts/${postId}`);
     data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return postRef.update(data);
   }
 
-  public delete(parentUserId: string, forumId: string, postId: string) {
-    const postRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/posts`).doc(postId);
-    return postRef.delete();
+  public delete(parentUserId: string, forumId: string, postId: string): Promise<void>{
+    return new Promise((resolve, reject) => {
+      this.db.database.ref(`users/${parentUserId}/forums/${forumId}/posts/${postId}`).once('value').then(snapshot => {
+        if (snapshot.exists){
+          let post = snapshot.val();
+
+          // remove the post
+          snapshot.ref.remove().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        }
+        else reject(`Post with postId ${postId} does not exist or was removed`);
+      });
+    });
   }
 
   public getLastPosts(parentUserId: string, forumId: string, limit: number): Observable<any[]> {
-    return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.orderBy('creationDate','desc').limit(limit)).valueChanges();
+    return this.db.list(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.orderByKey().limitToLast(limit)).snapshotChanges()
+      .pipe(map(actions => actions.map(this.documentToDomainObject)));
   }
 
   public getPosts(parentUserId: string, forumId: string): Observable<any[]> {
-    return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.orderBy('creationDate','desc').limit(12)).valueChanges();
+    return this.db.list(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.limitToLast(12)).snapshotChanges()
+      .pipe(map(actions => actions.map(this.documentToDomainObject)));
   }
 }

@@ -83,7 +83,7 @@
                         <div style="flex:1;display:flex;flex-direction:row">
                           <div style="flex:1;color:#474747" [ngClass]="activity.highlight == true ? 'highlight' : ''" [innerHTML]="post.message | linky: { newWindow: true, className: 'linkColor' }"></div>
                           <div style="flex:none">
-                            <div class="label label-default" matTooltip="{{ post.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ post.creationDate.toDate() | amTimeAgo }}</div>
+                            <div class="label label-default" matTooltip="{{ post.creationDate | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ post.creationDate | amTimeAgo }}</div>
                           </div>
                         </div>
                       </div>
