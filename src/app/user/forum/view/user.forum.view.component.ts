@@ -526,6 +526,8 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             that._postsSubscription = that.userForumPostService.getPosts(forum.uid, forum.forumId).pipe(
               switchMap(posts => {
                 if (posts && posts.length > 0) {
+                  console.log('reloading posts');
+
                   let observables = posts.map(post => {
                     let getService$ = that.userServiceService.getService(post.serviceUid, post.serviceId);
                     let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
@@ -557,6 +559,8 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                       switchMap(results => {
                         const [service, defaultServiceImage] = results;
 
+                        console.log('in service');
+
                         if (service){
                           if (defaultServiceImage)
                             service.defaultServiceImage = of(defaultServiceImage);
@@ -566,19 +570,16 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                             };
                             service.defaultServiceImage = of(tempImage);
                           }
-                          return of(service);
+                          post.service = of(service);
                         }
-                        else return of(null);
+                        else post.service = of(null);
+                        return of(post);
                       })
                     );
                   });
 
                   return zip(...observables, (...results) => {
                     return results.map((result, i) => {
-                      if (result)
-                        posts[i].service = of(result);
-                      else
-                        posts[i].service = of(null);
                       return posts[i];
                     });
                   });
