@@ -37,7 +37,7 @@
 				</ng-template>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;flex-wrap:wrap">
-				<div class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+				<div *ngIf="forumItem.creationDate" class="label label-default" matTooltip="{{ forumItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ forumItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<div style="flex:none;align-items:center;margin-right:5px">

@@ -27,7 +27,7 @@
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
-                <div class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+                <div *ngIf="forum.creationDate" class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
                   {{ forum.creationDate.toDate() | amTimeAgo }}
                 </div>
                 <div style="flex:none;margin-right:5px">
@@ -93,7 +93,7 @@
                     [readOnly]="true">
                   </star-rating-control>
                 </div>
-                <div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+                <div *ngIf="service.creationDate" class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
                   {{ service.creationDate.toDate() | amTimeAgo }}
                 </div>
                 <div style="flex:none;margin-right:5px">

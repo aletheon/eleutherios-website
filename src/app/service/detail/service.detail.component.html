@@ -31,7 +31,7 @@
 				<h4 matTooltip="{{ serviceItem.title }}">{{ serviceItem.title | noTitle }}</h4>
 			</div>
 			<div style="flex:1;display:flex;flex-direction:row;justify-content:flex-end;align-items:center">
-				<div class="label label-default" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+				<div *ngIf="serviceItem.creationDate" class="label label-default" matTooltip="{{ serviceItem.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 					{{ serviceItem.creationDate.toDate() | amTimeAgo }}
 				</div>
 				<div style="flex:none">

@@ -27,7 +27,7 @@
             </div>
             <!-- date -->
             <div style="flex:none;margin-right:5px">
-              <div class="label label-default" matTooltip="{{ activity.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ activity.forumCreationDate.toDate() | amTimeAgo }}</div>
+              <div *ngIf="activity.creationDate" class="label label-default" matTooltip="{{ activity.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ activity.forumCreationDate.toDate() | amTimeAgo }}</div>
             </div>
             <!-- type -->
             <div *ngIf="activity.uid == auth.uid" style="flex:none;margin-right:5px">
@@ -83,7 +83,7 @@
                         <div style="flex:1;display:flex;flex-direction:row">
                           <div style="flex:1;color:#474747" [ngClass]="activity.highlight == true ? 'highlight' : ''" [innerHTML]="post.message | linky: { newWindow: true, className: 'linkColor' }"></div>
                           <div style="flex:none">
-                            <div class="label label-default" matTooltip="{{ post.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ post.creationDate.toDate() | amTimeAgo }}</div>
+                            <div *ngIf="post.creationDate" class="label label-default" matTooltip="{{ post.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="padding:5px">{{ post.creationDate.toDate() | amTimeAgo }}</div>
                           </div>
                         </div>
                       </div>

@@ -85,7 +85,7 @@
 								</div>
 								<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
 									<!-- other button controls -->
-									<div class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+									<div *ngIf="forum.creationDate" class="label label-default" matTooltip="{{ forum.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 										{{ forum.creationDate.toDate() | amTimeAgo }}
 									</div>
 									<div style="flex:none;margin-right:5px">
@@ -134,7 +134,7 @@
 			</ng-container>
 		</div>
 		<!-- paging -->
-		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">		 
+		<div *ngIf='prevKeys?.length || nextKey' style="flex:none;padding:5px;display:flex;flex-direction:row;justify-content:flex-end">
 			<button class="btn" style="flex:none" (click)="onPrev()" *ngIf='prevKeys?.length'>Prev</button>
 			<button class="btn" style="flex:none" (click)="onNext()" *ngIf='nextKey'>Next</button>
 		</div>

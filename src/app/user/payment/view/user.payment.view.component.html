@@ -47,7 +47,7 @@
 								</ng-container>
 							</div>
 							<span style="padding:5px;margin-right:5px" class="label label-default" matTooltip="Payment Id">{{ paymentGroup.get('paymentId').value }}</span>
-							<div class="label label-default" matTooltip="{{ paymentGroup.get('creationDate').value.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+							<div *ngIf="paymentGroup.get('creationDate').value" class="label label-default" matTooltip="{{ paymentGroup.get('creationDate').value.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 								{{ paymentGroup.get('creationDate').value.toDate() | amTimeAgo }}
 							</div>
 						</div>

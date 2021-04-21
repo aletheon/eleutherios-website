@@ -47,7 +47,7 @@
 								</ng-container>
 							</div>
 							<div style="flex:none;margin-right:5px"><span style="padding:5px" class="label label-default" matTooltip="Receipt Id">{{ receiptGroup.get('receiptId').value }}</span></div>
-							<div class="label label-default" matTooltip="{{ receiptGroup.get('creationDate').value.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+							<div *ngIf="receiptGroup.get('creationDate').value" class="label label-default" matTooltip="{{ receiptGroup.get('creationDate').value.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 								{{ receiptGroup.get('creationDate').value.toDate() | amTimeAgo }}
 							</div>
 						</div>

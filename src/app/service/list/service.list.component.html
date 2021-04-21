@@ -142,7 +142,7 @@
 											[readOnly]="true">
 										</star-rating-control>
 									</div>
-									<div class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
+									<div *ngIf="service.creationDate" class="label label-default" matTooltip="{{ service.creationDate.toDate() | date: 'MMM d, y, h:mm:ss a' }}" style="flex:none;padding:5px">
 										{{ service.creationDate.toDate() | amTimeAgo }}
 									</div>
 									<div *ngIf="service.uid == loggedInUserId" style="flex:none;margin-right:5px">
