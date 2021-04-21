@@ -66,24 +66,24 @@ export class AppComponent implements OnInit {
       this._activitySideBarState.subscribe(state => {
         if (state){
           this.activitySideBarState = 'open';
-  
+
           if (this._containerClosedRef) {
             this._containerClosedRef.destroy();
             this._containerClosedRef = null;
           }
-  
+
           let componentFactory = this.resolver.resolveComponentFactory(UserActivityOpenComponent);
           this._containerOpenRef = this._activityComponent.createComponent(componentFactory);
           this._containerOpenRef.changeDetectorRef.detectChanges();
         }
         else {
           this.activitySideBarState = 'closed';
-  
+
           if (this._containerOpenRef) {
             this._containerOpenRef.destroy();
             this._containerOpenRef = null;
           }
-  
+
           let componentFactory = this.resolver.resolveComponentFactory(UserActivityClosedComponent);
           this._containerClosedRef = this._activityComponent.createComponent(componentFactory);
           this._containerClosedRef.changeDetectorRef.detectChanges();
