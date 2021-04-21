@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
-import { AngularFireDatabase } from '@angular/fire/database';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
@@ -46,20 +45,19 @@ import * as _ from "lodash";
 })
 export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild(NgxAutoScroll, { static: false }) test: NgxAutoScroll;
-  // @ViewChild('scrollMe', { static: false }) scrollMeContainer: ElementRef;
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
+  private _newPostId = new BehaviorSubject('');
   private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
+  private _newPostIdSubscription: Subscription;
   private _forumSubscription: Subscription;
   private _defaultRegistrantSubscription: Subscription;
   private _totalSubscription: Subscription;
   private _userRegistrantsSubscription: Subscription;
   private _defaultForumImageSubscription: Subscription;
   private _postsSubscription: Subscription;
-  private _newPostsRef: any;
-  private _newPostsCallback: any;
   private _registrantCount = new BehaviorSubject(0);
   private _forumCount = new BehaviorSubject(0);
   private _postCount = new BehaviorSubject(0);
@@ -84,6 +82,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   public messages: Observable<any[]>;
   public forumTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
+  public newPostId: Observable<string> = this._newPostId.asObservable();
   public newMessageCtrl: FormControl;
   public userRegistrantsCtrl: FormControl;
   public selectedUserRegistrant: any;
@@ -97,8 +96,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   public returnType: Observable<string> = of('');
   public loggedInUserId: string = '';
 
-  constructor(private db: AngularFireDatabase,
-    public  auth: AuthService,
+  constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
     private userActivityService: UserActivityService,
@@ -127,6 +125,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
 
+    if (this._newPostIdSubscription)
+      this._newPostIdSubscription.unsubscribe();
+
     if (this._initialForumSubscription)
       this._initialForumSubscription.unsubscribe();
 
@@ -147,9 +148,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
     if (this._defaultForumImageSubscription)
       this._defaultForumImageSubscription.unsubscribe();
-
-    if (this._newPostsRef && this._newPostsCallback)
-      this._newPostsRef.off('child_added', this._newPostsCallback);
   }
 
   trackPosts (index, post) { return post.postId; }
@@ -260,9 +258,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
     if (this._postsSubscription)
       this._postsSubscription.unsubscribe();
-
-    if (this._newPostsRef && this._newPostsCallback)
-      this._newPostsRef.off('child_added', this._newPostsCallback);
 
     if (this._defaultForumImageSubscription)
       this._defaultForumImageSubscription.unsubscribe();
@@ -522,50 +517,63 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               })
             );
 
+            // alert new post sound
+            that._newPostIdSubscription = that.newPostId.subscribe(postId => {
+              if (postId){
+                const tempPostSubscription = that.userForumPostService.getPost(forum.uid, forum.forumId, postId).subscribe(post => {
+                  tempPostSubscription.unsubscribe();
+
+                  console.log('post ' + JSON.stringify(post));
+
+                  if (post){
+                    that.audioSound.nativeElement.pause();
+                    that.audioSound.nativeElement.currentTime = 0;
+                    that.audioSound.nativeElement.play()
+                  }
+                });
+              }
+            });
+
             // forum posts
             that._postsSubscription = that.userForumPostService.getPosts(forum.uid, forum.forumId).pipe(
               switchMap(posts => {
                 if (posts && posts.length > 0) {
                   let observables = posts.map(post => {
                     let getService$ = that.userServiceService.getService(post.serviceUid, post.serviceId);
-                    let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
-                      switchMap(serviceImages => {
-                        if (serviceImages && serviceImages.length > 0){
-                          let getDownloadUrl$: Observable<any>;
+                    // let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(post.serviceUid, post.serviceId).pipe(
+                    //   switchMap(serviceImages => {
+                    //     if (serviceImages && serviceImages.length > 0){
+                    //       let getDownloadUrl$: Observable<any>;
 
-                          if (serviceImages[0].tinyUrl)
-                            getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
+                    //       if (serviceImages[0].tinyUrl)
+                    //         getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].tinyUrl).getDownloadURL());
 
-                          return combineLatest([getDownloadUrl$]).pipe(
-                            switchMap(results => {
-                              const [downloadUrl] = results;
+                    //       return combineLatest([getDownloadUrl$]).pipe(
+                    //         switchMap(results => {
+                    //           const [downloadUrl] = results;
 
-                              if (downloadUrl)
-                                serviceImages[0].url = downloadUrl;
-                              else
-                                serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
+                    //           if (downloadUrl)
+                    //             serviceImages[0].url = downloadUrl;
+                    //           else
+                    //             serviceImages[0].url = '../../../../assets/defaultTiny.jpg';
 
-                              return of(serviceImages[0]);
-                            })
-                          );
-                        }
-                        else return of(null);
-                      })
-                    );
+                    //           return of(serviceImages[0]);
+                    //         })
+                    //       );
+                    //     }
+                    //     else return of(null);
+                    //   })
+                    // );
 
-                    return combineLatest([getService$, getDefaultServiceImage$]).pipe(
+                    return combineLatest([getService$]).pipe(
                       switchMap(results => {
-                        const [service, defaultServiceImage] = results;
+                        const [service] = results;
 
                         if (service){
-                          if (defaultServiceImage)
-                            service.defaultServiceImage = of(defaultServiceImage);
-                          else {
-                            let tempImage = {
-                              url: '../../../../assets/defaultTiny.jpg'
-                            };
-                            service.defaultServiceImage = of(tempImage);
-                          }
+                          let tempImage = {
+                            url: '../../../../assets/defaultTiny.jpg'
+                          };
+                          service.defaultServiceImage = of(tempImage);
                           post.service = of(service);
                         }
                         else post.service = of(null);
@@ -588,24 +596,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 that.posts = of(_.orderBy(posts, ['creationDate'], ['asc']));
               else
                 that.posts = of([]);
-            });
-
-            // listen for new posts added to the forum and sound an alert to the end user
-            that._newPostsRef = that.db.database.ref(`users/${forum.uid}/forums/${forum.forumId}/posts`);
-
-            // get a unique timestamp from the server and listen from this moment onwards
-            const startKey = that._newPostsRef.push().key;
-
-            // listen for when a new post has been added to the posts collection
-            // then play a sound alerting the end user
-            that._newPostsCallback = that._newPostsRef.orderByKey().startAt(startKey).on('child_added', (snap) => {
-              let nopromise = {
-                catch : new Function()
-              };
-
-              that.audioSound.nativeElement.pause();
-              that.audioSound.nativeElement.currentTime = 0;
-              (that.audioSound.nativeElement.play() || nopromise).catch(() => {});
             });
 
             // populate the end user registrants so that the end user can chose a pseudonym or service to post as
@@ -801,29 +791,20 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 imageId: '',
                 imageUid: '',
                 message: this.newMessageCtrl.value,
-                lastUpdateDate: firebase.database.ServerValue.TIMESTAMP,
-                creationDate: firebase.database.ServerValue.TIMESTAMP
+                lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+                creationDate: firebase.firestore.FieldValue.serverTimestamp()
               };
 
               // empty message
               that.newMessageCtrl.setValue('');
 
-              this.userForumPostService.create(this.userId, this.forumId, post).then(() => {
-                setTimeout(() => {
-                  this._talkingToServer = false;
-                }, 300);
-              })
-              .catch(error => {
+              // create post
+              this.userForumPostService.create(this.userId, this.forumId, post).then(post => {
+                this._newPostId.next(post.postId);
                 this._talkingToServer = false;
-
-                const snackBarRef = that.snackbar.openFromComponent(
-                  NotificationSnackBar,
-                  {
-                    duration: 8000,
-                    data: error.message,
-                    panelClass: ['red-snackbar']
-                  }
-                );
+              }).catch(error => {
+                console.error(error);
+                this._talkingToServer = false;
               });
             }
           }

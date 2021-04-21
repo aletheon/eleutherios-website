@@ -25,13 +25,9 @@ export class UserForumUserBlockService {
 
   public create(parentUserId: string, serviceId: string, userId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      console.log('here');
-
       this.afs.firestore.collection(`users/${parentUserId}/forumuserblocks`).where("serviceId", "==", serviceId).where("userId", "==", userId)
         .get().then(querySnapshot => {
           if (querySnapshot.size == 0){
-            console.log('here 1');
-
             const forumUserBlockRef = this.afs.collection(`users/${parentUserId}/forumuserblocks`).doc(this.afs.createId());
             data.forumUserBlockId = forumUserBlockRef.ref.id;
             forumUserBlockRef.set(data).then(() => {
@@ -41,10 +37,7 @@ export class UserForumUserBlockService {
               reject(error);
             });
           }
-          else {
-            console.log('here 2');
-            resolve();
-          }
+          else resolve();
         }
       );
     });
