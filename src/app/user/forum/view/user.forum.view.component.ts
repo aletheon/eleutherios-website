@@ -523,8 +523,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                 const tempPostSubscription = that.userForumPostService.getPost(forum.uid, forum.forumId, postId).subscribe(post => {
                   tempPostSubscription.unsubscribe();
 
-                  console.log('post ' + JSON.stringify(post));
-
                   if (post){
                     that.audioSound.nativeElement.pause();
                     that.audioSound.nativeElement.currentTime = 0;

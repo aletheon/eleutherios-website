@@ -160,7 +160,6 @@ export class UserForumDetailComponent implements OnInit, OnDestroy {
                                         }
                                       )
                                       .catch(error => {
-                                        console.log('here 2');
                                         console.error(error);
                                       });
                                     }
