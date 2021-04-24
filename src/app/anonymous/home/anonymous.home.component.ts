@@ -54,7 +54,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
     // redirect user if they are already logged in
     if (this.auth.uid && this.auth.uid.length > 0)
       this.router.navigate(['/']);
-    
+
     let load = async function(){
       try {
         // public forums
@@ -66,23 +66,10 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   let getDefaultForumImage$ = that.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
+                        if (!forumImages[0].smallDownloadUrl)
+                          forumImages[0].smallDownloadUrl = '../../../assets/defaultThumbnail.jpg';
 
-                        if (forumImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-                            
-                            if (downloadUrl)
-                              forumImages[0].url = downloadUrl;
-                            else
-                              forumImages[0].url = '../../../assets/defaultThumbnail.jpg';
-              
-                            return of(forumImages[0]);
-                          })
-                        );
+                        return of(forumImages[0]);
                       }
                       else return of(null);
                     })
@@ -92,12 +79,12 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getDefaultForumImage$, getForumTags$]).pipe(
                     switchMap(results => {
                       const [defaultForumImage, forumTags] = results;
-        
+
                       if (defaultForumImage)
                         forum.defaultForumImage = of(defaultForumImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultThumbnail.jpg'
+                          smallDownloadUrl: '../../../assets/defaultThumbnail.jpg'
                         };
                         forum.defaultForumImage = of(tempImage);
                       }
@@ -106,14 +93,14 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                         forum.forumTags = of(forumTags);
                       else
                         forum.forumTags = of([]);
-                        
+
                       return of(forum);
                     })
                   );
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results) => {
                 return results.map((result, i) => {
                   return forums[i];
@@ -133,23 +120,10 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   let getDefaultServiceImage$ = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
                     switchMap(serviceImages => {
                       if (serviceImages && serviceImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
+                        if (!serviceImages[0].smallDownloadUrl)
+                          serviceImages[0].smallDownloadUrl = '../../../assets/defaultThumbnail.jpg';
 
-                        if (serviceImages[0].smallUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-                            
-                            if (downloadUrl)
-                              serviceImages[0].url = downloadUrl;
-                            else
-                              serviceImages[0].url = '../../../assets/defaultThumbnail.jpg';
-              
-                            return of(serviceImages[0]);
-                          })
-                        );
+                        return of(serviceImages[0]);
                       }
                       else return of(null);
                     })
@@ -159,12 +133,12 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                   return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
                       const [defaultServiceImage, serviceTags] = results;
-                      
+
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
                       else {
                         let tempImage = {
-                          url: '../../../assets/defaultThumbnail.jpg',
+                          smallDownloadUrl: '../../../assets/defaultThumbnail.jpg',
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
@@ -180,7 +154,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
                 }
                 else return of(null);
               });
-        
+
               return zip(...observables, (...results: any[]) => {
                 return results.map((result, i) => {
                   return services[i];
@@ -188,7 +162,7 @@ export class AnonymousHomeComponent implements OnDestroy, OnInit {
               });
             }
             else return of([]);
-          }) 
+          })
         );
       }
       catch (error) {

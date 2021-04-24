@@ -108,23 +108,10 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
                   let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                     switchMap(forumImages => {
                       if (forumImages && forumImages.length > 0){
-                        let getDownloadUrl$: Observable<any>;
+                        if (!forumImages[0].tinyDownloadUrl)
+                          forumImages[0].tinyDownloadUrl = '../../../../assets/defaultTiny.jpg';
 
-                        if (forumImages[0].tinyUrl)
-                          getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].tinyUrl).getDownloadURL());
-
-                        return combineLatest([getDownloadUrl$]).pipe(
-                          switchMap(results => {
-                            const [downloadUrl] = results;
-
-                            if (downloadUrl)
-                              forumImages[0].url = downloadUrl;
-                            else
-                              forumImages[0].url = '../../../../assets/defaultTiny.jpg';
-
-                            return of(forumImages[0]);
-                          })
-                        );
+                        return of(forumImages[0]);
                       }
                       else return of(null);
                     })
@@ -138,7 +125,7 @@ export class UserServiceUserBlockListComponent implements OnInit, OnDestroy {
                         forum.defaultForumImage = of(defaultForumImage);
                       else {
                         let tempImage = {
-                          url: '../../../../assets/defaultTiny.jpg'
+                          tinyDownloadUrl: '../../../../assets/defaultTiny.jpg'
                         };
                         forum.defaultForumImage = of(tempImage);
                       }

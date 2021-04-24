@@ -2,7 +2,7 @@
   <div style="display:flex;flex-direction:row;justify-content:center">
     <p style="flex:none;margin:0 5px 5px 5px;cursor:pointer;color:#818181" onclick="event.stopPropagation()" (click)="changeActivitySideBar()">
       ({{ total.activityCount }})
-    </p>   
+    </p>
   </div>
 </ng-container>
 <ng-container *ngIf="activities | async;let activityItems">
@@ -17,7 +17,7 @@
             <ng-template #showdefaultforumimage>
               <ng-container *ngIf="activity.defaultForumImage | async;let image">
                 <div style="flex:none">
-                  <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="image.url" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
+                  <a [routerLink]="['/user/forum/view']" [queryParams]='{ userId: activity.uid, forumId: activity.forumId }' matTooltipPosition="after"><img [src]="image.tinyDownloadUrl" matTooltip="{{ activity.fullTitle }}" matTooltipPosition="right" (load)="setActivityHighlight(activity)" style="margin:1px"></a>
                 </div>
               </ng-container>
             </ng-template>

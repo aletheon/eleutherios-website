@@ -201,50 +201,13 @@ export class UserImageListComponent implements OnInit, OnDestroy {
         if (images && images.length > 0){
           let observables = images.map(image => {
             let getImageTotal$ = this.siteTotalService.getTotal(image.imageId);
-            let getDownloadUrl$: Observable<any>;
-            let genericRetryStrategy = ({
-              maxRetryAttempts = 3,
-              scalingDuration = 1000,
-              excludedStatusCodes = []
-            }: {
-              maxRetryAttempts?: number,
-              scalingDuration?: number,
-              excludedStatusCodes?: number[]
-            } = {}) => (attempts: Observable<any>) => {
-              return attempts.pipe(
-                mergeMap((error, i) => {
-                  const retryAttempt = i + 1;
-                  // if maximum number of retries have been met
-                  // or response is a status code we don't wish to retry, throw error
-                  if (
-                    retryAttempt > maxRetryAttempts ||
-                    excludedStatusCodes.find(e => e === error.status)
-                  ) {
-                    return throwError(error);
-                  }
-                  // retry after 1s, 2s, etc...
-                  return timer(retryAttempt * scalingDuration);
-                })
-              );
-            };
 
-            if (image.smallUrl){
-              // defer image download url as it may not have arrived yet
-              getDownloadUrl$ = defer(() => firebase.storage().ref(image.smallUrl).getDownloadURL())
-                .pipe(
-                  retryWhen(genericRetryStrategy({
-                    maxRetryAttempts: 25
-                  })),
-                  catchError(error => of(error))
-                ).pipe(mergeMap(url => {
-                  return of(url);
-                }
-              ));
-            }
+            if (!image.smallDownloadUrl)
+              image.smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-            return combineLatest([getImageTotal$, getDownloadUrl$]).pipe(
+            return combineLatest([getImageTotal$]).pipe(
               switchMap(results => {
-                const [imageTotal, downloadUrl] = results;
+                const [imageTotal] = results;
 
                 if (imageTotal){
                   image.forumCount = imageTotal.forumCount;
@@ -254,12 +217,6 @@ export class UserImageListComponent implements OnInit, OnDestroy {
                   image.forumCount = 0;
                   image.serviceCount = 0;
                 }
-
-                if (downloadUrl)
-                  image.url = downloadUrl;
-                else
-                  image.url = '../../../../assets/defaultThumbnail.jpg';
-
                 return of(image);
               })
             );

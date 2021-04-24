@@ -36,12 +36,12 @@
 				<ng-container *ngFor="let image of imageItems; trackBy: trackImages">
 					<div class="panel panel-default" style="display:flex;flex-direction:row;padding:5px;margin-bottom:5px;align-items:center">
 						<div style="flex:none;margin-right:10px">
-							<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-container *ngIf="image.smallDownloadUrl == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 								<ng-template #showimage>
-									<img [src]="image.url" [routerLink]="['/user/image/view']" [queryParams]="{ userId: image.uid, imageId: image.imageId }" style="cursor:pointer">
+									<img [src]="image.smallDownloadUrl" [routerLink]="['/user/image/view']" [queryParams]="{ userId: image.uid, imageId: image.imageId }" style="cursor:pointer">
 								</ng-template>
 								<ng-template #noimage>
-									<img [src]="image.url">
+									<img [src]="image.smallDownloadUrl">
 								</ng-template>
 						</div>
             <div style="flex:1;margin-right:5px" contenteditable="true" [textContent]="image.name" (blur)="changeImageName(image, $event.target.textContent)"></div>

@@ -20,13 +20,13 @@
                   <ng-template #showdefaultforumimage>
                     <ng-container *ngIf="forum.defaultForumImage | async;let image">
                       <div style="flex:none;margin-right:10px">
-                        <ng-container *ngIf="image.url == '../../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
+                        <ng-container *ngIf="image.tinyDownloadUrl == '../../../../assets/defaultTiny.jpg'; then noimage else showimage"></ng-container>
                         <ng-template #showimage>
-                          <img *ngIf="forum.type == 'Private'" [src]="image.url" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer">
-                          <img *ngIf="forum.type == 'Public'" [src]="image.url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+                          <img *ngIf="forum.type == 'Private'" [src]="image.tinyDownloadUrl" [routerLink]="['/user/forum/detail']" [queryParams]='{ userId: forum.uid, forumId: forum.forumId }' style="cursor:pointer">
+                          <img *ngIf="forum.type == 'Public'" [src]="image.tinyDownloadUrl" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
                         </ng-template>
                         <ng-template #noimage>
-                          <img [src]="image.url">
+                          <img [src]="image.tinyDownloadUrl">
                         </ng-template>
                       </div>
                     </ng-container>

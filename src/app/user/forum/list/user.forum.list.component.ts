@@ -156,23 +156,10 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                 let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                   switchMap(forumImages => {
                     if (forumImages && forumImages.length > 0){
-                      let getDownloadUrl$: Observable<any>;
+                      if (!forumImages[0].smallDownloadUrl)
+                        forumImages[0].smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-                      if (forumImages[0].smallUrl)
-                        getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-                      return combineLatest([getDownloadUrl$]).pipe(
-                        switchMap(results => {
-                          const [downloadUrl] = results;
-
-                          if (downloadUrl)
-                            forumImages[0].url = downloadUrl;
-                          else
-                            forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
-
-                          return of(forumImages[0]);
-                        })
-                      );
+                      return of(forumImages[0]);
                     }
                     else return of(null);
                   })
@@ -186,7 +173,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
                       let tempImage = {
-                        url: '../../../../assets/defaultThumbnail.jpg'
+                        smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
                       };
                       forum.defaultForumImage = of(tempImage);
                     }
@@ -242,23 +229,10 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                 let getDefaultForumImage$ = this.userForumImageService.getDefaultForumImages(forum.uid, forum.forumId).pipe(
                   switchMap(forumImages => {
                     if (forumImages && forumImages.length > 0){
-                      let getDownloadUrl$: Observable<any>;
+                      if (!forumImages[0].smallDownloadUrl)
+                        forumImages[0].smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-                      if (forumImages[0].smallUrl)
-                        getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-                      return combineLatest([getDownloadUrl$]).pipe(
-                        switchMap(results => {
-                          const [downloadUrl] = results;
-
-                          if (downloadUrl)
-                            forumImages[0].url = downloadUrl;
-                          else
-                            forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
-
-                          return of(forumImages[0]);
-                        })
-                      );
+                      return of(forumImages[0]);
                     }
                     else return of(null);
                   })
@@ -272,7 +246,7 @@ export class UserForumListComponent implements OnInit, OnDestroy {
                       forum.defaultForumImage = of(defaultForumImage);
                     else {
                       let tempImage = {
-                        url: '../../../../assets/defaultThumbnail.jpg'
+                        smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
                       };
                       forum.defaultForumImage = of(tempImage);
                     }

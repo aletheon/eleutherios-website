@@ -17,7 +17,7 @@
             <ng-template #showdefaultforumimage>
               <ng-container *ngIf="activity.defaultForumImage | async;let image">
                 <div style="flex:none;margin-right:5px">
-                  <img [src]="image.url">
+                  <img [src]="image.tinyDownloadUrl">
                 </div>
               </ng-container>
             </ng-template>
@@ -72,7 +72,7 @@
                             <ng-template #showdefaultserviceimage>
                               <ng-container *ngIf="service.defaultServiceImage | async;let image">
                                 <div style="flex:none;margin-right:5px">
-                                  <img [src]="image.url" (load)="setActivityHighlight(activity)">
+                                  <img [src]="image.tinyDownloadUrl" (load)="setActivityHighlight(activity)">
                                 </div>
                               </ng-container>
                             </ng-template>

@@ -10,7 +10,7 @@
             <div style="flex:none;display:flex;flex-direction:row;align-items:center">
               <ng-container *ngIf="defaultForumImage | async;let image">
                 <div style="flex:none;margin-right:5px">
-                  <img [src]="image.url">
+                  <img [src]="image.tinyDownloadUrl">
                 </div>
               </ng-container>
               <p style="flex:none;margin-right:5px">
@@ -41,7 +41,7 @@
                       <ng-template #showdefaultserviceimage>
                         <ng-container *ngIf="service.defaultServiceImage | async;let image">
                           <div style="flex:none;margin-right:5px">
-                            <img [src]="image.url">
+                            <img [src]="image.tinyDownloadUrl">
                           </div>
                         </ng-container>
                       </ng-template>
@@ -183,7 +183,7 @@
                     <ng-template #showdefaultserviceimage>
                       <ng-container *ngIf="service.defaultServiceImage | async;let image">
                         <div style="flex:none;margin-right:10px">
-                          <img [src]="image.url">
+                          <img [src]="image.tinyDownloadUrl">
                         </div>
                       </ng-container>
                     </ng-template>

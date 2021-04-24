@@ -104,23 +104,10 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
             this._image = this.userImageService.getImage(this.loggedInUserId, this._imageId).pipe(
               switchMap(image => {
                 if (image){
-                  let getDownloadUrl$: Observable<any>;
+                  if (!image.largeUrl)
+                    image.largeDownloadUrl = '../../../../assets/defaultLarge.jpg';
 
-                  if (image.largeUrl)
-                    getDownloadUrl$ = from(firebase.storage().ref(image.largeUrl).getDownloadURL());
-
-                  return combineLatest([getDownloadUrl$]).pipe(
-                    switchMap(results => {
-                      const [downloadUrl] = results;
-
-                      if (downloadUrl)
-                        image.url = downloadUrl;
-                      else
-                        image.url = '../../../../assets/defaultLarge.jpg';
-
-                      return of(image);
-                    })
-                  );
+                  return of(image);
                 }
                 else return of(null);
               })

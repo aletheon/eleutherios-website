@@ -62,23 +62,10 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
       switchMap(forumImages => {
         if (forumImages && forumImages.length > 0){
-          let getDownloadUrl$: Observable<any>;
+          if (!forumImages[0].smallDownloadUrl)
+            forumImages[0].smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-          if (forumImages[0].smallUrl)
-            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-          return combineLatest([getDownloadUrl$]).pipe(
-            switchMap(results => {
-              const [downloadUrl] = results;
-
-              if (downloadUrl)
-                forumImages[0].url = downloadUrl;
-              else
-                forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
-
-              return of(forumImages[0]);
-            })
-          );
+          return of(forumImages[0]);
         }
         else return of(null);
       })
@@ -88,7 +75,7 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
         this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
-          url: '../../../../assets/defaultThumbnail.jpg'
+          smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }

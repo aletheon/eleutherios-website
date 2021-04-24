@@ -60,12 +60,12 @@
                   <ng-template #showdefaultforumimage>
                     <ng-container *ngIf="forum.defaultForumImage | async;let image">
                       <div style="flex:none;margin-right:10px">
-                        <ng-container *ngIf="url == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+                        <ng-container *ngIf="smallDownloadUrl == '../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
                         <ng-template #showimage>
-                          <img [src]="image.url" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
+                          <img [src]="image.smallDownloadUrl" [routerLink]="['/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer">
                         </ng-template>
                         <ng-template #noimage>
-                          <img [src]="image.url">
+                          <img [src]="image.smallDownloadUrl">
                         </ng-template>
                       </div>
                     </ng-container>

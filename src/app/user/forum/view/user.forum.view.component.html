@@ -7,12 +7,12 @@
 				<ng-template #showdefaultforumimage>
 					<ng-container *ngIf="defaultForumImage | async;let image">
 						<div style="flex:none;margin-right:5px">
-							<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-container *ngIf="image.smallDownloadUrl == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 							<ng-template #showimage>
-								<img [src]="image.url" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
+								<img [src]="image.smallDownloadUrl" [routerLink]="['/user/forum/image/list']" [queryParams]='{ userId: forumItem.uid, forumId: forumItem.forumId }' style="cursor:pointer">
 							</ng-template>
 							<ng-template #noimage>
-								<img [src]="image.url">
+								<img [src]="image.smallDownloadUrl">
 							</ng-template>
 						</div>
 					</ng-container>
@@ -152,7 +152,7 @@
 										<ng-template #showdefaultserviceimage>
 											<ng-container *ngIf="service.defaultServiceImage | async;let image">
 												<div style="flex:none;margin-right:10px">
-													<img [src]="image.url">
+													<img [src]="image.tinyDownloadUrl">
 												</div>
 											</ng-container>
 										</ng-template>
@@ -199,7 +199,7 @@
 												<ng-template #showdefaultserviceimage>
 													<ng-container *ngIf="service.defaultServiceImage | async;let image">
 														<div style="flex:none;margin-right:5px">
-															<img [src]="image.url">
+															<img [src]="image.tinyDownloadUrl">
 														</div>
 													</ng-container>
 												</ng-template>
@@ -264,7 +264,7 @@
 										<ng-template #showdefaultforumimage>
 											<ng-container *ngIf="forumForum.defaultForumImage | async;let image">
 												<div style="flex:none;margin-right:5px">
-													<img [src]="image.url">
+													<img [src]="image.tinyDownloadUrl">
 												</div>
 											</ng-container>
 										</ng-template>

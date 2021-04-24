@@ -578,23 +578,10 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
             that._defaultServiceImageSubscription = that.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
               switchMap(serviceImages => {
                 if (serviceImages && serviceImages.length > 0){
-                  let getDownloadUrl$: Observable<any>;
+                  if (!serviceImages[0].smallDownloadUrl)
+                    serviceImages[0].smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-                  if (serviceImages[0].smallUrl)
-                    getDownloadUrl$ = from(firebase.storage().ref(serviceImages[0].smallUrl).getDownloadURL());
-
-                  return combineLatest([getDownloadUrl$]).pipe(
-                    switchMap(results => {
-                      const [downloadUrl] = results;
-
-                      if (downloadUrl)
-                        serviceImages[0].url = downloadUrl;
-                      else
-                        serviceImages[0].url = '../../../../assets/defaultThumbnail.jpg';
-
-                      return of(serviceImages[0]);
-                    })
-                  );
+                  return of(serviceImages[0]);
                 }
                 else return of(null);
               })
@@ -604,7 +591,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
                 that.defaultServiceImage = of(serviceImage);
               else {
                 let tempImage = {
-                  url: '../../../../assets/defaultThumbnail.jpg'
+                  smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
                 };
                 that.defaultServiceImage = of(tempImage);
               }

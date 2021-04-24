@@ -8,7 +8,7 @@
 				<ng-template #showdefaultforumimage>
 					<ng-container *ngIf="defaultForumImage | async;let image">
 						<div style="flex:none;margin-right:10px">
-							<img [src]="image.url">
+							<img [src]="image.smallDownloadUrl">
 						</div>
 					</ng-container>
 				</ng-template>
@@ -44,7 +44,7 @@
 					</div>
 					<div style="display:flex;flex-direction:row;align-items:center;justify-content:center">
 						<div *ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
-							<img [src]="forumImage.url" matTooltip="{{ forumImage.name }}">
+							<img [src]="forumImage.largeDownloadUrl" matTooltip="{{ forumImage.name }}">
 						</div>
 					</div>
 				</ng-template>

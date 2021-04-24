@@ -44,7 +44,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
   public defaultForumImage: Observable<any>;
   public forumImagesArray: any[] = [];
   public forumUid: string;
-  
+
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private siteTotalService: SiteTotalService,
@@ -74,7 +74,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     // redirect user if they are already logged in
     if (this.auth.uid && this.auth.uid.length > 0)
       this.router.navigate(['/']);
-      
+
     this.nextKey = null;
     this.prevKeys = [];
     this.forumGroup = this.fb.group({
@@ -172,7 +172,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
 
             // get default forum image
             that.getDefaultForumImage();
-            
+
             // get forum images
             that.getForumImagesList();
 
@@ -206,25 +206,12 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
       switchMap(forumImages => {
         if (forumImages && forumImages.length > 0){
           let observables = forumImages.map(forumImage => {
-            let getDownloadUrl$: Observable<any>;
+            if (!forumImage.largeDownloadUrl)
+              forumImage.largeDownloadUrl = '../../../../assets/defaultLarge.jpg';
 
-            if (forumImage.largeUrl)
-              getDownloadUrl$ = from(firebase.storage().ref(forumImage.largeUrl).getDownloadURL());
-
-            return combineLatest([getDownloadUrl$]).pipe(
-              switchMap(results => {
-                const [downloadUrl] = results;
-                
-                if (downloadUrl)
-                  forumImage.url = downloadUrl;
-                else
-                  forumImage.url = '../../../../assets/defaultLarge.jpg';
-  
-                return of(forumImage);
-              })
-            );
+            return of(forumImage);
           });
-    
+
           return zip(...observables, (...results: any[]) => {
             return results.map((result, i) => {
               return forumImages[i];
@@ -247,23 +234,10 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     this._defaultForumImageSubscription = this.userForumImageService.getDefaultForumImages(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value).pipe(
       switchMap(forumImages => {
         if (forumImages && forumImages.length > 0){
-          let getDownloadUrl$: Observable<any>;
+          if (!forumImages[0].smallDownloadUrl)
+            forumImages[0].smallDownloadUrl = '../../../../assets/defaultThumbnail.jpg';
 
-          if (forumImages[0].smallUrl)
-            getDownloadUrl$ = from(firebase.storage().ref(forumImages[0].smallUrl).getDownloadURL());
-
-          return combineLatest([getDownloadUrl$]).pipe(
-            switchMap(results => {
-              const [downloadUrl] = results;
-              
-              if (downloadUrl)
-                forumImages[0].url = downloadUrl;
-              else
-                forumImages[0].url = '../../../../assets/defaultThumbnail.jpg';
-
-              return of(forumImages[0]);
-            })
-          );
+          return of(forumImages[0]);
         }
         else return of(null);
       })
@@ -273,7 +247,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
         this.defaultForumImage = of(forumImage);
       else {
         let tempImage = {
-          url: '../../../../assets/defaultThumbnail.jpg'
+          smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
         };
         this.defaultForumImage = of(tempImage);
       }
@@ -284,7 +258,7 @@ export class AnonymousForumImageListComponent implements OnInit, OnDestroy {
     this.prevKeys.push(_.first(this.forumImagesArray)['creationDate']);
     this.getForumImagesList(this.nextKey);
   }
-  
+
   onPrev () {
     const prevKey = _.last(this.prevKeys); // get last key
     this.prevKeys = _.dropRight(this.prevKeys); // delete last key

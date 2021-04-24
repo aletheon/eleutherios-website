@@ -94,7 +94,7 @@ export class UserImageService {
         let image: Image = {
           imageId: id,
           uid: parentUserId, // id of the user who is creating this image
-          name: upload.file.name, // use the filename e.g. dog.jpg as the name 
+          name: upload.file.name, // use the filename e.g. dog.jpg as the name
           filePath: storageFilePath,
           tinyUrl: `users/${parentUserId}/tiny_${id}.jpg`,
           smallUrl: `users/${parentUserId}/thumb_${id}.jpg`,
@@ -104,10 +104,10 @@ export class UserImageService {
           lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
           creationDate: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
+
         this.createUserImage(parentUserId, image).then(() => {
           // do something
-        })	
+        })
         .catch(error =>{
           console.log('createUserImage ' + error);
         });
@@ -124,7 +124,7 @@ export class UserImageService {
   public delete (parentUserId: string, imageId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const imageRef = this.afs.collection(`users/${parentUserId}/images`).doc(imageId);
-      
+
       imageRef.delete().then(() => {
         resolve();
       })
@@ -134,16 +134,6 @@ export class UserImageService {
     });
   }
 
-  public getDownloadUrl (fileName): Observable<any> {
-    let fileRef = firebase.storage().ref(fileName);
-
-    return from(fileRef.getDownloadURL()).pipe(
-      mergeMap(url => {
-        return of(url);
-      })
-    );
-  }
-  
   public getImages (parentUserId: string, numberOfItems: number, key?: any, direction?: string): Observable<any[]> {
     let collectionName: string = `users/${parentUserId}/images`;
 

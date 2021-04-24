@@ -7,18 +7,18 @@
 				<ng-template #showdefaultserviceimage>
 					<ng-container *ngIf="defaultServiceImage | async;let image">
 						<div style="flex:none;margin-right:10px">
-							<ng-container *ngIf="image.url == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
+							<ng-container *ngIf="image.smallDownloadUrl == '../../../../assets/defaultThumbnail.jpg'; then noimage else showimage"></ng-container>
 							<ng-template #showimage>
-								<img [src]="image.url" [routerLink]="['/user/service/image/list']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="cursor:pointer">
+								<img [src]="image.smallDownloadUrl" [routerLink]="['/user/service/image/list']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="cursor:pointer">
 							</ng-template>
 							<ng-template #noimage>
 								<ng-container *ngIf="imageCount | async as t">
 									<ng-container [ngSwitch]="t">
 										<ng-container *ngSwitchCase="-1">
-											<img [src]="image.url">
+											<img [src]="image.smallDownloadUrl">
 										</ng-container>
 										<ng-container *ngSwitchDefault>
-											<img [src]="image.url" [routerLink]="['/user/service/image/list']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="cursor:pointer">
+											<img [src]="image.smallDownloadUrl" [routerLink]="['/user/service/image/list']" [queryParams]='{ userId: serviceItem.uid, serviceId: serviceItem.serviceId }' style="cursor:pointer">
 										</ng-container>
 									</ng-container>
 								</ng-container>
@@ -203,7 +203,7 @@
 														<ng-template #showdefaultforumimage>
 															<ng-container *ngIf="forum.defaultForumImage | async;let image">
 																<div style="flex:none;margin-right:5px">
-																	<img [src]="image.url">
+																	<img [src]="image.tinyDownloadUrl">
 																</div>
 															</ng-container>
 														</ng-template>
