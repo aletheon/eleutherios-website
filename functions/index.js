@@ -4120,19 +4120,6 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
     }
   };
 
-  var updateServiceImage = async function () {
-    try {
-      return await serviceImageRef.update({
-        tinyUrl: tinyImageStorageFilePath,
-        smallUrl: smallImageStorageFilePath,
-        mediumUrl: mediumImageStorageFilePath,
-        largeUrl: largeImageStorageFilePath
-      });
-    } catch (error) {
-      throw error;
-    }
-  };
-
   try {
     // repopulate image count
     const imageSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/images`).select().get();
@@ -4155,8 +4142,7 @@ exports.createUserServiceImage = functions.firestore.document("users/{userId}/se
     );
 
     // create image reference to this service
-    await createUserImageService();
-    return await updateServiceImage();
+    return await createUserImageService();
   }
   catch (error) {
     return Promise.reject(error);
@@ -8438,19 +8424,6 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
     }
   };
 
-  var updateForumImage = async function () {
-    try {
-      return await forumImageRef.update({
-        tinyUrl: tinyImageStorageFilePath,
-        smallUrl: smallImageStorageFilePath,
-        mediumUrl: mediumImageStorageFilePath,
-        largeUrl: largeImageStorageFilePath
-      });
-    } catch (error) {
-      throw error;
-    }
-  };
-
   try {
     // repopulate image count
     const imageSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/images`).select().get();
@@ -8473,8 +8446,7 @@ exports.createUserForumImage = functions.firestore.document("users/{userId}/foru
     );
 
     // create image reference to this forum
-    await createUserImageForum();
-    return await updateForumImage();
+    return await createUserImageForum();
   }
   catch (error) {
     return Promise.reject(error);

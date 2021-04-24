@@ -135,21 +135,23 @@
 				<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 					<ng-container *ngIf="forumImages | async;let forumImageItems">
 						<ng-container *ngIf="forumImageItems.length > 0">
-							<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap"
-								*ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
-								<div style="flex:none;display:flex;flex-direction:row;align-items:center">
-									<div style="flex:none;margin-right:5px">
-										<img [src]="forumImage.smallDownloadUrl" matTooltip="{{ forumImage.name }}">
-									</div>
-								</div>
-								<div style="flex:none;display:flex;flex-direction:column;align-items:center">
-									<div style="flex:none">
-										<mat-icon onclick="event.stopPropagation()" (click)="removeForumImage(forumImage)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-									</div>
-									<div style="flex:none">
-										<mat-checkbox matTooltip="Set Default" matTooltipPosition="above" [checked]="forumImage.default" (change)="setDefaultForumImage(forumImage)"></mat-checkbox>
-									</div>
-								</div>
+							<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap">
+                <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none;margin-left:10px"></mat-spinner>
+                <ng-container *ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
+                  <div style="flex:none;display:flex;flex-direction:row;align-items:center">
+                    <div style="flex:none;margin-right:5px">
+                      <img [src]="forumImage.smallDownloadUrl" matTooltip="{{ forumImage.name }}">
+                    </div>
+                  </div>
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center">
+                    <div style="flex:none">
+                      <mat-icon onclick="event.stopPropagation()" (click)="removeForumImage(forumImage)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+                    </div>
+                    <div style="flex:none">
+                      <mat-checkbox matTooltip="Set Default" matTooltipPosition="above" [checked]="forumImage.default" (change)="setDefaultForumImage(forumImage)"></mat-checkbox>
+                    </div>
+                  </div>
+                </ng-container>
 							</div>
 						</ng-container>
 					</ng-container>

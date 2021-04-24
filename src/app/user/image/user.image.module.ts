@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from '../../app-routing.module';
 import { LoadingSpinnerModule } from '../../shared';
@@ -38,6 +39,7 @@ import {
     MatAutocompleteModule,
     MatSnackBarModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     LoadingSpinnerModule,
     BackModule,
     PipeModule,
