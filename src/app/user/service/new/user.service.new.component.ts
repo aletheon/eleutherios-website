@@ -222,28 +222,68 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
           if (fetchedImage){
             fetchedImage.default = false;
 
-            const newServiceImageSubscription = this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage).subscribe((serviceImage: any) => {
-              newServiceImageSubscription.unsubscribe();
+            const newForumImageSubscription = this.userForumImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage).subscribe((serviceImage: any) => {
+              newForumImageSubscription.unsubscribe();
 
-              let tinyDownloadUrl$ = from(firebase.storage().ref(serviceImage.tinyUrl).getDownloadURL());
-              let smallDownloadUrl$ = from(firebase.storage().ref(serviceImage.smallUrl).getDownloadURL());
-              let mediumDownloadUrl$ = from(firebase.storage().ref(serviceImage.mediumUrl).getDownloadURL());
-              let largeDownloadUrl$ = from(firebase.storage().ref(serviceImage.largeUrl).getDownloadURL());
+              let getDownloadUrl$: Observable<any>;
+              let genericRetryStrategy = ({
+                maxRetryAttempts = 3,
+                scalingDuration = 1000,
+                excludedStatusCodes = []
+              }: {
+                maxRetryAttempts?: number,
+                scalingDuration?: number,
+                excludedStatusCodes?: number[]
+              } = {}) => (attempts: Observable<any>) => {
+                return attempts.pipe(
+                  mergeMap((error, i) => {
+                    const retryAttempt = i + 1;
+                    // if maximum number of retries have been met
+                    // or response is a status code we don't wish to retry, throw error
+                    if (
+                      retryAttempt > maxRetryAttempts ||
+                      excludedStatusCodes.find(e => e === error.status)
+                    ) {
+                      return throwError(error);
+                    }
+                    // retry after 1s, 2s, etc...
+                    return timer(retryAttempt * scalingDuration);
+                  })
+                );
+              };
 
-              combineLatest([tinyDownloadUrl$, smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+              // defer image download url as it may not have arrived yet
+              getDownloadUrl$ = defer(() => firebase.storage().ref(serviceImage.tinyUrl).getDownloadURL())
+                .pipe(
+                  retryWhen(genericRetryStrategy({
+                    maxRetryAttempts: 25
+                  })),
+                  catchError(error => of(error))
+                ).pipe(mergeMap(url => {
+                  return of(url);
+                }
+              ));
+
+              combineLatest([getDownloadUrl$]).pipe(
                 switchMap(results => {
-                  const [tinyDownloadUrl, smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+                  const [downloadUrl] = results;
 
-                  console.log('tinyDownloadUrl ' + tinyDownloadUrl);
-                  console.log('smallDownloadUrl ' + smallDownloadUrl);
-                  console.log('mediumDownloadUrl ' + mediumDownloadUrl);
-                  console.log('largeDownloadUrl ' + largeDownloadUrl);
+                  serviceImage.tinyDownloadUrl = downloadUrl;
 
-                  serviceImage.tinyDownloadUrl = tinyDownloadUrl;
-                  serviceImage.smallDownloadUrl = smallDownloadUrl;
-                  serviceImage.mediumDownloadUrl = mediumDownloadUrl;
-                  serviceImage.largeDownloadUrl = largeDownloadUrl;
-                  return of(serviceImage);
+                  let smallDownloadUrl$ = from(firebase.storage().ref(serviceImage.smallUrl).getDownloadURL());
+                  let mediumDownloadUrl$ = from(firebase.storage().ref(serviceImage.mediumUrl).getDownloadURL());
+                  let largeDownloadUrl$ = from(firebase.storage().ref(serviceImage.largeUrl).getDownloadURL());
+
+                  return combineLatest([smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+                    switchMap(results => {
+                      const [smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+
+                      serviceImage.smallDownloadUrl = smallDownloadUrl;
+                      serviceImage.mediumDownloadUrl = mediumDownloadUrl;
+                      serviceImage.largeDownloadUrl = largeDownloadUrl;
+                      return of(serviceImage);
+                    })
+                  );
                 })
               ).subscribe(updatedServiceImage => {
                 this.userServiceImageService.update(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, updatedServiceImage.imageId, updatedServiceImage);
