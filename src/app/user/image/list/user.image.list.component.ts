@@ -15,7 +15,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationSnackBar } from '../../../shared/components/notification.snackbar.component';
 
-import { Observable, Subscription, BehaviorSubject, of, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject, of, combineLatest, from, zip, timer, defer, throwError } from 'rxjs';
 import { switchMap, retryWhen, catchError, mergeMap, take } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
@@ -71,7 +71,45 @@ export class UserImageListComponent implements OnInit, OnDestroy {
     this.disableButton = true;
     let file = this.selectedFiles.item(0);
     this.currentUpload = new Upload(file);
-    this.userImageService.create(this.loggedInUserId, this.currentUpload);
+    this.userImageService.create(this.loggedInUserId, this.currentUpload).then(image => {
+      const newImageSubscription = this.userImageService.getImage(image.uid, image.imageId).subscribe((image: any) => {
+        newImageSubscription.unsubscribe();
+
+        let tinyDownloadUrl$ = from(firebase.storage().ref(image.tinyUrl).getDownloadURL());
+        let smallDownloadUrl$ = from(firebase.storage().ref(image.smallUrl).getDownloadURL());
+        let mediumDownloadUrl$ = from(firebase.storage().ref(image.mediumUrl).getDownloadURL());
+        let largeDownloadUrl$ = from(firebase.storage().ref(image.largeUrl).getDownloadURL());
+
+        combineLatest([tinyDownloadUrl$, smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+          switchMap(results => {
+            const [tinyDownloadUrl, smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+
+            console.log('tinyDownloadUrl ' + tinyDownloadUrl);
+            console.log('smallDownloadUrl ' + smallDownloadUrl);
+            console.log('mediumDownloadUrl ' + mediumDownloadUrl);
+            console.log('largeDownloadUrl ' + largeDownloadUrl);
+
+            image.tinyDownloadUrl = tinyDownloadUrl;
+            image.smallDownloadUrl = smallDownloadUrl;
+            image.mediumDownloadUrl = mediumDownloadUrl;
+            image.largeDownloadUrl = largeDownloadUrl;
+            return of(image);
+          })
+        ).subscribe(updatedImage => {
+          this.userImageService.update(updatedImage.uid, updatedImage.imageId, updatedImage);
+        });
+      });
+    })
+    .catch(error => {
+      const snackBarRef =this.snackbar.openFromComponent(
+        NotificationSnackBar,
+        {
+          duration: 8000,
+          data: error,
+          panelClass: ['red-snackbar']
+        }
+      );
+    });
   }
 
   clearUpload () {

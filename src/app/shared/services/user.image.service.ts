@@ -73,46 +73,48 @@ export class UserImageService {
     return this.afs.collection(`users/${parentUserId}/images`).doc(imageId).valueChanges();
   }
 
-  public create (parentUserId: string, upload: Upload) {
-    let storageRef = firebase.storage().ref();
-    let id = this.afs.createId();
-    let storageFilePath: string = `users/${parentUserId}/${id}_${upload.file.name}`;
-    let uploadTask = storageRef.child(storageFilePath).put(upload.file);
+  public create (parentUserId: string, upload: Upload): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref();
+      let id = this.afs.createId();
+      let storageFilePath: string = `users/${parentUserId}/${id}_${upload.file.name}`;
+      let uploadTask = storageRef.child(storageFilePath).put(upload.file);
 
-    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
-      (snapshot) =>  {
-        // upload in progress
-        upload.progress = (uploadTask.snapshot.bytesTransferred / uploadTask.snapshot.totalBytes) * 100
-      },
-      (error) => {
-        // upload failed
-        console.error(error)
-      },
-      () => {
-        // upload success
-        // add to users collection
-        let image: Image = {
-          imageId: id,
-          uid: parentUserId, // id of the user who is creating this image
-          name: upload.file.name, // use the filename e.g. dog.jpg as the name
-          filePath: storageFilePath,
-          tinyUrl: `users/${parentUserId}/tiny_${id}.jpg`,
-          smallUrl: `users/${parentUserId}/thumb_${id}.jpg`,
-          mediumUrl: `users/${parentUserId}/medium_${id}.jpg`,
-          largeUrl: `users/${parentUserId}/large_${id}.jpg`,
-          default: false,
-          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
-          creationDate: firebase.firestore.FieldValue.serverTimestamp()
-        };
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+        (snapshot) =>  {
+          // upload in progress
+          upload.progress = (uploadTask.snapshot.bytesTransferred / uploadTask.snapshot.totalBytes) * 100
+        },
+        (error) => {
+          // upload failed
+          reject(error);
+        },
+        () => {
+          // upload success
+          // add to users collection
+          let image: Image = {
+            imageId: id,
+            uid: parentUserId, // id of the user who is creating this image
+            name: upload.file.name, // use the filename e.g. dog.jpg as the name
+            filePath: storageFilePath,
+            tinyUrl: `users/${parentUserId}/tiny_${id}.jpg`,
+            smallUrl: `users/${parentUserId}/thumb_${id}.jpg`,
+            mediumUrl: `users/${parentUserId}/medium_${id}.jpg`,
+            largeUrl: `users/${parentUserId}/large_${id}.jpg`,
+            default: false,
+            lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+            creationDate: firebase.firestore.FieldValue.serverTimestamp()
+          };
 
-        this.createUserImage(parentUserId, image).then(() => {
-          // do something
-        })
-        .catch(error =>{
-          console.log('createUserImage ' + error);
-        });
-      }
-    );
+          this.createUserImage(parentUserId, image).then(() => {
+            resolve(image);
+          })
+          .catch(error =>{
+            reject(error);
+          });
+        }
+      );
+    });
   }
 
   public update (parentUserId: string, imageId: string, data: any) {
