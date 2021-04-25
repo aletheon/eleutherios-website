@@ -301,6 +301,9 @@ export class UserServiceImageListComponent implements OnInit, OnDestroy {
       this.serviceImagesArray = _.slice(serviceImages, 0, this.numberOfItems);
       this.serviceImages = of(this.serviceImagesArray);
       this.nextKey = _.get(serviceImages[this.numberOfItems], 'creationDate');
+
+      console.log('nextkey ' + this.nextKey)
+
       this._loading.next(false);
     });
   }

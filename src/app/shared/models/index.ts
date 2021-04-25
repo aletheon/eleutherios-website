@@ -1,4 +1,3 @@
-export * from './forum.image.model';
 export * from './forum.model';
 export * from './service.block.model';
 export * from './service.user.block.model';
@@ -7,7 +6,6 @@ export * from './post.model';
 export * from './registrant.model';
 export * from './forum.block.model';
 export * from './service.model';
-export * from './service.image.model';
 export * from './forum.user.block.model';
 export * from './tag.model';
 export * from './user.model';

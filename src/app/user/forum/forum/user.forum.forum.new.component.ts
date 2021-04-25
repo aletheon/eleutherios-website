@@ -805,83 +805,89 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
             if (fetchedImage){
               fetchedImage.default = false;
 
-              const newForumImageSubscription = this.userForumImageService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, fetchedImage).subscribe((forumImage: any) => {
-                newForumImageSubscription.unsubscribe();
+              this.userForumImageService.create(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, fetchedImage).then(() => {
+                const forumImageSubscription = this.userForumImageService.getForumImage(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, fetchedImage.imageId)
+                  .subscribe(forumImage => {
+                    forumImageSubscription.unsubscribe();
 
-                let tinyImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/tiny_${forumImage.imageId}.jpg`;
-                let smallImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/thumb_${forumImage.imageId}.jpg`;
-                let mediumImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/medium_${forumImage.imageId}.jpg`;
-                let largeImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/large_${forumImage.imageId}.jpg`;
-                let getDownloadUrl$: Observable<any>;
-                let genericRetryStrategy = ({
-                  maxRetryAttempts = 3,
-                  scalingDuration = 1000,
-                  excludedStatusCodes = []
-                }: {
-                  maxRetryAttempts?: number,
-                  scalingDuration?: number,
-                  excludedStatusCodes?: number[]
-                } = {}) => (attempts: Observable<any>) => {
-                  return attempts.pipe(
-                    mergeMap((error, i) => {
-                      const retryAttempt = i + 1;
-                      // if maximum number of retries have been met
-                      // or response is a status code we don't wish to retry, throw error
-                      if (
-                        retryAttempt > maxRetryAttempts ||
-                        excludedStatusCodes.find(e => e === error.status)
-                      ) {
-                        return throwError(error);
+                    console.log('forumImage ' + JSON.stringify(forumImage));
+
+                    let tinyImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/tiny_${forumImage.imageId}.jpg`;
+                    let smallImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/thumb_${forumImage.imageId}.jpg`;
+                    let mediumImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/medium_${forumImage.imageId}.jpg`;
+                    let largeImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/large_${forumImage.imageId}.jpg`;
+                    let getDownloadUrl$: Observable<any>;
+                    let genericRetryStrategy = ({
+                      maxRetryAttempts = 3,
+                      scalingDuration = 1000,
+                      excludedStatusCodes = []
+                    }: {
+                      maxRetryAttempts?: number,
+                      scalingDuration?: number,
+                      excludedStatusCodes?: number[]
+                    } = {}) => (attempts: Observable<any>) => {
+                      return attempts.pipe(
+                        mergeMap((error, i) => {
+                          const retryAttempt = i + 1;
+                          // if maximum number of retries have been met
+                          // or response is a status code we don't wish to retry, throw error
+                          if (
+                            retryAttempt > maxRetryAttempts ||
+                            excludedStatusCodes.find(e => e === error.status)
+                          ) {
+                            return throwError(error);
+                          }
+                          // retry after 1s, 2s, etc...
+                          return timer(retryAttempt * scalingDuration);
+                        })
+                      );
+                    };
+
+                    // defer image download url as it may not have arrived yet
+                    getDownloadUrl$ = defer(() => firebase.storage().ref(tinyImageStorageFilePath).getDownloadURL())
+                      .pipe(
+                        retryWhen(genericRetryStrategy({
+                          maxRetryAttempts: 25
+                        })),
+                        catchError(error => of(error))
+                      ).pipe(mergeMap(url => {
+                        return of(url);
                       }
-                      // retry after 1s, 2s, etc...
-                      return timer(retryAttempt * scalingDuration);
-                    })
-                  );
-                };
+                    ));
 
-                // defer image download url as it may not have arrived yet
-                getDownloadUrl$ = defer(() => firebase.storage().ref(tinyImageStorageFilePath).getDownloadURL())
-                  .pipe(
-                    retryWhen(genericRetryStrategy({
-                      maxRetryAttempts: 25
-                    })),
-                    catchError(error => of(error))
-                  ).pipe(mergeMap(url => {
-                    return of(url);
-                  }
-                ));
-
-                combineLatest([getDownloadUrl$]).pipe(
-                  switchMap(results => {
-                    const [downloadUrl] = results;
-
-                    forumImage.tinyDownloadUrl = downloadUrl;
-
-                    let smallDownloadUrl$ = from(firebase.storage().ref(forumImage.smallUrl).getDownloadURL());
-                    let mediumDownloadUrl$ = from(firebase.storage().ref(forumImage.mediumUrl).getDownloadURL());
-                    let largeDownloadUrl$ = from(firebase.storage().ref(forumImage.largeUrl).getDownloadURL());
-
-                    return combineLatest([smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+                    combineLatest([getDownloadUrl$]).pipe(
                       switchMap(results => {
-                        const [smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+                        const [downloadUrl] = results;
 
-                        forumImage.smallDownloadUrl = smallDownloadUrl;
-                        forumImage.mediumDownloadUrl = mediumDownloadUrl;
-                        forumImage.largeDownloadUrl = largeDownloadUrl;
-                        forumImage.tinyUrl = tinyImageStorageFilePath;
-                        forumImage.smallUrl = smallImageStorageFilePath;
-                        forumImage.mediumUrl = mediumImageStorageFilePath;
-                        forumImage.largeUrl = largeImageStorageFilePath;
-                        return of(forumImage);
+                        forumImage.tinyDownloadUrl = downloadUrl;
+
+                        let smallDownloadUrl$ = from(firebase.storage().ref(forumImage.smallUrl).getDownloadURL());
+                        let mediumDownloadUrl$ = from(firebase.storage().ref(forumImage.mediumUrl).getDownloadURL());
+                        let largeDownloadUrl$ = from(firebase.storage().ref(forumImage.largeUrl).getDownloadURL());
+
+                        return combineLatest([smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+
+                            forumImage.smallDownloadUrl = smallDownloadUrl;
+                            forumImage.mediumDownloadUrl = mediumDownloadUrl;
+                            forumImage.largeDownloadUrl = largeDownloadUrl;
+                            forumImage.tinyUrl = tinyImageStorageFilePath;
+                            forumImage.smallUrl = smallImageStorageFilePath;
+                            forumImage.mediumUrl = mediumImageStorageFilePath;
+                            forumImage.largeUrl = largeImageStorageFilePath;
+                            return of(forumImage);
+                          })
+                        );
                       })
-                    );
-                  })
-                ).subscribe(updatedForumImage => {
-                  this.userForumImageService.update(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, updatedForumImage.imageId, updatedForumImage).then(() => {
-                    this.showSpinner = false;
-                    this._settingDefaultForumImage = false;
-                  });
-                });
+                    ).subscribe(updatedForumImage => {
+                      this.userForumImageService.update(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, updatedForumImage.imageId, updatedForumImage).then(() => {
+                        this.showSpinner = false;
+                        this._settingDefaultForumImage = false;
+                      });
+                    });
+                  }
+                );
               });
             }
             else {

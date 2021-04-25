@@ -28,7 +28,7 @@ import {
   Service,
   ForumBlock,
   ForumUserBlock,
-  ServiceImage,
+  Image,
   NoTitlePipe
 } from '../../../shared';
 
@@ -227,83 +227,89 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             if (fetchedImage){
               fetchedImage.default = false;
 
-              const newServiceImageSubscription = this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage).subscribe((serviceImage: any) => {
-                newServiceImageSubscription.unsubscribe();
+              this.userServiceImageService.create(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage).then(() => {
+                const serviceImageSubscription = this.userServiceImageService.getServiceImage(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, fetchedImage.imageId)
+                  .subscribe(serviceImage => {
+                    serviceImageSubscription.unsubscribe();
 
-                let tinyImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/tiny_${serviceImage.imageId}.jpg`;
-                let smallImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/thumb_${serviceImage.imageId}.jpg`;
-                let mediumImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/medium_${serviceImage.imageId}.jpg`;
-                let largeImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/large_${serviceImage.imageId}.jpg`;
-                let getDownloadUrl$: Observable<any>;
-                let genericRetryStrategy = ({
-                  maxRetryAttempts = 3,
-                  scalingDuration = 1000,
-                  excludedStatusCodes = []
-                }: {
-                  maxRetryAttempts?: number,
-                  scalingDuration?: number,
-                  excludedStatusCodes?: number[]
-                } = {}) => (attempts: Observable<any>) => {
-                  return attempts.pipe(
-                    mergeMap((error, i) => {
-                      const retryAttempt = i + 1;
-                      // if maximum number of retries have been met
-                      // or response is a status code we don't wish to retry, throw error
-                      if (
-                        retryAttempt > maxRetryAttempts ||
-                        excludedStatusCodes.find(e => e === error.status)
-                      ) {
-                        return throwError(error);
+                    console.log('serviceImage ' + JSON.stringify(serviceImage));
+
+                    let tinyImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/tiny_${serviceImage.imageId}.jpg`;
+                    let smallImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/thumb_${serviceImage.imageId}.jpg`;
+                    let mediumImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/medium_${serviceImage.imageId}.jpg`;
+                    let largeImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/large_${serviceImage.imageId}.jpg`;
+                    let getDownloadUrl$: Observable<any>;
+                    let genericRetryStrategy = ({
+                      maxRetryAttempts = 3,
+                      scalingDuration = 1000,
+                      excludedStatusCodes = []
+                    }: {
+                      maxRetryAttempts?: number,
+                      scalingDuration?: number,
+                      excludedStatusCodes?: number[]
+                    } = {}) => (attempts: Observable<any>) => {
+                      return attempts.pipe(
+                        mergeMap((error, i) => {
+                          const retryAttempt = i + 1;
+                          // if maximum number of retries have been met
+                          // or response is a status code we don't wish to retry, throw error
+                          if (
+                            retryAttempt > maxRetryAttempts ||
+                            excludedStatusCodes.find(e => e === error.status)
+                          ) {
+                            return throwError(error);
+                          }
+                          // retry after 1s, 2s, etc...
+                          return timer(retryAttempt * scalingDuration);
+                        })
+                      );
+                    };
+
+                    // defer image download url as it may not have arrived yet
+                    getDownloadUrl$ = defer(() => firebase.storage().ref(tinyImageStorageFilePath).getDownloadURL())
+                      .pipe(
+                        retryWhen(genericRetryStrategy({
+                          maxRetryAttempts: 25
+                        })),
+                        catchError(error => of(error))
+                      ).pipe(mergeMap(url => {
+                        return of(url);
                       }
-                      // retry after 1s, 2s, etc...
-                      return timer(retryAttempt * scalingDuration);
-                    })
-                  );
-                };
+                    ));
 
-                // defer image download url as it may not have arrived yet
-                getDownloadUrl$ = defer(() => firebase.storage().ref(tinyImageStorageFilePath).getDownloadURL())
-                  .pipe(
-                    retryWhen(genericRetryStrategy({
-                      maxRetryAttempts: 25
-                    })),
-                    catchError(error => of(error))
-                  ).pipe(mergeMap(url => {
-                    return of(url);
-                  }
-                ));
-
-                combineLatest([getDownloadUrl$]).pipe(
-                  switchMap(results => {
-                    const [downloadUrl] = results;
-
-                    serviceImage.tinyDownloadUrl = downloadUrl;
-
-                    let smallDownloadUrl$ = from(firebase.storage().ref(smallImageStorageFilePath).getDownloadURL());
-                    let mediumDownloadUrl$ = from(firebase.storage().ref(mediumImageStorageFilePath).getDownloadURL());
-                    let largeDownloadUrl$ = from(firebase.storage().ref(largeImageStorageFilePath).getDownloadURL());
-
-                    return combineLatest([smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+                    combineLatest([getDownloadUrl$]).pipe(
                       switchMap(results => {
-                        const [smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+                        const [downloadUrl] = results;
 
-                        serviceImage.smallDownloadUrl = smallDownloadUrl;
-                        serviceImage.mediumDownloadUrl = mediumDownloadUrl;
-                        serviceImage.largeDownloadUrl = largeDownloadUrl;
-                        serviceImage.tinyUrl = tinyImageStorageFilePath;
-                        serviceImage.smallUrl = smallImageStorageFilePath;
-                        serviceImage.mediumUrl = mediumImageStorageFilePath;
-                        serviceImage.largeUrl = largeImageStorageFilePath;
-                        return of(serviceImage);
+                        serviceImage.tinyDownloadUrl = downloadUrl;
+
+                        let smallDownloadUrl$ = from(firebase.storage().ref(smallImageStorageFilePath).getDownloadURL());
+                        let mediumDownloadUrl$ = from(firebase.storage().ref(mediumImageStorageFilePath).getDownloadURL());
+                        let largeDownloadUrl$ = from(firebase.storage().ref(largeImageStorageFilePath).getDownloadURL());
+
+                        return combineLatest([smallDownloadUrl$, mediumDownloadUrl$, largeDownloadUrl$]).pipe(
+                          switchMap(results => {
+                            const [smallDownloadUrl, mediumDownloadUrl, largeDownloadUrl] = results;
+
+                            serviceImage.smallDownloadUrl = smallDownloadUrl;
+                            serviceImage.mediumDownloadUrl = mediumDownloadUrl;
+                            serviceImage.largeDownloadUrl = largeDownloadUrl;
+                            serviceImage.tinyUrl = tinyImageStorageFilePath;
+                            serviceImage.smallUrl = smallImageStorageFilePath;
+                            serviceImage.mediumUrl = mediumImageStorageFilePath;
+                            serviceImage.largeUrl = largeImageStorageFilePath;
+                            return of(serviceImage);
+                          })
+                        );
                       })
-                    );
-                  })
-                ).subscribe(updatedServiceImage => {
-                  this.userServiceImageService.update(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, updatedServiceImage.imageId, updatedServiceImage).then(() => {
-                    this.showSpinner = false;
-                    this._settingDefaultServiceImage = false;
-                  });
-                });
+                    ).subscribe(updatedServiceImage => {
+                      this.userServiceImageService.update(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, updatedServiceImage.imageId, updatedServiceImage).then(() => {
+                        this.showSpinner = false;
+                        this._settingDefaultServiceImage = false;
+                      });
+                    });
+                  }
+                );
               });
             }
             else {

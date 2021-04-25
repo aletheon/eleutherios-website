@@ -24,14 +24,17 @@ export class UserServiceImageService {
     });
   }
 
-  public create (parentUserId: string, serviceId: string, data: any) {
-    const userServiceImageRef = this.afs.collection(`users/${parentUserId}/services/${serviceId}/images`).doc(data.imageId);
-
-    // Overwrite existing image creationDate with new serviceImage creationDate.
-    data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
-
-    userServiceImageRef.set(data);
-    return userServiceImageRef.valueChanges();
+  public create (parentUserId: string, serviceId: string, data: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const userServiceImageRef = this.afs.collection(`users/${parentUserId}/services/${serviceId}/images`).doc(data.imageId);
+      data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
+      userServiceImageRef.set(data).then(() => {
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
   }
 
   public update (parentUserId: string, serviceId: string, imageId: string, data: any) {

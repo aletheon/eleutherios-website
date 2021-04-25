@@ -24,17 +24,17 @@ export class UserForumImageService {
     });
   }
 
-  public create (parentUserId: string, forumId: string, data: any) {
-    const userForumImageRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/images`).doc(data.imageId);
-
-    // *************************************************************************
-    // We should be using the forumImage object creationDate
-    // Instead of overwriting it with the creationDate of the image object.
-    // *************************************************************************
-    data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
-
-    userForumImageRef.set(data);
-    return userForumImageRef.valueChanges();
+  public create (parentUserId: string, forumId: string, data: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const userForumImageRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/images`).doc(data.imageId);
+      data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
+      userForumImageRef.set(data).then(() => {
+        resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
   }
 
   public update (parentUserId: string, forumId: string, imageId: string, data: any) {
@@ -100,7 +100,7 @@ export class UserForumImageService {
           })
           .catch(error => {
             reject(error);
-          });    
+          });
         }
         else resolve();
       })
