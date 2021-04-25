@@ -758,8 +758,6 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                   .subscribe(forumImage => {
                     forumImageSubscription.unsubscribe();
 
-                    console.log('forumImage ' + JSON.stringify(forumImage));
-
                     let tinyImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/tiny_${forumImage.imageId}.jpg`;
                     let smallImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/thumb_${forumImage.imageId}.jpg`;
                     let mediumImageStorageFilePath = `users/${this.forumGroup.get('uid').value}/forums/${this.forumGroup.get('forumId').value}/images/medium_${forumImage.imageId}.jpg`;

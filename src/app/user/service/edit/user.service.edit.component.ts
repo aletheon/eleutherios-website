@@ -234,9 +234,6 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                   .subscribe(serviceImage => {
                     serviceImageSubscription.unsubscribe();
 
-                    console.log('serviceImage ' + JSON.stringify(serviceImage));
-
-                    // here rob creationDate is still returning null might have to update individual properties or something?
                     let tinyImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/tiny_${serviceImage.imageId}.jpg`;
                     let smallImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/thumb_${serviceImage.imageId}.jpg`;
                     let mediumImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/medium_${serviceImage.imageId}.jpg`;

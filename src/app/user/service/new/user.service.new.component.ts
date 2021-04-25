@@ -232,8 +232,6 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                   .subscribe(serviceImage => {
                     serviceImageSubscription.unsubscribe();
 
-                    console.log('serviceImage ' + JSON.stringify(serviceImage));
-
                     let tinyImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/tiny_${serviceImage.imageId}.jpg`;
                     let smallImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/thumb_${serviceImage.imageId}.jpg`;
                     let mediumImageStorageFilePath = `users/${this.serviceGroup.get('uid').value}/services/${this.serviceGroup.get('serviceId').value}/images/medium_${serviceImage.imageId}.jpg`;
