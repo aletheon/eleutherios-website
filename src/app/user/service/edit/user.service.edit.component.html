@@ -199,8 +199,8 @@
 				<div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
 					<ng-container *ngIf="serviceImages | async;let serviceImageItems">
 						<ng-container *ngIf="serviceImageItems.length > 0">
-							<div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap">
-                <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none;margin-left:10px"></mat-spinner>
+              <div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap">
+                <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none;margin-right:5px"></mat-spinner>
                 <ng-container *ngFor="let serviceImage of serviceImageItems; trackBy: trackServiceImages">
                   <div style="flex:none;display:flex;flex-direction:row;align-items:center">
                     <div style="flex:none;margin-right:5px">
@@ -216,7 +216,7 @@
                     </div>
                   </div>
                 </ng-container>
-							</div>
+              </div>
 						</ng-container>
 					</ng-container>
 				</div>

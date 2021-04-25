@@ -41,7 +41,8 @@
 									<img [src]="image.smallDownloadUrl" [routerLink]="['/user/image/view']" [queryParams]="{ userId: image.uid, imageId: image.imageId }" style="cursor:pointer">
 								</ng-template>
 								<ng-template #noimage>
-									<img [src]="image.smallDownloadUrl">
+                  <mat-spinner *ngIf="showSpinner" diameter="30"></mat-spinner>
+									<!-- <img [src]="image.smallDownloadUrl"> -->
 								</ng-template>
 						</div>
             <div style="flex:1;margin-right:5px" contenteditable="true" [textContent]="image.name" (blur)="changeImageName(image, $event.target.textContent)"></div>

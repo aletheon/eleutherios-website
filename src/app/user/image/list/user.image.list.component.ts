@@ -44,6 +44,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
   public currentUpload: Upload;
   public disableButton: boolean = true;
   public loggedInUserId: string = '';
+  public showSpinner: boolean = false;
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -69,6 +70,7 @@ export class UserImageListComponent implements OnInit, OnDestroy {
 
   uploadSingle () {
     this.disableButton = true;
+    this.showSpinner = true;
     let file = this.selectedFiles.item(0);
     this.currentUpload = new Upload(file);
     this.userImageService.create(this.loggedInUserId, this.currentUpload).then(newImage => {
@@ -136,11 +138,15 @@ export class UserImageListComponent implements OnInit, OnDestroy {
             );
           })
         ).subscribe(updatedImage => {
-          this.userImageService.update(updatedImage.uid, updatedImage.imageId, updatedImage);
+          this.userImageService.update(updatedImage.uid, updatedImage.imageId, updatedImage).then(() => {
+            this.showSpinner = false;
+          });
         });
       });
     })
     .catch(error => {
+      this.showSpinner = false;
+
       const snackBarRef =this.snackbar.openFromComponent(
         NotificationSnackBar,
         {

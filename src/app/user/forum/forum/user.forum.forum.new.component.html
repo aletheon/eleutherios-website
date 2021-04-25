@@ -114,7 +114,7 @@
               <ng-container *ngIf="forumImageItems.length > 0; then showforumimages else noforumimages"></ng-container>
               <ng-template #showforumimages>
                 <div style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin:0 5px 5px 0;flex-wrap:nowrap">
-                  <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none;margin-left:10px"></mat-spinner>
+                  <mat-spinner *ngIf="showSpinner" diameter="30" style="flex:none;margin-right:5px"></mat-spinner>
                   <ng-container *ngFor="let forumImage of forumImageItems; trackBy: trackForumImages">
                     <div style="flex:none;display:flex;flex-direction:row;align-items:center">
                       <div style="flex:none;margin-right:5px">
