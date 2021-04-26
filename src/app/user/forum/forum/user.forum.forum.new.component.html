@@ -149,7 +149,7 @@
                     *ngFor="let image of imageItems; trackBy: trackImages">
                     <div style="flex:none;display:flex;flex-direction:row;align-items:center">
                       <div style="flex:none;margin-right:5px">
-                        <img [src]="image.smallDownloadUrl">
+                        <img [src]="image.smallDownloadUrl" matTooltip="{{ image.name }}">
                       </div>
                     </div>
                     <div style="flex:none">
