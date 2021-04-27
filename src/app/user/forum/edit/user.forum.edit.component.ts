@@ -94,6 +94,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
   public loading: Observable<boolean> = this._loading.asObservable();
   public loggedInUserId: string = '';
   public showSpinner: boolean = false;
+  public newForumImageId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -745,6 +746,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
 
     if (this.showSpinner == false){
       this.showSpinner = true;
+      this.newForumImageId = image.imageId;
       this._settingDefaultForumImage = true;
 
       this.userForumImageService.exists(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, image.imageId).then(exists => {
@@ -829,6 +831,7 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
                     ).subscribe(updatedForumImage => {
                       this.userForumImageService.update(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, updatedForumImage.imageId, updatedForumImage).then(() => {
                         this.showSpinner = false;
+                        this.newForumImageId = '';
                         this._settingDefaultForumImage = false;
                       });
                     });
@@ -838,12 +841,14 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
             }
             else {
               this.showSpinner = false;
+              this.newForumImageId = '';
               this._settingDefaultForumImage = false;
             }
           });
         }
         else {
           this.showSpinner = false;
+          this.newForumImageId = '';
           this._settingDefaultForumImage = false;
         }
       });

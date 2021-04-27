@@ -94,6 +94,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
   public stripeButtonDisabled: boolean = false;
   public loggedInUserId: string = '';
   public showSpinner: boolean = false;
+  public newForumImageId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -221,6 +222,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this.showSpinner == false){
       this.showSpinner = true;
+      this.newForumImageId = image.imageId;
       this._settingDefaultServiceImage = true;
 
       this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
@@ -305,6 +307,7 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
                     ).subscribe(updatedServiceImage => {
                       this.userServiceImageService.update(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, updatedServiceImage.imageId, updatedServiceImage).then(() => {
                         this.showSpinner = false;
+                        this.newForumImageId = '';
                         this._settingDefaultServiceImage = false;
                       });
                     });
@@ -314,12 +317,14 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
             }
             else {
               this.showSpinner = false;
+              this.newForumImageId = '';
               this._settingDefaultServiceImage = false;
             }
           });
         }
         else {
           this.showSpinner = false;
+          this.newForumImageId = '';
           this._settingDefaultServiceImage = false;
         }
       });

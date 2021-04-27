@@ -97,6 +97,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
   public defaultForumImage: Observable<any>;
   public loggedInUserId: string = '';
   public showSpinner: boolean = false;
+  public newForumImageId: string = '';
 
   constructor(public auth: AuthService,
     private route: ActivatedRoute,
@@ -797,6 +798,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
 
     if (this.showSpinner == false){
       this.showSpinner = true;
+      this.newForumImageId = image.imageId;
       this._settingDefaultForumImage = true;
 
       this.userForumImageService.exists(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, image.imageId).then(exists => {
@@ -881,6 +883,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                     ).subscribe(updatedForumImage => {
                       this.userForumImageService.update(this.forumGroup.get('uid').value, this.forumGroup.get('forumId').value, updatedForumImage.imageId, updatedForumImage).then(() => {
                         this.showSpinner = false;
+                        this.newForumImageId = '';
                         this._settingDefaultForumImage = false;
                       });
                     });
@@ -890,12 +893,14 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
             }
             else {
               this.showSpinner = false;
+              this.newForumImageId = '';
               this._settingDefaultForumImage = false;
             }
           });
         }
         else {
           this.showSpinner = false;
+          this.newForumImageId = '';
           this._settingDefaultForumImage = false;
         }
       });
