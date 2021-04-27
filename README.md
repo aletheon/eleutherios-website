@@ -8,14 +8,14 @@ People or business are use to serving one another on a local level or one busine
 
 ```bash
 Forum (Lump under armpit)
----- Service (Mary or customer)
----- Service (Doctor or business)
+-- Service (Mary or customer)
+-- Service (Doctor or business)
 Forum (Insurance claim)
----- Service (Doctor or customer)
----- Service (NZ Insurance or business)
+-- Service (Doctor or customer)
+-- Service (NZ Insurance or business)
 Forum (Mammogram test)
----- Service (NZ Insurance or customer)
----- Service (Radiologist or business)
+-- Service (NZ Insurance or customer)
+-- Service (Radiologist or business)
 ```
 
 In this example, there is only one business managing each of the three forums.  A doctor is managing, Mary's forum for a lump under her armpit. An insurance company is managing the doctor's forum for an insurance claim, and a radiologist is managing the insurers forum for a mammogram test.
@@ -24,14 +24,14 @@ Eleutherios, changes this way of serving, by inverting or scaling the forum or r
 
 ```bash
 Forum (Lump under armpit)
----- Service (Mary or customer)
----- Service (Doctor or business)
----- Forum (Insurance claim)
--------- Service (Doctor or customer)
--------- Service (Healthcare Insurance or business)
--------- Forum (Mammogram test)
------------- Service (Healthcare Insurance or customer)
------------- Service (Radiologist or business)
+-- Service (Mary or customer)
+-- Service (Doctor or business)
+-- Forum (Insurance claim)
+---- Service (Doctor or customer)
+---- Service (Healthcare Insurance or business)
+---- Forum (Mammogram test)
+------ Service (Healthcare Insurance or customer)
+------ Service (Radiologist or business)
 ```
 
 In this example, there is more than one business or service (doctor, healthcare insurer, radiologist) all cooperating with one another, through the same forum, for a lump under Mary's armpit.  Each service is being invited by another service, through a sub-forum to manage, that aspect of the request or conversation.
