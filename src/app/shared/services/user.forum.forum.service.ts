@@ -51,7 +51,7 @@ export class UserForumForumService {
               else resolve();
             });
           });
-  
+
           Promise.all(promises).then(() => {
             resolve();
           })
@@ -65,7 +65,7 @@ export class UserForumForumService {
   }
 
   public getForumForums (parentUserId: string, parentForumId: string): Observable<any[]> {
-    return this.afs.collection<any>(`users/${parentUserId}/forums/${parentForumId}/forums`, ref => ref.where('indexed', '==', true).orderBy('creationDate')).valueChanges();
+    return this.afs.collection<any>(`users/${parentUserId}/forums/${parentForumId}/forums`, ref => ref.orderBy('creationDate')).valueChanges();
   }
 
   public removeForumForums (parentUserId: string, parentForumId: string): Promise<void>{
@@ -82,7 +82,7 @@ export class UserForumForumService {
                 });
               });
             });
-  
+
             Promise.all(promises).then(() => {
               resolve();
             })
