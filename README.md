@@ -18,7 +18,7 @@ Forum (Mammogram test)
 ---- Service (Radiologist or business)
 ```
 
-In this example, there is only one business managing each of the three forums.  A doctor is managing Mary's forum for a lump under her armpit. An insurance company is managing the doctor's forum for an insurance claim and a radiologist is managing, the insurers forum for a mammogram test.
+In this example, there is only one business managing each of the three forums.  A doctor is managing, Mary's forum for a lump under her armpit. An insurance company is managing the doctor's forum for an insurance claim, and a radiologist is managing the insurers forum for a mammogram test.
 
 Eleutherios, changes this way of serving, by inverting or scaling the forum or request, so that more than one business can manage it.
 
