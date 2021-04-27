@@ -8961,7 +8961,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
               var getBreadcrumb = function (userIdToRecurse, forumIdToRecurse) {
                 // predicate to decide parent/child relationship
                 var predicate = function (tempForum){
-                  if (tempForum && tempForum.indexed == true){
+                  if (tempForum){
                     // create crumbs
                     breadcrumbs.push(tempForum);
 
@@ -9029,37 +9029,23 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(parentForumId).update({ forumCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return updateBreadcrumbs(forum.uid, forum.forumId).then(() => {
+  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(parentForumId).update({ forumCount: snapshot.size });
+        else
           return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      })
-      .catch(error => {
-        return Promise.reject(error);
       });
     }
-  )
+  ).then(() => {
+    return updateBreadcrumbs(forum.uid, forum.forumId).then(() => {
+      return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+  })
   .catch(error => {
     return Promise.reject(error);
   });
@@ -9129,7 +9115,7 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
               var getBreadcrumb = function (userIdToRecurse, forumIdToRecurse) {
                 // predicate to decide parent/child relationship
                 var predicate = function (tempForum){
-                  if (tempForum && tempForum.indexed == true){
+                  if (tempForum){
                     // create crumbs
                     breadcrumbs.push(tempForum);
 
@@ -9197,37 +9183,23 @@ exports.updateUserForumForum = functions.firestore.document("users/{userId}/foru
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(parentForumId).update({ forumCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return updateBreadcrumbs(newValue.uid, newValue.forumId).then(() => {
+  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(parentForumId).update({ forumCount: snapshot.size });
+        else
           return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      })
-      .catch(error => {
-        return Promise.reject(error);
       });
     }
-  )
+  ).then(() => {
+    return updateBreadcrumbs(newValue.uid, newValue.forumId).then(() => {
+      return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+  })
   .catch(error => {
     return Promise.reject(error);
   });
@@ -9272,37 +9244,23 @@ exports.deleteUserForumForum = functions.firestore.document("users/{userId}/foru
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-    .select()
-    .get().then(indexedSnapshot => {
-      return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`)
-        .where('indexed', '==', false)
-        .select()
-        .get().then(UnIndexedSnapshot => {
-          return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists()){
-              return admin.database().ref("totals").child(parentForumId).update({ forumCount: indexedSnapshot.size - UnIndexedSnapshot.size })
-                .then(() => {
-                  return Promise.resolve();
-                }
-              );
-            }
-            else return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return removeBreadCrumbs().then(() => {
+  return admin.firestore().collection(`users/${userId}/forums/${parentForumId}/forums`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(parentForumId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(parentForumId).update({ forumCount: snapshot.size });
+        else
           return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      })
-      .catch(error => {
-        return Promise.reject(error);
       });
     }
-  )
+  ).then(() => {
+    return removeBreadCrumbs().then(() => {
+      return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+  })
   .catch(error => {
     return Promise.reject(error);
   });
