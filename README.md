@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables humankind (human or non-human) to serve one another at scale or from the Heart.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or prior unity of humankind (human or non-human), to serve one another at scale or from the Heart.
 
 Eleutherios operates like a computer network, where servers subscribe to the network in order to make requests to other servers on the network.  Eleutherios does the same thing, except the server is a person or business, and the request is a forum, customer or conversation.
 
