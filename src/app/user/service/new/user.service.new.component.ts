@@ -93,7 +93,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
   public stripeButtonDisabled: boolean = false;
   public loggedInUserId: string = '';
   public showSpinner: boolean = false;
-  public newForumImageId: string = '';
+  public newServiceImageId: string = '';
 
   constructor(public auth: AuthService,
     private siteTotalService: SiteTotalService,
@@ -220,7 +220,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (this.showSpinner == false){
       this.showSpinner = true;
-      this.newForumImageId = image.imageId;
+      this.newServiceImageId = image.imageId;
       this._settingDefaultServiceImage = true;
 
       this.userServiceImageService.exists(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, image.imageId).then(exists => {
@@ -305,7 +305,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
                     ).subscribe(updatedServiceImage => {
                       this.userServiceImageService.update(this.serviceGroup.get('uid').value, this.serviceGroup.get('serviceId').value, updatedServiceImage.imageId, updatedServiceImage).then(() => {
                         this.showSpinner = false;
-                        this.newForumImageId = '';
+                        this.newServiceImageId = '';
                         this._settingDefaultServiceImage = false;
                       });
                     });
@@ -315,14 +315,14 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
             }
             else {
               this.showSpinner = false;
-              this.newForumImageId = '';
+              this.newServiceImageId = '';
               this._settingDefaultServiceImage = false;
             }
           });
         }
         else {
           this.showSpinner = false;
-          this.newForumImageId = '';
+          this.newServiceImageId = '';
           this._settingDefaultServiceImage = false;
         }
       });
