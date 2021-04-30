@@ -34,7 +34,7 @@ Forum (Lump under armpit)
 ------ Service (Radiologist or business)
 ```
 
-In this example, there is more than one business or service (doctor, healthcare insurer, radiologist) all cooperating with one another, through the same forum, for a lump under Mary's armpit.  Each service is being invited by another service, through a sub-forum to manage, that aspect of the request or conversation.
+In this example, there is more than one business or service (doctor, healthcare insurer and radiologist) all managing the forum for a lump under Mary's armpit.  Each service is being invited by another service, through a sub-forum to manage, that aspect of the request or conversation.
 
 This way of managing a request is circular or a network, because it's the forum, that is being scaled, not the service or work, that people or businesses are performing.  People or businesses still pay one another, or provide the same service or work in the world, but within the same forum or conversation.
 
