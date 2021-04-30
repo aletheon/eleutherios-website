@@ -184,7 +184,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             }
           }
 
-          this.messageSharingService.changeViewForumId('');
+          this.messageSharingService.changeViewForumId(''); // dis-inform listeners that the view forum page is viewing this forum
 
           this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).pipe(take(1)).subscribe(forum => {
             if (forum){
@@ -242,7 +242,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   private initForm () {
     const that = this;
 
-    this.messageSharingService.changeViewForumId(''); // dis-inform listeners that the view forum page is viewing this forum
+    this.messageSharingService.changeViewForumId('');
 
     if (this._forumSubscription)
       this._forumSubscription.unsubscribe();
