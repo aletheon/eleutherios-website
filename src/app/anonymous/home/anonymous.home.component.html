@@ -23,7 +23,7 @@
                 </ng-container>
               </ng-template>
               <div style="flex:1;margin-right:5px">
-                <a [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+                <a [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 200 }}</i></a>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                 <!-- other button controls -->
@@ -80,7 +80,7 @@
               </ng-template>
               <div style="flex:1;margin-right:5px">
                 <p style="word-break: break-all">
-                  <a [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 80 }}</i></a>
+                  <a [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 200 }}</i></a>
                 </p>
               </div>
               <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">

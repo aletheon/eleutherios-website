@@ -18,10 +18,10 @@
             <div style="flex:1;margin-right:5px">
               <ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
               <ng-template #showdefaultregistrant>
-                <a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
+                <a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | truncate: 35 }}</a>
               </ng-template>
               <ng-template #nodefaultregistrant>
-                <a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | truncate: 35 }}</a>
+                <a [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | truncate: 35 }}</a>
               </ng-template>
             </div>
           </div>
@@ -50,7 +50,7 @@
               </ng-container>
             </ng-template>
             <div style="flex:1;margin-right:5px">
-              <a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | truncate: 35 }}</a>
+              <a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | truncate: 35 }}</a>
             </div>
           </div>
         </ng-container>
@@ -88,7 +88,7 @@
                 </ng-template>
                 <div style="flex:1;margin-right:5px">
                   <p style="word-break: break-all">
-                    <a *ngIf="receipt.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.buyerTitle }}{{ receipt.buyerDescription.length > 0 ? (' - ' + receipt.buyerDescription | truncate: 80) : '' }}">{{ receipt.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.buyerDescription.length > 0">- {{ receipt.buyerDescription | truncate: 80 }}</i></a>
+                    <a *ngIf="receipt.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.buyerUid, serviceId: receipt.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.buyerTitle }}{{ receipt.buyerDescription.length > 0 ? (' - ' + receipt.buyerDescription | truncate: 200) : '' }}">{{ receipt.buyerTitle | noTitle | truncate: 35 }} <i *ngIf="receipt.buyerDescription.length > 0">- {{ receipt.buyerDescription | truncate: 200 }}</i></a>
                     <span *ngIf="receipt.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.buyerTitle }}</span>
                   </p>
                 </div>
@@ -143,7 +143,7 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a *ngIf="receipt.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="receipt.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 200) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                           <span *ngIf="receipt.sellerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</span>
                         </p>
                       </div>
@@ -169,7 +169,7 @@
                         </ng-template>
                         <div style="flex:1;margin-right:5px">
                           <p style="word-break: break-all">
-                            <a *ngIf="receipt.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 80) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
+                            <a *ngIf="receipt.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: receipt.sellerUid, serviceId: receipt.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ receipt.sellerTitle }}{{ receipt.sellerDescription.length > 0 ? (' - ' + receipt.sellerDescription | truncate: 200) : '' }}">{{ receipt.sellerTitle | noTitle | truncate: 35 }}</a>
                             <span *ngIf="receipt.sellerPaymentType == 'No service'" style="color:#1B1B1B">{{ receipt.sellerTitle }}</span>
                           </p>
                         </div>
@@ -214,7 +214,7 @@
                 </ng-template>
                 <div style="flex:1;margin-right:5px">
                   <p style="word-break: break-all">
-                    <a *ngIf="payment.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 80) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 80 }}</i></a>
+                    <a *ngIf="payment.sellerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.sellerUid, serviceId: payment.sellerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.sellerTitle }}{{ payment.sellerDescription.length > 0 ? (' - ' + payment.sellerDescription | truncate: 200) : '' }}">{{ payment.sellerTitle | noTitle | truncate: 35 }} <i *ngIf="payment.sellerDescription.length > 0">- {{ payment.sellerDescription | truncate: 200 }}</i></a>
                     <span *ngIf="payment.sellerPaymentType == 'No service'" style="color:#1B1B1B">{{ payment.sellerTitle }}</span>
                   </p>
                 </div>
@@ -269,7 +269,7 @@
                       </ng-template>
                       <div style="flex:1;margin-right:5px">
                         <p style="word-break: break-all">
-                          <a *ngIf="payment.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                          <a *ngIf="payment.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 200) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
                           <span *ngIf="payment.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ payment.buyerTitle }}</span>
                         </p>
                       </div>
@@ -295,7 +295,7 @@
                         </ng-template>
                         <div style="flex:1;margin-right:5px">
                           <p style="word-break: break-all">
-                            <a *ngIf="payment.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 80) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
+                            <a *ngIf="payment.buyerPaymentType != 'No service'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: payment.buyerUid, serviceId: payment.buyerServiceId }" style="color:#1B1B1B" matTooltip="{{ payment.buyerTitle }}{{ payment.buyerDescription.length > 0 ? (' - ' + payment.buyerDescription | truncate: 200) : '' }}">{{ payment.buyerTitle | noTitle | truncate: 35 }}</a>
                             <span *ngIf="payment.buyerPaymentType == 'No service'" style="color:#1B1B1B">{{ payment.buyerTitle }}</span>
                           </p>
                         </div>
@@ -334,10 +334,10 @@
             <div style="flex:1;margin-right:5px">
               <ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
               <ng-template #showdefaultregistrant>
-                <a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
+                <a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
               </ng-template>
               <ng-template #nodefaultregistrant>
-                <a [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 80) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
+                <a [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="flex:none;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
               </ng-template>
             </div>
             <div style="flex:none">
@@ -377,7 +377,7 @@
               </ng-container>
             </ng-template>
             <div style="flex:1;margin-right:5px">
-              <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 80) : '' }}">{{ service.title | noTitle | truncate: 35 }}</a>
+              <a [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 35 }}</a>
             </div>
             <div style="flex:none">
               <!-- other button controls -->

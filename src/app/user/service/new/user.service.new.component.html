@@ -276,12 +276,12 @@
 													<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
 													<ng-template #showdefaultregistrant>
 														<p style="word-break: break-all">
-															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ forum.title }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+															<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
 														</p>
 													</ng-template>
 													<ng-template #nodefaultregistrant>
-														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.description | truncate: 80 }}">{{ forum.title | noTitle | truncate: 35 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
+														<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId, serviceUserId: serviceGroup.get('uid').value, serviceId: serviceGroup.get('serviceId').value }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 35 }}</a>
 													</ng-template>
 												</div>
 												<div style="flex:none">
@@ -363,12 +363,12 @@
 												<ng-container *ngIf="forum.defaultRegistrant | async; then showdefaultregistrant else nodefaultregistrant"></ng-container>
 												<ng-template #showdefaultregistrant>
 													<p style="word-break: break-all">
-														<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+														<a [routerLink]="['/user/forum/view']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }}</a>
 													</p>
 												</ng-template>
 												<ng-template #nodefaultregistrant>
-													<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
-													<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }} <i *ngIf="forum.description.length > 0">- {{ forum.description | truncate: 80 }}</i></a>
+													<a *ngIf="forum.type == 'Private'" [routerLink]="['/user/forum/detail']" [queryParams]="{ userId: forum.uid, forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }}</a>
+													<a *ngIf="forum.type == 'Public'" [routerLink]="['/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="word-break: break-all;color:#1B1B1B" matTooltip="{{ forum.title }}{{ forum.description.length > 0 ? (' - ' + forum.description | truncate: 200) : '' }}">{{ forum.title | noTitle | truncate: 50 }}</a>
 												</ng-template>
 											</div>
 											<mat-icon onclick="event.stopPropagation()" (click)="addForum(forum)" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="Add forum">add</mat-icon>
