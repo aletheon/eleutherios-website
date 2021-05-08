@@ -8589,7 +8589,7 @@ exports.createUserForumRegistrant = functions.firestore.document("users/{userId}
                 includeTagsInDetailPage: forum.includeImagesInDetailPage,
                 forumLastUpdateDate: forum.lastUpdateDate,
                 forumCreationDate: forum.creationDate,
-                receivePosts: true,
+                receivePosts: false,
                 highlightPost: false,
                 lastUpdateDate: FieldValue.serverTimestamp(),
                 creationDate: FieldValue.serverTimestamp()
