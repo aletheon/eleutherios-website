@@ -500,7 +500,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                   if (post){
                     that.audioSound.nativeElement.pause();
                     that.audioSound.nativeElement.currentTime = 0;
-                    that.audioSound.nativeElement.play()
+                    that.audioSound.nativeElement.play();
                   }
                 });
               }
