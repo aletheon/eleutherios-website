@@ -129,7 +129,7 @@
 								</ng-template>
 								<div style="flex:1;margin-right:5px">
 									<p style="word-break: break-all">
-										<a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 35 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 200 }}</i></a>
+										<a [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 60 }} <i *ngIf="service.description.length > 0">- {{ service.description | truncate: 200 }}</i></a>
 									</p>
 								</div>
 								<div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
