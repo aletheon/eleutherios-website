@@ -20,6 +20,7 @@ export * from './user.service.tag.service';
 export * from './user.forum.registrant.service';
 export * from './user.forum.forum.service';
 export * from './user.forum.post.service';
+export * from './user.forum.postid.service';
 export * from './user.where.serving.service';
 export * from './user.service.rate.service';
 export * from './user.service.review.service';

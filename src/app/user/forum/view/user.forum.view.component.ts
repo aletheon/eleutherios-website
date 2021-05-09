@@ -14,6 +14,7 @@ import {
   UserForumImageService,
   UserServiceImageService,
   UserForumPostService,
+  UserForumPostIdService,
   UserForumBreadcrumbService,
   UserForumTagService,
   UserServiceBlockService,
@@ -48,7 +49,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   @ViewChild('audioSound', { static: false }) audioSound: ElementRef;
   @ViewChild('descriptionPanelTitle', { static: false }) descriptionPanelTitle: ElementRef;
   private _loading = new BehaviorSubject(false);
-  private _newPostId = new BehaviorSubject('');
   private _userSubscription: Subscription;
   private _initialForumSubscription: Subscription;
   private _newPostIdSubscription: Subscription;
@@ -64,6 +64,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   private _tagCount = new BehaviorSubject(0);
   private _imageCount = new BehaviorSubject(0);
   private _talkingToServer: boolean = false;
+  private _postIdFirstTimeThrough: boolean = true;
   private _tempForum: any;
 
   public forum: Observable<any>;
@@ -82,7 +83,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
   public messages: Observable<any[]>;
   public forumTags: Observable<any[]>;
   public loading: Observable<boolean> = this._loading.asObservable();
-  public newPostId: Observable<string> = this._newPostId.asObservable();
   public newMessageCtrl: FormControl;
   public userRegistrantsCtrl: FormControl;
   public selectedUserRegistrant: any;
@@ -107,6 +107,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     private userForumImageService: UserForumImageService,
     private userServiceImageService: UserServiceImageService,
     private userForumPostService: UserForumPostService,
+    private userForumPostIdService: UserForumPostIdService,
     private userForumBreadcrumbService: UserForumBreadcrumbService,
     private userForumTagService: UserForumTagService,
     private userServiceBlockService: UserServiceBlockService,
@@ -256,6 +257,9 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
     if (this._userRegistrantsSubscription)
       this._userRegistrantsSubscription.unsubscribe();
 
+    if (this._newPostIdSubscription)
+      this._newPostIdSubscription.unsubscribe();
+
     if (this._postsSubscription)
       this._postsSubscription.unsubscribe();
 
@@ -263,6 +267,8 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
       this._defaultForumImageSubscription.unsubscribe();
 
     this._loading.next(true);
+
+    this._postIdFirstTimeThrough = true;
 
     this._forumSubscription = this.forum
       .subscribe(forum => {
@@ -492,17 +498,14 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             );
 
             // alert new post sound
-            that._newPostIdSubscription = that.newPostId.subscribe(postId => {
-              if (postId){
-                const tempPostSubscription = that.userForumPostService.getPost(forum.uid, forum.forumId, postId).subscribe(post => {
-                  tempPostSubscription.unsubscribe();
-
-                  if (post){
-                    that.audioSound.nativeElement.pause();
-                    that.audioSound.nativeElement.currentTime = 0;
-                    that.audioSound.nativeElement.play();
-                  }
-                });
+            that._newPostIdSubscription = that.userForumPostIdService.getLastPostIds(forum.uid, forum.forumId, 1).subscribe(postIds => {
+              if (postIds){
+                if (that._postIdFirstTimeThrough == false){
+                  that.audioSound.nativeElement.pause();
+                  that.audioSound.nativeElement.currentTime = 0;
+                  that.audioSound.nativeElement.play();
+                }
+                else that._postIdFirstTimeThrough = false;
               }
             });
 
@@ -750,8 +753,18 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
 
               // create post
               this.userForumPostService.create(this.userId, this.forumId, post).then(post => {
-                this._newPostId.next(post.postId);
-                this._talkingToServer = false;
+                let postId = {
+                  postId: post.data,
+                  creationDate: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // create post id
+                this.userForumPostIdService.create(this.userId, this.forumId, postId).then(() => {
+                  this._talkingToServer = false;
+                }).catch(error => {
+                  console.error(error);
+                  this._talkingToServer = false;
+                });
               }).catch(error => {
                 console.error(error);
                 this._talkingToServer = false;
