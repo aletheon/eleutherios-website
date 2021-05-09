@@ -5405,23 +5405,6 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  // because something is playing up with firestore deleting posts
-  // so use RT db instead to store them, create the forum first
-  var createForumRT = function () {
-    return new Promise((resolve, reject) => {
-      admin.database().ref(`users/${userId}/forums`).child(forumId).set({
-        forumId: forumId
-        // posts: [] <-- we will create this when we need it
-      })
-      .then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
-
   var addToUserForumNoTags = function () {
     return new Promise((resolve, reject) => {
       var forumRef = admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId);
@@ -5493,18 +5476,13 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     }
   ).then(() => {
     return createForumTotals().then(() => {
-      return createForumRT().then(() => {
-        return addToUserForumNoTags().then(() => {
-          if (forum.indexed == true && forum.type == 'Public'){
-            return createPublicForum().then(() => {
-              return createAnonymousForum().then(() => {
-                return addToPublicForumNoTags().then(() => {
-                  return addToAnonymousForumNoTags().then(() => {
-                    return Promise.resolve();
-                  })
-                  .catch(error => {
-                    return Promise.reject(error);
-                  });
+      return addToUserForumNoTags().then(() => {
+        if (forum.indexed == true && forum.type == 'Public'){
+          return createPublicForum().then(() => {
+            return createAnonymousForum().then(() => {
+              return addToPublicForumNoTags().then(() => {
+                return addToAnonymousForumNoTags().then(() => {
+                  return Promise.resolve();
                 })
                 .catch(error => {
                   return Promise.reject(error);
@@ -5517,12 +5495,12 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
             .catch(error => {
               return Promise.reject(error);
             });
-          }
-          else return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
+          })
+          .catch(error => {
+            return Promise.reject(error);
+          });
+        }
+        else return Promise.resolve();
       })
       .catch(error => {
         return Promise.reject(error);
@@ -6342,17 +6320,6 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
     }
   };
 
-  // this routine also removes
-  // this posts associated to this forum
-  var removeForumRT = async function () {
-    try {
-      await admin.database().ref(`users/${userId}/forums`).child(forumId).remove();
-      return;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   var removeUserForum = async function (tags) {
     try {
       if (tags && tags.length > 0)
@@ -6423,6 +6390,23 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
       if (forumForumSnapshot.size > 0){
         return await Promise.all(
           forumForumSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  var removeForumPosts = async function () {
+    try {
+      const forumPostSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/posts`).get();
+
+      if (forumPostSnapshot.size > 0){
+        return await Promise.all(
+          forumPostSnapshot.docs.map(async doc => {
             return doc.ref.delete();
           })
         );
@@ -6693,7 +6677,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
 
     let tags = await getTags();
 
-    await removeForumRT();
+    await removeForumPosts();
     await removeForumImages();
     await removeParentForum();
     await removeForumForums();
@@ -8833,38 +8817,6 @@ exports.deleteUserForumRegistrant = functions.firestore.document("users/{userId}
       });
     });
   };
-
-  // var removeRegistrantPosts = function () {
-  //   return new Promise((resolve, reject) => {
-  //     // remove all posts associated with this registrant
-  //     admin.firestore().collection(`users/${userId}/forums/${forumId}/posts`).where("registrantId", "==", registrantId).get().then(postSnapshot => {
-  //       if (postSnapshot.size > 0){
-  //         var promises = postSnapshot.docs.map(postDoc => {
-  //           return new Promise((resolve, reject) => {
-  //             // delete from the firebase db
-  //             var userForumPostRef = admin.database().ref(`users/${userId}/forums/${forumId}/posts/${postDoc.data().postId}`);
-  //             userForumPostRef.remove().then(() => {
-  //               resolve();
-  //             })
-  //             .catch(error => {
-  //               reject(error);
-  //             });
-  //           });
-  //         });
-
-  //         Promise.all(promises).then(() => {
-  //           resolve();
-  //         })
-  //         .catch(error => {
-  //           reject(error);
-  //         });
-  //       }
-  //     })
-  //     .catch(error => {
-  //       reject(error);
-  //     });
-  //   });
-  // };
 
   return admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`).select()
 		.get().then(snapshot => {
