@@ -4,9 +4,6 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  NewPostIdModel
-} from '../../shared';
 
 @Injectable()
 export class UserForumPostService {
