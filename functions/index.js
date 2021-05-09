@@ -6417,6 +6417,23 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
     }
   };
 
+  var removeForumPostIds = async function () {
+    try {
+      const forumPostIdSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/postids`).get();
+
+      if (forumPostIdSnapshot.size > 0){
+        return await Promise.all(
+          forumPostIdSnapshot.docs.map(async doc => {
+            return doc.ref.delete();
+          })
+        );
+      }
+      else return;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   var removeUserForumBreadcrumbs = async function () {
     try {
       const forumBreadcrumbSnapshot = await admin.firestore().collection(`users/${userId}/forums/${forumId}/breadcrumbs`).get();
@@ -6678,6 +6695,7 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
     let tags = await getTags();
 
     await removeForumPosts();
+    await removeForumPostIds();
     await removeForumImages();
     await removeParentForum();
     await removeForumForums();

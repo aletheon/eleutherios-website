@@ -308,33 +308,10 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
         else return of([]);
       })
     ).subscribe(activities => {
-      if (activities && activities.length > 0){
-        // activities.forEach(activity => {
-        //   // play highlightPost sound(s)
-        //   // set when new posts for the forum comes in
-        //   activity.highlight = false;
-
-        //   if (activity.receivePosts == true && activity.highlightPost == true){
-        //     let nopromise = {
-        //       catch : new Function()
-        //     };
-
-        //     // augment activity.highlightPost so real-time updates
-        //     // don't interfere with the css highlighting process
-        //     activity.highlight = true;
-
-        //     // make sure the user is not on the view forum page (user redundancy)
-        //     if (this._viewForumId != activity.forumId){
-        //       this.audioSound.nativeElement.pause();
-        //       this.audioSound.nativeElement.currentTime = 0;
-        //       (this.audioSound.nativeElement.play() || nopromise).catch(() => {});
-        //     }
-        //     else activity.highlight = false;
-        //   }
-        // })
+      if (activities && activities.length > 0)
         this.activities = of(activities);
-      }
-      else this.activities = of([]);
+      else
+        this.activities = of([]);
     });
   }
 }
