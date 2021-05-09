@@ -500,12 +500,15 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             // alert new post sound
             that._newPostIdSubscription = that.userForumPostIdService.getLastPostIds(forum.uid, forum.forumId, 1).subscribe(postIds => {
               if (postIds){
-                if (that._postIdFirstTimeThrough == false){
-                  that.audioSound.nativeElement.pause();
-                  that.audioSound.nativeElement.currentTime = 0;
-                  that.audioSound.nativeElement.play();
+                if (postIds[0].creationDate != null){
+                  if (that._postIdFirstTimeThrough == false){
+                    console.log('postIds ' + JSON.stringify(postIds[0]));
+                    that.audioSound.nativeElement.pause();
+                    that.audioSound.nativeElement.currentTime = 0;
+                    that.audioSound.nativeElement.play();
+                  }
+                  else that._postIdFirstTimeThrough = false;
                 }
-                else that._postIdFirstTimeThrough = false;
               }
             });
 
@@ -754,7 +757,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               // create post
               this.userForumPostService.create(this.userId, this.forumId, post).then(post => {
                 let postId = {
-                  postId: post.data,
+                  postId: post.postId,
                   creationDate: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
