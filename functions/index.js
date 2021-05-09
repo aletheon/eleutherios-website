@@ -8117,6 +8117,25 @@ exports.deleteUserForumPost = functions.firestore.document("users/{userId}/forum
     });
   };
 
+  var removePostId = function (){
+    return new Promise((resolve, reject) => {
+      admin.firestore().collection(`users/${userId}/forums/${forumId}/postids`).doc(postId).get().then(doc => {
+        if (doc.exists){
+          doc.ref.delete().then(() => {
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        }
+        else resolve();
+      })
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
+
   return admin.firestore().collection(`users/${userId}/forums/${forumId}/posts`).select()
     .get().then(snapshot => {
       return admin.database().ref("totals").child(forumId).once("value", totalSnapshot => {
@@ -8127,15 +8146,20 @@ exports.deleteUserForumPost = functions.firestore.document("users/{userId}/forum
       });
     }
   ).then(() => {
-    if (post.imageId && post.imageId.length > 0){
-      return removeImagePostReference().then(() => {
-        return Promise.resolve();
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-    }
-    else return Promise.resolve();
+    return removePostId().then(() => {
+      if (post.imageId && post.imageId.length > 0){
+        return removeImagePostReference().then(() => {
+          return Promise.resolve();
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      }
+      else return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
   });
 });
 
