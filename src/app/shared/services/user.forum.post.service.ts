@@ -46,10 +46,6 @@ export class UserForumPostService {
     return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.orderBy('creationDate','desc').limit(limit)).valueChanges();
   }
 
-  public getNewPostIds(parentUserId: string, forumId: string, limit: number): Observable<any[]> {
-    return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/newpostids`, ref => ref.orderBy('creationDate','desc').limit(limit)).valueChanges();
-  }
-
   public getPosts(parentUserId: string, forumId: string): Observable<any[]> {
     return this.afs.collection<any>(`users/${parentUserId}/forums/${forumId}/posts`, ref => ref.orderBy('creationDate','desc').limit(12)).valueChanges();
   }
