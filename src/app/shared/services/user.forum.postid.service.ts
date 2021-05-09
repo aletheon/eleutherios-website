@@ -12,12 +12,12 @@ export class UserForumPostIdService {
   // *********************************************************************
   // public methods
   // *********************************************************************
-  public create (parentUserId: string, forumId: string, data: any): Promise<void> {
+  public create (parentUserId: string, forumId: string, data: any): Promise<any> {
     return new Promise((resolve, reject) => {
       // create new post id
       const postIdRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/postids`).doc(data.postId);
       postIdRef.set(data).then(() => {
-        resolve();
+        resolve(data);
       })
       .catch(error => {
         reject(error);

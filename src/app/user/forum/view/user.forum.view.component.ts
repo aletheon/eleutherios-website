@@ -498,8 +498,8 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
             );
 
             // alert new post sound
-            that._newPostIdSubscription = that.userForumPostIdService.getLastPostIds(forum.uid, forum.forumId, 1).subscribe(postIds => {
-              if (postIds){
+            that._newPostIdSubscription = that.userForumPostIdService.getLastPostIds(forum.uid, forum.forumId, 2).subscribe(postIds => {
+              if (postIds && postIds.length > 0){
                 if (postIds[0].creationDate != null){
                   if (that._postIdFirstTimeThrough == false){
                     that.audioSound.nativeElement.pause();
@@ -509,6 +509,7 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
                   else that._postIdFirstTimeThrough = false;
                 }
               }
+              else that._postIdFirstTimeThrough = false;
             });
 
             // forum posts
