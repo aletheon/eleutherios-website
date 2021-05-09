@@ -502,7 +502,6 @@ export class UserForumViewComponent implements OnInit, OnDestroy  {
               if (postIds){
                 if (postIds[0].creationDate != null){
                   if (that._postIdFirstTimeThrough == false){
-                    console.log('postIds ' + JSON.stringify(postIds[0]));
                     that.audioSound.nativeElement.pause();
                     that.audioSound.nativeElement.currentTime = 0;
                     that.audioSound.nativeElement.play();
