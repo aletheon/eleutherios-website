@@ -40,11 +40,11 @@ This way of managing a request is circular or a network, because it's the forum,
 
 #### Features:
 
-* Forum in forum (scalability)
 * Tags for filtering forums or services (search)
-* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (accountability)
+* Forum in forum (scalability)
+* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (resilience)
 * Service ratings/reviews (trust)
-* B2B Payments (resilience)
+* B2B Payments (accountability)
 * Shared process or manifest (redundancy)
 * AI (automation)
 
