@@ -1,6 +1,6 @@
 <div class="navbar navbar-inverse" style="margin:0px;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
   <div style="flex:none;display:flex;flex-direction:row;align-items:center;margin-left:10px">
-    <img src="../../assets/eleutheriosLogo.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
+    <img src="../../assets/eleutheriosLogo2.gif" style="flex:none;margin-right:10px;cursor:pointer" onclick="event.stopPropagation()" (click)="home()">
     <ng-container *ngIf="auth.user | async; then showloggedinlogo else showloggedoutlogo"></ng-container>
     <ng-template #showloggedinlogo>
       <h4 style="flex:none;padding:0px;margin:0px;cursor:pointer;color:#faebd7;letter-spacing:0.5px" [routerLink]="['/']">Eleutherios(alpha)</h4>
