@@ -468,18 +468,18 @@ export class UserServiceDetailComponent implements OnInit, OnDestroy  {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let serviceId = params['serviceId'];
-          let serviceUserId = params['userId'];
-          let forumId = params['forumId'];
-          let forumUserId = params['forumUserId'];
+          let serviceId = params['serviceId'] ? params['serviceId'] : '';
+          let serviceUserId = params['userId'] ? params['userId'] : ''
+          let forumId = params['forumId'] ? params['forumId'] : ''
+          let forumUserId = params['forumUserId'] ? params['forumUserId'] : ''
 
-          if (forumId){
+          if (forumId.length > 0){
             this.id = of(forumId);
             this.returnUserId = of(forumUserId);
             this.returnType = of('Forum');
           }
 
-          if (serviceId){
+          if (serviceId.length > 0){
             this._initialServiceSubscription = this.userServiceService.getService(serviceUserId, serviceId).pipe(take(1))
               .subscribe(service => {
                 if (service){

@@ -199,8 +199,8 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this.parentForumId = params['forumId'];
-          this.parentForumUserId = params['userId'];
+          this.parentForumId = params['forumId'] ? params['forumId'] : '';
+          this.parentForumUserId = params['userId'] ? params['userId'] : '';
 
           const childForum: Forum = {
             forumId: '',

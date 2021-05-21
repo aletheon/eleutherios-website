@@ -102,9 +102,9 @@ export class AnonymousServiceDetailComponent implements OnInit, OnDestroy  {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      let serviceId = params['serviceId'];
+      let serviceId = params['serviceId'] ? params['serviceId'] : '';
 
-      if (serviceId){
+      if (serviceId.length > 0){
         // redirect user if they are already logged in
         if (this.auth.uid && this.auth.uid.length > 0){
           this.router.navigate(['/service/detail'], { queryParams: { serviceId: serviceId } });

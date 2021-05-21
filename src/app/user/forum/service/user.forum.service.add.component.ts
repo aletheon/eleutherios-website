@@ -476,8 +476,8 @@ export class UserForumServiceAddComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this.forumId = params['forumId'];
-          this.userId = params['userId'];
+          this.forumId = params['forumId'] ? params['forumId'] : '';
+          this.userId = params['userId'] ? params['userId'] : '';
 
           this._initialForumSubscription = this.userForumService.getForum(this.userId, this.forumId).pipe(take(1))
             .subscribe(forum => {

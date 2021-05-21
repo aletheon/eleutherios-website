@@ -106,13 +106,13 @@ export class ServiceRateListComponent implements OnInit, OnDestroy {
 
         // get params
         this.route.queryParams.subscribe((params: Params) => {
-          let parentServiceId = params['parentServiceId'];
+          let parentServiceId = params['parentServiceId'] ? params['parentServiceId'] : '';
 
           // reset keys if the route changes either public/private
           this.nextKey = null;
           this.prevKeys = [];
 
-          if (parentServiceId){
+          if (parentServiceId.length > 0){
             this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
               .subscribe(service => {
                 if (service){

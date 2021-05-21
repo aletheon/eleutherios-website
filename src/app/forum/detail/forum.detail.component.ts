@@ -464,13 +464,13 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let forumId = params['forumId'];
-          let serviceId = params['serviceId'];
-          let serviceUserId = params['serviceUserId']
-          let parentForumId = params['parentForumId'];
-          let parentForumUserId = params['forumUserId'];
+          let forumId = params['forumId'] ? params['forumId'] : '';
+          let serviceId = params['serviceId'] ? params['serviceId'] : '';
+          let serviceUserId = params['serviceUserId'] ? params['serviceUserId'] : '';
+          let parentForumId = params['parentForumId'] ? params['parentForumId'] : '';
+          let parentForumUserId = params['forumUserId'] ? params['forumUserId'] : '';
 
-          if (serviceId || parentForumId){
+          if (serviceId.length > 0 || parentForumId.length > 0){
             if (serviceId){
               this.id = of(serviceId);
               this.returnUserId = of(serviceUserId);
@@ -483,7 +483,7 @@ export class ForumDetailComponent implements OnInit, OnDestroy {
             }
           }
 
-          if (forumId){
+          if (forumId.length > 0){
             this._initialForumSubscription = this.forumService.getForum(forumId).pipe(take(1)).subscribe(forum => {
               if (forum){
                 this.forum = this.forumService.getForum(forumId);

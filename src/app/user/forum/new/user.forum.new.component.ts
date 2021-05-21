@@ -1036,8 +1036,8 @@ export class UserForumNewComponent implements OnInit, OnDestroy, AfterViewInit  
 
         this.route.queryParams.subscribe((params: Params) => {
           if (params['serviceId']){
-            let requestServiceId = params['serviceId'];
-            let requestServiceUserId = params['userId'];
+            let requestServiceId = params['serviceId'] ? params['serviceId'] : '';
+            let requestServiceUserId = params['userId'] ? params['userId'] : '';
 
             this._requestServiceId.next(requestServiceId);
             this._requestServiceUserId = requestServiceUserId;

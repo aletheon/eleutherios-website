@@ -269,60 +269,75 @@ export class UserReceiptViewComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).pipe(take(1)).subscribe(receipt => {
-            if (receipt){
-              this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, params['receiptId']).pipe(
-                switchMap(receipt => {
-                  if (receipt){
-                    let getBuyerService$ = this.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
-                    let getSellerService$ = this.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
+          let receiptId = params['receiptId'] ? params['receiptId'] : '';
 
-                    return combineLatest([getBuyerService$, getSellerService$]).pipe(
-                      switchMap(results => {
-                        const [buyerService, sellerService] = results;
+          if (receiptId.length > 0){
+            this._initialReceiptSubscription = this.userReceiptService.getReceipt(this.loggedInUserId, receiptId).pipe(take(1)).subscribe(receipt => {
+              if (receipt){
+                this.receipt = this.userReceiptService.getReceipt(this.loggedInUserId, receiptId).pipe(
+                  switchMap(receipt => {
+                    if (receipt){
+                      let getBuyerService$ = this.userServiceService.getService(receipt.buyerUid, receipt.buyerServiceId);
+                      let getSellerService$ = this.userServiceService.getService(receipt.sellerUid, receipt.sellerServiceId);
 
-                        if (buyerService){
-                          receipt.buyerPaymentType = buyerService.paymentType;
-                          receipt.buyerTitle = buyerService.title;
-                          receipt.buyerDescription = buyerService.description;
-                        }
-                        else {
-                          receipt.buyerPaymentType = 'No service';
-                          receipt.buyerTitle = 'No service';
-                          receipt.buyerDescription = '';
-                        }
+                      return combineLatest([getBuyerService$, getSellerService$]).pipe(
+                        switchMap(results => {
+                          const [buyerService, sellerService] = results;
 
-                        if (sellerService){
-                          receipt.sellerPaymentType = sellerService.paymentType;
-                          receipt.sellerTitle = sellerService.title;
-                          receipt.sellerDescription = sellerService.description;
-                        }
-                        else {
-                          receipt.sellerPaymentType = 'No service';
-                          receipt.sellerTitle = 'No service';
-                          receipt.sellerDescription = '';
-                        }
-                        return of(receipt);
-                      })
-                    );
+                          if (buyerService){
+                            receipt.buyerPaymentType = buyerService.paymentType;
+                            receipt.buyerTitle = buyerService.title;
+                            receipt.buyerDescription = buyerService.description;
+                          }
+                          else {
+                            receipt.buyerPaymentType = 'No service';
+                            receipt.buyerTitle = 'No service';
+                            receipt.buyerDescription = '';
+                          }
+
+                          if (sellerService){
+                            receipt.sellerPaymentType = sellerService.paymentType;
+                            receipt.sellerTitle = sellerService.title;
+                            receipt.sellerDescription = sellerService.description;
+                          }
+                          else {
+                            receipt.sellerPaymentType = 'No service';
+                            receipt.sellerTitle = 'No service';
+                            receipt.sellerDescription = '';
+                          }
+                          return of(receipt);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                this.initForm();
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Receipt does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
                   }
-                  else return of(null);
-                })
-              );
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Receipt does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
-          });
+                );
+                this.router.navigate(['/']);
+              }
+            });
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'No paymentId was supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
         });
       }
     });

@@ -103,11 +103,11 @@ export class ServiceReviewViewComponent implements OnInit, OnDestroy  {
 
         // get params
         this.route.queryParams.subscribe((params: Params) => {
-          let parentServiceId = params['parentServiceId'];
-          this._userId = params['userId'];
-          this._serviceId = params['serviceId'];
+          let parentServiceId = params['parentServiceId'] ? params['parentServiceId'] : '';
+          this._userId = params['userId'] ? params['userId'] : '';
+          this._serviceId = params['serviceId'] ? params['serviceId'] : '';
 
-          if (parentServiceId){
+          if (parentServiceId.length > 0){
             this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
               .subscribe(service => {
                 if (service){

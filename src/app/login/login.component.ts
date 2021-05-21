@@ -11,7 +11,7 @@ import { NotificationSnackBar } from '../shared/components/notification.snackbar
 import * as _ from "lodash";
 import * as firebase from 'firebase/app';
 import * as firebaseui from 'firebaseui';
-import { 
+import {
   UserService,
   User
 } from '../shared';
@@ -44,16 +44,16 @@ export class LoginComponent implements OnInit {
 
   ngOnInit () {
     const that = this;
-    
+
     // redirect the user if they are logged in
     if (this.auth.uid && this.auth.uid.length > 0){
       // get ids for other sources
       this.route.queryParams.subscribe((params: Params) => {
-        let forumId = params['forumId'];
-        let serviceId = params['serviceId'];
-  
+        let forumId = params['forumId'] ? params['forumId'] : '';
+        let serviceId = params['serviceId'] ? params['serviceId'] : '';
+
         // redirect to other sources
-        if (forumId)
+        if (forumId.length > 0)
           this.router.navigate(['/forum/detail'], { queryParams: { forumId: forumId } });
         else if (serviceId)
           this.router.navigate(['/service/detail'], { queryParams: { serviceId: serviceId } });

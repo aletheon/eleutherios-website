@@ -128,14 +128,14 @@ export class UserServiceReviewListComponent implements OnInit, OnDestroy {
 
         // get params
         this.route.queryParams.subscribe((params: Params) => {
-          let parentServiceUserId = params['parentServiceUserId'];
-          let parentServiceId = params['parentServiceId'];
+          let parentServiceUserId = params['parentServiceUserId'] ? params['parentServiceUserId'] : '';
+          let parentServiceId = params['parentServiceId'] ? params['parentServiceId'] : '';
 
           // reset keys if the route changes either public/private
           this.nextKey = null;
           this.prevKeys = [];
 
-          if (parentServiceUserId && parentServiceId){
+          if (parentServiceUserId.length > 0 && parentServiceId.length > 0){
             this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId).pipe(take(1))
               .subscribe(service => {
                 if (service){

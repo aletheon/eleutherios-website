@@ -196,23 +196,38 @@ export class UserForumEditComponent implements OnInit, OnDestroy, AfterViewInit 
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this._initialForumSubscription = this.userForumService.getForum(this.loggedInUserId, params['forumId']).pipe(take(1)).subscribe(forum => {
-            if (forum){
-              this.forum = this.userForumService.getForum(this.loggedInUserId, params['forumId']);
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Forum does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
-          });
+          let forumId = params['forumId'] ? params['forumId'] : '';
+
+          if (forumId.length > 0){
+            this._initialForumSubscription = this.userForumService.getForum(this.loggedInUserId, forumId).pipe(take(1)).subscribe(forum => {
+              if (forum){
+                this.forum = this.userForumService.getForum(this.loggedInUserId, forumId);
+                this.initForm();
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Forum does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
+                  }
+                );
+                this.router.navigate(['/']);
+              }
+            });
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'There was no forumId supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
         });
       }
     });

@@ -1133,30 +1133,44 @@ export class UserServiceEditComponent implements OnInit, OnDestroy, AfterViewIni
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let onboarding = params['onboarding'];
+          let onboarding = params['onboarding'] ? params['onboarding'] : '';
+          let serviceId = params['serviceId'] ? params['serviceId'] : '';
 
-          if (onboarding)
+          if (onboarding.length > 0)
             this._onboarding = true;
 
-          this._initialServiceSubscription = this.userServiceService.getService(this.loggedInUserId, params['serviceId']).pipe(take(1)).subscribe(service => {
-            if (service){
-              this.service = this.userServiceService.getService(this.loggedInUserId, params['serviceId']);
-              this.searchPrivateForums = true;
-              this.searchForumIncludeTagsInSearch = true;
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Service does not exist or you do not have permission to edit it',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/service/list', 'private']);
-            }
-          });
+          if (serviceId.length > 0){
+            this._initialServiceSubscription = this.userServiceService.getService(this.loggedInUserId, serviceId).pipe(take(1)).subscribe(service => {
+              if (service){
+                this.service = this.userServiceService.getService(this.loggedInUserId, serviceId);
+                this.searchPrivateForums = true;
+                this.searchForumIncludeTagsInSearch = true;
+                this.initForm();
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Service does not exist or you do not have permission to edit it',
+                    panelClass: ['red-snackbar']
+                  }
+                );
+                this.router.navigate(['/service/list', 'private']);
+              }
+            });
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'No serviceId was supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
         });
       }
     });

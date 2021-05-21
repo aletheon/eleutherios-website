@@ -116,15 +116,15 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
 
         // get params
         this.route.queryParams.subscribe((params: Params) => {
-          let parentServiceId = params['parentServiceId'];
-          this._userId = params['userId'];
-          this._serviceId = params['serviceId'];
+          let parentServiceId = params['parentServiceId'] ? params['parentServiceId'] : '';
+          this._userId = params['userId'] ? params['userId'] : '';
+          this._serviceId = params['serviceId'] ? params['serviceId'] : '';
 
           // reset keys if the route changes either public/private
           this.nextKey = null;
           this.prevKeys = [];
 
-          if (parentServiceId){
+          if (parentServiceId.length > 0){
             this._initialServiceSubscription = this.serviceService.getService(parentServiceId).pipe(take(1))
               .subscribe(service => {
                 if (service){
@@ -239,7 +239,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
               NotificationSnackBar,
               {
                 duration: 8000,
-                data: 'You cannot rate your own service',
+                data: 'You cannot review your own service',
                 panelClass: ['red-snackbar']
               }
             );

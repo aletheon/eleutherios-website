@@ -79,6 +79,7 @@ export class UserReceiptListComponent implements OnInit, OnDestroy {
           // reset keys if the route changes either public/private
           this.nextKey = null;
           this.prevKeys = [];
+
           this._siteTotalSubscription = this.siteTotalService.getTotal(this.loggedInUserId)
             .subscribe(total => {
               if (total){

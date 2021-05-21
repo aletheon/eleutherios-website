@@ -269,60 +269,75 @@ export class UserPaymentViewComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          this._initialPaymentSubscription = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']).pipe(take(1)).subscribe(payment => {
-            if (payment){
-              this.payment = this.userPaymentService.getPayment(this.loggedInUserId, params['paymentId']).pipe(
-                switchMap(payment => {
-                  if (payment){
-                    let getBuyerService$ = this.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
-                    let getSellerService$ = this.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
+          let paymentId = params['paymentId'] ? params['paymentId'] : '';
 
-                    return combineLatest([getBuyerService$, getSellerService$]).pipe(
-                      switchMap(results => {
-                        const [buyerService, sellerService] = results;
+          if (paymentId.length > 0){
+            this._initialPaymentSubscription = this.userPaymentService.getPayment(this.loggedInUserId, paymentId).pipe(take(1)).subscribe(payment => {
+              if (payment){
+                this.payment = this.userPaymentService.getPayment(this.loggedInUserId, paymentId).pipe(
+                  switchMap(payment => {
+                    if (payment){
+                      let getBuyerService$ = this.userServiceService.getService(payment.buyerUid, payment.buyerServiceId);
+                      let getSellerService$ = this.userServiceService.getService(payment.sellerUid, payment.sellerServiceId);
 
-                        if (buyerService){
-                          payment.buyerPaymentType = buyerService.paymentType;
-                          payment.buyerTitle = buyerService.title;
-                          payment.buyerDescription = buyerService.description;
-                        }
-                        else {
-                          payment.buyerPaymentType = 'No service';
-                          payment.buyerTitle = 'No service';
-                          payment.buyerDescription = '';
-                        }
+                      return combineLatest([getBuyerService$, getSellerService$]).pipe(
+                        switchMap(results => {
+                          const [buyerService, sellerService] = results;
 
-                        if (sellerService){
-                          payment.sellerPaymentType = sellerService.paymentType;
-                          payment.sellerTitle = sellerService.title;
-                          payment.sellerDescription = sellerService.description;
-                        }
-                        else {
-                          payment.sellerPaymentType = 'No service';
-                          payment.sellerTitle = 'No service';
-                          payment.sellerDescription = '';
-                        }
-                        return of(payment);
-                      })
-                    );
+                          if (buyerService){
+                            payment.buyerPaymentType = buyerService.paymentType;
+                            payment.buyerTitle = buyerService.title;
+                            payment.buyerDescription = buyerService.description;
+                          }
+                          else {
+                            payment.buyerPaymentType = 'No service';
+                            payment.buyerTitle = 'No service';
+                            payment.buyerDescription = '';
+                          }
+
+                          if (sellerService){
+                            payment.sellerPaymentType = sellerService.paymentType;
+                            payment.sellerTitle = sellerService.title;
+                            payment.sellerDescription = sellerService.description;
+                          }
+                          else {
+                            payment.sellerPaymentType = 'No service';
+                            payment.sellerTitle = 'No service';
+                            payment.sellerDescription = '';
+                          }
+                          return of(payment);
+                        })
+                      );
+                    }
+                    else return of(null);
+                  })
+                );
+                this.initForm();
+              }
+              else {
+                const snackBarRef = this.snackbar.openFromComponent(
+                  NotificationSnackBar,
+                  {
+                    duration: 8000,
+                    data: 'Payment does not exist or was recently removed',
+                    panelClass: ['red-snackbar']
                   }
-                  else return of(null);
-                })
-              );
-              this.initForm();
-            }
-            else {
-              const snackBarRef = this.snackbar.openFromComponent(
-                NotificationSnackBar,
-                {
-                  duration: 8000,
-                  data: 'Payment does not exist or was recently removed',
-                  panelClass: ['red-snackbar']
-                }
-              );
-              this.router.navigate(['/']);
-            }
-          });
+                );
+                this.router.navigate(['/']);
+              }
+            });
+          }
+          else {
+            const snackBarRef = this.snackbar.openFromComponent(
+              NotificationSnackBar,
+              {
+                duration: 8000,
+                data: 'No paymentId was supplied',
+                panelClass: ['red-snackbar']
+              }
+            );
+            this.router.navigate(['/']);
+          }
         });
       }
     });

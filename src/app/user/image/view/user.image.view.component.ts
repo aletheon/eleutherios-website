@@ -90,8 +90,8 @@ export class UserImageViewComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let nextKey = params['nextKey'];
-          let prevKey = params['prevKey'];
+          let nextKey = params['nextKey'] ? params['nextKey'] : '';
+          let prevKey = params['prevKey'] ? params['prevKey'] : ''
 
           if (nextKey)
             this.nextKeyQuerystring = of(nextKey);

@@ -100,10 +100,10 @@ export class ServiceImageListComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let serviceId = params['serviceId'];
+          let serviceId = params['serviceId'] ? params['serviceId'] : '';
           this.serviceGroup.get('serviceId').setValue(params['serviceId']);
 
-          if (serviceId){
+          if (serviceId.length > 0){
             this._initialServiceSubscription = this.serviceService.getService(serviceId).pipe(take(1))
               .subscribe(service => {
                 if (service){

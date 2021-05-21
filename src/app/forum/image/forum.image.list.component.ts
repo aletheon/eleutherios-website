@@ -105,10 +105,10 @@ export class ForumImageListComponent implements OnInit, OnDestroy {
         this.loggedInUserId = user.uid;
 
         this.route.queryParams.subscribe((params: Params) => {
-          let forumId = params['forumId'];
+          let forumId = params['forumId'] ? params['forumId'] : '';
           this.forumGroup.get('forumId').setValue(params['forumId']);
 
-          if (forumId){
+          if (forumId.length > 0){
             this._initialForumSubscription = this.forumSerivce.getForum(forumId).pipe(take(1))
               .subscribe(forum => {
                 if (forum){

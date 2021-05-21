@@ -123,13 +123,13 @@ export class UserServiceReviewViewComponent implements OnInit, OnDestroy  {
 
         // get params
         this.route.queryParams.subscribe((params: Params) => {
-          let parentServiceUserId = params['parentServiceUserId'];
-          let parentServiceId = params['parentServiceId'];
+          let parentServiceUserId = params['parentServiceUserId'] ? params['parentServiceUserId'] : '';
+          let parentServiceId = params['parentServiceId'] ? params['parentServiceId'] : '';
 
-          this._userId = params['userId'];
-          this._serviceId = params['serviceId'];
+          this._userId = params['userId'] ? params['userId'] : '';
+          this._serviceId = params['serviceId'] ? params['serviceId'] : '';
 
-          if (parentServiceUserId && parentServiceId){
+          if (parentServiceUserId.length > 0 && parentServiceId.length > 0){
             this._initialServiceSubscription = this.userServiceService.getService(parentServiceUserId, parentServiceId)
               .subscribe(service => {
                 this._initialServiceSubscription.unsubscribe();

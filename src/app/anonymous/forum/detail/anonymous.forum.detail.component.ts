@@ -103,9 +103,9 @@ export class AnonymousForumDetailComponent implements OnInit, OnDestroy {
     this._loading.next(true);
 
     this.route.queryParams.subscribe((params: Params) => {
-      let forumId = params['forumId'];
+      let forumId = params['forumId'] ? params['forumId'] : '';
 
-      if (forumId){
+      if (forumId.length > 0){
         // redirect user if they are already logged in
         if (this.auth.uid && this.auth.uid.length > 0){
           this.router.navigate(['/forum/detail'], { queryParams: { forumId: forumId } });
