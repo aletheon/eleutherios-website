@@ -443,9 +443,9 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
               })
             );
 
-            // get service serving in this forum
+            // services serving in the forum
             that.registrants = that.userForumRegistrantService.getRegistrants(forum.uid, forum.forumId).pipe(
-              switchMap(registrants => { // get the service
+              switchMap(registrants => {
                 if (registrants && registrants.length > 0){
                   let observables = registrants.map(registrant => {
                     let getService$ = that.userServiceService.getService(registrant.uid, registrant.serviceId).pipe(
