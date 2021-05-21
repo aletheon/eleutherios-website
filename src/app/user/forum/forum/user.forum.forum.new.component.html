@@ -170,36 +170,38 @@
             <ng-container *ngIf="registrants | async;let registrantItems">
               <ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants">
                 <ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
-                  <ng-container *ngIf="registrant.service | async; then showservice"></ng-container>
-                  <ng-template #showservice>
-                    <ng-container *ngIf="registrant.service | async;let service">
-                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
-                        <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
-                        <ng-template #showdefaultserviceimage>
-                          <ng-container *ngIf="service.defaultServiceImage | async;let image">
-                            <div style="flex:none;margin-right:5px">
-                              <img [src]="image.tinyDownloadUrl">
-                            </div>
-                          </ng-container>
-                        </ng-template>
-                        <p style="flex:1;margin-right:5px">
-                          <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | truncate: 35 }}</a>
-                          <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | truncate: 35 }}</a>
-                        </p>
-                        <div style="flex:none">
-                          <ng-container *ngIf="loggedInUserId != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
-                          <ng-template #showblockcontrol>
-                            <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
-                              <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
-                            </mat-select>
+                  <ng-container *ngIf="registrant.service | async;let service">
+                    <ng-container *ngIf="service; then showservice"></ng-container>
+                    <ng-template #showservice>
+                      <ng-container *ngIf="registrant.service | async;let service">
+                        <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+                          <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+                          <ng-template #showdefaultserviceimage>
+                            <ng-container *ngIf="service.defaultServiceImage | async;let image">
+                              <div style="flex:none;margin-right:5px">
+                                <img [src]="image.tinyDownloadUrl">
+                              </div>
+                            </ng-container>
                           </ng-template>
-                          <ng-template #noblockcontrol>
-                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
-                          </ng-template>
+                          <p style="flex:1;margin-right:5px">
+                            <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | truncate: 35 }}</a>
+                            <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | truncate: 35 }}</a>
+                          </p>
+                          <div style="flex:none">
+                            <ng-container *ngIf="loggedInUserId != service.uid; then showblockcontrol else noblockcontrol"></ng-container>
+                            <ng-template #showblockcontrol>
+                              <mat-select #select="matSelect" placeholder="" (selectionChange)="blockRegistrant($event, registrant)">
+                                <mat-option *ngFor="let t of blockTypes" [value]="t">{{ t }}</mat-option>
+                              </mat-select>
+                            </ng-template>
+                            <ng-template #noblockcontrol>
+                              <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+                            </ng-template>
+                          </div>
                         </div>
-                      </div>
-                    </ng-container>
-                  </ng-template>
+                      </ng-container>
+                    </ng-template>
+                  </ng-container>
                 </ng-container>
               </ng-container>
             </ng-container>
