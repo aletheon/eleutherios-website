@@ -168,7 +168,7 @@
           <!-- registrants -->
           <div style="display:flex;flex-direction:row;overflow-x:auto;margin-bottom:10px">
             <ng-container *ngIf="registrants | async;let registrantItems">
-              <ng-container *ngIf="registrantItems.length > 0; then showregistrants else noregistrants">
+              <ng-container *ngIf="registrantItems.length > 0">
                 <ng-container *ngFor="let registrant of registrantItems; trackBy: trackRegistrants">
                   <ng-container *ngIf="registrant.service | async;let service">
                     <ng-container *ngIf="service; then showservice"></ng-container>
