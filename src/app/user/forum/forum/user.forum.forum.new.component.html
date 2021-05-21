@@ -173,7 +173,7 @@
                   <ng-container *ngIf="registrant.service | async;let service">
                     <ng-container *ngIf="service; then showservice"></ng-container>
                     <ng-template #showservice>
-                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;margin-right:5px;flex-wrap:nowrap">
+                      <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:row;align-items:center;padding:5px;margin-right:5px;flex-wrap:nowrap">
                         <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
                         <ng-template #showdefaultserviceimage>
                           <ng-container *ngIf="service.defaultServiceImage | async;let image">
@@ -194,7 +194,7 @@
                             </mat-select>
                           </ng-template>
                           <ng-template #noblockcontrol>
-                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer" matTooltip="Remove">close</mat-icon>
+                            <mat-icon onclick="event.stopPropagation()" (click)="removeRegistrant(registrant)" style="cursor:pointer;color:#1B1B1B" matTooltip="Remove">close</mat-icon>
                           </ng-template>
                         </div>
                       </div>
