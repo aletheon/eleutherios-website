@@ -1329,7 +1329,14 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               })
             )
             .subscribe(serviceImage => {
-              that.defaultServiceImage = of(serviceImage);
+              if (serviceImage)
+                that.defaultServiceImage = of(serviceImage);
+              else {
+                let tempImage = {
+                  smallDownloadUrl: '../../../../assets/defaultThumbnail.jpg'
+                };
+                that.defaultServiceImage = of(tempImage);
+              }
             });
 
             // service tags
