@@ -18,15 +18,39 @@ Or, a person receiving a vaccination from a Healthcare Worker.
 
 Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
 
+```bash
+Forum (Holiday to New Zealand)
+-- Service (Donna or customer)
+-- Service (Travel Agent or business)
+Forum (COVID-19 vaccination)
+-- Service (Donna or customer)
+-- Service (Healthcare Worker or business)
+Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
+-- Service (Donna or customer)
+-- Service (Jetstar Airlines or business)
+```
+
 For example, the request or conversation, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.
 
 ![5b](./src/assets/5b.jpg)
 
 Eleutherios changes this behavior, by decoupling the request or turning it into a service (i.e website) that services, can see or participate in.
 
+```bash
+Forum (Holiday to New Zealand)
+-- Service (Donna or customer)
+-- Service (Travel Agent or business)
+-- Forum (COVID-19 vaccination)
+---- Service (Donna or customer)
+---- Service (Healthcare Worker or business)
+---- Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
+------ Service (Donna or customer)
+------ Service (Jetstar Airlines or business)
+```
+
 Now, Donna’s request for air travel, can be seen or managed by other services serving in the system, including the Healthcare worker and Jetstar Airlines.
 
-Eleutherios provides the tools, that enable end users to create both public or private, requests or forums in the system, including:
+Eleutherios, provides the tools or features to enable people or businesses, to serve in the same forum, customer request or conversation, together.
 
 #### Features:
 
