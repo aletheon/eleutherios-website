@@ -16,8 +16,6 @@ Or, a person receiving a vaccination from a Healthcare Worker.
 
 ![4b](./src/assets/4b.jpg)
 
-Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
-
 ```bash
 Forum (Holiday to New Zealand)
 -- Service (Donna or customer)
@@ -30,11 +28,11 @@ Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
 -- Service (Jetstar Airlines or business)
 ```
 
+Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
+
 For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.  In order to talk to them, Donna has to create a separate request or forum.
 
 ![5b](./src/assets/5b.jpg)
-
-Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses, can see or participate in.
 
 ```bash
 Forum (Holiday to New Zealand)
@@ -47,6 +45,8 @@ Forum (Holiday to New Zealand)
 ------ Service (Donna or customer)
 ------ Service (Jetstar Airlines or business)
 ```
+
+Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses, can see or participate in.
 
 Now, Donna’s request or forum, for a Holiday, can be seen or managed by other services, serving in the system. Including the Healthcare worker and Jetstar Airlines.
 
