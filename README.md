@@ -30,7 +30,7 @@ Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
 -- Service (Jetstar Airlines or business)
 ```
 
-For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.  In order to talk to them, Donna has to create a separate request or forum, with them.
+For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.  In order to talk to them, Donna has to create a separate request or forum.
 
 ![5b](./src/assets/5b.jpg)
 
