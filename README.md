@@ -4,7 +4,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or new wa
 
 ![1b](./src/assets/1b.jpg)
 
-It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
+It does this, by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
 
 ![2b](./src/assets/2b.jpg)
 
@@ -12,19 +12,19 @@ Such as a Travel Agent booking a flight with an airline.
 
 ![3b](./src/assets/3b.jpg)
 
-Or, a person receiving a vaccination from a Healthcare worker.
+Or, a person receiving a vaccination from a Healthcare Worker.
 
 ![4b](./src/assets/4b.jpg)
 
 Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
 
-For example, the request or conversation, between the Travel agent and Jetstar airlines, can’t be seen or managed by Donna or the Healthcare worker.
+For example, the request or conversation, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.
 
 ![5b](./src/assets/5b.jpg)
 
 Eleutherios changes this behavior, by decoupling the request or turning it into a service (i.e website) that services, can see or participate in.
 
-Now, Donna’s request for air travel can be seen or managed by other services serving in the system, including the Healthcare worker and Jetstar Airlines.
+Now, Donna’s request for air travel, can be seen or managed by other services serving in the system, including the Healthcare worker and Jetstar Airlines.
 
 Eleutherios provides the tools, that enable end users to create both public or private, requests or forums in the system, including:
 
