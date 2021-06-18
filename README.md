@@ -30,11 +30,11 @@ Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
 -- Service (Jetstar Airlines or business)
 ```
 
-For example, the request or conversation, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.
+For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.  In order to talk to them, Donna has to create a separate request or forum, with them.
 
 ![5b](./src/assets/5b.jpg)
 
-Eleutherios changes this behavior, by decoupling the request or turning it into a service (i.e website) that services, can see or participate in.
+Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses, can see or participate in.
 
 ```bash
 Forum (Holiday to New Zealand)
@@ -48,9 +48,9 @@ Forum (Holiday to New Zealand)
 ------ Service (Jetstar Airlines or business)
 ```
 
-Now, Donna’s request for air travel, can be seen or managed by other services serving in the system, including the Healthcare worker and Jetstar Airlines.
+Now, Donna’s request or forum, for a Holiday, can be seen or managed by other services, serving in the system. Including the Healthcare worker and Jetstar Airlines.
 
-Eleutherios, provides the tools or features to enable people or businesses, to serve in the same forum, customer request or conversation, together.
+Eleutherios, provides the tools, that people or businesses need in order to have a global or multi-stake holder (SME,NGO, government) conversation.
 
 #### Features:
 
