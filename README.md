@@ -46,9 +46,9 @@ Forum (Holiday to New Zealand)
 
 Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses, can see or participate in.
 
-Now, Donna’s request or forum, for a Holiday, can be seen or managed by other services, serving in the system. Including the Healthcare worker and Jetstar Airlines.
+Now, Donna’s request or forum to take a Holiday, is non-separate or can be seen or managed by more, than one person or business at a time. Including the Healthcare worker and Jetstar Airlines.
 
-Eleutherios, provides the tools, that people or businesses need in order to have a global or multi-stake holder (SME,NGO, government) conversation.
+Eleutherios, provides the tools, that people or businesses need in order to have a global or multi-stake holder (SME,NGO, government) conversation with one another.
 
 #### Features:
 
