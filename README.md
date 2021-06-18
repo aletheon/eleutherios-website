@@ -4,7 +4,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or new wa
 
 ![1b](./src/assets/1b.jpg)
 
-It does this, by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
+It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
 
 ![2b](./src/assets/2b.jpg)
 
@@ -27,7 +27,7 @@ Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
 -- Service (Jetstar Airlines or business)
 ```
 
-Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
+Unfortunately, this way of serving customer requests, doesn't scale or the services are too, tightly coupled to one another.
 
 For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jestar Airlines.  In order to talk to them, Donna has to create a separate request or forum.
 
