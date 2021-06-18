@@ -4,7 +4,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or new wa
 
 ![1b](./src/assets/1b.jpg)
 
-It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
+It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
 
 ![2b](./src/assets/2b.jpg)
 
