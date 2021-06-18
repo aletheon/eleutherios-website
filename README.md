@@ -44,7 +44,7 @@ Forum (Holiday to New Zealand)
 ------ Service (Jetstar Airlines or business)
 ```
 
-Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses, can see or participate in.
+Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses can see or participate.
 
 Now, Donna’s request or forum to take a Holiday, is non-separate or can be seen or managed by more, than one person or business at a time. Including the Healthcare worker and Jetstar Airlines.
 
