@@ -48,7 +48,7 @@ Eleutherios changes this behavior, by decoupling the customer request or forum a
 
 Now, Donna’s request or forum to take a Holiday, is non-separate or can be seen or managed by more, than one person or business at a time. Including the Healthcare worker and Jetstar Airlines.
 
-Eleutherios, provides the tools, that people or businesses need in order to have a global or multi-stake holder (SME,NGO, government) conversation with one another.
+Eleutherios, provides the tools, that people or businesses need in order to have a global or multi-stake holder (SME, NGO, government) conversation with one another.
 
 #### Features:
 
