@@ -1,44 +1,32 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or circular request, that enables services (people or business) to serve one another at scale or from the Heart.
-
-Eleutherios operates like a computer network, where servers subscribe to the network in order to make requests to other servers on the network.  Eleutherios does the same thing, except the server is a person or business, and the request is a forum or customer.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or new way for people or businesses to serve one another, online.
 
 ![1b](./src/assets/1b.jpg)
 
-People or businesses, are use to serving one another on a local level or one business, per forum or request.
+It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service industry is having with one another.
 
-```bash
-Forum (Lump under armpit)
--- Service (Mary or customer)
--- Service (Doctor or business)
-Forum (Insurance claim)
--- Service (Doctor or customer)
--- Service (NZ Insurance or business)
-Forum (Mammogram test)
--- Service (NZ Insurance or customer)
--- Service (Radiologist or business)
-```
+![2b](./src/assets/2b.jpg)
 
-In this example, there is only one business managing each of the three forums.  A doctor is managing, Mary's forum for a lump under her armpit. An insurance company is managing the doctor's forum for an insurance claim, and a radiologist is managing the insurers forum for a mammogram test.
+Such as a Travel Agent booking a flight with an airline.
 
-Eleutherios changes this, by inverting or scaling the forum, so that more than one business can manage it.
+![3b](./src/assets/3b.jpg)
 
-```bash
-Forum (Lump under armpit)
--- Service (Mary or customer)
--- Service (Doctor or business)
--- Forum (Insurance claim)
----- Service (Doctor or customer)
----- Service (Healthcare Insurance or business)
----- Forum (Mammogram test)
------- Service (Healthcare Insurance or customer)
------- Service (Radiologist or business)
-```
+Or, a person receiving a vaccination from a Healthcare worker.
 
-In this example, there is more than one business or service (doctor, healthcare insurer and radiologist) all managing the forum for a lump under Mary's armpit.  Each service is being invited by another service, through a sub-forum to manage, that aspect of the request or conversation.
+![4b](./src/assets/4b.jpg)
 
-This way of managing a request is circular or a network, because it's the forum, that is being scaled, not the service or work, that people or businesses are performing.  People or businesses still pay one another, or provide the same service or work in the world, but within the same forum or conversation.
+Unfortunately, this way of serving customer requests, does’nt scale or the services are too, tightly coupled to one another.
+
+For example, the request or conversation, between the Travel agent and Jetstar airlines, can’t be seen or managed by Donna or the Healthcare worker.
+
+![5b](./src/assets/5b.jpg)
+
+Eleutherios changes this behavior, by decoupling the request or turning it into a service (i.e website) that services, can see or participate in.
+
+Now, Donna’s request for air travel can be seen or managed by other services serving in the system, including the Healthcare worker and Jetstar Airlines.
+
+Eleutherios provides the tools, that enable end users to create both public or private, requests or forums in the system, including:
 
 #### Features:
 
