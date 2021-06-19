@@ -22,9 +22,11 @@ For example, the customer request or forum, between Donna and the Travel Agent, 
 
 ![5c](./src/assets/5c.jpg)
 
-Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses can see or participate in.
+Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses, can see or participate in.
 
 Now, Donna’s request or forum to take a Holiday to New Zealand, can be seen or managed by more than one person or business at a time. Including the Healthcare worker or Jetstar Airlines.
+
+Eleutherios provides, people or businesses with the tools to scale their forums and invite other people or businesses to join or help manage them.
 
 #### Features:
 
