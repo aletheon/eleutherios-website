@@ -14,39 +14,15 @@ Such as a Travel Agent booking a flight with an airline.
 
 Or, a person receiving a vaccination from a Healthcare Worker.
 
-![4b](./src/assets/4b.jpg)
+![4c](./src/assets/4c.jpg)
 
 Unfortunately, this way of serving customer requests, doesn't scale or the services are too, tightly coupled to one another.
 
-```bash
-Forum (Holiday to New Zealand)
--- Service (Donna or customer)
--- Service (Travel Agent or business)
-Forum (COVID-19 vaccination)
--- Service (Donna or customer)
--- Service (Healthcare Worker or business)
-Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
--- Service (Donna or customer)
--- Service (Jetstar Airlines or business)
-```
-
 For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jetstar Airlines.  In order to talk to them, Donna has to create a separate request or forum.
 
-![5b](./src/assets/5b.jpg)
+![5c](./src/assets/5c.jpg)
 
 Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses can see or participate in.
-
-```bash
-Forum (Holiday to New Zealand)
--- Service (Donna or customer)
--- Service (Travel Agent or business)
--- Forum (COVID-19 vaccination)
----- Service (Donna or customer)
----- Service (Healthcare Worker or business)
----- Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
------- Service (Donna or customer)
------- Service (Jetstar Airlines or business)
-```
 
 Now, Donna’s request or forum to take a Holiday to New Zealand, can be seen or managed by more, than one person, business or stake holder (SME, NGO, government) at a time. Including the Healthcare worker or Jetstar Airlines.
 

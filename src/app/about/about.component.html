@@ -14,31 +14,11 @@
     <p style="margin-bottom:5px">Such as a Travel Agent booking a flight with an airline.</p>
     <img src="../../assets/3b.jpg" style="margin-bottom:5px" />
     <p style="margin-bottom:5px">Or, a person receiving a vaccination from a Healthcare Worker.</p>
-    <img src="../../assets/4b.jpg" style="margin-bottom:5px" />
+    <img src="../../assets/4c.jpg" style="margin-bottom:5px" />
     <p style="margin-bottom:5px">Unfortunately, this way of serving customer requests, doesn't scale or the services are too, tightly coupled to one another.</p>
-<pre>
-Forum (Holiday to New Zealand)
--- Service (Donna or customer)
--- Service (Travel Agent or business)
-Forum (COVID-19 vaccination)
--- Service (Donna or customer)
--- Service (Healthcare Worker or business)
-Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
--- Service (Donna or customer)
--- Service (Jetstar Airlines or business)</pre>
     <p style="margin-bottom:5px">For example, the customer request or forum, between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jetstar Airlines. In order to talk to them, Donna has to create a separate request or forum.</p>
-    <img src="../../assets/5b.jpg" style="margin-bottom:5px" />
+    <img src="../../assets/5c.jpg" style="margin-bottom:5px" />
     <p style="margin-bottom:5px">Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses can see or participate in.</p>
-<pre>
-Forum (Holiday to New Zealand)
--- Service (Donna or customer)
--- Service (Travel Agent or business)
--- Forum (COVID-19 vaccination)
----- Service (Donna or customer)
----- Service (Healthcare Worker or business)
----- Forum (Flight to Auckland, New Zealand, August 21, 8.05am)
------- Service (Donna or customer)
------- Service (Jetstar Airlines or business)</pre>
     <p style="margin-bottom:5px">Now, Donna’s request or forum to take a Holiday to New Zealand, can be seen or managed by more, than one person, business or stake holder (SME, NGO, government) at a time. Including the Healthcare worker or Jetstar Airlines.</p>
     <h5>Features:</h5>
     <ul>
