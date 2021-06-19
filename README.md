@@ -24,7 +24,7 @@ For example, the customer request or forum, between Donna and the Travel Agent, 
 
 Eleutherios changes this behavior, by decoupling the customer request or forum and turning it into a service (i.e website) that, people or businesses can see or participate in.
 
-Now, Donna’s request or forum to take a Holiday to New Zealand, can be seen or managed by more, than one person, business or stake holder (SME, NGO, government) at a time. Including the Healthcare worker or Jetstar Airlines.
+Now, Donna’s request or forum to take a Holiday to New Zealand, can be seen or managed by more than one person or business at a time. Including the Healthcare worker or Jetstar Airlines.
 
 #### Features:
 
