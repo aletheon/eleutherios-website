@@ -1,7 +1,7 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;height:100%">
   <ng-container *ngIf="publicForums | async;let publicForumItems">
-    <ng-container *ngIf="publicForumItems.length > 0; then showpublicforums"></ng-container>
+    <ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
     <ng-template #showpublicforums>
       <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Forums</h4>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
@@ -55,9 +55,14 @@
         </ng-container>
       </div>
     </ng-template>
+    <ng-template #nopublicforums>
+      <p style="flex:none;color:#999;font-size:90%">
+        <i>No Forums</i>
+      </p>
+    </ng-template>
   </ng-container>
   <ng-container *ngIf="publicServices | async;let publicServiceItems">
-    <ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices"></ng-container>
+    <ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else nopublicservices"></ng-container>
     <ng-template #showpublicservices>
       <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h4>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
@@ -141,6 +146,11 @@
           </div>
         </ng-container>
       </div>
+    </ng-template>
+    <ng-template #nopublicservices>
+      <p style="flex:none;color:#999;font-size:90%">
+        <i>No Services</i>
+      </p>
     </ng-template>
   </ng-container>
 </div>
