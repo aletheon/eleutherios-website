@@ -121,6 +121,3 @@ ii.   go to http://localhost:4200/
 
 Help fix bugs or resolve issues.
 https://github.com/aletheon/eleutherios-website/issues
-
-Make a donation to the Eleutherios open source project.
-https://opencollective.com/eleutherios
