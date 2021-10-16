@@ -33,8 +33,6 @@ Now, Donna’s request or forum to take a Holiday to New Zealand can be seen or 
 * Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (resilience)
 * Service ratings/reviews (trust)
 * B2B Payments (accountability)
-* Shared process or manifest (capacity/redundancy)
-* AI (automation)
 
 Eleutherios is built with Node.js, Firestore and Angular.
 
