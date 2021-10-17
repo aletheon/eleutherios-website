@@ -26,7 +26,7 @@ Eleutherios changes this behavior by decoupling the customer request and turning
 
 Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one person or business, including the Distributor and Farmer.
 
-Eleutherios provides people or businesses with the tools to scale their forums and invite other people or businesses to join or help manage them.
+Eleutherios gives service providers the tools to scale their request or forum, and invite other service providers to join and help manage them.
 
 #### Features:
 
