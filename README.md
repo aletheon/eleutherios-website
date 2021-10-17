@@ -22,7 +22,7 @@ For example the request between Mary and the Retailer can’t be seen or managed
 
 ![5c](./src/assets/5c.jpg)
 
-Eleutherios changes this behavior by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses can subscribe too.
+Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that people or businesses can subscribe too.
 
 Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one person or business, including the Distributor and Farmer.
 
