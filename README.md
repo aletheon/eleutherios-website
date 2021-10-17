@@ -18,7 +18,7 @@ Or, a distributor requesting ten ton of fruit + vegetables from a farmer.
 
 Unfortunately this way of serving customer requests doesn't scale or the services are too tightly coupled to one another.
 
-For example the request between Mary and the Retailer can’t be seen or managed by the Farmer or Distributor.
+For example the request between Mary and the Retailer can’t be seen or managed by the Distributor or Farmer.
 
 ![5c](./src/assets/5c.jpg)
 
