@@ -24,7 +24,7 @@ For example the request between Mary and the Retailer can’t be seen or managed
 
 Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that people or businesses can subscribe too.
 
-Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one person or business, including the Distributor and Farmer.
+Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one service provider, including the Distributor and Farmer.
 
 Eleutherios gives service providers the tools to scale their request or forum, and invite other service providers to join and help manage them.
 
