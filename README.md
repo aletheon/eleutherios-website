@@ -1,30 +1,32 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or new way for people or businesses to cooperate or serve one another online.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or two-way communications network that enables service providers (people or business) to cooperate or serve one another online.
 
-![1b](./src/assets/1b.jpg)
+![1b](./src/assets/1b.png)
 
-It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
+It does this by decoupling or scaling the customer request, forum or conversation that the vertical domain or service layer is having with one another.
 
-![2b](./src/assets/2b.jpg)
+![2b](./src/assets/2b.png)
 
-Such as a Travel Agent booking a flight with an airline.
+Such as an individual requesting a bag of apples from a retailer.
 
-![3b](./src/assets/3b.jpg)
+![3b](./src/assets/3b.png)
 
-Or, a person receiving a vaccination from a Healthcare Worker.
+Or, a distributor requesting ten ton of fruit + vegetables from a farmer.
 
-![4c](./src/assets/4c.jpg)
+![4c](./src/assets/4b.png)
 
 Unfortunately this way of serving customer requests doesn't scale or the services are too tightly coupled to one another.
 
-For example the customer request or forum between Donna and the Travel Agent, can’t be seen or managed by the Healthcare Worker or Jetstar Airlines.  In order to talk to them Donna has to create a separate request or forum.
+For example the request between Mary and the Retailer can’t be seen or managed by the Farmer or Distributor.
 
 ![5c](./src/assets/5c.jpg)
 
-Eleutherios changes this behavior by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses can see or participate in.
+Eleutherios changes this behavior by decoupling the customer request or forum and turning it into a service (i.e website) that people or businesses can subscribe too.
 
-Now, Donna’s request or forum to take a Holiday to New Zealand can be seen or managed by more than one person or business, including the Healthcare worker or Jetstar Airlines.
+Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one person or business, including the Distributor and Farmer.
+
+Eleutherios provides people or businesses with the tools to scale their forums and invite other people or businesses to join or help manage them.
 
 #### Features:
 
