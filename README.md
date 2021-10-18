@@ -12,21 +12,17 @@ Such as an individual requesting a bag of apples from a retailer.
 
 ![3b](./src/assets/3b.png)
 
-Or, a distributor requesting ten ton of fruit + vegetables from a farmer.
+Or a distributor requesting ten ton of fruit + vegetables from a farmer.
 
 ![4c](./src/assets/4b.png)
 
-Unfortunately this way of serving customer requests doesn't scale or the services are too tightly coupled to one another.
-
-For example the request between Mary and the Retailer can’t be seen or managed by the Distributor or Farmer.
+Unfortunately this way of serving customer requests doesn't scale or the request can only go in one direction.
 
 ![5c](./src/assets/5c.jpg)
 
-Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that people or businesses can subscribe too.
+Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that service providers can subscribe too.
 
-Now Mary's request or forum for a Bag of Apples can be seen or managed by more than one service provider, including the Distributor and Farmer.
-
-Eleutherios gives service providers the tools to scale their request or forum, and invite other service providers to join and help manage the conversation.
+Now, Mary's request or forum for a Bag of Apples can be scaled or go in both directions.  Eleutherios gives service providers the tools to scale their request or forum, and invite other service providers to join and help manage the conversation.
 
 #### Features:
 
