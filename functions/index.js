@@ -2253,38 +2253,6 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
-  var updateWhereServings = async function () {
-    try {
-      const whereServingSnapshot = await admin.firestore().collection(`users/${userId}/services/${serviceId}/whereservings`).get();
-
-      if (whereServingSnapshot.size > 0){
-        return await Promise.all(
-          whereServingSnapshot.docs.map(async whereServingDoc => {
-            var whereServing = whereServingDoc.data();
-            var updateRegistrant = async function () {
-              try {
-                var registrantSnapshot = await admin.firestore().collection(`users/${whereServing.uid}/forums/${whereServing.forumId}/registrants`).where("serviceId", "==", serviceId).get();
-                var registrantRef = registrantSnapshot.docs[0].ref;
-                var registrant = registrantSnapshot.docs[0].data();
-
-                if (registrantSnapshot.size > 0)
-                  await registrantRef.update();
-
-                return;
-              } catch (error) {
-                throw error;
-              }
-            };
-            return await updateRegistrant();
-          })
-        );
-      }
-      else return;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   var createOrUpdatePublicService = function (tags) {
     return new Promise((resolve, reject) => {
       var createPublicServiceCollectionTitles = function (tags) {
@@ -2842,37 +2810,32 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
 
   return getTags().then(tags => {
     return updateUserService(tags).then(() => {
-      return updateWhereServings().then(() => {
-        if (newValue.indexed == true && newValue.type == 'Public'){
-          return createOrUpdatePublicService(tags).then(() => {
-            return createOrUpdateAnonymousService(tags).then(() => {
-              return Promise.resolve();
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+      if (newValue.indexed == true && newValue.type == 'Public'){
+        return createOrUpdatePublicService(tags).then(() => {
+          return createOrUpdateAnonymousService(tags).then(() => {
+            return Promise.resolve();
           })
           .catch(error => {
             return Promise.reject(error);
           });
-        }
-        else {
-          return removePublicService(tags).then(() => {
-            return removeAnonymousService(tags).then(() => {
-              return Promise.resolve();
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      }
+      else {
+        return removePublicService(tags).then(() => {
+          return removeAnonymousService(tags).then(() => {
+            return Promise.resolve();
           })
           .catch(error => {
             return Promise.reject(error);
           });
-        }
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      }
 		})
 		.catch(error => {
 			return Promise.reject(error);
