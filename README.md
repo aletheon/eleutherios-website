@@ -4,15 +4,15 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or two-wa
 
 ![1b](./src/assets/1b.png)
 
-It does this by decoupling or scaling the customer request, forum or conversation that the vertical domain or service layer is having with one another.
+It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
 
 ![2b](./src/assets/2b.png)
 
-Such as an individual requesting a bag of apples from a retailer.
+Such as an individual buying a can of corn from a retailer.
 
 ![3b](./src/assets/3b.png)
 
-Or a distributor requesting ten ton of fruit + vegetables from a farmer.
+Or a manufacturer requesting a ton of corn from a farmer.
 
 ![4c](./src/assets/4b.png)
 
@@ -20,9 +20,9 @@ Unfortunately this way of serving customer requests doesn't scale or the request
 
 ![5c](./src/assets/5b.png)
 
-Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that service providers can subscribe too.
+Eleutherios changes this behavior by decoupling the customer request and turning it into a service or conversation, that can go in both directions.
 
-Now, Mary's request or forum for a Bag of Apples can be scaled or go in both directions.  Eleutherios gives service providers the tools to scale their request or forum, and invite other service providers to join and help manage the conversation.
+Now, Mary's request for a can of corn can be created once and service providers can self-organize themselves around it.  Eleutherios gives service providers the tools to scale their request and invite other service providers to join and help manage the conversation.
 
 #### Features:
 
