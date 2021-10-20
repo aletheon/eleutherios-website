@@ -24,7 +24,7 @@ Eleutherios changes this behavior by decoupling the customer request from the se
 
 Now, if the Farmer needs to be a part of the conversation about a Can of Corn, then they could be invited to join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of Corn, then they can be invited to join that conversation.
 
-Eleutherios provides basic features, but will evolve to provide a governance or policies layer, B2B API to enable service providers to run services or store data onto their own servers.  AI, Analytics + Reporting, book-keeping etc.
+Eleutherios provides basic features, but will evolve to provide a governance or policies layer, B2B API to enable service providers to run services or provide data from their own servers.  AI, Analytics + Reporting, book-keeping etc.
 
 #### Features:
 
