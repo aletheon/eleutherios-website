@@ -16,7 +16,7 @@ Or a manufacturer buying a ton of corn from a farmer.
 
 ![4c](./src/assets/4b.png)
 
-Unfortunately this way of serving customer requests doesn't scale or the request can only go in one direction.
+Unfortunately this way of serving a customers request doesn't scale or the request can only go in one direction.
 
 ![5c](./src/assets/5b.png)
 
