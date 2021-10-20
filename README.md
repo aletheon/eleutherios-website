@@ -20,7 +20,7 @@ Unfortunately this way of serving a customers request doesn't scale or the reque
 
 ![5c](./src/assets/5b.png)
 
-Eleutherios changes this behavior by decoupling the customer request from the services layer and turns it into a forum or conversation, that can go in both directions.
+Eleutherios changes this behavior by decoupling the customer request from the services layer and turning it into a forum or conversation, that can go in both directions.
 
 Now, if the Farmer needs to be a part of the conversation about a Can of Corn, then they could be invited to join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of Corn, then they can be invited to join that conversation.
 
