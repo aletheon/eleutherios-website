@@ -12,7 +12,7 @@ Such as an individual buying a can of corn from a retailer.
 
 ![3b](./src/assets/3b.png)
 
-Or a manufacturer requesting a ton of corn from a farmer.
+Or a manufacturer buying a ton of corn from a farmer.
 
 ![4c](./src/assets/4b.png)
 
