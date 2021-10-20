@@ -20,9 +20,11 @@ Unfortunately this way of serving customer requests doesn't scale or the request
 
 ![5c](./src/assets/5b.png)
 
-Eleutherios changes this behavior by decoupling the customer request and turning it into a service or conversation, that can go in both directions.
+Eleutherios changes this behavior by decoupling the customer request layer and turning it into a service or conversation, that can go in both directions.
 
-Now, Mary's request for a can of corn can be created once and service providers can self-organize themselves around it.  Eleutherios gives service providers the tools to scale their request and invite other service providers to join and help manage the conversation.
+Now, if the Farmer needs to be a part of the conversation about a can of corn, they can join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of corn, then they can be invited to join that conversation.
+
+Eleutherios provides basic features, but will quickly evolve to include more SAAS, PAAS features such as AI, analytics + reporting.
 
 #### Features:
 
