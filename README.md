@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or two-way communications network that enables service providers (people or business) to cooperate or serve one another online.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or two-way communications network that enables service providers (people or business) to cooperate or serve one another at scale.
 
 ![1b](./src/assets/1b.png)
 
@@ -22,17 +22,17 @@ Unfortunately this way of serving customer requests doesn't scale or the request
 
 Eleutherios changes this behavior by decoupling the customer request layer and turning it into a service or conversation, that can go in both directions.
 
-Now, if the Farmer needs to be a part of the conversation about a Can of Corn, then they could be invited to join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of corn, then they can be invited to join that conversation.
+Now, if the Farmer needs to be a part of the conversation about a Can of Corn, then they could be invited to join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of Corn, then they can be invited to join that conversation.
 
-Eleutherios provides basic features, but will quickly evolve to include more SAAS, PAAS features such as AI, analytics + reporting.
+Eleutherios provides basic features, but will evolve to provide a governance or policies layer, B2B API to enable service providers to run services or store data onto their own servers.  AI, Analytics + Reporting, book-keeping etc.
 
 #### Features:
 
-* Tags for filtering forums or services (search)
-* Forum in forum (scalability)
-* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request (resilience)
-* Service ratings/reviews (trust)
-* B2B Payments (accountability)
+* Tags for filtering forums or services
+* Forum in forum
+* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
+* Service ratings/reviews
+* B2B Payments
 
 Eleutherios is built with Node.js, Firestore and Angular.
 
