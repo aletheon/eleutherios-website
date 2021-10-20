@@ -22,7 +22,7 @@ Unfortunately this way of serving customer requests doesn't scale or the request
 
 Eleutherios changes this behavior by decoupling the customer request layer and turning it into a service or conversation, that can go in both directions.
 
-Now, if the Farmer needs to be a part of the conversation about a can of corn, they can join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of corn, then they can be invited to join that conversation.
+Now, if the Farmer needs to be a part of the conversation about a Can of Corn, then they could be invited to join that conversation.  Likewise if the retailer needs to join the conversation about a Tonne of corn, then they can be invited to join that conversation.
 
 Eleutherios provides basic features, but will quickly evolve to include more SAAS, PAAS features such as AI, analytics + reporting.
 
