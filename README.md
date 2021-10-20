@@ -18,7 +18,7 @@ Or a distributor requesting ten ton of fruit + vegetables from a farmer.
 
 Unfortunately this way of serving customer requests doesn't scale or the request can only go in one direction.
 
-![5c](./src/assets/5b.jpg)
+![5c](./src/assets/5b.png)
 
 Eleutherios changes this behavior by decoupling the customer request and turning it into a service (i.e website) that service providers can subscribe too.
 
