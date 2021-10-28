@@ -22,7 +22,7 @@ Unfortunately this way of serving customer requests, doesn't scale or the reques
 
 Eleutherios changes this behavior by decoupling the customer request from the services layer and turning it into a forum or conversation, that can travel in both directions.
 
-Now, if Mary Smith and the Retailer needed the help of the farmer?  Then they could scale their forum and invite the farmer to join their conversation.  Likewise if the farmer and manufacturer needed the help of the retailer, then they could scale their forum and invite the retailer to join that.
+Now, if Mary Smith and the Retailer needed the help of the farmer?  Then they could scale their forum and invite the farmer to join their conversation.  Likewise if the farmer and manufacturer needed the help of the retailer, then they could scale their forum and invite the retailer to join their conversation.
 
 Eleutherios provides basic features, but will evolve to provide a governance or policies layer, B2B API to enable service providers to run services or provide data from their own servers.  AI, Analytics + Reporting, book-keeping etc.
 
