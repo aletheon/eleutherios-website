@@ -191,7 +191,7 @@ export class UserActivityClosedComponent implements OnInit, OnDestroy {
                   activity.defaultForumImage = of(defaultForumImage);
                 else {
                   let tempImage = {
-                    url: '../../../assets/defaultTiny.jpg'
+                    tinyDownloadUrl: '../../../assets/defaultTiny.jpg'
                   };
                   activity.defaultForumImage = of(tempImage);
                 }

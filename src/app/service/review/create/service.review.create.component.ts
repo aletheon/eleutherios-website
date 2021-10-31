@@ -392,7 +392,7 @@ export class ServiceReviewCreateComponent implements OnInit, OnDestroy {
                           service.defaultServiceImage = of(defaultServiceImage);
                         else {
                           let tempImage = {
-                            url: '../../../assets/defaultThumbnail.jpg'
+                            smallDownloadUrl: '../../../assets/defaultThumbnail.jpg'
                           };
                           service.defaultServiceImage = of(tempImage);
                         }

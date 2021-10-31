@@ -1,12 +1,8 @@
-<ng-container *ngIf="userTotal | async as total">
-  <div style="display:flex;flex-direction:row;justify-content:center">
-    <p style="flex:none;margin:0 5px 5px 5px;cursor:pointer;color:#818181" onclick="event.stopPropagation()" (click)="changeActivitySideBar()">
-      ({{ total.activityCount }})
-    </p>
-  </div>
-</ng-container>
+<div style="display:flex;flex-direction:row">
+  <p style="flex:1;padding:5px;cursor:pointer" onclick="event.stopPropagation()" (click)="changeActivitySideBar()"></p>
+</div>
 <ng-container *ngIf="activities | async;let activityItems">
-  <ng-container *ngIf="activityItems.length > 0; then showactivity else noactivity"></ng-container>
+  <ng-container *ngIf="activityItems.length > 0; then showactivity"></ng-container>
   <ng-template #showactivity>
     <div style="display:flex;flex-direction:column;align-items:flex-start;padding:0 3px 0 3px">
       <ng-container *ngFor="let activity of activityItems; trackBy: trackActivities">
@@ -25,9 +21,6 @@
         </div>
       </ng-container>
     </div>
-  </ng-template>
-  <ng-template #noactivity>
-    <!-- <p style="width:20px"></p> -->
   </ng-template>
 </ng-container>
 <audio #audioSound>
