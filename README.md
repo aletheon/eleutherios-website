@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a platform that provides human beings with the tools to create a self-sustainable, human community on earth.
+Eleutherios (https://eleutherios.org.nz) is a platform that provides services (people or business) with the tools to create a self-sustainable, human community on earth.
 
 It does this by operating as a two-way communications network to enable service providers (people or business) to cooperate or serve one another online.
 
