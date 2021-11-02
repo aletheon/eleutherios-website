@@ -28,7 +28,7 @@ Now, if Mary Smith and the Retailer needed the help of the farmer?  Then they co
 
 Eleutherios provides basic features, but will evolve to provide a governance layer, B2B API to enable service providers to run services or provide data from their own servers.  AI, Analytics + Reporting, book-keeping etc.
 
-#### Features:
+#### Current features:
 
 * Tags for filtering forums or services
 * Forum in forum
