@@ -6,7 +6,7 @@ It does this by operating as a two-way communications network to enable service 
 
 ![1b](./src/assets/1b.png)
 
-It does this by decoupling or scaling the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
+Eleutherios decouples or scales the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
 
 ![2b](./src/assets/2b.png)
 
