@@ -28,7 +28,7 @@ In the above example, the Barley yield farming forum is a child of the Barley yi
 
 The current version of Eleutherios provides basic tooling such as creating a forum, creating a sub-forum, creating a service, searching for forums or services, and purchasing services.
 
-Over-time Eleutherios will evolve into a PAAS (Platform-as-a-service) or cloud architecture, enabling service providers to operate their business through the platform at scale.
+Over-time Eleutherios will evolve into a PAAS (Platform-as-a-service) or cloud architecture, enabling service providers to operate their business at scale.
 
 #### Current features:
 
