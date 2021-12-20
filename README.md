@@ -1,40 +1,38 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a platform that provides services (people or business) with the tools to create a self-sustainable, human community on earth.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or sociopolitical or economic system, that enables humankind to self-organize with one another at scale, via the internet.
 
-It does this by operating as a two-way communications network to enable service providers to cooperate or serve one another online.
+![futureOverview](./src/assets/futureOverview.jpg)
 
-![1b](./src/assets/1b.png)
+It does this by scaling the request layer (customer) over the service layer (business) to enable more than one service provider to be able to participate in the same request or network at the same time.
 
-Eleutherios decouples or scales the customer request, forum or conversation, that the vertical domain or service layer is having with one another.
+![currentOverview](./src/assets/currentOverview.jpg)
 
-![2b](./src/assets/2b.png)
+Our current human sociopolitical or economic system does the opposite and doesn’t scale the request layer. Only one service provider can participate in the request or network at the same time.
 
-Such as an individual buying a can of corn from a retailer.
+There are many problems that manifest from this type of behavior, such as a competitive service layer, an inherent cost to acquire customers and the inability to share data or policies.
 
-![3b](./src/assets/3b.png)
+Eleutherios changes this behavior by turning the service layer into a cooperative network and reducing the cost for service providers to acquire customers, and enabling them to share data and policies with one another.
 
-Or a manufacturer buying a ton of corn from a farmer.
+![subforum](./src/assets/subforum.jpg)
 
-![4c](./src/assets/4b.png)
+End users can create a forum or request, that can be scaled indefinitely, enabling more than one service provider to be able to participate in the same forum or request.
 
-Unfortunately this way of serving customer requests, doesn't scale or the request can only travel in one direction.
+![breadcrumb](./src/assets/breadcrumb.jpg)
 
-![5c](./src/assets/5b.png)
+End users can navigate their way around the conversation through a virtual breadcrumb.
 
-Eleutherios changes this behavior by decoupling the customer request from the services layer and turning it into a forum or conversation, that can travel in both directions.
+![priskaService](./src/assets/priskaService.jpg)
 
-Now, if Mary Smith and the Retailer needed the help of the farmer?  Then they could scale their forum and invite the farmer to join their conversation.  Likewise if the farmer and manufacturer needed the help of the retailer, then they could scale their forum and invite the retailer to join their conversation.
-
-Eleutherios provides basic features, but will evolve to provide a governance layer, B2B API to enable service providers to run services or provide data from their own servers.  AI, Analytics + Reporting, book-keeping etc.
+The current version of Eleutherios provides basic business tools such as creating a forum, scaling a forum, creating a service, searching for forums or services, and purchasing services. Over-time Eleutherios will evolve into a PAAS or cloud environment, enabling service providers to operate their business, through our platform.
 
 #### Current features:
 
-* Tags for filtering forums or services
-* Forum in forum
-* Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
-* Service ratings/reviews
-* B2B Payments
+- Tags for filtering forums or services
+- Forum in forum
+- Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
+- Service ratings/reviews
+- B2B Payments
 
 Eleutherios is built with Node.js, Firestore and Angular.
 
@@ -77,6 +75,7 @@ export const environment = {
   url: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 };
 ```
+
 ```bash
 iv.   firebase login
 v.    firebase init
@@ -84,7 +83,7 @@ v.    firebase init
 
 ### 2. Login to firebase and deploy functions folder
 
-Eleutherios uses functions to modify the behavior of the system and its data before or after it is created, updated or deleted in the system.  If you are planning on doing work on the backend API, then you should install firebase functions to help you test your work before committing it.
+Eleutherios uses functions to modify the behavior of the system and its data before or after it is created, updated or deleted in the system. If you are planning on doing work on the backend API, then you should install firebase functions to help you test your work before committing it.
 
 ```bash
 i.   cd functions
