@@ -1,30 +1,34 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or sociopolitical or economic system, that enables humankind to self-organize with one another at scale, via the internet.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or digital sociopolitical or economic system, that enables humankind to self-organize with one another at scale through the internet.
 
 ![futureOverview](./src/assets/futureOverview.jpg)
 
-It does this by scaling the request layer (customer) over the service layer (business) to enable more than one service provider to be able to participate in the same request or network at the same time.
+It does this by scaling the request layer (customer) horizontally over the service layer (business) to enable, more than one service provider to be able to participate in the same forum or request (B2B)
 
 ![currentOverview](./src/assets/currentOverview.jpg)
 
-Our current human sociopolitical or economic system does the opposite and doesn’t scale the request layer. Only one service provider can participate in the request or network at the same time.
+In the old school analogue sociopolitical or economic system it's the opposite. Only one service provider can participate in the forum or request (B2C).
 
-There are many problems that manifest from this type of behavior, such as a competitive service layer, an inherent cost to acquire customers and the inability to share data or policies.
-
-Eleutherios changes this behavior by turning the service layer into a cooperative network and reducing the cost for service providers to acquire customers, and enabling them to share data and policies with one another.
+There are many problems that can occur from this type of behavior. Such as competition among service providers; an inherent cost to acquire customers; and the inability for service providers to able to share data or policies with one another.
 
 ![subforum](./src/assets/subforum.jpg)
 
-End users can create a forum or request, that can be scaled indefinitely, enabling more than one service provider to be able to participate in the same forum or request.
+Eleutherios changes this behavior by making the forum or request scalable. In this example Hire My Farmer wants to use the Barley yield data, that they're getting from GYGA to share with another service provider.
+
+They can click on the plus button to create a sub-forum in the Barley yield data forum and include the service provider they want to share the data with.
 
 ![breadcrumb](./src/assets/breadcrumb.jpg)
 
-End users can navigate their way around the conversation through a virtual breadcrumb.
+The main advantage to doing this is that it separates the concerns of each service provider. Service providers are able to take the responsibility for managing their request or concerns of their customers.
+
+In the above example, the Barley yield farming forum is a child of the Barley yield data forum. Service providers can navigate their way through the conversation using a virtual breadcrumb.
 
 ![priskaService](./src/assets/priskaService.jpg)
 
-The current version of Eleutherios provides basic business tools such as creating a forum, scaling a forum, creating a service, searching for forums or services, and purchasing services. Over-time Eleutherios will evolve into a PAAS or cloud environment, enabling service providers to operate their business, through our platform.
+The current version of Eleutherios provides basic tooling such as creating a forum, creating a sub-forum, creating a service, searching for forums or services, and purchasing services.
+
+Over-time Eleutherios will evolve into a PAAS (Platform-as-a-service) or cloud architecture, enabling service providers to operate their business through the platform at scale.
 
 #### Current features:
 
