@@ -2,25 +2,25 @@
 @import "../node_modules/css-star-rating/css/star-rating.css";
 @import "~firebaseui/dist/firebaseui.css";
 
-
-html, body {
-	height: 100%;
-	margin: 0;
+html,
+body {
+  height: 100%;
+  margin: 0;
 }
 
 p {
-	margin:0;
-	padding:0;
+  margin: 0;
+  padding: 0;
 }
 
 .green-snackbar {
-	background: #2E7D32;
-	text-align:center;
+  background: #2e7d32;
+  text-align: center;
 }
 
 .red-snackbar {
-	background: rgb(195, 34, 34);
-	text-align:center;
+  background: rgb(195, 34, 34);
+  text-align: center;
 }
 
 .btn-circle {
@@ -33,7 +33,15 @@ p {
   border-radius: 15px;
 }
 
-a.linkColor { color:#faebd7 }
-a.linkColor:hover { color:#faebd7 }
-a.viewPageLinkyClass { color:#337ab7 }
-a.viewPageLinkyClass:hover { color:#337ab7 }
+a.linkColor {
+  color: #faebd7;
+}
+a.linkColor:hover {
+  color: #faebd7;
+}
+a.viewPageLinkyClass {
+  color: #337ab7;
+}
+a.viewPageLinkyClass:hover {
+  color: #337ab7;
+}
