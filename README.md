@@ -50,9 +50,9 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 #### Current features:
 
 - Search for finding forums or services
-- Forum in forum
+- Redundant forum (forum in forum)
 - Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
-- Service ratings/reviews
+- Service ratings and reviews
 - B2B Payments
 
 Eleutherios is built with Node.js, Firestore and Angular.
