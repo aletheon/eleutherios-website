@@ -2,33 +2,43 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or digital sociopolitical or economic system, that enables humankind to self-organize with one another at scale through the internet.
 
-![futureOverview](./src/assets/futureOverview.jpg)
+![futureOverview](./src/assets/futureOverview2.jpg)
 
-It does this by scaling the request layer (customer) horizontally over the service layer (business) to enable, more than one service provider to be able to participate in the same forum or request (B2B)
+Our approach to unlocking data for systems governance is to presume stakeholders or service providers are in relationship with one another or operating under the same policy, rule, regulation or system. And then, provide them with the tools to be able to scale the forum or network that they are participating in.
 
-![currentOverview](./src/assets/currentOverview.jpg)
+#### Advantages
 
-In the old school analogue sociopolitical or economic system it's the opposite. Only one service provider can participate in the forum or request (B2C).
+- Creates global partnerships (Service providers can create and share policies with one another)
+- Builds capacity (Service providers can create a non-redundant forum or customer request)
+- Improves livelihoods or equality (Service providers can create new businesses or business models)
+- Reduced cost of goods and materials, waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
-There are many problems that can occur from this type of behavior. Such as competition among service providers; an inherent cost to acquire customers; and the inability for service providers to able to share data or policies with one another.
+![currentOverview](./src/assets/currentOverview3.jpg)
 
-![subforum](./src/assets/subforum.jpg)
+What we discovered is that the current human sociopolitical or economic system, presumes that services providers are not in relationship with one another or operating under different policies, rules or regulations. Service providers do not have the tools to scale their request or network and have other service providers join.
 
-Eleutherios changes this behavior by making the forum or request scalable. In this example Hire My Farmer wants to use the Barley yield data, that they're getting from GYGA to share with another service provider.
+#### Disadvantages
 
-They can click on the plus button to create a sub-forum in the Barley yield data forum and include the service provider they want to share the data with.
+- Creates local partnerships (Service providers cannot create and share policies)
+- Prevents capacity building (Service providers cannot create a non-redundant forum or customer request)
+- Impairs livelihoods (Service providers cannot create new businesses or business models)
+- Increases cost of goods and materials, waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
 
-![breadcrumb](./src/assets/breadcrumb.jpg)
+![priskaservice](./src/assets/priskaService.jpg)
 
-The main advantage to doing this is that it separates the concerns of each service provider. Service providers are able to take the responsibility for managing their request or concerns of their customers.
+Priska can register with the website and create a service. She can give it a price, title, description, website url and tags.
 
-In the above example, the Barley yield farming forum is a child of the Barley yield data forum. Service providers can navigate their way through the conversation using a virtual breadcrumb.
+![selectforum](./src/assets/selectForum.jpg)
 
-![priskaService](./src/assets/priskaService.jpg)
+End users can search for services such as Priska’s and request her service by clicking on the plus symbol to create a forum.
 
-The current version of Eleutherios provides basic tooling such as creating a forum, creating a sub-forum, creating a service, searching for forums or services, and purchasing services.
+![newforum](./src/assets/newForum.jpg)
 
-Over-time Eleutherios will evolve into a PAAS (Platform-as-a-service) or cloud architecture, enabling service providers to operate their business at scale.
+In this example, Moin wants access to barley yield data from Priska and has added himself (Hire My Farmer) and Priska (Gyga) to the forum.
+
+![subforum](./src/assets/subForum.jpg)
+
+Service providers communicate with one another by sending text messages through the forum. They can click the plus button on the services tab to keep adding more services to the conversation or click the sub-forum button to create a feedback loop to separate the concerns of each request.
 
 #### Current features:
 
