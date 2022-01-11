@@ -44,6 +44,9 @@ Separating the concerns of each request is important, because it enables service
 ![parentlevel](./src/assets/parentLevel.jpg)
 At the parent level sub-forums show up in a list and can be navigated to by clicking on them.
 
+![breadcrumb](./src/assets/breadcrumb.jpg)
+At the child level the parent shows up as a breadcrumb, where the service provider can navigate their way back up the tree by clicking on the parent forum.
+
 #### Current features:
 
 - Tags for filtering forums or services
