@@ -24,7 +24,7 @@ What we discovered is that the current human sociopolitical or economic system, 
 - Impairs livelihoods (Service providers cannot create new businesses or business models)
 - Increases cost of goods and materials, waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
 
-#### Prototype (Eleutherios)
+#### Prototype
 
 ![priskaservice](./src/assets/priskaService.jpg)
 
