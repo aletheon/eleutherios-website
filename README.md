@@ -38,7 +38,7 @@ End users can search for services such as Priska’s and request her service by 
 
 In this example, Moin wants access to barley yield data from Priska and has added himself (Hire My Farmer) and Priska (Gyga) to the forum.
 
-![subforum](./src/assets/subForum.jpg)
+![subforum](./src/assets/subforum.jpg)
 
 Service providers communicate with one another by sending text messages through the forum. They can click the plus button on the services tab to keep adding more services to the conversation or click the sub-forum button to create a feedback loop to separate the concerns of each request.
 
