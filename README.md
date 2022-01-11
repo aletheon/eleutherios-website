@@ -27,27 +27,21 @@ What we discovered is that the current human sociopolitical or economic system, 
 #### Prototype
 
 ![priskaservice](./src/assets/priskaService.jpg)
-
 Priska can register with the website and create a service. She can give it a price, title, description, website url and tags.
 
 ![selectforum](./src/assets/selectForum.jpg)
-
 End users can search for services such as Priska’s and request her service by clicking on the plus symbol to create a forum.
 
 ![newforum](./src/assets/newForum.jpg)
-
 In this example, Moin wants access to barley yield data from Priska and has added himself (Hire My Farmer) and Priska (Gyga) to the forum.
 
 ![subforum](./src/assets/subforum.jpg)
-
 Service providers communicate with one another by sending text messages through the forum. They can click the plus button on the services tab to keep adding more services to the conversation or click the sub-forum button to create a feedback loop to separate the concerns of each request.
 
 ![separatingconcerns](./src/assets/separatingConcerns.jpg)
-
 Separating the concerns of each request is important, because it enables service providers to focus on the data or service that they are able to provide. In this case Moin wants to separate the concerns of managing Barley yield data away from Barley yield farming and delegates the responsibility to another service provider, John (Barley Farming Ltd) to manage. In our MVP, service providers who create forums, don’t have to be the ones that manage it. Any service provider can manage the forum, depending on whether they have been invited or not.
 
 ![parentlevel](./src/assets/parentLevel.jpg)
-
 At the parent level sub-forums show up in a list and can be navigated to by clicking on them.
 
 #### Current features:
