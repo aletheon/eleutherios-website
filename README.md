@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or digital sociopolitical or economic system, that enables humankind to self-organize with one another at scale through the internet.
 
-![futureOverview](./src/assets/futureOverview2.jpg)
+![futureOverview](./src/assets/futureOverview2.png)
 
 Our approach to unlocking data for systems governance is to presume stakeholders or service providers are in relationship with one another or operating under the same policy, rule, regulation or system. And then, provide them with the tools to be able to scale the forum or network that they are participating in.
 
@@ -13,7 +13,7 @@ Our approach to unlocking data for systems governance is to presume stakeholders
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduced cost of goods and materials, waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
-![currentOverview](./src/assets/currentOverview3.jpg)
+![currentOverview](./src/assets/currentOverview3.png)
 
 What we discovered is that the current human sociopolitical or economic system, presumes that services providers are not in relationship with one another or operating under different policies, rules or regulations. Service providers do not have the tools to scale their request or network and have other service providers join.
 
