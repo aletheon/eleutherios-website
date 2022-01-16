@@ -4,7 +4,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that ena
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
-Service providers can maintain a relationship with one another by scaling the forum and inviting other service providers to join their forum or network.
+Service providers can scale the forum and inviting other service providers to bring their energy or service into the conversation.
 
 #### Advantages
 
