@@ -1,10 +1,10 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables humankind to self-organize with one another, through the same forum or network.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum that enables humankind to self-organize with one another, through the same forum or network.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
-Service providers can scale their forum and invite other service providers to help manage them.
+Service providers can scale their forum and invite other service providers to help them manage it.
 
 #### Advantages
 
@@ -15,7 +15,7 @@ Service providers can scale their forum and invite other service providers to he
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
-The current sociopolitical or economic system presumes that services providers are not in relationship with one another. They cannot scale their forum or customer request and invite other service providers to help manage them.
+The current sociopolitical or economic system presumes that services providers are not in relationship with one another. Service providers are unable to scale their forum or customer request and invite other service providers to help them manage it.
 
 #### Disadvantages
 
