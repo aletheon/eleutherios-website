@@ -16,7 +16,7 @@ Service providers can scale their forum and invite other service providers to he
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
-The current sociopolitical or economic system presumes that services providers are not in relationship with one another. Service providers are unable to scale their forum or customer request and invite other service providers to help manage it.
+In the current sociopolitical or economic system, service providers are serving one another through a separate customer request or network.
 
 #### Disadvantages
 
