@@ -15,7 +15,7 @@ Service providers can scale their forum and invite other service providers to he
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
-What we discovered is that the current human sociopolitical or economic system, presumes that services providers are not in relationship with one another or operating under local policies, rules or regulations. Service providers do not have the tools to scale their request or network and have other service providers join.
+What we discovered is that the current human sociopolitical or economic system, presumes that services providers are not in relationship with one another or operating under separate policies, rules or regulations. Service providers do not have the tools to scale their request or network and have other service providers join.
 
 #### Disadvantages
 
