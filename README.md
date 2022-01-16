@@ -10,6 +10,7 @@ Service providers can scale their forum and invite other service providers to he
 
 - Creates partnerships (Service providers can create and share policies with one another)
 - Builds capacity (Service providers can scale their forum or customer request)
+- Share data (Service providers can share their data with other service providers)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduces waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
@@ -21,6 +22,7 @@ The current sociopolitical or economic system presumes that services providers a
 
 - Prevents partnerships (Service providers cannot create and share policies)
 - Prevents capacity building (Service providers cannot scale their forum or customer request)
+- Unable to share data (Service providers cannot share data with other service providers)
 - Impairs livelihoods (Service providers cannot create new businesses or business models)
 - Increases waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
 
