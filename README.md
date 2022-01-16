@@ -22,7 +22,7 @@ What we discovered is that the current human sociopolitical or economic system, 
 - Prevents partnerships (Service providers cannot create and share policies)
 - Prevents capacity building (Service providers cannot scale their forum or customer request)
 - Impairs livelihoods (Service providers cannot create new businesses or business models)
-- Reduced waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
+- Increased waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
 
 #### Prototype
 
