@@ -1,10 +1,10 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum or digital sociopolitical or economic system, that enables humankind to self-organize with one another at scale through the internet.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables humankind to self-organize with one another at scale through the same forum or network.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
-Our approach to unlocking data for systems governance is to presume stakeholders or service providers are in relationship with one another or operating under the same policy, rule, regulation or system. And then, provide them with the tools to be able to scale the forum or network that they are participating in.
+Eleutherios unlocks data or the service layer by presuming service providers are in relationship with one another or operating under the same policy, rule, regulation or system.
 
 #### Advantages
 
