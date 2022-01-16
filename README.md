@@ -9,7 +9,7 @@ Service providers can scale their forum and invite other service providers to he
 #### Advantages
 
 - Creates global partnerships (Service providers can create and share policies with one another)
-- Builds capacity (Service providers can create a non-redundant forum or customer request)
+- Builds capacity (Service providers can scale their forum or customer request)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduced waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
@@ -20,7 +20,7 @@ What we discovered is that the current human sociopolitical or economic system, 
 #### Disadvantages
 
 - Creates local partnerships (Service providers cannot create and share policies)
-- Prevents capacity building (Service providers cannot create a non-redundant forum or customer request)
+- Prevents capacity building (Service providers cannot scale their forum or customer request)
 - Impairs livelihoods (Service providers cannot create new businesses or business models)
 - Increases cost of goods and materials, waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
 
