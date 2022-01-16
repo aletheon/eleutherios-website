@@ -11,7 +11,7 @@ Service providers can scale their forum and invite other service providers to he
 - Creates global partnerships (Service providers can create and share policies with one another)
 - Builds capacity (Service providers can create a non-redundant forum or customer request)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
-- Reduced cost of goods and materials, waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
+- Reduced waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
