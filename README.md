@@ -60,7 +60,7 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 #### Future features:
 
 - Create and share policies
-- Sharing files
+- Share files
 - Bookkeeping
 - B2B/Cloud (i.e. compute, analytics, database, storage, AI)
 - Plugins (e.g. video, audio, VR)
