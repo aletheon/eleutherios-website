@@ -55,6 +55,12 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 - Service ratings and reviews
 - B2B Payments
 
+#### Future features:
+
+- Create and share policies
+- Booking keeping, compute, analytics, database, storage, AI
+- Plugins (e.g. video, audio, VR)
+
 Eleutherios is built with Node.js, Firestore and Angular.
 
 # Installation and Setup
