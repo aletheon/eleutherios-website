@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables humankind to self-organize with one another at scale through the same forum or network.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables humankind to self-organize with one another, through the same forum or network.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
