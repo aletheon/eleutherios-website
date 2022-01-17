@@ -53,7 +53,7 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 
 - Search for forums or services
 - Redundant forum (i.e. forum in forum)
-- Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
+- Blocking to prevent unwanted behavior within forums
 - Service ratings and reviews
 - B2B Payments
 
