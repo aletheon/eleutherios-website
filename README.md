@@ -20,11 +20,11 @@ In the current sociopolitical or economic system, service providers are serving 
 
 #### Disadvantages
 
-- Prevents partnerships from forming (Service providers cannot create or share policies)
-- Prevents capacity building (Service providers cannot scale their forum or customer request)
-- Unable to share data or information (Service providers cannot share their data or information with one another)
-- Impairs livelihoods (Service providers cannot create new businesses or business models)
-- Increases waste and inefficiencies (Service providers cannot manage the entire value chain from supplier to consumer)
+- Prevents partnerships from forming (Service providers are unable to create or share policies)
+- Prevents capacity building (Service providers are unable to scale their forum or customer request)
+- Unable to share data or information (Service providers are unable to share their data or information with one another)
+- Impairs livelihoods (Service providers are unable to create new businesses or business models)
+- Increases waste and inefficiencies (Service providers are unable to manage the entire value chain from supplier to consumer)
 
 #### Prototype
 
