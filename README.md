@@ -47,7 +47,7 @@ Separating the concerns of each request is important, because it enables service
 At the parent level sub-forums show up in a list and can be navigated to by clicking on them.
 
 ![breadcrumb](./src/assets/breadcrumb.jpg)
-At the child level the parent shows up as a breadcrumb, where the service provider can navigate their way back up the tree by clicking on the parent forum.
+At the child level the parent shows up as a breadcrumb, where the service provider can navigate their way back up the tree or network.
 
 #### Current features:
 
