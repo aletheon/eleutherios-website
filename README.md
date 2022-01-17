@@ -51,10 +51,10 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 
 #### Current features:
 
-- Search for forums or services
+- Search for forums or service providers
 - Redundant forum (i.e. forum in forum)
 - Blocking to prevent unwanted behavior within forums
-- Service ratings and reviews
+- Rating and reviewing service providers
 - B2B Payments
 
 #### Future features:
