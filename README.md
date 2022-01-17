@@ -51,7 +51,7 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 
 #### Current features:
 
-- Search for finding forums or services
+- Search for forums or services
 - Redundant forum (forum in forum)
 - Blocking to prevent unwanted services or users from serving in forums, they have been asked not to serve in or for requesting services, they have been asked not to request
 - Service ratings and reviews
@@ -60,9 +60,9 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 #### Future features:
 
 - Create and share policies
-- Share files
+- File sharing
 - Bookkeeping
-- B2B/Cloud (i.e. compute, analytics, database, storage, AI)
+- B2B/Cloud services (i.e. compute, analytics, database, storage, AI)
 - Plugins (e.g. video, audio, VR)
 
 Eleutherios is built with Node.js, Firestore and Angular.
