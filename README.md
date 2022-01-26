@@ -54,7 +54,7 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 #### Current features:
 
 - Search for forums or service providers
-- Redundant forum (i.e. forum in forum)
+- Scalable forum or network
 - Blocking to prevent unwanted behavior within forums
 - Rating and reviewing service providers
 - B2B Payments
