@@ -10,7 +10,7 @@ Service providers can scale their forum or network, and share in the policy maki
 
 - Creates partnerships (Service providers can create and share policies with one another)
 - Builds capacity (Service providers can scale their forum or network)
-- Share data or information (Service providers can share their data or information with one another)
+- Share data (Service providers can share their data or information with one another)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduces waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
 
@@ -24,7 +24,7 @@ The customer request or network is linear or a one-to-one relationship between t
 
 - Prevents partnerships from forming (Service providers are unable to create or share policies)
 - Prevents capacity building (Service providers are unable to scale their request or network)
-- Unable to share data or information (Service providers are unable to share their data or information with one another)
+- Unable to share data (Service providers are unable to share their data or information with one another)
 - Impairs livelihoods (Service providers are unable to create new businesses or business models)
 - Increases waste and inefficiencies (Service providers are unable to manage the entire value chain from supplier to consumer)
 
