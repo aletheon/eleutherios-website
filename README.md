@@ -2,7 +2,7 @@
 
 Eleutherios (https://eleutherios.org.nz) is a global cooperative forum that enables people or service providers to cooperate with one another, through the same forum or network.
 
-Service providers can scale their forum or network, and share in the policy making process.
+Service providers can scale their forum and share in the policy making process.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
