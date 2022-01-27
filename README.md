@@ -22,8 +22,8 @@ The customer request or network is linear or a one-to-one relationship between t
 
 #### Disadvantages
 
-- Prevents partnerships from forming (Service providers are unable to create or share policies)
-- Prevents capacity building (Service providers are unable to scale their request or network)
+- Prevents partnerships (Service providers are unable to create or share policies)
+- Prevents capacity (Service providers are unable to scale their request or network)
 - Unable to share data (Service providers are unable to share their data or information with one another)
 - Impairs livelihoods (Service providers are unable to create new businesses or business models)
 - Increases waste and inefficiencies (Service providers are unable to manage the entire value chain from supplier to consumer)
