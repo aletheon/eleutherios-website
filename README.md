@@ -9,7 +9,7 @@ Service providers can scale their forum and share in the policy making process.
 #### Advantages
 
 - Creates partnerships (Service providers can create and share policies with one another)
-- Builds capacity (Service providers can scale their forum or network)
+- Creates new capacity (Service providers can scale their forum or network)
 - Share data (Service providers can share their data or information with one another)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduces waste, carbon emissions or inefficiences (Service providers can manage the entire value chain from supplier to consumer)
@@ -23,7 +23,7 @@ The customer request or network is linear or a one-to-one relationship between t
 #### Disadvantages
 
 - Prevents partnerships (Service providers are unable to create or share policies)
-- Prevents capacity (Service providers are unable to scale their request or network)
+- Prevents new capacity (Service providers are unable to scale their request or network)
 - Unable to share data (Service providers are unable to share their data or information with one another)
 - Impairs livelihoods (Service providers are unable to create new businesses or business models)
 - Increases waste, carbon emissions or inefficiences (Service providers are unable to manage the entire value chain from supplier to consumer)
