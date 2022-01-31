@@ -12,7 +12,7 @@ Service providers can scale their forum and share in the policy making process.
 - Builds capacity (Service providers can scale their forum or network)
 - Share data (Service providers can share their data or information with one another)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
-- Reduces waste and inefficiencies (Service providers can manage the entire value chain from supplier to consumer)
+- Reduces waste, carbon emissions or inefficiences (Service providers can manage the entire value chain from supplier to consumer)
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
@@ -26,7 +26,7 @@ The customer request or network is linear or a one-to-one relationship between t
 - Prevents capacity (Service providers are unable to scale their request or network)
 - Unable to share data (Service providers are unable to share their data or information with one another)
 - Impairs livelihoods (Service providers are unable to create new businesses or business models)
-- Increases waste and inefficiencies (Service providers are unable to manage the entire value chain from supplier to consumer)
+- Increases waste, carbon emissions or inefficiences (Service providers are unable to manage the entire value chain from supplier to consumer)
 
 #### Prototype
 
