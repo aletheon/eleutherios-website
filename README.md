@@ -24,7 +24,7 @@ The <i><b>customer request</b></i> or network is linear or one-to-one relationsh
 - Prevents new capacity (Service providers are unable to scale their request or network)
 - Unable to share data (Service providers are unable to share their data or information with one another)
 - Impairs livelihoods or inequality (Service providers are unable to create new businesses or business models)
-- Increases waste, carbon emissions and inefficiences (Service providers are unable to manage the entire value chain from supplier to consumer)
+- Increases waste, carbon emissions and inefficiences (Service providers are unable to manage the value chain from supplier to consumer)
 
 #### Prototype
 
