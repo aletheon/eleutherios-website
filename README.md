@@ -18,7 +18,7 @@ Service providers can scale their forum or network and operate under the same po
 
 In the current sociopolitical or economic system, service providers are unable to scale their forum or network.
 
-The <i>customer request</i> or network is linear or a one-to-one relationship between two service providers.
+The <i><b>customer request</b></i> or network is linear or a one-to-one relationship between two service providers.
 
 #### Disadvantages
 
