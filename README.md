@@ -16,7 +16,7 @@ Eleutherios (https://eleutherios.org.nz) is a global multi-stakeholder forum, th
 
 In the current sociopolitical or economic system, service providers are unable to scale their forum or network.
 
-The <i><b>customer request</b></i> or network is linear or in a one-to-one relationship with two service providers.
+The <i><b>customer request</b></i> or network is in a one-to-one or linear relationship with each service provider.
 
 #### Disadvantages
 
