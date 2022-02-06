@@ -7,16 +7,16 @@ Eleutherios (https://eleutherios.org.nz) is a global multi-stakeholder forum, th
 #### Advantages
 
 - Creates partnerships (Service providers can create and share policies with one another)
-- Creates new capacity (Service providers can scale their forum or network)
+- Creates new capacity (Service providers can scale a forum or network)
 - Share data (Service providers can share their data or information with one another)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
-- Reduces waste, carbon emissions and inefficiences (Service providers can manage the entire value chain from supplier to consumer)
+- Reduces waste, carbon emissions and inefficiences (Service providers can manage the value chain from supplier to consumer)
 
 ![currentOverview](./src/assets/currentOverview3.png)
 
 In the current sociopolitical or economic system, service providers are unable to scale their forum or network.
 
-The <i><b>customer request</b></i> or network is in a linear or one-to-one relationship with each service provider.
+The <i><b>customer request</b></i> or network is linear or one-to-one relationship with each service provider.
 
 #### Disadvantages
 
