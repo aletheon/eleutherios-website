@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that enables people or service providers to serve one another, through the same forum or network.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative forum that enables people or service providers to serve one another, through the same forum or network.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
@@ -16,7 +16,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative forum, that ena
 
 In the current sociopolitical or economic system, service providers are unable to scale their forum or network.
 
-The <i><b>customer request</b></i> or network is flat or linear relationship with service providers.
+The <i><b>customer request</b></i> or network is flat or in a linear relationship with service providers.
 
 #### Disadvantages
 
