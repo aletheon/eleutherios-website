@@ -1,6 +1,6 @@
 # Eleutherios
 
-Eleutherios (https://eleutherios.org.nz) is a global cooperative / multi-stakeholder forum that enables people or service providers to serve one another through the same forum or network.
+Eleutherios (https://eleutherios.org.nz) is a global cooperative / multi-stakeholder forum that enables people or service providers to serve one another, through the same forum or network.
 
 ![futureOverview](./src/assets/futureOverview2.png)
 
