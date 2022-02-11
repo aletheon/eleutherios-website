@@ -62,7 +62,7 @@ At the child level the parent shows up as a breadcrumb, where the service provid
 - Create and share policies
 - File sharing
 - Bookkeeping
-- B2B/Cloud services (i.e. compute, analytics, database, storage, AI)
+- API/Cloud services (i.e. compute, analytics, database, storage, AI)
 - Plugins (e.g. video, audio, VR)
 
 Eleutherios is built with Node.js, Firestore and Angular.
