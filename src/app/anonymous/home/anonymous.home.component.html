@@ -1,8 +1,8 @@
 <loading-spinner *ngIf="loading | async"></loading-spinner>
 <div *ngIf="!(loading | async)" style="display:flex;flex-direction:column;height:100%">
+  <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Forums</h4>
   <ng-container *ngIf="publicForums | async;let publicForumItems">
     <ng-container *ngIf="publicForumItems.length > 0; then showpublicforums else nopublicforums"></ng-container>
-    <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Forums</h4>
     <ng-template #showpublicforums>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
         <ng-container *ngFor="let forum of publicForumItems; trackBy: trackPublicForums">
@@ -61,9 +61,9 @@
       </p>
     </ng-template>
   </ng-container>
+  <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h4>
   <ng-container *ngIf="publicServices | async;let publicServiceItems">
     <ng-container *ngIf="publicServiceItems.length > 0; then showpublicservices else nopublicservices"></ng-container>
-    <h4 style="flex:none;margin-left:10px;margin-bottom:0px">Services</h4>
     <ng-template #showpublicservices>
       <div style="flex:none;display:flex;flex-direction:column;padding:10px;overflow-x:hidden;overflow-y:auto">
         <ng-container *ngFor="let service of publicServiceItems; trackBy: trackPublicServices">
