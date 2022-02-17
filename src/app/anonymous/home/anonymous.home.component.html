@@ -34,7 +34,7 @@
                   <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]="{ forumId: forum.forumId }" style="cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
                 </div>
                 <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/anonymous/forum/detail']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
+                  <mat-icon [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add_box</mat-icon>
                 </div>
                 <div style="flex:none">
                   <mat-icon [routerLink]="['/login']" [queryParams]='{ forumId: forum.forumId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create service">add_circle</mat-icon>
@@ -105,7 +105,7 @@
                   <mat-icon [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="flex:none;cursor:pointer;color:#1B1B1B" matTooltip="View details">description</mat-icon>
                 </div>
                 <div style="flex:none;margin-right:5px">
-                  <mat-icon [routerLink]="['/anonymous/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
+                  <mat-icon [routerLink]="['/login']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="Add forum">add_box</mat-icon>
                 </div>
                 <div style="flex:none">
                   <mat-icon [routerLink]="['/login']" [queryParams]='{ serviceId: service.serviceId }' style="cursor:pointer;color:#1B1B1B" matTooltip="Create forum">add_circle</mat-icon>
