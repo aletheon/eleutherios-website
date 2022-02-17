@@ -249,6 +249,68 @@
                 <div *ngIf="searchServiceResultItems.length > 0; then showsearchserviceresults else nosearchserviceresults"></div>
                 <ng-template #showsearchserviceresults>
                   <ng-container *ngFor="let service of searchServiceResultItems; trackBy: trackSearchServiceResults">
+                    <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;padding:10px;margin-bottom:5px">
+                      <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
+                        <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
+                        <ng-template #showdefaultserviceimage>
+                          <ng-container *ngIf="service.defaultServiceImage | async;let image">
+                            <div style="flex:none;margin-right:10px">
+                              <img [src]="image.tinyDownloadUrl">
+                            </div>
+                          </ng-container>
+                        </ng-template>
+                        <div style="flex:1;margin-right:5px">
+                          <a *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]='{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
+                          <a *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]='{ serviceId: service.serviceId, forumUserId: forumGroup.get("uid").value, forumId: forumGroup.get("forumId").value }' style="flex:none;color:#1B1B1B" matTooltip="{{ service.title }}{{ service.description.length > 0 ? (' - ' + service.description | truncate: 200) : '' }}">{{ service.title | noTitle | truncate: 50 }}</a>
+                        </div>
+                        <div style="flex:none;margin-right:5px">
+                          <mat-icon *ngIf="service.type == 'Private'" [routerLink]="['/user/service/detail']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                          <mat-icon *ngIf="service.type == 'Public'" [routerLink]="['/service/detail']" [queryParams]="{ serviceId: service.serviceId }" style="color:#1B1B1B;cursor:pointer" matTooltip="View details">description</mat-icon>
+                        </div>
+                        <div style="flex:none">
+                          <mat-icon onclick="event.stopPropagation()" (click)="addService(service)" style="cursor:pointer;color:#1B1B1B" matTooltip="Add service">add</mat-icon>
+                        </div>
+                      </div>
+                      <ng-container *ngIf="service.serviceTags | async;let serviceTagItems">
+                        <div style="flex:none;display:flex;flex-direction:row">
+                          <ng-container *ngIf="serviceTagItems.length > 0; then showtags"></ng-container>
+                          <ng-template #showtags>
+                            <div style="flex:1;display:flex;flex-direction:row;margin-top:5px">
+                              <ng-container *ngFor="let serviceTag of serviceTagItems">
+                                <span [ngClass]="service.paymentType == 'Free' ? 'label label-success' : 'label label-info'" style="flex:none;margin-right:5px;padding:5px">{{ serviceTag.tag }}</span>
+                              </ng-container>
+                            </div>
+                          </ng-template>
+                          <ng-container *ngIf="service.paymentType == 'Payment'">
+                            <ng-container *ngIf="serviceTagItems.length > 0; then showtagswithpayment else showtagswithoutpayment"></ng-container>
+                            <ng-template #showtagswithpayment>
+                              <div style="flex:none">
+                                <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get('uid').value, forumId: forumGroup.get('forumId').value }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+                              </div>
+                            </ng-template>
+                            <ng-template #showtagswithoutpayment>
+                              <div style="flex:1;text-align:right">
+                                <a [routerLink]="['/user/payment/new']" [queryParams]="{ userId: service.uid, serviceId: service.serviceId, forumUserId: forumGroup.get('uid').value, forumId: forumGroup.get('forumId').value }" style="color:#1B1B1B" matTooltip="Buy">{{ service.currency.toUpperCase() }} {{ service.amount.toFixed(2) }}</a>
+                              </div>
+                            </ng-template>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </ng-container>
+                </ng-template>
+                <ng-template #nosearchserviceresults>
+                  <p style="flex:none;color:#999;font-size:90%">
+                    <i>No Results</i>
+                  </p>
+                </ng-template>
+              </ng-container>
+            </div>
+            <!-- <div style="display:flex;flex-direction:column">
+              <ng-container *ngIf="searchServiceResults | async;let searchServiceResultItems">
+                <div *ngIf="searchServiceResultItems.length > 0; then showsearchserviceresults else nosearchserviceresults"></div>
+                <ng-template #showsearchserviceresults>
+                  <ng-container *ngFor="let service of searchServiceResultItems; trackBy: trackSearchServiceResults">
                     <div [ngClass]="service.paymentType == 'Free' ? 'alert alert-success' : 'alert alert-info'" style="flex:none;display:flex;flex-direction:column;margin-bottom:5px">
                       <div style="flex:none;display:flex;flex-direction:row;align-items:center;flex-wrap:wrap">
                         <ng-container *ngIf="service.defaultServiceImage | async; then showdefaultserviceimage"></ng-container>
@@ -276,7 +338,7 @@
                   </p>
                 </ng-template>
               </ng-container>
-            </div>
+            </div> -->
           </div>
         </div>
         <div style="display:flex;flex-direction:row;justify-content:flex-end;margin:20px 0 50px 0">

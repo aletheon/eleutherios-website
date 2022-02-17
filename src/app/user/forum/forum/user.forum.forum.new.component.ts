@@ -20,6 +20,7 @@ import {
   UserForumForumService,
   UserServiceImageService,
   UserImageService,
+  UserServiceTagService,
   ServiceService,
   TagService,
   Forum,
@@ -112,6 +113,7 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
     private userForumUserBlockService: UserForumUserBlockService,
     private userForumRegistrantService: UserForumRegistrantService,
     private userForumForumService: UserForumForumService,
+    private userServiceTagService: UserServiceTagService,
     private userTagService: UserTagService,
     private userServiceService: UserServiceService,
     private userForumService: UserForumService,
@@ -528,10 +530,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                 else return of(null);
                               })
                             );
+                            let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                            return combineLatest([getDefaultServiceImage$]).pipe(
+                            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                               switchMap(results => {
-                                const [defaultServiceImage] = results;
+                                const [defaultServiceImage, serviceTags] = results;
 
                                 if (defaultServiceImage)
                                   service.defaultServiceImage = of(defaultServiceImage);
@@ -541,6 +544,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
+
+                                if (serviceTags)
+                                  service.serviceTags = of(serviceTags);
+                                else
+                                  service.serviceTags = of([]);
+
                                 return of(service);
                               })
                             );
@@ -577,10 +586,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             else return of(null);
                           })
                         );
+                        let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                        return combineLatest([getDefaultServiceImage$]).pipe(
+                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImage] = results;
+                            const [defaultServiceImage, serviceTags] = results;
 
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
@@ -590,6 +600,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
+
+                            if (serviceTags)
+                              service.serviceTags = of(serviceTags);
+                            else
+                              service.serviceTags = of([]);
+
                             return of(service);
                           })
                         );
@@ -633,10 +649,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                 else return of(null);
                               })
                             );
+                            let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                            return combineLatest([getDefaultServiceImage$]).pipe(
+                            return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                               switchMap(results => {
-                                const [defaultServiceImage] = results;
+                                const [defaultServiceImage, serviceTags] = results;
 
                                 if (defaultServiceImage)
                                   service.defaultServiceImage = of(defaultServiceImage);
@@ -646,6 +663,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                                   };
                                   service.defaultServiceImage = of(tempImage);
                                 }
+
+                                if (serviceTags)
+                                  service.serviceTags = of(serviceTags);
+                                else
+                                  service.serviceTags = of([]);
+
                                 return of(service);
                               })
                             );
@@ -682,10 +705,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                             else return of(null);
                           })
                         );
+                        let getServiceTags$ = that.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                        return combineLatest([getDefaultServiceImage$]).pipe(
+                        return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                           switchMap(results => {
-                            const [defaultServiceImage] = results;
+                            const [defaultServiceImage, serviceTags] = results;
 
                             if (defaultServiceImage)
                               service.defaultServiceImage = of(defaultServiceImage);
@@ -695,6 +719,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                               };
                               service.defaultServiceImage = of(tempImage);
                             }
+
+                            if (serviceTags)
+                              service.serviceTags = of(serviceTags);
+                            else
+                              service.serviceTags = of([]);
+
                             return of(service);
                           })
                         );
@@ -947,10 +977,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
 
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -960,6 +991,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -994,10 +1031,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
 
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -1007,6 +1045,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -1045,10 +1089,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
 
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1058,6 +1103,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -1092,10 +1143,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                     else return of(null);
                   })
                 );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                return combineLatest([getDefaultServiceImage$]).pipe(
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                   switchMap(results => {
-                    const [defaultServiceImage] = results;
+                    const [defaultServiceImage, serviceTags] = results;
 
                     if (defaultServiceImage)
                       service.defaultServiceImage = of(defaultServiceImage);
@@ -1105,6 +1157,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       };
                       service.defaultServiceImage = of(tempImage);
                     }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
                     return of(service);
                   })
                 );
@@ -1407,10 +1465,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
 
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -1420,6 +1479,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -1454,10 +1519,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                       else return of(null);
                     })
                   );
+                  let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                  return combineLatest([getDefaultServiceImage$]).pipe(
+                  return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                     switchMap(results => {
-                      const [defaultServiceImage] = results;
+                      const [defaultServiceImage, serviceTags] = results;
 
                       if (defaultServiceImage)
                         service.defaultServiceImage = of(defaultServiceImage);
@@ -1467,6 +1533,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         };
                         service.defaultServiceImage = of(tempImage);
                       }
+
+                      if (serviceTags)
+                        service.serviceTags = of(serviceTags);
+                      else
+                        service.serviceTags = of([]);
+
                       return of(service);
                     })
                   );
@@ -1585,10 +1657,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         else return of(null);
                       })
                     );
+                    let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                    return combineLatest([getDefaultServiceImage$]).pipe(
+                    return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImage] = results;
+                        const [defaultServiceImage, serviceTags] = results;
 
                         if (defaultServiceImage)
                           service.defaultServiceImage = of(defaultServiceImage);
@@ -1598,6 +1671,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           };
                           service.defaultServiceImage = of(tempImage);
                         }
+
+                        if (serviceTags)
+                          service.serviceTags = of(serviceTags);
+                        else
+                          service.serviceTags = of([]);
+
                         return of(service);
                       })
                     );
@@ -1617,7 +1696,58 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         })
       ).subscribe();
 
-      this.searchServiceResults = this.userServiceService.tagSearch(this.loggedInUserId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true);
+      this.searchServiceResults = this.userServiceService.tagSearch(this.loggedInUserId, this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        switchMap(services => {
+          if (services && services.length > 0){
+            let observables = services.map(service => {
+              if (service){
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      if (!serviceImages[0].tinyDownloadUrl)
+                        serviceImages[0].tinyDownloadUrl = '../../../../assets/defaultTiny.jpg';
+
+                      return of(serviceImages[0]);
+                    }
+                    else return of(null);
+                  })
+                );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [defaultServiceImage, serviceTags] = results;
+
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
+                    else {
+                      let tempImage = {
+                        tinyDownloadUrl: '../../../../assets/defaultTiny.jpg'
+                      };
+                      service.defaultServiceImage = of(tempImage);
+                    }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
+                    return of(service);
+                  })
+                );
+              }
+              else return of(null);
+            });
+
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return services[i];
+              });
+            });
+          }
+          else return of([]);
+        })
+      );
     }
     else {
       // search services
@@ -1646,10 +1776,11 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                         else return of(null);
                       })
                     );
+                    let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
 
-                    return combineLatest([getDefaultServiceImage$]).pipe(
+                    return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
                       switchMap(results => {
-                        const [defaultServiceImage] = results;
+                        const [defaultServiceImage, serviceTags] = results;
 
                         if (defaultServiceImage)
                           service.defaultServiceImage = of(defaultServiceImage);
@@ -1659,6 +1790,12 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
                           };
                           service.defaultServiceImage = of(tempImage);
                         }
+
+                        if (serviceTags)
+                          service.serviceTags = of(serviceTags);
+                        else
+                          service.serviceTags = of([]);
+
                         return of(service);
                       })
                     );
@@ -1678,7 +1815,58 @@ export class UserForumForumNewComponent implements OnInit, OnDestroy, AfterViewI
         })
       ).subscribe();
 
-      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true);
+      this.searchServiceResults = this.serviceService.tagSearch(this.searchServiceCtrl.value, this._tempServiceTags, this.forumGroup.get('searchServiceIncludeTagsInSearch').value, true).pipe(
+        switchMap(services => {
+          if (services && services.length > 0){
+            let observables = services.map(service => {
+              if (service){
+                let getDefaultServiceImage$ = this.userServiceImageService.getDefaultServiceImages(service.uid, service.serviceId).pipe(
+                  switchMap(serviceImages => {
+                    if (serviceImages && serviceImages.length > 0){
+                      if (!serviceImages[0].tinyDownloadUrl)
+                        serviceImages[0].tinyDownloadUrl = '../../../../assets/defaultTiny.jpg';
+
+                      return of(serviceImages[0]);
+                    }
+                    else return of(null);
+                  })
+                );
+                let getServiceTags$ = this.userServiceTagService.getTags(service.uid, service.serviceId);
+
+                return combineLatest([getDefaultServiceImage$, getServiceTags$]).pipe(
+                  switchMap(results => {
+                    const [defaultServiceImage, serviceTags] = results;
+
+                    if (defaultServiceImage)
+                      service.defaultServiceImage = of(defaultServiceImage);
+                    else {
+                      let tempImage = {
+                        tinyDownloadUrl: '../../../../assets/defaultTiny.jpg'
+                      };
+                      service.defaultServiceImage = of(tempImage);
+                    }
+
+                    if (serviceTags)
+                      service.serviceTags = of(serviceTags);
+                    else
+                      service.serviceTags = of([]);
+
+                    return of(service);
+                  })
+                );
+              }
+              else return of(null);
+            });
+
+            return zip(...observables, (...results) => {
+              return results.map((result, i) => {
+                return services[i];
+              });
+            });
+          }
+          else return of([]);
+        })
+      );
     }
   }
 
