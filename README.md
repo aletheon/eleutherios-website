@@ -39,7 +39,7 @@ In this example, Moin wants access to barley yield data from Priska and has adde
 Service providers communicate with one another by sending text messages through the forum. They can click the plus button on the services tab to keep adding more services to the conversation or click the sub-forum button to create a feedback loop to separate the concerns of each request.
 
 ![separatingconcerns](./src/assets/separatingConcerns.jpg)
-Separating the concerns of each request is important, because it enables service providers to focus on the data or service that they are able to provide. In this case Moin wants to separate the concerns of managing Barley yield data away from Barley yield farming and delegates the responsibility to another service provider, John (Barley Farming Ltd) to manage. In our MVP, service providers who create forums, don’t have to be the ones that manage it. Any service provider can manage the forum, depending on whether they can provide the service or not.
+Separating the concerns helps service providers manage their service within the forum or network. In this case Moin wants to separate the concerns of managing Barley yield data away from Barley yield farming and delegates the responsibility to another service provider, John (Barley Farming Ltd) to manage.
 
 ![parentlevel](./src/assets/parentLevel.jpg)
 At the parent level sub-forums show up in a list and can be navigated to by clicking on them.
