@@ -7,7 +7,7 @@ Eleutherios (https://eleutherios.org.nz) is a global cooperative / multi-stakeho
 #### Advantages
 
 - Creates partnerships (Service providers can create and share policies with one another)
-- Creates capacity (Service providers can share their service or data)
+- Creates capacity (Service providers can share their service or data with one another)
 - Improves livelihoods or equality (Service providers can create new businesses or business models)
 - Reduces waste, carbon emissions and inefficiences (Service providers can manage the value chain from supplier to consumer)
 
@@ -20,7 +20,7 @@ The <i><b>customer request</b></i> or network is flat or in a linear relationshi
 #### Disadvantages
 
 - Prevents partnerships (Service providers are unable to create or share policies with one another)
-- Prevents capacity (Service providers are unable to share their service or data)
+- Prevents capacity (Service providers are unable to share their service or data with one another)
 - Impairs livelihoods or inequality (Service providers are unable to create new businesses or business models)
 - Increases waste, carbon emissions and inefficiences (Service providers are unable to manage the value chain from supplier to consumer)
 
