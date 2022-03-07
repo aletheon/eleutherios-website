@@ -114,7 +114,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
         // https://medium.com/@saikiran1298/integrating-stripe-payments-into-angular-and-nodejs-applications-10f40dcc21f5
         this._loadCardListener.subscribe(result => {
           if (result == true){
-            this.stripeService.changeKey(environment.stripeLiveKey, { stripeAccount: this._connectedUser.stripeAccountId });
+            this.stripeService.changeKey(environment.stripeTestKey, { stripeAccount: this._connectedUser.stripeAccountId });
             this.stripeService.elements(this.elementsOptions)
               .subscribe(elements => {
                 this.elements = elements;
@@ -146,7 +146,7 @@ export class UserPaymentNewComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngOnDestroy () {
     // change the key back before leaving
-    this.stripeService.changeKey(environment.stripeLiveKey);
+    this.stripeService.changeKey(environment.stripeTestKey);
 
     if (this._userSubscription)
       this._userSubscription.unsubscribe();
