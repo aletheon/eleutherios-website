@@ -783,10 +783,27 @@ export class ServiceService {
     }
   }
 
-  public search(searchTerm: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
+  public search(userId: string, searchTerm: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
     let collectionName: string = 'services';
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'service',
+      numberOfItems: 0,
+      key: searchTerm,
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      paymentType: paymentType,
+      currency: currency,
+      startAmount: startAmount,
+      endAmount: endAmount,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -913,10 +930,27 @@ export class ServiceService {
     }
   }
 
-  public tagSearch(searchTerm: any, tags: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
+  public tagSearch(userId: string, searchTerm: any, tags: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
     let collectionName: string = 'services';
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'service',
+      numberOfItems: 0,
+      key: searchTerm,
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      paymentType: paymentType,
+      currency: currency,
+      startAmount: startAmount,
+      endAmount: endAmount,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
