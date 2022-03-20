@@ -156,7 +156,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       if (!key)
         key = this.searchServiceCtrl.value;
 
-      this._subscription = this.serviceService.getServicesSearchTerm(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
+      this._subscription = this.serviceService.getServicesSearchTerm(this.auth.uid, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {
@@ -216,7 +216,7 @@ export class ServiceListComponent implements OnInit, OnDestroy {
       });
     }
     else {
-      this._subscription = this.serviceService.getAllServices(this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
+      this._subscription = this.serviceService.getAllServices(this.auth.uid, this.numberItems, key, this._tempSearchTags, this.includeTagsInSearch, false, this.serviceGroup.get('paymentType').value, this.serviceGroup.get('currency').value, this.serviceGroup.get('startAmount').value, this.serviceGroup.get('endAmount').value).pipe(
         switchMap(services => {
           if (services && services.length > 0){
             let observables = services.map(service => {

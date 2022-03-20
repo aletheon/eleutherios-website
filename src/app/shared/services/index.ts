@@ -38,6 +38,8 @@ export * from './service.service';
 export * from './anonymous.forum.service';
 export * from './anonymous.service.service';
 
+export * from './search.service';
+
 export * from './tag.service';
 export * from './site.total.service';
 export * from './message.sharing.service';
