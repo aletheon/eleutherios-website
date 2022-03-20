@@ -49,8 +49,7 @@ export class ServiceService {
     let data = {
       userId: userId,
       type: 'service',
-      numberOfItems: numberOfItems,
-      key: key,
+      key: key ? key : '',
       tags: tags,
       includeTagsInSearch: includeTagsInSearch,
       filterTitle: filterTitle,
@@ -538,8 +537,7 @@ export class ServiceService {
     let data = {
       userId: userId,
       type: 'service',
-      numberOfItems: numberOfItems,
-      key: key,
+      key: key ? key : '',
       tags: tags,
       includeTagsInSearch: includeTagsInSearch,
       filterTitle: filterTitle,
@@ -788,12 +786,16 @@ export class ServiceService {
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
+    if (typeof searchTerm === "string")
+      newSearchTerm = searchTerm;
+    else if (searchTerm != null)
+      newSearchTerm = searchTerm.title;
+
     // record search
     let data = {
       userId: userId,
       type: 'service',
-      numberOfItems: 0,
-      key: searchTerm,
+      key: newSearchTerm,
       tags: tags,
       includeTagsInSearch: includeTagsInSearch,
       filterTitle: filterTitle,
@@ -814,11 +816,6 @@ export class ServiceService {
       }
       else collectionName = 'servicesnotags';
     }
-
-    if (typeof searchTerm === "string")
-      newSearchTerm = searchTerm;
-    else if (searchTerm != null)
-      newSearchTerm = searchTerm.title;
 
     if (paymentType){
       if (paymentType == 'Payment'){
@@ -935,12 +932,16 @@ export class ServiceService {
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
+    if (typeof searchTerm === "string")
+      newSearchTerm = searchTerm;
+    else if (searchTerm != null)
+      newSearchTerm = searchTerm.title;
+
     // record search
     let data = {
       userId: userId,
       type: 'service',
-      numberOfItems: 0,
-      key: searchTerm,
+      key: newSearchTerm,
       tags: tags,
       includeTagsInSearch: includeTagsInSearch,
       filterTitle: filterTitle,
@@ -961,11 +962,6 @@ export class ServiceService {
       }
       else collectionName = 'servicesnotags';
     }
-
-    if (typeof searchTerm === "string")
-      newSearchTerm = searchTerm;
-    else if (searchTerm != null)
-      newSearchTerm = searchTerm.title;
 
     if (paymentType){
       if (paymentType == 'Payment'){
