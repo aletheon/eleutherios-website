@@ -142,7 +142,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
       if (!key)
         key = this.searchForumCtrl.value;
 
-      this._subscription = this.forumService.getForumsSearchTerm(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+      this._subscription = this.forumService.getForumsSearchTerm(this.auth.uid, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {
@@ -215,7 +215,7 @@ export class ForumListComponent implements OnInit, OnDestroy {
       });
     }
     else {
-      this._subscription = this.forumService.getAllForums(this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
+      this._subscription = this.forumService.getAllForums(this.auth.uid, this.numberOfItems, key, this._tempSearchTags, this.includeTagsInSearch, true).pipe(
         switchMap(forums => {
           if (forums && forums.length > 0){
             let observables = forums.map(forum => {

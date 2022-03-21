@@ -1591,7 +1591,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
               // searchForum mat subscription
               that.matAutoCompleteSearchForums = that.searchForumCtrl.valueChanges.pipe(
                 startWith(''),
-                switchMap(searchTerm => that.forumService.search(searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
+                switchMap(searchTerm => that.forumService.search(that.auth.uid, searchTerm, that._tempSearchTags, null, that.serviceGroup.get('searchForumIncludeTagsInSearch').value, true))
               );
 
               // searchForum other subscriptions
@@ -1944,7 +1944,7 @@ export class UserServiceNewComponent implements OnInit, OnDestroy, AfterViewInit
       this.matAutoCompleteSearchForums = this.searchForumCtrl.valueChanges.pipe(
         startWith(''),
         switchMap(searchTerm =>
-          this.forumService.search(searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
+          this.forumService.search(this.auth.uid, searchTerm, this._tempSearchTags, null, this.serviceGroup.get('searchForumIncludeTagsInSearch').value, true)
         )
       );
 

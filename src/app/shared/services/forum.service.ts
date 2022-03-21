@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { SearchService } from './search.service';
 
+import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ForumService {
   constructor(private afs: AngularFirestore,
-    private db: AngularFireDatabase) { }
+    private db: AngularFireDatabase,
+    private searchService: SearchService) { }
 
   public exists (forumId: string): Promise<boolean>{
     return new Promise<boolean>((resolve, reject) => {
@@ -40,9 +43,21 @@ export class ForumService {
     return this.afs.collection('forums').doc(forumId).valueChanges();
   }
 
-  public getForumsSearchTerm (numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public getForumsSearchTerm (userId: string, numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
     let collectionName: string = 'forums';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'forum',
+      key: key ? key : '',
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -148,9 +163,21 @@ export class ForumService {
     }
   }
 
-  public getAllForums (numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public getAllForums (userId: string, numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
     let collectionName: string = 'forums';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'forum',
+      key: key ? key : '',
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -202,10 +229,27 @@ export class ForumService {
     }
   }
 
-  public search (searchTerm: any, tags?: string[], excludeForumId?: string, includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public search (userId: string, searchTerm: any, tags?: string[], excludeForumId?: string, includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
     let collectionName: string = 'forums';
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    if (typeof searchTerm === "string")
+      newSearchTerm = searchTerm;
+    else if (searchTerm != null)
+      newSearchTerm = searchTerm.title;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'forum',
+      key: newSearchTerm,
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -216,11 +260,6 @@ export class ForumService {
       }
       else collectionName = 'forumsnotags';
     }
-
-    if (typeof searchTerm === "string")
-      newSearchTerm = searchTerm;
-    else if (searchTerm != null)
-      newSearchTerm = searchTerm.title;
 
     let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(newSearchTerm.toLowerCase()).endAt(newSearchTerm.toLowerCase()+"\uf8ff"));
     let tempObservable = tempCollection.valueChanges().pipe(
@@ -255,10 +294,22 @@ export class ForumService {
     return tempObservable;
   }
 
-  public tagSearch (searchTerm: any, tags: string[], excludeForumId?: string, includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
+  public tagSearch (userId: string, searchTerm: any, tags: string[], excludeForumId?: string, includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]>{
     let collectionName: string = 'forums';
     let newSearchTerm: string = '';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
+
+    // record search
+    let data = {
+      userId: userId,
+      type: 'forum',
+      key: newSearchTerm,
+      tags: tags,
+      includeTagsInSearch: includeTagsInSearch,
+      filterTitle: filterTitle,
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -269,11 +320,6 @@ export class ForumService {
       }
       else collectionName = 'forumsnotags';
     }
-
-    if (typeof searchTerm === "string")
-      newSearchTerm = searchTerm;
-    else if (searchTerm != null)
-      newSearchTerm = searchTerm.title;
 
     let tempCollection = this.afs.collection<any>(collectionName, ref => ref.orderBy('title_lowercase').startAt(newSearchTerm.toLowerCase()).endAt(newSearchTerm.toLowerCase()+"\uf8ff"));
     let tempObservable = tempCollection.valueChanges().pipe(
