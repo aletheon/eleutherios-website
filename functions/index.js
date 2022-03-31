@@ -6725,33 +6725,6 @@ exports.createUserForumBreadcrumb = functions.firestore.document("users/{userId}
   var breadcrumb = snap.data();
   var userId = context.params.userId;
   var parentForumId = context.params.parentForumId;
-  var forumId = context.params.forumId;
-  var forum = null;
-
-  var getForum = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`users/${userId}/forums`).doc(parentForumId).get().then(doc => {
-        if (doc.exists)
-          forum = doc.data();
-
-        resolve();
-      }).catch(error => {
-        reject(error);
-      });
-    });
-  };
-
-  var createPublicBreadcrumb = function () {
-    return new Promise((resolve, reject) => {
-      var breadcrumbRef = admin.firestore().collection(`forums/${parentForumId}/breadcrumbs`).doc(forumId);
-      breadcrumbRef.set(breadcrumb).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
 
   // create a reference in this forums breadcrumb references table to the parent forum that it is pointing to
   var createBreadcrumbReference = function () {
@@ -6769,31 +6742,8 @@ exports.createUserForumBreadcrumb = functions.firestore.document("users/{userId}
     });
   };
 
-  return getForum().then(() => {
-    if (forum){
-      if (forum.type == 'Public'){
-        return createPublicBreadcrumb().then(() => {
-          return createBreadcrumbReference().then(() => {
-            return Promise.resolve();
-          })
-          .catch(error => {
-            return Promise.reject(error);
-          });
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      }
-      else {
-        return createBreadcrumbReference().then(() => {
-          return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      }
-    }
-    else return Promise.reject(`Forum with forumId ${parentForumId} was not found`);
+  return createBreadcrumbReference().then(() => {
+    return Promise.resolve();
   })
   .catch(error => {
     return Promise.reject(error);
@@ -6808,26 +6758,6 @@ exports.deleteUserForumBreadcrumb = functions.firestore.document("users/{userId}
   var userId = context.params.userId;
   var parentForumId = context.params.parentForumId;
   var forumId = context.params.forumId;
-
-  // delete public breadcrumb, to clean up system
-  var deletePublicBreadcrumb = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection(`forums/${parentForumId}/breadcrumbs`).doc(forumId).get().then(doc => {
-        if (doc.exists){
-          doc.ref.delete().then(() => {
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          });
-        }
-        else resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  };
 
   var deleteBreadcrumbReference = function () {
     return new Promise((resolve, reject) => {
@@ -6848,13 +6778,8 @@ exports.deleteUserForumBreadcrumb = functions.firestore.document("users/{userId}
     });
   };
 
-  return deletePublicBreadcrumb().then(() => {
-    return deleteBreadcrumbReference().then(() => {
-      return Promise.resolve();
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
+  return deleteBreadcrumbReference().then(() => {
+    return Promise.resolve();
   })
   .catch(error => {
     return Promise.reject(error);
