@@ -8873,7 +8873,7 @@ exports.createUserForumForum = functions.firestore.document("users/{userId}/foru
                 return getCrumb(userIdToRecurse, forumIdToRecurse).then(predicate);
               }
 
-              // call the recursive function
+              // Start our recursive function
               getBreadcrumb(userIdCrumb, forumId).then(result => {
                 resolve(breadcrumbs.reverse());
               })
