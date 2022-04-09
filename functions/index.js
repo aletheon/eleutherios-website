@@ -6726,12 +6726,15 @@ exports.createUserForumBreadcrumb = functions.firestore.document("users/{userId}
   var userId = context.params.userId;
   var parentForumId = context.params.parentForumId;
 
-  // create a reference in this forums breadcrumb references table to the parent forum that it is pointing to
+  // Create a reference in this forums breadcrumb references table to the parent forum that it is pointing to
+  // So that if the parent gets deleted, we know we have to rebuild the breadcrumbs
+
   var createBreadcrumbReference = function () {
     return new Promise((resolve, reject) => {
       var breadcrumbReferenceRef = admin.firestore().collection(`users/${breadcrumb.uid}/forums/${breadcrumb.forumId}/breadcrumbreferences`).doc(parentForumId);
       breadcrumbReferenceRef.set({
         forumId: parentForumId,
+        uid: userId,
         creationDate: FieldValue.serverTimestamp()
       }).then(() => {
         resolve();
