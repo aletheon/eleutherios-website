@@ -7,6 +7,6 @@ export interface AnonymousForum {
   description: string, // description of the forum
   website: string, // website of the forum
   indexed: boolean, // [true or false] indicates whether this forum is publicly available
-  lastUpdateDate: object, 
-  creationDate: object 
+  lastUpdateDate: object,
+  creationDate: object
 }

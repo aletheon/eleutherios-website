@@ -13,23 +13,25 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const session = require("express-session");
-const { startsWith } = require('lodash');
 const FirestoreStore = require('firestore-store')(session);
 const spawn = require('child-process-promise').spawn;
-const app = express();
+const app = express(); // Used for Stripe calls
 const gcs = new Storage();
 const info = functions.config().info;
 const settings = { timestampsInSnapshots: true };
 admin.firestore().settings(settings);
-const stripe = require("stripe")(functions.config().stripe.secret); // initialize stripe
+
+// initialize stripe for onboarding end users
+// See: https://stripe.com/docs/connect/standard-accounts
+const stripe = require("stripe")(functions.config().stripe.secret);
 const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 const connectedEndpointSecret = functions.config().keys.connectedsigning;
 
-// Automatically allow cross-origin requests
+// Allow cross-origin requests for onboarding end users
 app.use(cors({ origin: true }));
 
-// initialize session
+// initialize session to remember accountId and returnUrl for onboarding end users
 app.use(
   session({
     store: new FirestoreStore({
@@ -42,21 +44,22 @@ app.use(
   })
 );
 
-// onboard-user
+// send back the account link url to enable the web client to start the onboarding process
+// See: https://stripe.com/docs/api/account_links/object
 app.post("/onboard-user", async (req, res) => {
   try {
     const account = await stripe.accounts.create({ type: "standard" });
 
-    console.log('in onboarding user account before ' + JSON.stringify(account));
+    // console.log('in onboarding user account before ' + JSON.stringify(account));
 
     req.session.accountId = account.id;
     req.session.returnUrl = req.body.returnUrl;
 
     const accountAfter = await stripe.accounts.retrieve(account.id);
 
-    console.log('in onboarding user account after ' + JSON.stringify(accountAfter));
+    // console.log('in onboarding user account after ' + JSON.stringify(accountAfter));
 
-    let requestedUid = req.body.uid;     // resource the user is requsting to modify
+    let requestedUid = req.body.uid;     // resource the user is requesting to modify
     let authToken = validateHeader(req); // current user encrypted
 
     if (!authToken) {
@@ -80,9 +83,14 @@ app.post("/onboard-user", async (req, res) => {
   }
 });
 
-// onboard-user/refresh
+// The URL the user will be redirected to if the account link is expired, has been previously-visited,
+// or is otherwise invalid. The URL you specify should attempt to generate a new account link with the
+// same parameters used to create the original account link, then redirect the user to the new account link’s
+// URL so they can continue with Connect Onboarding. If a new account link cannot be generated or the redirect
+// fails you should display a useful error to the user.
+// See: https://stripe.com/docs/api/account_links/object
 app.get("/onboard-user/refresh", async (req, res) => {
-  console.log('in onboarding user refresh');
+  // console.log('in onboarding user refresh');
 
   if (!req.session.accountId) {
     res.redirect("/");
@@ -100,6 +108,7 @@ app.get("/onboard-user/refresh", async (req, res) => {
 });
 
 // generateAccountLink
+// See: https://stripe.com/docs/api/account_links/object
 function generateAccountLink(accountId, origin, returnUrl) {
   return stripe.accountLinks
     .create({
@@ -114,7 +123,7 @@ function generateAccountLink(accountId, origin, returnUrl) {
 // Helper to validate auth header is present
 function validateHeader(req) {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-    console.log('auth header found')
+    // console.log('auth header found')
     return req.headers.authorization.split('Bearer ')[1]
   }
 };
@@ -131,6 +140,8 @@ function decodeAuthToken(authToken) {
 };
 
 // export app as stripe API
+// we have attached all of our routines to the app
+// export it and make them publicly available
 exports.stripe = functions.https.onRequest(app);
 
 // listen to stripe webhook events test
@@ -144,7 +155,7 @@ exports.stripeEventsTest = functions.https.onRequest(async (req, res) => {
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     const eventDB = await admin.database().ref("events").push(event); // Add the event to the database
 
-    console.log('event ' + JSON.stringify(event));
+    // console.log('event ' + JSON.stringify(event));
 
     // switch (event.type) {
     //   case 'payment_intent.created':
@@ -261,12 +272,12 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
     // See https://stripe.com/docs/webhooks/signatures for more information.
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
 
-    console.log('event ' + JSON.stringify(event));
+    // console.log('event ' + JSON.stringify(event));
 
     const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
     if (event.type == 'account.application.authorized'){
-      console.log('account.application.authorized');
+      // console.log('account.application.authorized');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
@@ -279,7 +290,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else if (event.type == 'account.application.deauthorized'){
-      console.log('account.application.deauthorized');
+      // console.log('account.application.deauthorized');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
@@ -291,7 +302,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else if (event.type == 'account.updated'){
-      console.log('account.updated');
+      // console.log('account.updated');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
@@ -304,7 +315,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.created'){
-      console.log('payment_intent.created');
+      // console.log('payment_intent.created');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata;
@@ -340,7 +351,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.succeeded'){
-      console.log('payment_intent.succeeded');
+      // console.log('payment_intent.succeeded');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
@@ -370,7 +381,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
-      console.log('payment_intent.payment_failed');
+      // console.log('payment_intent.payment_failed');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
@@ -392,7 +403,7 @@ exports.stripeConnectedEventsTest = functions.https.onRequest(async (req, res) =
       return res.json({ received: true });
     }
     else {
-      console.log('Unknown event.type ' + event.type);
+      // console.log('Unknown event.type ' + event.type);
       return res.json({ received: true });
     }
   } catch (error) {
@@ -411,7 +422,7 @@ exports.stripeEvents = functions.https.onRequest(async (req, res) => {
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, endpointSecret); // Validate the request
     const eventDB = await admin.database().ref("events").push(event); // Add the event to the database
 
-    console.log('event ' + JSON.stringify(event));
+    // console.log('event ' + JSON.stringify(event));
 
     // switch (event.type) {
     //   case 'payment_intent.created':
@@ -528,7 +539,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
     // See https://stripe.com/docs/webhooks/signatures for more information.
     event = stripeWebhook.webhooks.constructEvent(req.rawBody, sig, connectedEndpointSecret);
 
-    console.log('event ' + JSON.stringify(event));
+    // console.log('event ' + JSON.stringify(event));
 
     const connectedEventDB = await admin.database().ref("connectedevents").push(event); // Add the event to the database
 
@@ -546,7 +557,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'account.application.deauthorized'){
-      console.log('account.application.deauthorized');
+      // console.log('account.application.deauthorized');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
@@ -558,7 +569,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'account.updated'){
-      console.log('account.updated');
+      // console.log('account.updated');
 
       var snapshot = await admin.firestore().collection('users').where('stripeAccountId', '==', event.account).limit(1).get();
 
@@ -571,7 +582,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.created'){
-      console.log('payment_intent.created');
+      // console.log('payment_intent.created');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
@@ -607,7 +618,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.succeeded'){
-      console.log('payment_intent.succeeded');
+      // console.log('payment_intent.succeeded');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
@@ -637,7 +648,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else if (event.type == 'payment_intent.payment_failed'){
-      console.log('payment_intent.payment_failed');
+      // console.log('payment_intent.payment_failed');
 
       var paymentIntent = event.data.object;
       var metadata = paymentIntent.metadata; // { userId: userId, paymentId: paymentId }
@@ -659,7 +670,7 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
       return res.json({ received: true });
     }
     else {
-      console.log('Unknown event.type ' + event.type);
+      // console.log('Unknown event.type ' + event.type);
       return res.json({ received: true });
     }
   } catch (error) {
@@ -667,7 +678,10 @@ exports.stripeConnectedEvents = functions.https.onRequest(async (req, res) => {
   }
 });
 
-// create stripe payment intents
+// create and return a stripe payment intent
+// https://stripe.com/docs/payments/payment-intents
+// charge on behalf of connected account
+// https://stripe.com/docs/payments/connected-accounts
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   const userId = context.auth.uid;
   const sellerUid = data.sellerUid;
@@ -688,13 +702,13 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
     const buyerServiceSnapshot = await admin.firestore().collection(`users/${buyerUid}/services`).doc(buyerServiceId).get();
     const buyerService = buyerServiceSnapshot.data();
 
-    console.log('buyerService ' + JSON.stringify(buyerService));
+    // console.log('buyerService ' + JSON.stringify(buyerService));
 
     // get seller service
     const sellerServiceSnapshot = await admin.firestore().collection(`users/${sellerUid}/services`).doc(sellerServiceId).get();
     const sellerService = sellerServiceSnapshot.data();
 
-    console.log('sellerService ' + JSON.stringify(sellerService));
+    // console.log('sellerService ' + JSON.stringify(sellerService));
 
     const newPayment = {
       paymentId: uuid.v4().replace(/-/g, ''),
@@ -743,24 +757,6 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
     const paymentUpdate = await paymentRef.update({ paymentIntentId: paymentIntent.id });
     return Promise.resolve(paymentIntent);
-  }
-  catch (error) {
-    return Promise.reject(error);
-  }
-});
-
-// create stripe payment intents
-exports.updatePaymentIntent = functions.https.onCall(async (data, context) => {
-  const userId = context.auth.uid;
-  const paymentIntentId = data.paymentIntentId;
-  const customerId = data.customerId;
-
-  try {
-    const paymentIntent = await stripe.paymentIntents.update(
-      paymentIntentId,
-      { customer: customerId }
-    );
-    return Promise.resolve();
   }
   catch (error) {
     return Promise.reject(error);
