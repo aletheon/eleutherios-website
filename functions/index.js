@@ -767,6 +767,9 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
 // ********************************************************************************
 // onFileChange - image upload routine
+// This event is called after the upload event from the client storage API
+// let storageRef = firebase.storage().ref();
+// let uploadTask = storageRef.child(storageFilePath).put(upload.file);
 // ********************************************************************************
 exports.onFileChange = functions.storage.object().onFinalize(object => {
   const bucket = object.bucket;
