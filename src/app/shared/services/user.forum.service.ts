@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { SearchService } from './search.service';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
@@ -10,8 +9,7 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class UserForumService {
   constructor(private afs: AngularFirestore,
-    private db: AngularFireDatabase,
-    private searchService: SearchService) { }
+    private db: AngularFireDatabase) { }
 
   public exists (parentUserId: string, forumId: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
@@ -115,18 +113,6 @@ export class UserForumService {
   public getForumsSearchTerm (parentUserId: string, numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean): Observable<any[]> {
     let collectionName: string = `users/${parentUserId}/forums`;
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
-
-    // record search
-    let data = {
-      userId: parentUserId,
-      type: 'user.forum',
-      key: key ? key : '',
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -236,18 +222,6 @@ export class UserForumService {
     let collectionName: string = `users/${parentUserId}/forums`;
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
-    // record search
-    let data = {
-      userId: parentUserId,
-      type: 'user.forum',
-      key: key ? key : '',
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
-
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
         if (tags && tags.length > 0){
@@ -307,18 +281,6 @@ export class UserForumService {
       newSearchTerm = searchTerm;
     else if (searchTerm != null)
       newSearchTerm = searchTerm.title;
-
-    // record search
-    let data = {
-      userId: parentUserId,
-      type: 'user.forum',
-      key: newSearchTerm,
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -380,18 +342,6 @@ export class UserForumService {
       newSearchTerm = searchTerm;
     else if (searchTerm != null)
       newSearchTerm = searchTerm.title;
-
-    // record search
-    let data = {
-      userId: parentUserId,
-      type: 'user.forum',
-      key: newSearchTerm,
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){

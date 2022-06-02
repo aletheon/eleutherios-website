@@ -65,8 +65,7 @@ import 'hammerjs';
 
 import {
   NotificationSnackBar,
-  SiteTotalService,
-  SearchService
+  SiteTotalService
 } from './shared/';
 
 import { HeaderComponent } from './layout/header.component';
@@ -125,7 +124,7 @@ import { UserActivityClosedComponent } from './user/activity/user.activity.close
     FacebookModule.forRoot(),
     NgxStripeModule.forRoot(environment.stripeTestKey)
   ],
-  providers: [AuthGuard, IsLoggedIn, SiteTotalService, SearchService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
+  providers: [AuthGuard, IsLoggedIn, SiteTotalService, { provide: 'googleTagManagerId', useValue: environment.googleTagManagerId } ],
   bootstrap: [AppComponent],
   entryComponents: [NotificationSnackBar, UserActivityOpenComponent, UserActivityClosedComponent]
 })

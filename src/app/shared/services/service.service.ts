@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { SearchService } from './search.service';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
@@ -8,8 +7,7 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ServiceService {
-  constructor(private afs: AngularFirestore,
-    private searchService: SearchService) { }
+  constructor(private afs: AngularFirestore) { }
 
   public exists (serviceId: string): Promise<boolean>{
     return new Promise<boolean>((resolve, reject) => {
@@ -44,22 +42,6 @@ export class ServiceService {
   public getServicesSearchTerm (userId: string, numberOfItems: number, key?: string, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
-
-    // record search
-    let data = {
-      userId: userId,
-      type: 'service',
-      key: key ? key : '',
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      paymentType: paymentType,
-      currency: currency,
-      startAmount: startAmount,
-      endAmount: endAmount,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
@@ -533,22 +515,6 @@ export class ServiceService {
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
-    // record search
-    let data = {
-      userId: userId,
-      type: 'service',
-      key: key ? key : '',
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      paymentType: paymentType,
-      currency: currency,
-      startAmount: startAmount,
-      endAmount: endAmount,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
-
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
         if (tags && tags.length > 0){
@@ -791,22 +757,6 @@ export class ServiceService {
     else if (searchTerm != null)
       newSearchTerm = searchTerm.title;
 
-    // record search
-    let data = {
-      userId: userId,
-      type: 'service',
-      key: newSearchTerm,
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      paymentType: paymentType,
-      currency: currency,
-      startAmount: startAmount,
-      endAmount: endAmount,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
-
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
         if (tags && tags.length > 0){
@@ -936,22 +886,6 @@ export class ServiceService {
       newSearchTerm = searchTerm;
     else if (searchTerm != null)
       newSearchTerm = searchTerm.title;
-
-    // record search
-    let data = {
-      userId: userId,
-      type: 'service',
-      key: newSearchTerm,
-      tags: tags,
-      includeTagsInSearch: includeTagsInSearch,
-      filterTitle: filterTitle,
-      paymentType: paymentType,
-      currency: currency,
-      startAmount: startAmount,
-      endAmount: endAmount,
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    this.searchService.create(data);
 
     if (includeTagsInSearch !== undefined){
       if (includeTagsInSearch == true){
