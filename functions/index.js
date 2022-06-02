@@ -2252,6 +2252,15 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
+  // CERT (Community, Engagement, Retention, Trust) Ranking System
+  // Put public services into CERT collections
+  // Cert 1 - Everybody starts out as this.
+  // Cert 2 - Making some sales, delegating requests.
+  // Cert 3 -
+  // Cert 4 -
+  // Cert 5 -
+  // admin.firestore().collection(`cert${user.certification}/servicescollection/${collectionTitle}/services`).doc(serviceId).get()
+
   var createOrUpdatePublicService = function (tags) {
     return new Promise((resolve, reject) => {
       var createPublicServiceCollectionTitles = function (tags) {
@@ -5523,6 +5532,44 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
   var userId = context.params.userId;
   var forumId = context.params.forumId;
 
+  var updateParentForum = function () {
+    return new Promise((resolve, reject) => {
+      if ((newValue.parentId && newValue.parentId.length > 0) && (newValue.parentUid && newValue.parentUid.length > 0)){
+        admin.firestore().collection(`users/${newValue.parentUid}/forums/${newValue.parentId}/forums`).doc(forumId).get().then(doc => {
+          if (doc.exists){
+            doc.ref.update({
+              forumId: newValue.forumId,
+              parentId: newValue.parentId,
+              parentUid: newValue.parentUid,
+              uid: newValue.uid,
+              type: newValue.type,
+              title: newValue.title,
+              title_lowercase: newValue.title_lowercase,
+              description: newValue.description,
+              website: newValue.website,
+              indexed: newValue.indexed,
+              includeDescriptionInDetailPage: newValue.includeDescriptionInDetailPage,
+              includeImagesInDetailPage: newValue.includeImagesInDetailPage,
+              includeTagsInDetailPage: newValue.includeTagsInDetailPage,
+              lastUpdateDate: newValue.lastUpdateDate,
+              creationDate: newValue.creationDate
+            }).then(() => {
+              resolve();
+            })
+            .catch(error => {
+              reject(error);
+            });
+          }
+          else resolve();
+        })
+        .catch(error => {
+          reject(error);
+        });
+      }
+      else resolve();
+    });
+  };
+
   var updateUsersActivityForums = function () {
     return new Promise((resolve, reject) => {
       admin.firestore().collection(`users/${userId}/forums/${forumId}/registrants`)
@@ -5573,44 +5620,6 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
           else resolve();
         }
       );
-    });
-  };
-
-  var updateParentForum = function () {
-    return new Promise((resolve, reject) => {
-      if ((newValue.parentId && newValue.parentId.length > 0) && (newValue.parentUid && newValue.parentUid.length > 0)){
-        admin.firestore().collection(`users/${newValue.parentUid}/forums/${newValue.parentId}/forums`).doc(forumId).get().then(doc => {
-          if (doc.exists){
-            doc.ref.update({
-              forumId: newValue.forumId,
-              parentId: newValue.parentId,
-              parentUid: newValue.parentUid,
-              uid: newValue.uid,
-              type: newValue.type,
-              title: newValue.title,
-              title_lowercase: newValue.title_lowercase,
-              description: newValue.description,
-              website: newValue.website,
-              indexed: newValue.indexed,
-              includeDescriptionInDetailPage: newValue.includeDescriptionInDetailPage,
-              includeImagesInDetailPage: newValue.includeImagesInDetailPage,
-              includeTagsInDetailPage: newValue.includeTagsInDetailPage,
-              lastUpdateDate: newValue.lastUpdateDate,
-              creationDate: newValue.creationDate
-            }).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-      else resolve();
     });
   };
 

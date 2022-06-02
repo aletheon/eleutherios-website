@@ -12,10 +12,10 @@ export interface Activity {
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
   includeTagsInDetailPage: boolean,
-  forumLastUpdateDate: object, 
-  forumCreationDate: object 
-  receivePosts: boolean, 
-  highlightPost: boolean, 
-  lastUpdateDate: object, 
-  creationDate: object 
+  forumLastUpdateDate: object,
+  forumCreationDate: object
+  receivePosts: boolean,
+  highlightPost: boolean,
+  lastUpdateDate: object,
+  creationDate: object
 }
