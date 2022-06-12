@@ -2253,12 +2253,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
   };
 
   // CERT (Community, Engagement, Retention, Trust) Ranking System
-  // Put public services into CERT collections
-  // Cert 1 - Everybody starts out as this.
-  // Cert 2 - Making some sales, delegating requests.
-  // Cert 3 -
-  // Cert 4 -
-  // Cert 5 -
+  // Put public services into CERT collections 1,2,3,4,5
   // admin.firestore().collection(`cert${user.certification}/servicescollection/${collectionTitle}/services`).doc(serviceId).get()
 
   var createOrUpdatePublicService = function (tags) {
