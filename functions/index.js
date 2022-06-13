@@ -2255,6 +2255,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
   // CERT (Community, Engagement, Retention, Trust) Ranking System
   // Put public services into CERT collections 1,2,3,4,5
   // admin.firestore().collection(`cert${user.certification}/servicescollection/${collectionTitle}/services`).doc(serviceId).get()
+  // don't put anonymous into CERT collections
 
   var createOrUpdatePublicService = function (tags) {
     return new Promise((resolve, reject) => {
