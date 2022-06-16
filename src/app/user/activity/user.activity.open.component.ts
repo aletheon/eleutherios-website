@@ -21,7 +21,7 @@ import {
 } from '../../shared';
 
 import { Observable, Subscription, of, combineLatest, zip, from } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import * as _ from "lodash";
 
@@ -77,41 +77,6 @@ export class UserActivityOpenComponent implements OnInit, OnDestroy {
 
   changeReceivePosts (activity) {
     this.userActivityService.update(this.auth.uid, activity.forumId, { receivePosts: !activity.receivePosts } );
-  }
-
-  changeType (activity) {
-    this.userForumService.getForumFromPromise(activity.uid, activity.forumId)
-      .then(fetchedForum => {
-        if (fetchedForum){
-          if (fetchedForum.type == 'Public')
-            fetchedForum.type = 'Private';
-          else
-            fetchedForum.type = 'Public';
-
-          this.userForumService.update(fetchedForum.uid, fetchedForum.forumId, fetchedForum);
-        }
-        else {
-          const snackBarRef = this.snackbar.openFromComponent(
-            NotificationSnackBar,
-            {
-              duration: 8000,
-              data: `Forum with forumId ${activity.forumId} does not exist or was removed`,
-              panelClass: ['red-snackbar']
-            }
-          );
-        }
-      }
-    )
-    .catch(error => {
-      const snackBarRef = this.snackbar.openFromComponent(
-        NotificationSnackBar,
-        {
-          duration: 8000,
-          data: error.message,
-          panelClass: ['red-snackbar']
-        }
-      );
-    });
   }
 
   blockForum (event, forum) {
