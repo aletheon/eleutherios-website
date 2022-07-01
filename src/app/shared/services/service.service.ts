@@ -512,6 +512,8 @@ export class ServiceService {
   }
 
   public getAllServices (userId: string, numberOfItems: number, key?: any, tags?: string[], includeTagsInSearch?: boolean, filterTitle?: boolean, paymentType?: string, currency?: string, startAmount?: number, endAmount?: number): Observable<any[]> {
+    //console.log('in tag search');
+
     let collectionName: string = 'services';
     let tempFilterTitle: boolean = (filterTitle && filterTitle == true) ? true : false;
 
@@ -524,6 +526,8 @@ export class ServiceService {
       }
       else collectionName = 'servicesnotags';
     }
+
+    //console.log('collectionName ' + collectionName);
 
     if (!key){
       if (paymentType){
